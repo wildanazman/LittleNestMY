@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LittleNest MY - Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#121416",
+                    "surface-container-high": "#282a2c",
+                    "inverse-surface": "#e2e2e5",
+                    "on-secondary-fixed-variant": "#254f3a",
+                    "tertiary": "#deebff",
+                    "tertiary-fixed": "#d2e4ff",
+                    "secondary-fixed": "#bfedd1",
+                    "primary": "#ffe4d9",
+                    "on-background": "#e2e2e5",
+                    "on-primary": "#4d2613",
+                    "inverse-on-surface": "#2f3133",
+                    "surface-container-low": "#1a1c1e",
+                    "on-secondary-container": "#93bfa5",
+                    "secondary": "#a4d1b6",
+                    "on-tertiary-fixed-variant": "#28496c",
+                    "error-container": "#93000a",
+                    "surface-variant": "#333537",
+                    "surface-bright": "#37393b",
+                    "outline-variant": "#51443e",
+                    "on-secondary": "#0c3825",
+                    "outline": "#9e8d86",
+                    "surface-container": "#1e2022",
+                    "on-primary-fixed-variant": "#673c27",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#f7b89d",
+                    "on-secondary-fixed": "#002113",
+                    "on-tertiary-fixed": "#001c37",
+                    "surface-dim": "#121416",
+                    "primary-fixed": "#ffdbcc",
+                    "inverse-primary": "#83533c",
+                    "primary-container": "#ffbfa3",
+                    "background": "#121416",
+                    "on-surface": "#e2e2e5",
+                    "on-tertiary": "#0c3254",
+                    "on-primary-container": "#7a4b36",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#331203",
+                    "secondary-container": "#254f3a",
+                    "secondary-fixed-dim": "#a4d1b6",
+                    "surface-tint": "#f7b89d",
+                    "on-surface-variant": "#d6c2bb",
+                    "on-tertiary-container": "#39597e",
+                    "surface-container-highest": "#333537",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#b0d0fb",
+                    "tertiary-fixed-dim": "#a9c9f3",
+                    "surface-container-lowest": "#0c0e10"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1200px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "label-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(40, 42, 44, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(255, 228, 217, 0.1);
+        }
+        body {
+            background-color: #121416;
+            color: #e2e2e5;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl dark:bg-surface/80 flex justify-between items-center px-margin-mobile h-16 border-b border-white/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-primary/20">
+<img alt="Baby profile photo" class="w-full h-full object-cover" data-alt="A close-up, high-quality portrait of a sleeping newborn baby wrapped in a soft, cream-colored wool blanket. The lighting is low and warm, casting gentle shadows that emphasize the calm, nocturnal atmosphere of the Midnight Nest design system. The background is a soft, dark charcoal, creating a cocoon-like environment that feels safe and nurturing." src="https://lh3.googleusercontent.com/aida/AP1WRLvpBGIfvyZPTyNGA2ITEssYsiMu4KUa5BmekGxTDXsc2P1Ce5JMxuxgI8ecLKMjtPM8sWWn-PKO3enTkNC2iI_V3goxUG3FvngGNeW79mzTiv26bhjhupDdCOt85g54LKsmF4mtCORBcPqwXOi0y6O5paPUuW7T8ErKdk1gIiBoCjVIOp4cpF3dPvnAwi6ej7EICMcJ0It4pes4KAJTiu7yOQmHhE0li1Fc877vryTaHKqSHxyMJKAOIbw"/>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">LittleNest MY</span>
+</div>
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+            settings
+        </button>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-container-max mx-auto space-y-8">
+<!-- Greeting Section -->
+<section class="space-y-1">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Good evening, Wildan</h1>
+<p class="text-on-surface-variant font-body-md opacity-80">The nursery is quiet. Aisyah is resting comfortably.</p>
+</section>
+<!-- Baby Profile Card & Quick Actions Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Baby Profile -->
+<div class="col-span-1 md:col-span-2 glass-card rounded-xl p-6 flex flex-col justify-between min-h-[180px] relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="font-headline-md text-headline-md text-primary">Aisyah</h2>
+<p class="font-body-md text-on-surface-variant">3 months 12 days</p>
+</div>
+<div class="flex items-center gap-4 mt-6 z-10">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-secondary">child_care</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-tertiary">bedtime</span>
+</div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">All systems normal</span>
+</div>
+<!-- Subtle Ambient Background for Card -->
+
+</div>
+<!-- Next Feed Reminder -->
+<div class="col-span-1 bg-on-primary-container/20 border border-on-primary-container/10 rounded-xl p-6 flex flex-col justify-between active-glow">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary-container">notifications_active</span>
+<span class="text-label-sm font-label-sm px-2 py-1 bg-on-primary-container/30 text-primary-container rounded-full uppercase tracking-wider">Upcoming</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-primary-container/80 uppercase">Next Feed</p>
+<p class="font-headline-md text-headline-md text-primary-fixed">10:45 PM</p>
+<p class="text-body-md text-primary-container/60">In 45 minutes</p>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<section class="flex justify-between md:justify-start md:gap-12 items-center">
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-active:scale-90 transition-transform duration-150 border border-white/5">
+<span class="material-symbols-outlined text-tertiary">bedtime</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Sleep</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-active:scale-90 transition-transform duration-150 border border-white/5">
+<span class="material-symbols-outlined text-primary-fixed-dim">restaurant</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Feed</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-active:scale-90 transition-transform duration-150 border border-white/5">
+<span class="material-symbols-outlined text-secondary">baby_changing_station</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Diaper</span>
+</button>
+<button class="flex flex-col items-center gap-2 group">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center group-active:scale-90 transition-transform duration-150 border border-white/5">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">More</span>
+</button>
+</section>
+<!-- Status Cards -->
+<section class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<div class="glass-card rounded-xl p-4 space-y-3">
+<div class="flex items-center gap-2 text-tertiary">
+<span class="material-symbols-outlined text-[20px]">bedtime</span>
+<span class="text-label-md font-label-md">Sleep</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">2h 15m</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">Last: 4:30 PM</p>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container w-[65%] blur-[1px]"></div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-4 space-y-3">
+<div class="flex items-center gap-2 text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[20px]">restaurant</span>
+<span class="text-label-md font-label-md">Feed</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">120 ml</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">Last: 7:15 PM</p>
+</div>
+<div class="h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[80%] blur-[1px]"></div>
+</div>
+</div>
+<div class="glass-card rounded-xl p-4 space-y-3 col-span-2 md:col-span-1">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[20px]">baby_changing_station</span>
+<span class="text-label-md font-label-md">Diaper</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">Wet</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">Last: 8:00 PM</p>
+</div>
+<div class="flex gap-1">
+<div class="h-1 flex-1 bg-secondary w-full rounded-full"></div>
+<div class="h-1 flex-1 bg-surface-variant w-full rounded-full"></div>
+<div class="h-1 flex-1 bg-surface-variant w-full rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Timeline / Recent Logs -->
+<section class="space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Recent Activity</h3>
+<button class="text-label-md font-label-md text-primary">View History</button>
+</div>
+<div class="space-y-4 relative before:content-[''] before:absolute before:left-4 before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
+<!-- Timeline Item -->
+<div class="relative pl-12 group">
+<div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-secondary border-2 border-surface z-10"></div>
+<div class="glass-card rounded-xl p-4 hover:border-primary/20 transition-colors cursor-pointer">
+<div class="flex justify-between items-start">
+<p class="font-label-md text-label-md text-on-surface">Diaper Change</p>
+<span class="text-label-sm font-label-sm text-on-surface-variant">8:00 PM</span>
+</div>
+<p class="text-body-md text-on-surface-variant opacity-70 mt-1">Wet diaper, changed successfully.</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-12 group">
+<div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-primary-fixed-dim border-2 border-surface z-10"></div>
+<div class="glass-card rounded-xl p-4 hover:border-primary/20 transition-colors cursor-pointer">
+<div class="flex justify-between items-start">
+<p class="font-label-md text-label-md text-on-surface">Feeding (Bottle)</p>
+<span class="text-label-sm font-label-sm text-on-surface-variant">7:15 PM</span>
+</div>
+<p class="text-body-md text-on-surface-variant opacity-70 mt-1">120ml of expressed milk. Aisyah was calm.</p>
+</div>
+</div>
+<!-- Timeline Item -->
+<div class="relative pl-12 group">
+<div class="absolute left-2.5 top-1.5 w-3 h-3 rounded-full bg-tertiary border-2 border-surface z-10"></div>
+<div class="glass-card rounded-xl p-4 hover:border-primary/20 transition-colors cursor-pointer">
+<div class="flex justify-between items-start">
+<p class="font-label-md text-label-md text-on-surface">Nap Session Ended</p>
+<span class="text-label-sm font-label-sm text-on-surface-variant">6:45 PM</span>
+</div>
+<p class="text-body-md text-on-surface-variant opacity-70 mt-1">Slept for 1h 30m. Woke up happy.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-6 px-4 bg-surface/80 backdrop-blur-xl border-t border-white/5 z-50 rounded-t-xl shadow-lg">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<!-- Floating Action Button - Smart Contextual Add -->
+<div class="fixed bottom-24 right-6 z-40">
+<button class="w-14 h-14 rounded-full bg-primary text-on-primary shadow-2xl flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+</div>
+<script>
+        // Micro-interaction for feedback
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('click', () => {
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(5);
+                }
+            });
+        });
+        
+        // Dynamic time update for 'Next Feed' could be added here
+        // For static mockup purposes, UI reflects the dark nocturnal theme requested.
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

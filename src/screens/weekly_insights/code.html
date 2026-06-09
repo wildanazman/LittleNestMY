@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Weekly Insights - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#efeee9",
+              "surface-container-low": "#f5f3ee",
+              "tertiary-fixed": "#caecc4",
+              "surface-bright": "#fbf9f4",
+              "surface-container-high": "#eae8e3",
+              "on-primary": "#ffffff",
+              "secondary-fixed": "#e9e1d8",
+              "on-background": "#1b1c19",
+              "surface-container-lowest": "#ffffff",
+              "tertiary-container": "#b5d6af",
+              "primary-fixed": "#ffdbcc",
+              "on-primary-fixed-variant": "#673c27",
+              "outline-variant": "#d6c2bb",
+              "primary": "#83533c",
+              "tertiary-fixed-dim": "#aecfa9",
+              "on-tertiary-fixed": "#052108",
+              "primary-container": "#ffbfa3",
+              "outline": "#84746d",
+              "secondary-container": "#e6dfd5",
+              "on-secondary-container": "#67625a",
+              "surface-variant": "#e4e2de",
+              "secondary": "#625e56",
+              "surface": "#fbf9f4",
+              "on-surface": "#1b1c19",
+              "on-surface-variant": "#51443e",
+              "background": "#fbf9f4",
+              "primary-fixed-dim": "#f7b89d",
+              "on-primary-container": "#7a4b36",
+              "on-primary-fixed": "#331203",
+              "on-tertiary-container": "#415e3f",
+              "tertiary": "#486646"
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px"
+            },
+            spacing: {
+              md: "24px",
+              base: "8px",
+              xl: "48px",
+              lg: "32px",
+              xs: "4px",
+              "container-padding": "20px",
+              gutter: "16px",
+              sm: "12px"
+            },
+            fontFamily: {
+              "headline-lg": ["Nunito Sans"],
+              "display-lg": ["Nunito Sans"],
+              "headline-md": ["Nunito Sans"],
+              "label-sm": ["Nunito Sans"],
+              "body-lg": ["Nunito Sans"],
+              "headline-lg-mobile": ["Nunito Sans"],
+              "label-md": ["Nunito Sans"],
+              "body-md": ["Nunito Sans"]
+            },
+            fontSize: {
+              "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+              "display-lg": ["32px", { lineHeight: "40px", fontWeight: "800" }],
+              "headline-md": ["20px", { lineHeight: "28px", fontWeight: "700" }],
+              "label-sm": ["12px", { lineHeight: "16px", fontWeight: "700" }],
+              "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+              "headline-lg-mobile": ["22px", { lineHeight: "28px", fontWeight: "700" }],
+              "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      body {
+        min-height: max(884px, 100dvh);
+        font-family: 'Nunito Sans', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .soft-shadow {
+        box-shadow: 0 4px 20px rgba(255, 191, 163, 0.15);
+      }
+      .chart-container {
+        mask-image: linear-gradient(to right, black 92%, transparent);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<header class="sticky top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-50">
+<div class="flex items-center gap-base min-w-0">
+<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2 active:scale-95" id="backButton" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Weekly Insights</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center ring-2 ring-primary/10">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+</div>
+</header>
+<main class="px-container-padding pt-6 space-y-lg max-w-2xl mx-auto">
+<section class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Gentle weekly view</p>
+<h2 class="font-display-lg text-display-lg text-primary">This Week's Pattern</h2>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-80" id="weekRangeLabel">Loading this week's care rhythm...</p>
+</section>
+<div class="bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Timeframe">
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 bg-white text-primary soft-shadow" type="button">Week</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" type="button">Month</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" type="button">Year</button>
+</div>
+<section class="grid grid-cols-2 gap-gutter">
+<article class="col-span-2 bg-surface-container-lowest p-md rounded-[24px] soft-shadow border border-white/40 space-y-sm">
+<div class="flex justify-between items-start gap-3">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0369A1]">
+<span class="material-symbols-outlined">bedtime</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Average sleep</p>
+<h3 class="font-headline-lg text-headline-lg text-on-surface" id="averageSleepValue">--</h3>
+</div>
+</div>
+<span class="text-primary font-label-md text-label-md" id="sleepDaysValue">-- days</span>
+</div>
+<div class="h-16 w-full chart-container mt-4">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 60">
+<path d="M0 48 Q 45 24, 90 38 T 180 22 T 270 35 T 400 18" fill="none" stroke="#0369A1" stroke-linecap="round" stroke-width="3"></path>
+<path d="M0 48 Q 45 24, 90 38 T 180 22 T 270 35 T 400 18 V 60 H 0 Z" fill="#0369A1" opacity="0.08"></path>
+</svg>
+</div>
+<p class="font-body-md text-label-md text-on-surface-variant" id="sleepNote">Sleep details will appear here.</p>
+</article>
+<article class="bg-surface-container-lowest p-md rounded-[24px] soft-shadow border border-white/40 space-y-xs">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase pt-sm">Total feeding</p>
+<h3 class="font-headline-md text-headline-md text-on-surface"><span id="totalFeedingValue">--</span> <span class="text-label-md font-normal">feeds</span></h3>
+<p class="font-label-md text-label-md text-on-surface-variant" id="feedingAverageValue">-- per day</p>
+</article>
+<article class="bg-surface-container-lowest p-md rounded-[24px] soft-shadow border border-white/40 space-y-xs">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined">baby_changing_station</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase pt-sm">Diaper frequency</p>
+<h3 class="font-headline-md text-headline-md text-on-surface"><span id="diaperFrequencyValue">--</span> <span class="text-label-md font-normal">/ day</span></h3>
+<p class="font-label-md text-label-md text-on-surface-variant" id="diaperTotalValue">-- changes</p>
+</article>
+</section>
+<section class="bg-surface-container-lowest p-md rounded-[24px] soft-shadow border border-white/40 flex items-center gap-md">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">hotel</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Longest sleep</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="longestSleepValue">--</h3>
+<p class="font-body-md text-label-md text-on-surface-variant" id="longestSleepNote">A calm stretch will appear here.</p>
+</div>
+</section>
+<section class="bg-primary-fixed-dim/30 p-md rounded-[24px] flex gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-primary text-6xl">lightbulb</span>
+</div>
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="space-y-xs">
+<h4 class="font-headline-md text-headline-md text-on-primary-fixed">Recent pattern summary</h4>
+<p class="font-body-md text-body-md text-on-primary-fixed-variant leading-relaxed" id="patternSummary">Gathering this week's pattern gently.</p>
+</div>
+</section>
+<section class="bg-surface-container-low p-md rounded-[24px] soft-shadow border border-white/40">
+<div class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-primary mt-1">favorite</span>
+<p class="font-body-md text-body-md text-on-surface-variant">These insights are here to help you notice rhythms, not to grade your parenting. Some weeks are naturally more mixed than others.</p>
+</div>
+</section>
+<div class="h-12"></div>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script type="module">
+      const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+      const { feedingLogs, sleepLogs, diaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
+      const {
+        getPersistedFeedingLogs,
+        getPersistedSleepLogs,
+        getPersistedDiaperLogs
+      } = await import(`${moduleBase}utils/localState.mjs`);
+      const { formatDuration } = await import(`${moduleBase}utils/dateFormat.mjs`);
+
+      const now = new Date();
+      const weekStart = startOfDay(addDays(now, -6));
+      const weekEnd = endOfDay(now);
+      const weekDays = 7;
+
+      const weeklyFeeds = getPersistedFeedingLogs(feedingLogs).filter(log => isWithinWeek(log.startedAt));
+      const weeklySleep = getPersistedSleepLogs(sleepLogs).filter(log => log.endedAt && isWithinWeek(log.startedAt));
+      const weeklyDiapers = getPersistedDiaperLogs(diaperLogs).filter(log => isWithinWeek(log.changedAt));
+      const sleepDurations = weeklySleep
+        .map(log => Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)))
+        .filter(minutes => minutes > 0);
+      const totalSleepMinutes = sleepDurations.reduce((sum, minutes) => sum + minutes, 0);
+      const averageSleepMinutes = sleepDurations.length ? Math.round(totalSleepMinutes / weekDays) : 0;
+      const longestSleepMinutes = sleepDurations.length ? Math.max(...sleepDurations) : 0;
+
+      document.getElementById("weekRangeLabel").textContent = `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
+      document.getElementById("averageSleepValue").textContent = averageSleepMinutes ? formatDuration(averageSleepMinutes) : "No sleep logs yet";
+      document.getElementById("sleepDaysValue").textContent = `${countUniqueDays(weeklySleep, "startedAt")} days`;
+      document.getElementById("sleepNote").textContent = weeklySleep.length
+        ? `${weeklySleep.length} sleep entries are included for this week.`
+        : "When sleep is logged, weekly rest patterns will appear here.";
+      document.getElementById("totalFeedingValue").textContent = weeklyFeeds.length;
+      document.getElementById("feedingAverageValue").textContent = `${formatDecimal(weeklyFeeds.length / weekDays)} per day`;
+      document.getElementById("diaperFrequencyValue").textContent = formatDecimal(weeklyDiapers.length / weekDays);
+      document.getElementById("diaperTotalValue").textContent = `${weeklyDiapers.length} changes`;
+      document.getElementById("longestSleepValue").textContent = longestSleepMinutes ? formatDuration(longestSleepMinutes) : "No completed sleep yet";
+      document.getElementById("longestSleepNote").textContent = longestSleepMinutes
+        ? "Longest completed stretch from this week's logs."
+        : "Start and wake a sleep log to see the longest stretch.";
+      document.getElementById("patternSummary").textContent = buildPatternSummary({
+        averageSleepMinutes,
+        longestSleepMinutes,
+        feedCount: weeklyFeeds.length,
+        diaperCount: weeklyDiapers.length,
+        sleepEntries: weeklySleep.length
+      });
+
+      document.getElementById("backButton").addEventListener("click", () => {
+        window.location.href = "/calendar/";
+      });
+
+      document.querySelectorAll("main .bg-surface-container-low button").forEach(button => {
+        button.addEventListener("click", () => {
+          button.parentElement.querySelectorAll("button").forEach(item => {
+            item.classList.remove("bg-white", "text-primary", "soft-shadow");
+            item.classList.add("text-on-surface-variant");
+          });
+          button.classList.add("bg-white", "text-primary", "soft-shadow");
+          button.classList.remove("text-on-surface-variant");
+        });
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".soft-shadow").forEach((card, index) => {
+          card.style.opacity = "0";
+          card.style.transform = "translateY(16px)";
+          card.style.transition = `all 0.45s ease ${index * 0.06}s`;
+          setTimeout(() => {
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0)";
+          }, 10);
+        });
+      });
+
+      function buildPatternSummary(stats) {
+        if (!stats.sleepEntries && !stats.feedCount && !stats.diaperCount) {
+          return "There is not much logged for this week yet. As you add a few more entries, LittleNest will show gentle patterns here.";
+        }
+
+        if (stats.sleepEntries >= 3 && stats.averageSleepMinutes < 10 * 60) {
+          return "Sleep was more interrupted this week. You may want to review nap timing and keep the evening routine calm where possible.";
+        }
+
+        if (stats.longestSleepMinutes >= 6 * 60) {
+          return "There was at least one longer sleep stretch this week. That may be a helpful rhythm to notice when planning bedtime.";
+        }
+
+        if (stats.feedCount >= 14 && stats.diaperCount >= 14) {
+          return "Feeding and diaper logs look steady this week. The pattern can help Mama, Papa, and caregivers stay aligned.";
+        }
+
+        return "This week had a mix of care moments. Keep logging the basics, and the pattern will become easier to review.";
+      }
+
+      function isWithinWeek(dateTime) {
+        const date = new Date(dateTime);
+        return date >= weekStart && date <= weekEnd;
+      }
+
+      function countUniqueDays(items, field) {
+        return new Set(items.map(item => new Date(item[field]).toDateString())).size;
+      }
+
+      function formatDecimal(value) {
+        return Number.isFinite(value) ? value.toFixed(1) : "0.0";
+      }
+
+      function formatDate(date) {
+        return date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+      }
+
+      function startOfDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      }
+
+      function endOfDay(date) {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+      }
+
+      function addDays(date, amount) {
+        const nextDate = new Date(date);
+        nextDate.setDate(nextDate.getDate() + amount);
+        return nextDate;
+      }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

@@ -1,0 +1,14 @@
+{
+  "name": "littlenest-my-stitch-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static local runner for the Stitch-generated LittleNest MY UI prototype.",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve-static.mjs",
+    "start": "node scripts/serve-static.mjs",
+    "build": "node scripts/build-static.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

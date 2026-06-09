@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LittleNest MY - Parenting Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#efeee9",
+                        "surface-container-low": "#f5f3ee",
+                        "tertiary-fixed": "#caecc4",
+                        "inverse-primary": "#f7b89d",
+                        "surface-bright": "#fbf9f4",
+                        "surface-container-high": "#eae8e3",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#ccc5bc",
+                        "surface-tint": "#83533c",
+                        "inverse-surface": "#30312e",
+                        "on-secondary-container": "#67625a",
+                        "on-tertiary-fixed-variant": "#314d30",
+                        "on-error": "#ffffff",
+                        "surface": "#fbf9f4",
+                        "on-primary-fixed": "#331203",
+                        "surface-container-highest": "#e4e2de",
+                        "on-tertiary-container": "#415e3f",
+                        "on-surface-variant": "#51443e",
+                        "background": "#fbf9f4",
+                        "surface-dim": "#dbdad5",
+                        "primary-fixed-dim": "#f7b89d",
+                        "secondary-fixed": "#e9e1d8",
+                        "on-background": "#1b1c19",
+                        "on-secondary-fixed-variant": "#4a463f",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#b5d6af",
+                        "primary-fixed": "#ffdbcc",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#673c27",
+                        "outline-variant": "#d6c2bb",
+                        "on-secondary": "#ffffff",
+                        "primary": "#83533c",
+                        "inverse-on-surface": "#f2f1ec",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#aecfa9",
+                        "on-tertiary-fixed": "#052108",
+                        "on-primary-container": "#7a4b36",
+                        "primary-container": "#ffbfa3",
+                        "outline": "#84746d",
+                        "secondary-container": "#e6dfd5",
+                        "surface-variant": "#e4e2de",
+                        "on-secondary-fixed": "#1e1b15",
+                        "secondary": "#625e56",
+                        "on-surface": "#1b1c19",
+                        "tertiary": "#486646"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "base": "8px",
+                        "xl": "48px",
+                        "lg": "32px",
+                        "xs": "4px",
+                        "container-padding": "20px",
+                        "gutter": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "label-md": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #FFFDF8;
+            color: #1b1c19;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-bubble-shadow {
+            box-shadow: 0 4px 12px rgba(255, 191, 163, 0.1);
+        }
+        .suggestion-chip {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .suggestion-chip:active {
+            transform: scale(0.95);
+        }
+        .input-glow:focus-within {
+            box-shadow: 0 0 0 4px rgba(255, 191, 163, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e4e2de;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14 fixed z-50">
+<div class="flex items-center gap-sm">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Parenting Assistant</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-secondary-container">
+<img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A warm, soft-focus close-up portrait of a cheerful infant with sparkling eyes, bathed in gentle morning sunlight. The baby's expression is one of pure curiosity and joy, fitting the nurturing aesthetic of a premium parenting app. The background is a blurred, neutral-toned nursery that emphasizes a safe and loving home environment." src="https://lh3.googleusercontent.com/aida/AP1WRLtcEYbzMjIZIz-DWdiSrznHPVUoh-0DuK0x34CXT8FKtIYAedUG10ueEjE5ObB807B0zr2jYF1jnJQ-qBFfLsLs_uVcSrym5XDwWbsUnoFXOb6WaCZE6SN9sGVwt7LmYCSfsunw-Q_AMClaeMazl2i9WMsJhl5zZ6EIfiWpNi6Fnrdrmhmx1EQceOxLNGzlGM0F7T2mbdlCI-CQetP9tx6GPaYQJeex1WbJYOnOAlkpx84O_RIQLv2-jYQz"/>
+</div>
+</header>
+<!-- Chat Canvas -->
+<main class="flex-1 mt-14 pb-44 px-container-padding overflow-y-auto pt-lg space-y-lg" id="assistantCanvas">
+<!-- Safety Note -->
+<section class="rounded-xl bg-surface-container-low px-4 py-3 border border-outline-variant/40">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[20px] text-primary mt-0.5">health_and_safety</span>
+<p class="font-label-md text-label-md text-on-surface-variant">
+                    For medical concerns, please consult a doctor.
+                </p>
+</div>
+</section>
+<!-- AI Message -->
+<div class="flex gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container">
+<p class="font-body-md text-body-md text-on-surface">
+                    Hi Mama and Papa. Choose a prompt below to preview how LittleNest Assistant could help summarize routines, prepare checklists, or turn baby notes into calm, simple wording.
+                </p>
+</div>
+</div>
+<!-- Prompt Cards -->
+<section class="space-y-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Helpful prompts</h2>
+<p class="font-label-md text-label-md text-on-surface-variant">Prototype only. Prompts fill the composer and show a sample response.</p>
+</div>
+<div class="grid grid-cols-1 gap-sm">
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="bedtime" data-prompt="Summarize baby's sleep this week" data-reply="Prototype preview: I would summarize naps, night sleep, wakeups, and gentle patterns from this week's saved sleep logs.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">bedtime</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Summarize baby's sleep this week</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">See nap totals, night sleep, and gentle patterns.</p>
+</div>
+</div>
+</button>
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="nightlight" data-prompt="Create bedtime routine" data-reply="Prototype preview: I would create a simple, repeatable bedtime flow with calm steps for bath, feeding, quiet time, and sleep cues.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary bg-primary-fixed rounded-full p-2">nightlight</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Create bedtime routine</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Build a soft routine for tired evenings.</p>
+</div>
+</div>
+</button>
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="checklist" data-prompt="Generate daycare checklist" data-reply="Prototype preview: I would prepare a daycare list for bottles, diapers, extra baju, wipes, comfort item, and any notes for Cikgu.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed rounded-full p-2">checklist</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Generate daycare checklist</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Prepare bottles, diapers, baju, and notes.</p>
+</div>
+</div>
+</button>
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="clinical_notes" data-prompt="What should I ask the doctor?" data-reply="Prototype preview: I would help turn recent logs into calm questions about feeding, sleep, growth, and symptoms to discuss with a doctor.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary bg-secondary-container rounded-full p-2">clinical_notes</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">What should I ask the doctor?</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Prepare questions from logs and notes.</p>
+</div>
+</div>
+</button>
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="translate" data-prompt="Explain this milestone in simple Malay" data-reply="Prototype preview: Saya akan terangkan milestone ini dalam Bahasa Melayu yang mudah, lembut, dan sesuai untuk ibu bapa.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed rounded-full p-2">translate</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Explain this milestone in simple Malay</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Bilingual-friendly wording for family sharing.</p>
+</div>
+</div>
+</button>
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="article" data-prompt="Create weekly baby report" data-reply="Prototype preview: I would create a weekly report with feeding, sleep, diaper, milestones, and upcoming reminders in a parent-friendly format.">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">article</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Create weekly baby report</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">A gentle summary to share with caregivers.</p>
+</div>
+</div>
+</button>
+</div>
+</section>
+<section class="space-y-sm" id="prototypeConversation" aria-live="polite"></section>
+</main>
+<!-- Bottom Controls (Floating above Nav) -->
+<div class="fixed bottom-[88px] left-0 w-full px-container-padding pointer-events-none">
+<div class="bg-surface-bright p-3 rounded-3xl shadow-lg border border-surface-container input-glow pointer-events-auto flex items-center gap-base">
+<button aria-label="Add context" class="w-10 h-10 flex items-center justify-center text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="assistantInput" placeholder="Choose a prompt or type a question..." type="text"/>
+<button aria-label="Preview assistant response" class="w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform" id="sendPreviewButton" type="button">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
+</button>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-surface-container-highest rounded-t-xl shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm-mobile">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm-mobile">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-label-sm-mobile">Assistant</span>
+</a>
+</nav>
+<script>
+        const assistantInput = document.getElementById("assistantInput");
+        const sendPreviewButton = document.getElementById("sendPreviewButton");
+        const prototypeConversation = document.getElementById("prototypeConversation");
+        const assistantCanvas = document.getElementById("assistantCanvas");
+        let selectedReply = "Prototype preview: In the MVP, this would use your saved LittleNest logs to prepare a calm, parent-friendly answer. No AI API is connected yet.";
+
+        document.querySelectorAll(".prompt-card").forEach(card => {
+            card.addEventListener("click", () => {
+                assistantInput.value = card.dataset.prompt;
+                selectedReply = card.dataset.reply;
+                renderPrototypeTurn(card.dataset.prompt, selectedReply);
+                assistantInput.focus();
+            });
+        });
+
+        sendPreviewButton.addEventListener("click", () => {
+            const prompt = assistantInput.value.trim();
+            if (!prompt) {
+                assistantInput.focus();
+                return;
+            }
+            renderPrototypeTurn(prompt, selectedReply);
+        });
+
+        assistantInput.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendPreviewButton.click();
+            }
+        });
+
+        function renderPrototypeTurn(prompt, reply) {
+            prototypeConversation.innerHTML = `
+                <div class="flex flex-row-reverse gap-sm">
+                    <div class="max-w-[85%] bg-primary text-on-primary p-4 rounded-2xl rounded-tr-none shadow-sm">
+                        <p class="font-body-md text-body-md">${escapeHtml(prompt)}</p>
+                    </div>
+                </div>
+                <div class="flex gap-sm">
+                    <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                    </div>
+                    <div class="max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container space-y-2">
+                        <p class="font-label-sm text-label-sm text-primary uppercase">Prototype response</p>
+                        <p class="font-body-md text-body-md text-on-surface">${escapeHtml(reply)}</p>
+                        <p class="font-label-md text-label-md text-on-surface-variant">For medical concerns, please consult a doctor.</p>
+                    </div>
+                </div>
+            `;
+            requestAnimationFrame(() => {
+                assistantCanvas.scrollTop = assistantCanvas.scrollHeight;
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

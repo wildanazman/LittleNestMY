@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LittleNest MY - Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f4;
+            font-family: 'Nunito Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
+        }
+        .list-item-hover:active {
+            transform: scale(0.98);
+            background-color: #f5f3ee;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="bg-surface sticky top-0 z-40 flex justify-between items-center w-full px-container-padding h-14">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity flex items-center justify-center p-2 rounded-full Active: scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary font-headline-md text-headline-md">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary" data-i18n="settings.title">Settings</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-primary/10">
+<img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A close-up, heartwarming portrait of a sleeping newborn baby wrapped in a soft, cream-colored knitted blanket. The lighting is ethereal and soft, capturing the delicate textures of the skin and wool. The background is a gentle blur of warm peach and ivory tones, creating a calm, sanctuary-like atmosphere consistent with a premium parenting app's visual identity." src="https://lh3.googleusercontent.com/aida/AP1WRLsos-Y3I7L-KLYW8_S9IXAh8Ao72HFhlTyDywsmLGPsD6NuvFDPyj_ZSdhKYng_7-A7vpRYys4Gv0pojLCzQxh863ewvheZ5PJsFXzjwQoS0dGXjsGKTfySRueV93094B79DE2_yeYGOBKvj3YFkeKy8y_YgpH2CUD2y7XKvlArNpUWjPUD1R4Q1tiG7Dx_oDcMSav25loPCsANXVb9U-Tj03tzjmBgM0HyaqeY3-xB0m7DGWI2g1M5JYs"/>
+</div>
+</header>
+<main class="max-w-md mx-auto px-container-padding pb-32 pt-6">
+<!-- User Profile Header Section -->
+<section class="mb-lg flex flex-col items-center text-center">
+<div class="relative mb-md">
+<div class="w-24 h-24 rounded-full overflow-hidden soft-shadow border-4 border-white">
+<img alt="Parent Portrait" class="w-full h-full object-cover" data-alt="A professional and warm portrait of a smiling young mother in her late 20s, looking directly at the camera with a gentle and trustworthy expression. She is wearing a soft linen shirt in a neutral beige tone. The background is a brightly lit, minimalist modern home interior with soft natural lighting and warm cream accents, evoking a sense of security and domestic peace." src="https://lh3.googleusercontent.com/aida/AP1WRLs6t7T8wvYhQ5JxDkwnyBNFEZau1Iv3IcsvSm36oRLgn-XRLdaqB_fes-6jr43ieVmV5g2zqUsrs7MU43OAg9onnjgyYLwlf6jpUU6iuV5sHwLM_FkHrjmjGnPwCmYyn33d9_X8Yq0RSpNZ_VQdnpMlG8dRbBlL1bGq3bq0yOoIEpfi7w3rCYnT7OMOcECNdJTGGJZ9xHBwhE2TLIF1Z4HSITZeeJYTsgb3LSjKAAztu2clEdvvczcP4Uxr"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-md">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Sarah Mitchell</h2>
+<p class="font-label-md text-label-md text-on-surface-variant">sarah.m@littlenest.my</p>
+</section>
+<!-- Menu Groups -->
+<div class="space-y-sm">
+<!-- Group: Account & Profiles -->
+<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">child_care</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Baby profiles</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</a>
+<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
+<div class="p-4 rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">language</span>
+</div>
+<div class="flex flex-col flex-1">
+<span class="font-label-md text-label-md text-on-surface" data-i18n="settings.languageTitle">Language</span>
+<span class="text-[11px] font-label-sm text-outline uppercase tracking-wider" data-i18n="settings.languageSubtitle">Choose the app language</span>
+</div>
+</div>
+<div class="mt-4 bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Language">
+<button class="language-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all bg-white text-primary soft-shadow" data-language-option="en" type="button">English</button>
+<button class="language-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all text-on-surface-variant" data-language-option="ms" type="button">Bahasa Melayu</button>
+</div>
+<p class="min-h-5 mt-2 text-[11px] font-label-sm text-tertiary" id="languageFeedback"></p>
+</div>
+</div>
+<!-- Group: App Preferences -->
+<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">notifications_active</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Reminder settings</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">verified_user</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Privacy settings</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">ios_share</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Export data</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+</div>
+<!-- Group: Subscription & Help -->
+<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Subscription</span>
+<span class="text-[11px] font-label-sm text-primary font-bold uppercase tracking-wider">Premium Plan</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Help &amp; Support</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</a>
+</div>
+<!-- Danger Zone -->
+<div class="pt-md pb-md">
+<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group">
+<div class="w-10 h-10 rounded-full bg-error-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-error">logout</span>
+</div>
+<span class="font-label-md text-label-md text-error">Logout</span>
+</button>
+<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group mt-2">
+<div class="w-10 h-10 rounded-full bg-error-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-error/60">delete_forever</span>
+</div>
+<span class="font-label-md text-label-md text-error/60">Delete data &amp; account</span>
+</button>
+</div>
+</div>
+<div class="text-center mt-md opacity-30 select-none">
+<p class="font-label-sm text-label-sm">LittleNest MY Version 2.4.0 (102)</p>
+<p class="font-label-sm text-label-sm mt-1">Made with ♥ for parents</p>
+</div>
+</main>
+<!-- Bottom Navigation Bar - Hidden for transactional sub-page according to rules, but kept for context if this is a top-level settings -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-[10px]">Log</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-[10px]">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-[10px]">Milestones</span>
+</button>
+<!-- Home is default active usually, but here we aren't at Home. Settings might be a sub-page of 'Assistant' or 'Home' depending on app architecture. Defaulting Assistant as active for this context if settings lives there. -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-[10px]">Assistant</span>
+</button>
+</nav>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const {
+            applyTranslations,
+            getLanguage,
+            setLanguage,
+            t
+        } = await import(`${moduleBase}utils/i18n.mjs`);
+
+        const languageButtons = document.querySelectorAll("[data-language-option]");
+        const languageFeedback = document.getElementById("languageFeedback");
+
+        applyTranslations();
+        renderLanguageSelection(getLanguage());
+
+        languageButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const language = setLanguage(button.dataset.languageOption);
+                applyTranslations();
+                renderLanguageSelection(language);
+                languageFeedback.textContent = t("settings.languageSaved", language);
+            });
+        });
+
+        document.querySelectorAll(".list-item-hover").forEach(item => {
+            item.addEventListener("touchstart", function() {
+                this.classList.add("scale-95", "bg-surface-container");
+            });
+            item.addEventListener("touchend", function() {
+                this.classList.remove("scale-95", "bg-surface-container");
+            });
+        });
+
+        function renderLanguageSelection(language) {
+            languageButtons.forEach((button) => {
+                const isActive = button.dataset.languageOption === language;
+                button.classList.toggle("bg-white", isActive);
+                button.classList.toggle("text-primary", isActive);
+                button.classList.toggle("soft-shadow", isActive);
+                button.classList.toggle("text-on-surface-variant", !isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
+        }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

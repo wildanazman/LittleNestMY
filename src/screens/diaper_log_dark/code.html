@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Diaper Log - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #121416;
+            color: #e2e2e5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(40, 42, 44, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .option-card-active {
+            border: 1px solid #ffe4d9;
+            background: rgba(255, 228, 217, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#121416",
+                        "surface-container-high": "#282a2c",
+                        "inverse-surface": "#e2e2e5",
+                        "on-secondary-fixed-variant": "#254f3a",
+                        "tertiary": "#deebff",
+                        "tertiary-fixed": "#d2e4ff",
+                        "secondary-fixed": "#bfedd1",
+                        "primary": "#ffe4d9",
+                        "on-background": "#e2e2e5",
+                        "on-primary": "#4d2613",
+                        "inverse-on-surface": "#2f3133",
+                        "surface-container-low": "#1a1c1e",
+                        "on-secondary-container": "#93bfa5",
+                        "secondary": "#a4d1b6",
+                        "on-tertiary-fixed-variant": "#28496c",
+                        "error-container": "#93000a",
+                        "surface-variant": "#333537",
+                        "surface-bright": "#37393b",
+                        "outline-variant": "#51443e",
+                        "on-secondary": "#0c3825",
+                        "outline": "#9e8d86",
+                        "surface-container": "#1e2022",
+                        "on-primary-fixed-variant": "#673c27",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#f7b89d",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#001c37",
+                        "surface-dim": "#121416",
+                        "primary-fixed": "#ffdbcc",
+                        "inverse-primary": "#83533c",
+                        "primary-container": "#ffbfa3",
+                        "background": "#121416",
+                        "on-surface": "#e2e2e5",
+                        "on-tertiary": "#0c3254",
+                        "on-primary-container": "#7a4b36",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#331203",
+                        "secondary-container": "#254f3a",
+                        "secondary-fixed-dim": "#a4d1b6",
+                        "surface-tint": "#f7b89d",
+                        "on-surface-variant": "#d6c2bb",
+                        "on-tertiary-container": "#39597e",
+                        "surface-container-highest": "#333537",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#b0d0fb",
+                        "tertiary-fixed-dim": "#a9c9f3",
+                        "surface-container-lowest": "#0c0e10"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-surface/80 backdrop-blur-xl dark:bg-surface/80 fixed top-0 w-full z-50 border-b border-white/5 flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Baby profile photo" class="w-full h-full object-cover" data-alt="A close-up, high-detail portrait of a peaceful sleeping newborn baby wrapped in a soft organic cotton blanket. The lighting is low-key and cinematic, with soft warm amber highlights against a deep charcoal background. The style is modern and minimalist, evoking a nurturing and safe atmosphere with rich tonal depth." src="https://lh3.googleusercontent.com/aida/AP1WRLu5_E4wz61YhesOhv8OvpzszWIZTWfLwLGqARnCPWrREXaJiZa6cF1SwoT1_3vojODENkRI8Toa5OWes9LVg60tPvQ9T7mnagQjy6EQPfFperJZjnZmX8bZcml8xLAR2caPm2ZLm6-stCFgzDRc0A9yssSU6W6lpbPZorYKvk_sGwLAUaYaT4w0_0Fa1EsajMLeNOC6d59cBS1pwHIFlcE_OiirvgM0AUrV_aqdVFiqVb_ncWT4HOuJeTU"/>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">LittleNest MY</span>
+</div>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="pt-24 px-margin-mobile max-w-lg mx-auto">
+<!-- Title & Header -->
+<div class="mb-8">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-2">Diaper Change</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Log your baby's last change to track patterns and health.</p>
+</div>
+<!-- Animated Background Element -->
+<div class="relative w-full h-48 mb-8 rounded-xl overflow-hidden glass-panel">
+
+<div class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+<span class="material-symbols-outlined text-primary text-5xl mb-2" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
+<p class="font-label-md text-label-md text-on-primary-container">Current Status: Dry</p>
+</div>
+</div>
+<!-- Change Type Selector -->
+<section class="mb-8">
+<h2 class="font-label-md text-label-md text-primary mb-4">Change Type</h2>
+<div class="grid grid-cols-3 gap-3">
+<button class="glass-panel rounded-xl p-4 flex flex-col items-center gap-2 transition-all active:scale-95 option-card-active" data-type="pee" onclick="toggleType(this)">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+<span class="font-label-sm text-label-sm">Pee</span>
+</button>
+<button class="glass-panel rounded-xl p-4 flex flex-col items-center gap-2 transition-all active:scale-95" data-type="poop" onclick="toggleType(this)">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">1k</span>
+<span class="font-label-sm text-label-sm">Poop</span>
+</button>
+<button class="glass-panel rounded-xl p-4 flex flex-col items-center gap-2 transition-all active:scale-95" data-type="mixed" onclick="toggleType(this)">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="font-label-sm text-label-sm">Mixed</span>
+</button>
+</div>
+</section>
+<!-- Texture Selector -->
+<section class="mb-8">
+<h2 class="font-label-md text-label-md text-primary mb-4">Texture</h2>
+<div class="flex flex-wrap gap-3">
+<button class="px-4 py-2 rounded-full glass-panel border border-primary/20 text-primary font-label-sm text-label-sm transition-all hover:bg-primary/10">Soft</button>
+<button class="px-4 py-2 rounded-full glass-panel border border-white/5 text-on-surface-variant font-label-sm text-label-sm transition-all hover:bg-white/5">Liquid</button>
+<button class="px-4 py-2 rounded-full glass-panel border border-white/5 text-on-surface-variant font-label-sm text-label-sm transition-all hover:bg-white/5">Hard</button>
+<button class="px-4 py-2 rounded-full glass-panel border border-white/5 text-on-surface-variant font-label-sm text-label-sm transition-all hover:bg-white/5">Mucus</button>
+</div>
+</section>
+<!-- Color Selector -->
+<section class="mb-10">
+<h2 class="font-label-md text-label-md text-primary mb-4">Color</h2>
+<div class="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
+<button class="w-12 h-12 rounded-full border-4 border-primary bg-[#FFD700] flex-shrink-0 transition-transform active:scale-90"></button>
+<button class="w-12 h-12 rounded-full border-2 border-white/10 bg-[#DAA520] flex-shrink-0 transition-transform active:scale-90"></button>
+<button class="w-12 h-12 rounded-full border-2 border-white/10 bg-[#8B4513] flex-shrink-0 transition-transform active:scale-90"></button>
+<button class="w-12 h-12 rounded-full border-2 border-white/10 bg-[#556B2F] flex-shrink-0 transition-transform active:scale-90"></button>
+<button class="w-12 h-12 rounded-full border-2 border-white/10 bg-[#F5F5DC] flex-shrink-0 transition-transform active:scale-90"></button>
+<button class="w-12 h-12 rounded-full border-2 border-white/10 bg-[#FF8C00] flex-shrink-0 transition-transform active:scale-90"></button>
+</div>
+</section>
+<!-- Action Button -->
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md py-5 rounded-2xl shadow-xl shadow-primary/10 active:scale-[0.98] transition-all hover:brightness-110">
+            Save Change
+        </button>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="bg-surface/80 backdrop-blur-xl dark:bg-surface/80 fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-6 px-4 z-50 rounded-t-xl border-t border-white/5 shadow-lg">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-primary-container/20 rounded-xl px-3 py-1 transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined fill-icon">edit_note</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-colors active:scale-90 duration-150">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</button>
+</nav>
+<script>
+        function toggleType(element) {
+            const buttons = element.parentElement.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.classList.remove('option-card-active');
+                btn.classList.add('glass-panel');
+            });
+            element.classList.add('option-card-active');
+            element.classList.remove('glass-panel');
+        }
+
+        // Texture toggle
+        const textures = document.querySelectorAll('section:nth-of-type(2) button');
+        textures.forEach(t => {
+            t.addEventListener('click', () => {
+                textures.forEach(btn => {
+                    btn.classList.remove('border-primary', 'text-primary');
+                    btn.classList.add('border-white/5', 'text-on-surface-variant');
+                });
+                t.classList.add('border-primary', 'text-primary');
+                t.classList.remove('border-white/5', 'text-on-surface-variant');
+            });
+        });
+
+        // Color toggle
+        const colors = document.querySelectorAll('section:nth-of-type(3) button');
+        colors.forEach(c => {
+            c.addEventListener('click', () => {
+                colors.forEach(btn => {
+                    btn.classList.remove('border-primary');
+                    btn.classList.add('border-white/10');
+                    btn.style.borderWidth = '2px';
+                });
+                c.classList.add('border-primary');
+                c.classList.remove('border-white/10');
+                c.style.borderWidth = '4px';
+            });
+        });
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

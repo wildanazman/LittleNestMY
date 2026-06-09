@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#efeee9",
+                        "surface-container-low": "#f5f3ee",
+                        "tertiary-fixed": "#caecc4",
+                        "inverse-primary": "#f7b89d",
+                        "surface-bright": "#fbf9f4",
+                        "surface-container-high": "#eae8e3",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#ccc5bc",
+                        "surface-tint": "#83533c",
+                        "inverse-surface": "#30312e",
+                        "on-secondary-container": "#67625a",
+                        "on-tertiary-fixed-variant": "#314d30",
+                        "on-error": "#ffffff",
+                        "surface": "#fbf9f4",
+                        "on-primary-fixed": "#331203",
+                        "surface-container-highest": "#e4e2de",
+                        "on-tertiary-container": "#415e3f",
+                        "on-surface-variant": "#51443e",
+                        "background": "#fbf9f4",
+                        "surface-dim": "#dbdad5",
+                        "primary-fixed-dim": "#f7b89d",
+                        "secondary-fixed": "#e9e1d8",
+                        "on-background": "#1b1c19",
+                        "on-secondary-fixed-variant": "#4a463f",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#b5d6af",
+                        "primary-fixed": "#ffdbcc",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#673c27",
+                        "outline-variant": "#d6c2bb",
+                        "on-secondary": "#ffffff",
+                        "primary": "#83533c",
+                        "inverse-on-surface": "#f2f1ec",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#aecfa9",
+                        "on-tertiary-fixed": "#052108",
+                        "on-primary-container": "#7a4b36",
+                        "primary-container": "#ffbfa3",
+                        "outline": "#84746d",
+                        "secondary-container": "#e6dfd5",
+                        "surface-variant": "#e4e2de",
+                        "on-secondary-fixed": "#1e1b15",
+                        "secondary": "#625e56",
+                        "on-surface": "#1b1c19",
+                        "tertiary": "#486646"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "base": "8px",
+                        "xl": "48px",
+                        "lg": "32px",
+                        "xs": "4px",
+                        "container-padding": "20px",
+                        "gutter": "16px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Nunito Sans"],
+                        "display-lg": ["Nunito Sans"],
+                        "headline-md": ["Nunito Sans"],
+                        "label-sm": ["Nunito Sans"],
+                        "body-lg": ["Nunito Sans"],
+                        "headline-lg-mobile": ["Nunito Sans"],
+                        "label-md": ["Nunito Sans"],
+                        "body-md": ["Nunito Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .segmented-control-active {
+            transform: translateX(var(--tw-translate-x));
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .soft-shadow {
+            box-shadow: 0 8px 32px rgba(255, 191, 163, 0.12);
+        }
+        .inner-glow-primary {
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d6c2bb;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-40">
+<button class="text-primary hover:opacity-80 transition-opacity flex items-center justify-center p-2 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Diaper Change</h1>
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A soft-focus close-up portrait of a serene baby smiling gently, illuminated by natural warm morning light. The background is a minimalist nursery in shades of cream and peach, maintaining a high-key, modern light-mode aesthetic that feels calm and empathetic. The overall mood is peaceful, clean, and deeply trustworthy." src="https://lh3.googleusercontent.com/aida/AP1WRLsHBRqO1c9ZIzEtjT4V3azXeU6TZpjgLAWlzYCYpH0LV-HzVv9-yj4z8167KmAeNzXMAsrKRSihBfPrHGBeXEH8fX97M4OZ2owJ33dakaU1YylsZyO-HtdUiTGAM1A0av5CQN2X2AELEuPvGHxjZi-G90Vz94_LIVBTFPUPfoH8bOurB2-PUc3W48o07Rxkrz2JBBEpViqr6C_ftOKoYEwWVnQIbQFz5an4YD8GCngb_Mypn_qGbNNqlBzd"/>
+</div>
+</header>
+<main class="flex-grow px-container-padding pt-md pb-xl">
+<!-- Content Container -->
+<div class="max-w-md mx-auto space-y-lg">
+<!-- Hero Illustration / Mood Section -->
+<div class="relative w-full aspect-[16/9] rounded-3xl overflow-hidden soft-shadow bg-surface-container-low group">
+<img alt="Context" class="w-full h-full object-cover opacity-90" data-alt="A minimalist and aesthetically pleasing digital illustration of a clean nursery corner with a stack of soft diapers and a wooden mobile overhead. The lighting is diffused and warm, featuring a palette of soft peach and sage green. The scene evokes a digital sanctuary, prioritizing tranquility and security for parents during a diaper change." src="https://lh3.googleusercontent.com/aida/AP1WRLu9Sfp3CEXKm4yrgn8tkHG0Yu_l6wcWmmzsFd0aqCcz1vkaqP_UJeJK6J0DayTSRWlpmk7i093QH7tJzDK5P1Bg3PE3h-tpS-cE8geETEVQSTRUDab4Y65WE6mKg6SKjGtQbwu6t1rbrKqeWgAr2GHTsPBUV03qlj0-HGUvd0jb7ncSrHN9W-bDRUoUDeW0ZdXzcUrIRUo6SjfNhQSq6SnQoDGkh5KaYy0TaLSsUi35xZiKTROuDm0iRq3U"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-bright/40 to-transparent"></div>
+</div>
+<!-- Segmented Control: Type -->
+<section class="space-y-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant px-1">Change Type</h3>
+<div class="relative bg-surface-container-high p-1 rounded-full flex items-center h-12 shadow-inner">
+<!-- Sliding Active Indicator -->
+<div class="absolute h-10 w-[32%] bg-surface-container-lowest rounded-full soft-shadow transition-all duration-300 ease-out left-1" id="segment-indicator"></div>
+<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface" data-diaper-type="wet" type="button">Pee</button>
+<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="dirty" type="button">Poop</button>
+<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="mixed" type="button">Mixed</button>
+</div>
+</section>
+<!-- Color/Texture Selector -->
+<section class="space-y-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant px-1">Texture &amp; Color</h3>
+<div class="grid grid-cols-5 gap-sm">
+<button class="flex flex-col items-center space-y-xs group" data-texture="Normal" type="button">
+<div class="w-12 h-12 rounded-full border-2 border-primary bg-[#F4E4D4] flex items-center justify-center transition-transform group-active:scale-90">
+<span class="material-symbols-outlined text-primary text-body-md" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary">Normal</span>
+</button>
+<button class="flex flex-col items-center space-y-xs group" data-texture="Loose" type="button">
+<div class="w-12 h-12 rounded-full bg-[#E8D9B4] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Loose</span>
+</button>
+<button class="flex flex-col items-center space-y-xs group" data-texture="Hard" type="button">
+<div class="w-12 h-12 rounded-full bg-[#83533c] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Hard</span>
+</button>
+<button class="flex flex-col items-center space-y-xs group" data-color="Green" type="button">
+<div class="w-12 h-12 rounded-full bg-[#D4E8D4] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Green</span>
+</button>
+<button class="flex flex-col items-center justify-center space-y-xs group" data-color="Other" type="button">
+<div class="w-12 h-12 rounded-full border border-dashed border-outline flex items-center justify-center hover:bg-secondary-container transition-all group-active:scale-90">
+<span class="material-symbols-outlined text-outline">add</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Other</span>
+</button>
+</div>
+</section>
+<!-- Notes Field -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Notes</h3>
+<span class="font-label-sm text-label-sm text-outline">Optional</span>
+</div>
+<textarea class="w-full h-32 bg-surface-container-low border-none rounded-[16px] p-md font-body-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container focus:ring-opacity-50 transition-all resize-none" id="diaperNotesInput" placeholder="Any observations? (e.g. rash, amount...)"></textarea>
+</section>
+<!-- Time Selector (Quick Component) -->
+<div class="bg-surface-container-low rounded-2xl p-sm flex items-center justify-between border border-surface-container-high">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span class="font-label-md text-label-md">Time of change</span>
+</div>
+<span class="font-headline-md text-headline-md text-primary" id="diaperTimeLabel">Now</span>
+</div>
+<!-- Large Save Button -->
+<p class="font-label-md text-label-md text-tertiary px-1 hidden" id="diaperSaveFeedback" aria-live="polite">Saved.</p>
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full inner-glow-primary soft-shadow active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                Log Change
+            </button>
+<!-- Recent Diaper History -->
+<section class="space-y-sm pt-sm">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Recent Changes</h3>
+<span class="font-label-sm text-label-sm text-outline">Local only</span>
+</div>
+<div class="space-y-sm" id="diaperHistoryList"></div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { babyProfile, diaperLogs: mockDiaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
+        const { formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const { getLocalDiaperLogs, saveLocalDiaperLog } = await import(`${moduleBase}utils/localState.mjs`);
+
+        const state = {
+            diaperType: "wet",
+            color: "",
+            texture: "Normal"
+        };
+        const segmentButtons = [...document.querySelectorAll("[data-diaper-type]")];
+        const detailButtons = [...document.querySelectorAll("[data-color], [data-texture]")];
+        const notesInput = document.getElementById("diaperNotesInput");
+        const saveButton = document.getElementById("saveDiaperButton");
+        const saveFeedback = document.getElementById("diaperSaveFeedback");
+        const historyList = document.getElementById("diaperHistoryList");
+        const timeLabel = document.getElementById("diaperTimeLabel");
+
+        segmentButtons.forEach((button, index) => {
+            button.addEventListener("click", () => {
+                state.diaperType = button.dataset.diaperType;
+                updateSegment(index);
+            });
+        });
+
+        detailButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                state.color = button.dataset.color || state.color;
+                state.texture = button.dataset.texture || state.texture;
+                updateDetailSelection(button);
+            });
+        });
+
+        saveButton.addEventListener("click", saveDiaperLog);
+        updateSegment(0);
+        updateNowLabel();
+        setInterval(updateNowLabel, 30000);
+        renderHistory();
+
+        function updateSegment(index) {
+            const indicator = document.getElementById('segment-indicator');
+            const buttons = indicator.parentElement.querySelectorAll('button');
+            
+            // Move indicator
+            const offset = (index * 33.33) + 1; // Slight adjustment for padding
+            indicator.style.left = `${offset}%`;
+            
+            // Update text colors
+            buttons.forEach((btn, idx) => {
+                if (idx === index) {
+                    btn.classList.add('text-on-surface');
+                    btn.classList.remove('text-on-surface-variant');
+                } else {
+                    btn.classList.remove('text-on-surface');
+                    btn.classList.add('text-on-surface-variant');
+                }
+            });
+        }
+
+        function updateDetailSelection(activeButton) {
+            detailButtons.forEach((button) => {
+                button.querySelector("div")?.classList.remove("border-2", "border-primary");
+                button.querySelector("span")?.classList.remove("text-primary");
+                button.querySelector("span")?.classList.add("text-on-surface-variant");
+            });
+            activeButton.querySelector("div")?.classList.add("border-2", "border-primary");
+            activeButton.querySelector("span")?.classList.add("text-primary");
+            activeButton.querySelector("span")?.classList.remove("text-on-surface-variant");
+        }
+
+        function saveDiaperLog() {
+            const log = {
+                id: `diaper-local-${Date.now()}`,
+                babyId: babyProfile.id,
+                type: state.diaperType,
+                changedAt: new Date().toISOString(),
+                color: state.color || undefined,
+                texture: state.texture || undefined,
+                notes: notesInput.value.trim() || undefined
+            };
+
+            saveLocalDiaperLog(log);
+            notesInput.value = "";
+            renderHistory();
+            showSavedFeedback();
+        }
+
+        function renderHistory() {
+            const logs = [...getLocalDiaperLogs(), ...mockDiaperLogs]
+                .sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))
+                .slice(0, 5);
+
+            historyList.innerHTML = logs.length
+                ? logs.map(renderHistoryCard).join("")
+                : renderEmptyHistory();
+        }
+
+        function renderEmptyHistory() {
+            return `
+                <div class="bg-surface-container-lowest rounded-2xl p-6 soft-shadow border border-tertiary-container/30 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-tertiary-container/40 text-tertiary mx-auto flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[34px]">baby_changing_station</span>
+                    </div>
+                    <div>
+                        <p class="font-headline-md text-headline-md text-on-surface">No diaper logs yet</p>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Add the next change when you can. Rough tracking is okay.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistoryCard(log) {
+            const detail = [labelForType(log.type), log.texture, log.color].filter(Boolean).join(" · ");
+            return `
+                <div class="bg-surface-container-lowest rounded-2xl p-4 soft-shadow flex items-center justify-between">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-11 h-11 rounded-2xl ${toneForType(log.type)} flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-label-md text-label-md text-on-surface truncate">${detail}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${relativeDay(log.changedAt)} · ${formatTime(log.changedAt)}</p>
+                            ${log.notes ? `<p class="font-label-sm text-label-sm text-on-surface-variant truncate">${escapeHtml(log.notes)}</p>` : ""}
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                </div>
+            `;
+        }
+
+        function updateNowLabel() {
+            timeLabel.textContent = formatTime(new Date().toISOString());
+        }
+
+        function showSavedFeedback() {
+            saveFeedback.textContent = "Saved. Dashboard will use this latest change.";
+            saveFeedback.classList.remove("hidden");
+            setTimeout(() => saveFeedback.classList.add("hidden"), 2200);
+        }
+
+        function labelForType(type) {
+            return {
+                wet: "Pee",
+                dirty: "Poop",
+                mixed: "Mixed"
+            }[type] || "Diaper";
+        }
+
+        function toneForType(type) {
+            return type === "wet"
+                ? "bg-[#E0F2FE] text-[#0369A1]"
+                : type === "dirty"
+                    ? "bg-primary-container/30 text-primary"
+                    : "bg-tertiary-container/40 text-tertiary";
+        }
+
+        function relativeDay(dateTime) {
+            const date = new Date(dateTime);
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+            if (date.toDateString() === today.toDateString()) return "Today";
+            if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+            return date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+        }
+
+        function escapeHtml(value) {
+            return value
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

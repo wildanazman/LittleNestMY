@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LittleNest MY - Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
+        }
+        .active-day {
+            background-color: #ffbfa3;
+            color: #7a4b36;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="docked full-width top-0 z-50 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14">
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" data-icon="arrow_back">arrow_back</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Calendar</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img alt="Baby Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLv3C1BCXdVEbz8uTAEchXIMc69ORkAHh0yPjgGfxD4N6UzGgsmVtzg05l6sslvVZzhG-khNyl6CeWofb-t_ZioQogcGQHB2Vi1TjbPVSw3Si1ar7n4wkUM0_fkqwnel0HHkqKMTEYHu13cc5iYFzVfewAcYq0GQ4mXHfCoheJS31mxKuaOk1PwxzruTbz_XqFqJiTbteONVdm3vN5t5tEV_-PwvaqqdpWsGWccExh1pHcWE0Cap_4tuAtfB"/>
+</div>
+</header>
+<main class="px-container-padding pt-6 space-y-lg">
+<!-- Month Selector & Navigation -->
+<div class="flex justify-between items-center">
+<div class="space-y-1">
+<h2 class="font-display-lg text-headline-lg text-on-surface" id="monthTitle">September 2024</h2>
+<p class="font-label-md text-label-md text-on-surface-variant" id="todaySubtitle">Today is Friday, 13th</p>
+</div>
+<div class="flex gap-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors" id="previousMonthButton" type="button">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors" id="nextMonthButton" type="button">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Add Event Panel -->
+<section class="bg-surface-container-lowest rounded-[24px] p-4 soft-shadow space-y-sm" id="addEventPanel">
+<div class="flex items-center justify-between gap-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Add event</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Local reminder only. No Google Calendar yet.</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[32px]">event_available</span>
+</div>
+<div class="grid md:grid-cols-2 gap-gutter">
+<label class="space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Title</span>
+<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTitleInput" placeholder="Klinik Kesihatan appointment"/>
+</label>
+<label class="space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Category</span>
+<select class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventCategoryInput">
+<option value="health">Health</option>
+<option value="vaccine">Vaccine</option>
+<option value="clinic">Clinic</option>
+<option value="daycare">Daycare</option>
+<option value="school">School</option>
+<option value="family">Family</option>
+</select>
+</label>
+<label class="space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Date</span>
+<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventDateInput" type="date"/>
+</label>
+<label class="space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Time</span>
+<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTimeInput" type="time"/>
+</label>
+</div>
+<label class="block space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Notes</span>
+<textarea class="w-full min-h-[80px] bg-surface-container-low border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="eventNotesInput" placeholder="Bring appointment card, milk, diapers..."></textarea>
+</label>
+<p class="font-label-md text-label-md text-tertiary hidden" id="eventFeedback" aria-live="polite">Saved.</p>
+<button class="w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg active:scale-95 transition-transform" id="saveEventButton" type="button">Save Event</button>
+</section>
+<!-- View Toggle -->
+<div class="flex p-1 bg-surface-container rounded-full">
+<button class="flex-1 h-10 rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm" id="monthViewButton" type="button">Monthly</button>
+<button class="flex-1 h-10 rounded-full text-on-surface-variant font-label-md text-label-md" id="upcomingViewButton" type="button">Upcoming</button>
+</div>
+<!-- Monthly Calendar View -->
+<section class="bg-surface-container-lowest rounded-[24px] p-base soft-shadow" id="monthView">
+<div class="calendar-grid text-center mb-base">
+<div class="font-label-sm text-label-sm text-outline p-2">S</div>
+<div class="font-label-sm text-label-sm text-outline p-2">M</div>
+<div class="font-label-sm text-label-sm text-outline p-2">T</div>
+<div class="font-label-sm text-label-sm text-outline p-2">W</div>
+<div class="font-label-sm text-label-sm text-outline p-2">T</div>
+<div class="font-label-sm text-label-sm text-outline p-2">F</div>
+<div class="font-label-sm text-label-sm text-outline p-2">S</div>
+</div>
+<div class="calendar-grid gap-y-2" id="calendarDays">
+<!-- Row 1 -->
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">25</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">26</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">27</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">28</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">29</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md text-outline-variant">30</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">1</div>
+<!-- Row 2 -->
+<div class="h-12 flex flex-col items-center justify-center font-body-md">2</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md relative">
+                    3
+                    <div class="flex gap-0.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</div>
+</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">4</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">5</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md relative">
+                    6
+                    <div class="flex gap-0.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+</div>
+</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">7</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">8</div>
+<!-- Row 3 -->
+<div class="h-12 flex flex-col items-center justify-center font-body-md">9</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">10</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">11</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">12</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md active-day rounded-xl shadow-sm">13</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">14</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md relative">
+                    15
+                    <div class="flex gap-0.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="h-12 flex flex-col items-center justify-center font-body-md">16</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">17</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md relative">
+                    18
+                    <div class="flex gap-0.5 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-[#B6A9CF]"></span>
+</div>
+</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">19</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">20</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">21</div>
+<div class="h-12 flex flex-col items-center justify-center font-body-md">22</div>
+</div>
+</section>
+<!-- Category Pills (Horizontal Scroll) -->
+<div class="flex gap-sm overflow-x-auto pb-2 -mx-container-padding px-container-padding no-scrollbar">
+<span class="px-4 py-2 bg-primary-container text-on-primary-container rounded-full font-label-md whitespace-nowrap">Health</span>
+<span class="px-4 py-2 bg-[#F3E8FF] text-[#581C87] rounded-full font-label-md whitespace-nowrap">Vaccine</span>
+<span class="px-4 py-2 bg-[#DBEAFE] text-[#1E40AF] rounded-full font-label-md whitespace-nowrap">Clinic</span>
+<span class="px-4 py-2 bg-tertiary-container text-on-tertiary-container rounded-full font-label-md whitespace-nowrap">Daycare</span>
+<span class="px-4 py-2 bg-[#FEF9C3] text-[#854D0E] rounded-full font-label-md whitespace-nowrap">School</span>
+<span class="px-4 py-2 bg-secondary-fixed text-on-secondary-fixed rounded-full font-label-md whitespace-nowrap">Family</span>
+</div>
+<!-- Upcoming Events -->
+<section class="space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Upcoming Events</h3>
+<button class="text-primary font-label-md">See All</button>
+</div>
+<div class="space-y-sm" id="upcomingEventsList">
+<!-- Event 1 -->
+<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="w-14 h-14 rounded-2xl bg-primary-container flex flex-col items-center justify-center shrink-0">
+<span class="font-label-sm text-on-primary-container leading-none mb-1">SEP</span>
+<span class="font-headline-md text-on-primary-container leading-none">18</span>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-label-md text-on-surface">Klinik Kesihatan appointment</h4>
+<span class="material-symbols-outlined text-outline text-[20px]">more_vert</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            09:30 AM
+                        </div>
+<div class="inline-flex px-2 py-0.5 rounded-md bg-[#DBEAFE] text-[#1E40AF] text-[10px] font-bold uppercase tracking-wider">Clinic</div>
+</div>
+</div>
+<!-- Event 2 -->
+<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="w-14 h-14 rounded-2xl bg-tertiary-container flex flex-col items-center justify-center shrink-0">
+<span class="font-label-sm text-on-tertiary-container leading-none mb-1">SEP</span>
+<span class="font-headline-md text-on-tertiary-container leading-none">20</span>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-label-md text-on-surface">Playdate at Central Park</h4>
+<span class="material-symbols-outlined text-outline text-[20px]">more_vert</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            04:00 PM
+                        </div>
+<div class="inline-flex px-2 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed text-[10px] font-bold uppercase tracking-wider">Family</div>
+</div>
+</div>
+<!-- Event 3 -->
+<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="w-14 h-14 rounded-2xl bg-primary-fixed-dim flex flex-col items-center justify-center shrink-0">
+<span class="font-label-sm text-on-primary-fixed-variant leading-none mb-1">SEP</span>
+<span class="font-headline-md text-on-primary-fixed-variant leading-none">22</span>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-headline-md text-label-md text-on-surface">6-Month Health Checkup</h4>
+<span class="material-symbols-outlined text-outline text-[20px]">more_vert</span>
+</div>
+<div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+                            11:00 AM
+                        </div>
+<div class="inline-flex px-2 py-0.5 rounded-md bg-primary-container text-on-primary-container text-[10px] font-bold uppercase tracking-wider">Health</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Large Action Button -->
+<div class="py-md">
+<button class="w-full h-14 bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform" id="addEventJumpButton" type="button">
+<span class="material-symbols-outlined">add</span>
+                Add Event
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm-mobile">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm-mobile">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm-mobile">Assistant</span>
+</a>
+</nav>
+<!-- Visual Polish: Soft Decorative Shapes -->
+<div class="fixed top-20 -right-20 w-64 h-64 bg-primary-container opacity-20 blur-3xl -z-10 rounded-full"></div>
+<div class="fixed bottom-40 -left-20 w-80 h-80 bg-tertiary-container opacity-10 blur-3xl -z-10 rounded-full"></div>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
+        const { getPersistedCalendarEvents, saveLocalCalendarEvent } = await import(`${moduleBase}utils/localState.mjs`);
+
+        const monthTitle = document.getElementById("monthTitle");
+        const todaySubtitle = document.getElementById("todaySubtitle");
+        const calendarDays = document.getElementById("calendarDays");
+        const upcomingEventsList = document.getElementById("upcomingEventsList");
+        const monthView = document.getElementById("monthView");
+        const monthViewButton = document.getElementById("monthViewButton");
+        const upcomingViewButton = document.getElementById("upcomingViewButton");
+        const previousMonthButton = document.getElementById("previousMonthButton");
+        const nextMonthButton = document.getElementById("nextMonthButton");
+        const eventTitleInput = document.getElementById("eventTitleInput");
+        const eventCategoryInput = document.getElementById("eventCategoryInput");
+        const eventDateInput = document.getElementById("eventDateInput");
+        const eventTimeInput = document.getElementById("eventTimeInput");
+        const eventNotesInput = document.getElementById("eventNotesInput");
+        const eventFeedback = document.getElementById("eventFeedback");
+        const saveEventButton = document.getElementById("saveEventButton");
+        const addEventJumpButton = document.getElementById("addEventJumpButton");
+        const visibleMonth = new Date();
+
+        eventDateInput.value = new Date().toISOString().slice(0, 10);
+        eventTimeInput.value = "09:00";
+        previousMonthButton.addEventListener("click", () => changeMonth(-1));
+        nextMonthButton.addEventListener("click", () => changeMonth(1));
+        saveEventButton.addEventListener("click", saveEvent);
+        addEventJumpButton.addEventListener("click", () => {
+            document.getElementById("addEventPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+            eventTitleInput.focus();
+        });
+        monthViewButton.addEventListener("click", () => setView("month"));
+        upcomingViewButton.addEventListener("click", () => setView("upcoming"));
+
+        render();
+
+        function render() {
+            renderHeader();
+            renderMonth();
+            renderUpcoming();
+        }
+
+        function getEvents() {
+            return getPersistedCalendarEvents(mockCalendarEvents)
+                .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
+        }
+
+        function renderHeader() {
+            monthTitle.textContent = visibleMonth.toLocaleDateString("en-MY", { month: "long", year: "numeric" });
+            todaySubtitle.textContent = `Today is ${new Date().toLocaleDateString("en-MY", {
+                weekday: "long",
+                day: "numeric",
+                month: "short"
+            })}`;
+        }
+
+        function renderMonth() {
+            const year = visibleMonth.getFullYear();
+            const month = visibleMonth.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const firstGridDay = new Date(firstDay);
+            firstGridDay.setDate(firstDay.getDate() - firstDay.getDay());
+            const today = new Date();
+            const events = getEvents();
+
+            calendarDays.innerHTML = Array.from({ length: 42 }, (_, index) => {
+                const date = new Date(firstGridDay);
+                date.setDate(firstGridDay.getDate() + index);
+                const dayEvents = events.filter((event) => isSameDay(event.startsAt, date));
+                const isCurrentMonth = date.getMonth() === month;
+                const isToday = isSameDay(date, today);
+                const classes = [
+                    "h-12 flex flex-col items-center justify-center font-body-md relative rounded-xl",
+                    isCurrentMonth ? "text-on-surface" : "text-outline-variant",
+                    isToday ? "active-day shadow-sm" : ""
+                ].join(" ");
+
+                return `
+                    <button class="${classes}" type="button" aria-label="${date.toDateString()}">
+                        <span>${date.getDate()}</span>
+                        <span class="flex gap-0.5 mt-1 min-h-[6px]">
+                            ${dayEvents.slice(0, 3).map((event) => `<span class="w-1.5 h-1.5 rounded-full ${tagForCategory(event.type).dot}"></span>`).join("")}
+                        </span>
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function renderUpcoming() {
+            const now = startOfDay(new Date());
+            const events = getEvents()
+                .filter((event) => new Date(event.startsAt) >= now)
+                .slice(0, 8);
+
+            upcomingEventsList.innerHTML = events.length
+                ? events.map(renderEventCard).join("")
+                : `<div class="bg-surface-bright p-6 rounded-[24px] soft-shadow border border-primary-container/30 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-secondary-container text-secondary mx-auto flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[34px]">calendar_month</span>
+                    </div>
+                    <div>
+                        <p class="font-headline-md text-headline-md text-on-surface">No calendar events yet</p>
+                        <p class="font-body-md text-body-md text-on-surface-variant">Add clinic, daycare, school, or family reminders here. Simple reminders are enough.</p>
+                    </div>
+                </div>`;
+        }
+
+        function renderEventCard(event) {
+            const date = new Date(event.startsAt);
+            const tag = tagForCategory(event.type);
+            return `
+                <div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+                    <div class="w-14 h-14 rounded-2xl ${tag.dateBg} flex flex-col items-center justify-center shrink-0">
+                        <span class="font-label-sm leading-none mb-1">${date.toLocaleDateString("en-MY", { month: "short" }).toUpperCase()}</span>
+                        <span class="font-headline-md leading-none">${date.getDate()}</span>
+                    </div>
+                    <div class="flex-1 space-y-1 min-w-0">
+                        <div class="flex justify-between items-start gap-2">
+                            <h4 class="font-headline-md text-label-md text-on-surface truncate">${escapeHtml(event.title)}</h4>
+                            <span class="material-symbols-outlined text-outline text-[20px]">more_vert</span>
+                        </div>
+                        <div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
+                            <span class="material-symbols-outlined text-[16px]">schedule</span>
+                            ${event.isAllDay ? "All day" : formatTime(event.startsAt)}
+                        </div>
+                        ${event.location ? `<p class="font-label-sm text-label-sm text-on-surface-variant truncate">${escapeHtml(event.location)}</p>` : ""}
+                        <div class="inline-flex px-2 py-0.5 rounded-md ${tag.className} text-[10px] font-bold uppercase tracking-wider">${labelForCategory(event.type)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveEvent() {
+            const title = eventTitleInput.value.trim();
+            const date = eventDateInput.value;
+            const time = eventTimeInput.value || "09:00";
+
+            if (!title || !date) {
+                showFeedback("Add a title and date first.");
+                return;
+            }
+
+            saveLocalCalendarEvent({
+                id: `event-local-${Date.now()}`,
+                babyId: babyProfile.id,
+                type: eventCategoryInput.value,
+                title,
+                startsAt: new Date(`${date}T${time}:00`).toISOString(),
+                notes: eventNotesInput.value.trim() || undefined,
+                isAllDay: false
+            });
+
+            eventTitleInput.value = "";
+            eventNotesInput.value = "";
+            render();
+            showFeedback("Event saved locally.");
+        }
+
+        function changeMonth(delta) {
+            visibleMonth.setMonth(visibleMonth.getMonth() + delta);
+            render();
+        }
+
+        function setView(view) {
+            const isMonth = view === "month";
+            monthView.classList.toggle("hidden", !isMonth);
+            monthViewButton.classList.toggle("bg-surface-container-lowest", isMonth);
+            monthViewButton.classList.toggle("text-primary", isMonth);
+            upcomingViewButton.classList.toggle("bg-surface-container-lowest", !isMonth);
+            upcomingViewButton.classList.toggle("text-primary", !isMonth);
+        }
+
+        function tagForCategory(category) {
+            return {
+                health: { className: "bg-primary-container text-on-primary-container", dateBg: "bg-primary-container text-on-primary-container", dot: "bg-primary-container" },
+                vaccine: { className: "bg-[#F3E8FF] text-[#581C87]", dateBg: "bg-[#F3E8FF] text-[#581C87]", dot: "bg-[#C084FC]" },
+                clinic: { className: "bg-[#DBEAFE] text-[#1E40AF]", dateBg: "bg-[#DBEAFE] text-[#1E40AF]", dot: "bg-[#60A5FA]" },
+                daycare: { className: "bg-tertiary-container text-on-tertiary-container", dateBg: "bg-tertiary-container text-on-tertiary-container", dot: "bg-tertiary-container" },
+                school: { className: "bg-[#FEF9C3] text-[#854D0E]", dateBg: "bg-[#FEF9C3] text-[#854D0E]", dot: "bg-[#FACC15]" },
+                family: { className: "bg-secondary-fixed text-on-secondary-fixed", dateBg: "bg-secondary-fixed text-on-secondary-fixed", dot: "bg-secondary-fixed" }
+            }[category] || { className: "bg-surface-container text-on-surface", dateBg: "bg-surface-container text-on-surface", dot: "bg-outline" };
+        }
+
+        function labelForCategory(category) {
+            return {
+                health: "Health",
+                vaccine: "Vaccine",
+                clinic: "Clinic",
+                daycare: "Daycare",
+                school: "School",
+                family: "Family"
+            }[category] || "Event";
+        }
+
+        function formatTime(dateTime) {
+            return new Date(dateTime).toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit", hour12: true });
+        }
+
+        function isSameDay(value, date) {
+            const valueDate = new Date(value);
+            return valueDate.getFullYear() === date.getFullYear() &&
+                valueDate.getMonth() === date.getMonth() &&
+                valueDate.getDate() === date.getDate();
+        }
+
+        function startOfDay(date) {
+            return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        }
+
+        function showFeedback(message) {
+            eventFeedback.textContent = message;
+            eventFeedback.classList.remove("hidden");
+            setTimeout(() => eventFeedback.classList.add("hidden"), 2200);
+        }
+
+        function escapeHtml(value) {
+            return value
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

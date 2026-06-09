@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome to LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #FFFDF8;
+            font-family: 'Nunito Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .soft-shadow {
+            box-shadow: 0 10px 30px rgba(255, 191, 163, 0.15);
+        }
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .glow-button {
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 14px rgba(131, 83, 60, 0.2);
+        }
+        .segmented-control-bg {
+            background-color: #FFF7ED;
+        }
+        .active-pill {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex flex-col min-h-screen text-on-surface">
+<!-- Language Selector Header -->
+<header class="w-full px-container-padding pt-8 flex justify-end items-center z-10">
+<div class="segmented-control-bg p-1 rounded-full flex relative w-48 h-10 items-center">
+<div class="active-pill absolute h-8 w-[calc(50%-4px)] bg-white rounded-full shadow-sm left-1" id="language-pill"></div>
+<button class="relative z-10 flex-1 font-label-md text-label-md text-primary text-center" onclick="toggleLanguage('en')">English</button>
+<button class="relative z-10 flex-1 font-label-md text-label-md text-on-surface-variant text-center" onclick="toggleLanguage('ms')">Melayu</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-container-padding max-w-md mx-auto text-center pb-xl">
+<!-- Illustration Container -->
+<div class="relative w-full aspect-square max-w-[320px] mb-lg floating-element">
+<!-- Background organic blob -->
+<div class="absolute inset-0 bg-primary-container/20 rounded-[40%] filter blur-2xl opacity-60 scale-110"></div>
+<img alt="Warm illustration of a mother holding a baby" class="w-full h-full object-contain relative z-10 drop-shadow-xl rounded-full" data-alt="A warm and high-end digital illustration of a gentle mother cradling her newborn baby in a soft embrace. The style is modern minimalism with tactile softness, featuring organic lines and a palette of warm creams, soft peach, and sage green. The lighting is ethereal and diffused, creating a calm, digital sanctuary atmosphere. The illustration is centered against a clean, breathable background that evokes security and deep parental love." src="https://lh3.googleusercontent.com/aida/AP1WRLtiSr8-qx5y3c52nMI-GTchBWhp_sGBs8D5ZQLAhZrySYyU_T7qwmwH76a-PWkKtHomm1CWeMz22gKqJN1L2mG5ZsBuDTOCj1cwgsyZKaoYMFRBdm9zs0Mjq5hMHaTbdjY4VnNqGu_bGqm5TX_uErxI8-SXfRuZdy-MuEl203bUvVYZrUtzKoOub1Wgj6cPdQGkT9ySWCzzeEgOUV76Ui-0C-wgRHkSKzYPD7xRXFlt0_z2V5eu670Y2YKR"/>
+<!-- Small floating accent icons -->
+<div class="absolute -top-4 -right-4 bg-tertiary-container/30 p-3 rounded-full backdrop-blur-sm">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="absolute bottom-8 -left-2 bg-secondary-container/50 p-2 rounded-full backdrop-blur-sm">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">child_care</span>
+</div>
+</div>
+<!-- Text Content -->
+<div class="space-y-sm">
+<h1 class="font-display-lg text-display-lg text-on-primary-fixed leading-tight tracking-tight">
+                Welcome to LittleNest MY
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant px-2">
+                Track routines, milestones, and memories in one calm place.
+            </p>
+</div>
+<!-- Action Button -->
+<div class="w-full mt-xl space-y-md">
+<button class="w-full h-14 bg-primary text-white font-headline-md text-headline-md rounded-full flex items-center justify-center glow-button active:scale-95 transition-transform duration-200">
+                Get Started
+            </button>
+<p class="font-label-sm text-label-sm text-outline px-4">
+                By tapping Get Started, you agree to our Terms and Privacy Policy.
+            </p>
+</div>
+</main>
+<!-- Bottom subtle decoration -->
+<div class="fixed bottom-0 left-0 w-full h-24 pointer-events-none overflow-hidden">
+<svg class="absolute bottom-0 w-[200%] h-full opacity-10 fill-primary" viewbox="0 0 1440 320">
+<path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+</svg>
+</div>
+<script>
+        function toggleLanguage(lang) {
+            const pill = document.getElementById('language-pill');
+            const buttons = document.querySelectorAll('header button');
+            
+            if (lang === 'en') {
+                pill.style.transform = 'translateX(0)';
+                buttons[0].classList.add('text-primary');
+                buttons[0].classList.remove('text-on-surface-variant');
+                buttons[1].classList.remove('text-primary');
+                buttons[1].classList.add('text-on-surface-variant');
+                
+                // Update text content for English
+                document.querySelector('h1').innerText = "Welcome to LittleNest MY";
+                document.querySelector('p').innerText = "Track routines, milestones, and memories in one calm place.";
+                document.querySelector('button.bg-primary').innerText = "Get Started";
+                document.querySelector('p.text-outline').innerText = "By tapping Get Started, you agree to our Terms and Privacy Policy.";
+            } else {
+                pill.style.transform = 'translateX(100%)';
+                buttons[1].classList.add('text-primary');
+                buttons[1].classList.remove('text-on-surface-variant');
+                buttons[0].classList.remove('text-primary');
+                buttons[0].classList.add('text-on-surface-variant');
+                
+                // Update text content for Malay
+                document.querySelector('h1').innerText = "Selamat Datang ke LittleNest MY";
+                document.querySelector('p').innerText = "Jejaki rutin, pencapaian, dan kenangan dalam satu tempat yang tenang.";
+                document.querySelector('button.bg-primary').innerText = "Mula Sekarang";
+                document.querySelector('p.text-outline').innerText = "Dengan menekan Mula Sekarang, anda bersetuju dengan Terma dan Dasar Privasi kami.";
+            }
+        }
+
+        // Simple entry animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const main = document.querySelector('main');
+            main.style.opacity = '0';
+            main.style.transform = 'translateY(20px)';
+            main.style.transition = 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            
+            setTimeout(() => {
+                main.style.opacity = '1';
+                main.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

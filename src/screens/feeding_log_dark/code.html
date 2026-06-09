@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Log Feeding - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #121416;
+            color: #e2e2e5;
+            -webkit-font-smoothing: antialiased;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .active-segment {
+            background: rgba(255, 228, 217, 0.1);
+            border: 1px solid rgba(255, 228, 217, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for subtle dark UI */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333537; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#121416",
+                        "surface-container-high": "#282a2c",
+                        "inverse-surface": "#e2e2e5",
+                        "on-secondary-fixed-variant": "#254f3a",
+                        "tertiary": "#deebff",
+                        "tertiary-fixed": "#d2e4ff",
+                        "secondary-fixed": "#bfedd1",
+                        "primary": "#ffe4d9",
+                        "on-background": "#e2e2e5",
+                        "on-primary": "#4d2613",
+                        "inverse-on-surface": "#2f3133",
+                        "surface-container-low": "#1a1c1e",
+                        "on-secondary-container": "#93bfa5",
+                        "secondary": "#a4d1b6",
+                        "on-tertiary-fixed-variant": "#28496c",
+                        "error-container": "#93000a",
+                        "surface-variant": "#333537",
+                        "surface-bright": "#37393b",
+                        "outline-variant": "#51443e",
+                        "on-secondary": "#0c3825",
+                        "outline": "#9e8d86",
+                        "surface-container": "#1e2022",
+                        "on-primary-fixed-variant": "#673c27",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#f7b89d",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#001c37",
+                        "surface-dim": "#121416",
+                        "primary-fixed": "#ffdbcc",
+                        "inverse-primary": "#83533c",
+                        "primary-container": "#ffbfa3",
+                        "background": "#121416",
+                        "on-surface": "#e2e2e5",
+                        "on-tertiary": "#0c3254",
+                        "on-primary-container": "#7a4b36",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#331203",
+                        "secondary-container": "#254f3a",
+                        "secondary-fixed-dim": "#a4d1b6",
+                        "surface-tint": "#f7b89d",
+                        "on-surface-variant": "#d6c2bb",
+                        "on-tertiary-container": "#39597e",
+                        "surface-container-highest": "#333537",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#b0d0fb",
+                        "tertiary-fixed-dim": "#a9c9f3",
+                        "surface-container-lowest": "#0c0e10"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col">
+<!-- Top AppBar (from JSON) -->
+<header class="bg-surface/80 backdrop-blur-xl dark:bg-surface/80 fixed top-0 w-full z-50 border-b border-white/5 flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a serene sleeping baby with soft, natural lighting. The image captures the peaceful essence of early childhood in a minimalist setting. Muted, warm tones and gentle textures create a nurturing atmosphere consistent with a modern, clean dark-mode UI design focused on parenting and care." src="https://lh3.googleusercontent.com/aida/AP1WRLsKoyqHaXKYeUKygoDQzw4VqPgFj5t5fAFq1X4XywuCETHdsaO3q7pjO0A-ZOGokBc6-lztVMqyp-IsUl_ZUSymrotcG9NsHH-kHAfa6YsVPHinM9LqbpeIJEy2YW3CUxfWCBxr-nJ1NZ_G3TM6qBsE-DYQNwaE5xUjLkXJEydlCHyu1L1mH7557M083rvEqow8kfmqPGx53-8f7YbAyVY0_KNBsXdE7qHtwZGuZwx64dkiELLnQFo4tuyn"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Log Feeding</h1>
+</div>
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="flex-1 mt-16 mb-24 px-margin-mobile pt-6 max-w-md mx-auto w-full">
+<!-- Input Section -->
+<section class="space-y-6">
+<!-- Segmented Control -->
+<div class="glass-panel rounded-xl p-1 flex">
+<button class="flex-1 py-2.5 px-2 rounded-lg text-label-md font-label-md transition-all active-segment text-primary" onclick="selectType(this)">Breast</button>
+<button class="flex-1 py-2.5 px-2 rounded-lg text-label-md font-label-md transition-all text-on-surface-variant" onclick="selectType(this)">Bottle</button>
+<button class="flex-1 py-2.5 px-2 rounded-lg text-label-md font-label-md transition-all text-on-surface-variant" onclick="selectType(this)">Formula</button>
+<button class="flex-1 py-2.5 px-2 rounded-lg text-label-md font-label-md transition-all text-on-surface-variant" onclick="selectType(this)">Solid</button>
+</div>
+<!-- Main Input Card -->
+<div class="glass-panel rounded-2xl p-6 space-y-6">
+<div class="space-y-2">
+<label class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">opacity</span>
+                        AMOUNT (ML)
+                    </label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-4 px-5 text-headline-md font-headline-md text-primary placeholder:text-surface-variant focus:ring-1 focus:ring-primary/30 outline-none transition-all" placeholder="120" type="number"/>
+<span class="absolute right-5 top-1/2 -translate-y-1/2 text-on-surface-variant font-label-md">ml</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                            TIME
+                        </label>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-3 px-4 text-body-lg font-body-lg text-on-surface focus:ring-1 focus:ring-primary/30 outline-none" type="time" value="10:30"/>
+</div>
+<div class="space-y-2">
+<label class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">event</span>
+                            DATE
+                        </label>
+<input class="w-full bg-surface-container-lowest border-none rounded-xl py-3 px-4 text-body-lg font-body-lg text-on-surface focus:ring-1 focus:ring-primary/30 outline-none" type="date" value="2023-10-27"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-lg shadow-primary/10 hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                    Save Entry
+                </button>
+</div>
+</section>
+<!-- Timeline History -->
+<section class="mt-10 space-y-4">
+<h3 class="text-label-md font-label-md text-on-surface-variant tracking-wider">RECENT FEEDINGS</h3>
+<div class="space-y-3">
+<!-- Timeline Item 1 -->
+<div class="glass-panel p-4 rounded-xl flex items-center justify-between group hover:border-primary/20 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">baby_changing_station</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Formula Feeding</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">08:15 AM • 150 ml</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<!-- Timeline Item 2 -->
+<div class="glass-panel p-4 rounded-xl flex items-center justify-between group hover:border-primary/20 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">nutrition</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Breast Milk</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">05:30 AM • 12 mins</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+<!-- Timeline Item 3 -->
+<div class="glass-panel p-4 rounded-xl flex items-center justify-between group hover:border-primary/20 transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">nightlight</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Dream Feed</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant">11:45 PM • 100 ml</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (from JSON) -->
+<nav class="bg-surface/80 backdrop-blur-xl dark:bg-surface/80 fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-6 px-4 border-t border-white/5 z-50 rounded-t-xl shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim bg-primary-container/20 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script>
+        function selectType(btn) {
+            // Reset all buttons
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.classList.remove('active-segment', 'text-primary');
+                b.classList.add('text-on-surface-variant');
+            });
+            
+            // Activate current button
+            btn.classList.add('active-segment', 'text-primary');
+            btn.classList.remove('text-on-surface-variant');
+
+            // Haptic feedback simulation
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(5);
+            }
+        }
+
+        // Set default date to today
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.querySelector('input[type="date"]');
+            if(dateInput) dateInput.value = today;
+            
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const timeInput = document.querySelector('input[type="time"]');
+            if(timeInput) timeInput.value = time;
+        });
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

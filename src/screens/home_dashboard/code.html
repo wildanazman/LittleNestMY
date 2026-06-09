@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LittleNest MY - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Nunito Sans', sans-serif; background-color: #fbf9f4; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
+        .timeline-line { background: repeating-linear-gradient(to bottom, #d6c2bb, #d6c2bb 2px, transparent 2px, transparent 6px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-surface sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-14">
+<h1 class="font-headline-lg text-headline-lg text-primary">LittleNest MY</h1>
+<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a friendly young father in his early 30s with a warm smile. The image is set against a soft-focus minimalist domestic interior background with warm cream and peach tones. High-key lighting creates a gentle, trustworthy, and empathetic atmosphere consistent with a parental digital sanctuary brand." src="https://lh3.googleusercontent.com/aida/AP1WRLtq7msd86mPJ5Rpn40ROXOXa_zj0ygq1n0I9rvNHA0MS0pI9C-z4cYyItj5IEYdsDxiEgI-anCGWgskhODoaI5JROaiurcoht6Hqu7xRz9ZFPLLmStJcn5QiuAd3Q_s_tEeluIwTHok-dT4fQ8NL3FPqBO2Y4hGvbPNCTsxBevtW4SKBIGt8_ep4WuoxsKH8ugaYsvFCL7JJ2bixqJBSHotLBe1dKkyd0UWJnbhzUmAsmCsKk-8Gy-zQUc"/>
+</div>
+</header>
+<main class="px-container-padding pt-6 space-y-lg">
+<!-- Greeting & Profile -->
+<section class="space-y-sm">
+<div class="flex items-end justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant">Good morning,</span>
+<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName">Wildan</h2>
+</div>
+<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm">
+                    Today
+                </div>
+</div>
+<!-- Baby Profile Card -->
+<div class="bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow">
+<div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a beautiful 3-month-old infant with soft features and a peaceful expression. The baby is resting on a soft cream-colored linen texture. The lighting is ethereal and natural, highlighting the delicate skin tones and wispy hair. The color palette is composed of warm whites, subtle peaches, and muted earthy neutrals." src="https://lh3.googleusercontent.com/aida/AP1WRLuscSZ5G5liQO0GTmulxDac_-ms_OpzX7belNBSxC9HBCdymdfP81lANA4NL3WDliXRTzUdOpoP1qivD4_kaAgq_Gl1PZThUjNecr1dkx24mq1e-neVBc0see9jr-5uLxgI16ZlFHEzbuURWVuSFmkQNPrTfpgWeZU4TE7hj5EAME1UHtWxoWiAVuL2f_FwQm8g7FZsqj2AXmm2fFUGiLHMU-gdXq8GrvL_JJBoxfVm0nDp2KVIWt2HMbwz"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">Aisyah</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">3 months 12 days</p>
+</div>
+<div class="ml-auto">
+<button class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">settings_heart</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Status Grid -->
+<section class="grid grid-cols-2 gap-gutter">
+<!-- Feed -->
+<div class="bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="flex items-center gap-2 text-on-primary-container">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<span class="font-label-sm text-label-sm">Last Feed</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface" id="lastFeedTime">2h 30m</p>
+<span class="font-label-sm text-label-sm text-primary">ago</span>
+</div>
+<!-- Sleep -->
+<div class="bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="flex items-center gap-2 text-[#1E40AF]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+<span class="font-label-sm text-label-sm">Today Sleep</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface" id="todaySleepTotal">8h 20m</p>
+<span class="font-label-sm text-label-sm text-[#1E40AF]">total</span>
+</div>
+<!-- Diaper -->
+<div class="bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="flex items-center gap-2 text-[#166534]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
+<span class="font-label-sm text-label-sm">Diaper</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface" id="lastDiaperTime">45m</p>
+<span class="font-label-sm text-label-sm text-[#166534]">ago</span>
+</div>
+<!-- Vaccine -->
+<div class="bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="flex items-center gap-2 text-[#6B21A8]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">vaccines</span>
+<span class="font-label-sm text-label-sm" id="nextEventLabel">Next Vaccine</span>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface" id="nextEventDate">12 June</p>
+<span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative">in 24 days</span>
+</div>
+</section>
+<!-- Quick Actions -->
+<section>
+<div class="flex justify-between items-center px-2">
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Feed</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0369A1] group-active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined">bedtime</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sleep</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] group-active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined">baby_changing_station</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Diaper</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined">medication</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
+</div>
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
+<span class="material-symbols-outlined">edit_note</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Note</span>
+</div>
+</div>
+</section>
+<!-- Reminder Banner -->
+<section>
+<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
+<div class="absolute right-0 top-0 opacity-10 scale-150 rotate-12">
+<span class="material-symbols-outlined text-[120px]">notifications_active</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">alarm_on</span>
+</div>
+<div class="z-10">
+<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">Next feed may be soon</p>
+<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Based on Aisyah's typical 3h schedule</p>
+</div>
+</div>
+</section>
+<!-- Timeline Section -->
+<section class="space-y-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface px-1">Today's Log</h3>
+<div class="relative pl-8 space-y-lg" id="timelineList">
+<div class="absolute left-3 top-2 bottom-2 w-[2px] timeline-line rounded-full"></div>
+<!-- Timeline Items -->
+<div class="relative">
+<div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-primary-container flex items-center justify-center border-2 border-white">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">8:00 AM</p>
+<div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
+<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Bottle</span> · 90ml Breastmilk</p>
+</div>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-[#E0F2FE] flex items-center justify-center border-2 border-white">
+<div class="w-2 h-2 rounded-full bg-[#0369A1]"></div>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">9:20 AM</p>
+<div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
+<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Nap</span> · Started</p>
+</div>
+</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-[#DCFCE7] flex items-center justify-center border-2 border-white">
+<div class="w-2 h-2 rounded-full bg-[#15803D]"></div>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">10:45 AM</p>
+<div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
+<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Diaper</span> · Wet changed</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-container-padding w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const {
+            assistantSuggestions,
+            babyProfile,
+            calendarEvents,
+            diaperLogs,
+            familyMembers,
+            feedingLogs,
+            sleepLogs
+        } = await import(`${moduleBase}data/mockData.mjs`);
+        const {
+            calculateBabyAge,
+            formatDuration,
+            formatEventDate,
+            formatRelativeTime,
+            formatTime,
+            isSameLocalDay
+        } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const {
+            getPersistedCalendarEvents,
+            getPersistedDiaperLogs,
+            getPersistedFeedingLogs,
+            getPersistedSleepLogs
+        } = await import(`${moduleBase}utils/localState.mjs`);
+
+        const now = new Date();
+        const allFeedingLogs = getPersistedFeedingLogs(feedingLogs);
+        const allSleepLogs = getPersistedSleepLogs(sleepLogs);
+        const allDiaperLogs = getPersistedDiaperLogs(diaperLogs);
+        const allCalendarEvents = getPersistedCalendarEvents(calendarEvents);
+        const primaryParent = familyMembers.find(member => member.permission === "owner") || familyMembers[0];
+        const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
+        const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
+        const nextEvent = [...allCalendarEvents]
+            .filter(event => ["vaccine", "clinic"].includes(event.type) && new Date(event.startsAt) >= now)
+            .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0] || calendarEvents[0];
+        const feedSuggestion = assistantSuggestions.find(suggestion => suggestion.category === "feeding") || assistantSuggestions[0];
+
+        const setText = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        };
+
+        setText("parentName", primaryParent?.name || "Mama");
+        setText("babyName", babyProfile.name);
+        setText("babyAge", calculateBabyAge(babyProfile.dateOfBirth, now));
+        setText("lastFeedTime", formatRelativeTime(latestFeed.startedAt, now));
+        setText("todaySleepTotal", formatDuration(getTodaySleepMinutes(allSleepLogs, now)));
+        setText("lastDiaperTime", formatRelativeTime(latestDiaper.changedAt, now));
+        setText("assistantTitle", feedSuggestion.title);
+        setText("assistantMessage", feedSuggestion.message);
+
+        if (nextEvent) {
+            const { dateLabel, relativeLabel } = formatEventDate(nextEvent.startsAt, now);
+            setText("nextEventLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
+            setText("nextEventDate", dateLabel);
+            setText("nextEventRelative", relativeLabel);
+        }
+
+        renderTimeline(now);
+
+        function getTodaySleepMinutes(logs, date) {
+            const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
+
+            return logs.reduce((total, log) => {
+                const start = new Date(log.startedAt);
+                const end = log.endedAt ? new Date(log.endedAt) : date;
+                const overlapStart = new Date(Math.max(start, dayStart));
+                const overlapEnd = new Date(Math.min(end, dayEnd));
+                const minutes = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
+                return total + minutes;
+            }, 0);
+        }
+
+        function renderTimeline(date) {
+            const events = [
+                ...allFeedingLogs
+                    .filter(log => isSameLocalDay(log.startedAt, date))
+                    .map(log => ({
+                        at: log.startedAt,
+                        type: "feed",
+                        title: labelFeedingType(log.type),
+                        detail: log.amountGrams ? `${log.amountGrams}g solid food` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} feeding` : log.notes || "Feeding logged"
+                    })),
+                ...allSleepLogs
+                    .filter(log => isSameLocalDay(log.startedAt, date))
+                    .map(log => ({
+                        at: log.startedAt,
+                        type: "sleep",
+                        title: log.status === "nap" ? "Nap" : "Sleep",
+                        detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
+                    })),
+                ...allDiaperLogs
+                    .filter(log => isSameLocalDay(log.changedAt, date))
+                    .map(log => ({
+                        at: log.changedAt,
+                        type: "diaper",
+                        title: "Diaper",
+                        detail: `${capitalize(log.type)} changed`
+                    }))
+            ].sort((a, b) => new Date(a.at) - new Date(b.at));
+
+            const timeline = document.getElementById("timelineList");
+            if (!timeline) return;
+
+            timeline.innerHTML = '<div class="absolute left-3 top-2 bottom-2 w-[2px] timeline-line rounded-full"></div>' +
+                events.map(renderTimelineItem).join("");
+        }
+
+        function renderTimelineItem(event) {
+            const colors = {
+                feed: { outer: "bg-primary-container", inner: "bg-primary" },
+                sleep: { outer: "bg-[#E0F2FE]", inner: "bg-[#0369A1]" },
+                diaper: { outer: "bg-[#DCFCE7]", inner: "bg-[#15803D]" }
+            };
+            const color = colors[event.type];
+
+            return `
+                <div class="relative">
+                    <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full ${color.outer} flex items-center justify-center border-2 border-white">
+                        <div class="w-2 h-2 rounded-full ${color.inner}"></div>
+                    </div>
+                    <div>
+                        <p class="font-label-md text-label-md text-on-surface">${formatTime(event.at)}</p>
+                        <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
+                            <p class="font-body-md text-body-md text-on-surface"><span class="font-bold">${event.title}</span> &middot; ${event.detail}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function labelFeedingType(type) {
+            return {
+                bottle: "Bottle",
+                breast: "Breastfeed",
+                formula: "Formula",
+                solid: "Solid"
+            }[type] || "Feed";
+        }
+
+        function labelMilk(type) {
+            return type === "formula" ? "formula" : "breastmilk";
+        }
+
+        function capitalize(value) {
+            return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+        }
+
+        // Micro-interactions and simple effects
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Subtle tactile feedback simulation if needed
+            });
+        });
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

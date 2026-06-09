@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .sleep-glow {
+            box-shadow: 0 0 40px rgba(255, 191, 163, 0.3);
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 15.5px;
+            top: 32px;
+            bottom: 0;
+            width: 2px;
+            border-left: 2px dashed #d6c2bb;
+        }
+        .timeline-item:last-child .timeline-line::before {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-50">
+<div class="flex items-center gap-base">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_back">arrow_back</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Sleep Tracker</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A soft-focus profile avatar of a happy infant wrapped in a cream-colored organic cotton blanket, set against a warm, sun-drenched nursery background with pastel peach and sage green tones. The lighting is diffused and gentle, evoking a sense of safety and calm, consistent with a high-end parenting application's aesthetic." src="https://lh3.googleusercontent.com/aida/AP1WRLvughdMbSV91EsVAd1w-2FeccPleYlNiKeocYMlp8xR9PH5a80ridwfoCmNGiqPdSSz_YuzAIYwDsUvRixZGSpC4A_cEk7OirzYCj3k1dtbM00peJ_kJug2_kS-V22FoHt-_8gv6znhOCo0AuCdrwOmDF8B0_NVj4CNjwl9-dZCAK5seqoArt4iVBZ8i9IJtESyp75NPbOn6etjPDzEe6mIY0MLA-CtCIFrUTl_qNCGUZXTj_CLfLAk_Ny_"/>
+</div>
+</header>
+<main class="px-container-padding pt-6 space-y-lg">
+<!-- Sleep Hero State Controller (JS Handled) -->
+<section class="relative overflow-hidden rounded-[32px] p-8 bg-surface-container-low transition-all duration-500 ease-in-out" id="sleep-hero">
+<!-- Idle State -->
+<div class="flex flex-col items-center justify-center text-center space-y-6" id="idle-state">
+<div class="w-32 h-32 rounded-full bg-primary-container flex items-center justify-center sleep-glow animate-pulse">
+<span class="material-symbols-outlined text-on-primary-container !text-5xl" data-icon="bedtime" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Time for a nap?</h2>
+<p class="text-on-surface-variant mt-1">Tap to start tracking sleep</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md px-8 py-4 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all" id="startSleepButton" type="button">
+                    Start Sleep
+                </button>
+</div>
+<!-- Active State (Hidden by default) -->
+<div class="hidden flex flex-col items-center justify-center text-center space-y-6" id="active-state">
+<div class="relative w-40 h-40">
+<div class="absolute inset-0 rounded-full border-4 border-primary-container border-t-primary animate-spin"></div>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-primary !text-4xl" data-icon="nights_stay" style="font-variation-settings: 'FILL' 1;">nights_stay</span>
+<span class="font-headline-md text-headline-md text-primary mt-2" id="timer-display">0h 00m</span>
+</div>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Zzz... Resting</h2>
+<p class="text-on-surface-variant mt-1" id="sleepingSinceText">Sleeping now</p>
+</div>
+<button class="bg-secondary text-on-secondary font-label-md px-8 py-4 rounded-full shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-2" id="wakeUpButton" type="button">
+<span class="material-symbols-outlined" data-icon="wb_sunny">wb_sunny</span>
+                    Wake Up
+                </button>
+</div>
+</section>
+<!-- Today's Summary Card -->
+<section class="grid grid-cols-2 gap-gutter">
+<div class="bg-tertiary-container rounded-[24px] p-5 space-y-2">
+<div class="flex items-center gap-2 text-on-tertiary-container">
+<span class="material-symbols-outlined !text-[20px]" data-icon="schedule">schedule</span>
+<span class="font-label-sm text-label-sm">TOTAL SLEEP</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-on-tertiary-container" id="totalSleepHours">12</span>
+<span class="font-label-md text-label-md text-on-tertiary-container/80">h</span>
+<span class="font-display-lg text-display-lg text-on-tertiary-container ml-1" id="totalSleepMinutes">45</span>
+<span class="font-label-md text-label-md text-on-tertiary-container/80">m</span>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-[24px] p-5 space-y-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined !text-[20px]" data-icon="update">update</span>
+<span class="font-label-sm text-label-sm">NAPS</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-on-surface" id="napCount">0</span>
+<span class="font-label-md text-label-md text-on-surface-variant">today</span>
+</div>
+</div>
+</section>
+<!-- Nap History Timeline -->
+<section class="space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Today's Timeline</h3>
+<button class="text-primary font-label-md hover:opacity-70">View Stats</button>
+</div>
+<div class="space-y-0" id="napHistoryList">
+<!-- Timeline Item 1 -->
+<div class="timeline-item relative pl-12 pb-8 timeline-line">
+<div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-primary-container flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-on-primary-container !text-base" data-icon="bedtime" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center">
+<div>
+<p class="font-label-md text-on-surface">Afternoon Nap</p>
+<p class="text-label-sm text-on-surface-variant">1:12 PM — 2:45 PM</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-primary">1h 33m</p>
+<span class="material-symbols-outlined text-outline-variant !text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="timeline-item relative pl-12 pb-8 timeline-line">
+<div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-on-tertiary-container !text-base" data-icon="wb_sunny" style="font-variation-settings: 'FILL' 1;">wb_sunny</span>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center">
+<div>
+<p class="font-label-md text-on-surface">Morning Rest</p>
+<p class="text-label-sm text-on-surface-variant">9:05 AM — 10:20 AM</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-primary">1h 15m</p>
+<span class="material-symbols-outlined text-outline-variant !text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item 3 (Overnight) -->
+<div class="timeline-item relative pl-12 pb-2 timeline-line">
+<div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-on-secondary-container !text-base" data-icon="nights_stay" style="font-variation-settings: 'FILL' 1;">nights_stay</span>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center">
+<div>
+<p class="font-label-md text-on-surface">Night Sleep</p>
+<p class="text-label-sm text-on-surface-variant">Yesterday 8:00 PM — 7:00 AM</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-primary">11h 00m</p>
+<span class="material-symbols-outlined text-outline-variant !text-lg" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Decorative Illustration / Placeholder -->
+<section class="py-xl">
+<div class="aspect-video rounded-[32px] overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-key photograph of a sleeping baby in a serene, modern nursery. The image features soft peach and warm cream lighting, creating a calm and secure atmosphere. The composition uses a wide shot to show a hint of a minimalist crib and a plush toy in the corner. The focus is soft and dreamy, embodying a digital sanctuary aesthetic with no harsh shadows." src="https://lh3.googleusercontent.com/aida/AP1WRLuBk4uYxkYJ1reRRBmuyHt1TEhbiKeuy6YCbTcxXUC5EMOKapkjsfKEudM7FSLSSJpRtPsMeXhr93j99QpDEu3gnGAdi17ob5n3KHQlS4xu3CKYGpGjpJVAHn7SRogrhmBU3iSZp4YEq_GKcV4mXrWT3uKblFIt8dvMLgXIKqB5bq1YGyMXLUWfA4fcV7K3wXR9F497_rQkZDfC7IO9-74CwaHC_KnqlkVdjBG2LGWSSOXLQWcj33tiEfw0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-6">
+<p class="text-white font-label-md italic">"Sleep is the golden chain that ties health and our bodies together."</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm-mobile">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="font-label-sm text-label-sm-mobile">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm-mobile">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm-mobile">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm-mobile">Assistant</span>
+</a>
+</nav>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { babyProfile, sleepLogs: mockSleepLogs } = await import(`${moduleBase}data/mockData.mjs`);
+        const { formatDuration, formatTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const {
+            clearActiveSleepSession,
+            getActiveSleepSession,
+            getLocalSleepLogs,
+            saveActiveSleepSession,
+            saveLocalSleepLog
+        } = await import(`${moduleBase}utils/localState.mjs`);
+
+        const idle = document.getElementById("idle-state");
+        const active = document.getElementById("active-state");
+        const hero = document.getElementById("sleep-hero");
+        const startButton = document.getElementById("startSleepButton");
+        const wakeButton = document.getElementById("wakeUpButton");
+        const timerDisplay = document.getElementById("timer-display");
+        const sleepingSinceText = document.getElementById("sleepingSinceText");
+        const totalSleepHours = document.getElementById("totalSleepHours");
+        const totalSleepMinutes = document.getElementById("totalSleepMinutes");
+        const napCount = document.getElementById("napCount");
+        const napHistoryList = document.getElementById("napHistoryList");
+        let timerInterval;
+
+        startButton.addEventListener("click", startSleep);
+        wakeButton.addEventListener("click", wakeUp);
+        render();
+
+        function startSleep() {
+            const session = {
+                id: `sleep-active-${Date.now()}`,
+                babyId: babyProfile.id,
+                status: "started",
+                startedAt: new Date().toISOString()
+            };
+            saveActiveSleepSession(session);
+            render();
+        }
+
+        function wakeUp() {
+            const session = getActiveSleepSession();
+            if (!session) return;
+
+            const endedAt = new Date().toISOString();
+            saveLocalSleepLog({
+                id: `sleep-local-${Date.now()}`,
+                babyId: babyProfile.id,
+                status: "nap",
+                startedAt: session.startedAt,
+                endedAt,
+                notes: "Logged from Sleep Tracker"
+            });
+            clearActiveSleepSession();
+            render();
+        }
+
+        function render() {
+            const activeSession = getActiveSleepSession();
+            setActiveState(Boolean(activeSession));
+            renderTimer(activeSession);
+            renderSummary(activeSession);
+            renderHistory(activeSession);
+        }
+
+        function setActiveState(isActive) {
+            idle.classList.toggle("hidden", isActive);
+            active.classList.toggle("hidden", !isActive);
+            hero.classList.toggle("bg-surface-container-low", !isActive);
+            hero.classList.toggle("bg-primary-fixed", isActive);
+        }
+
+        function renderTimer(activeSession) {
+            clearInterval(timerInterval);
+
+            if (!activeSession) {
+                timerDisplay.textContent = "0h 00m";
+                return;
+            }
+
+            sleepingSinceText.textContent = `Sleeping since ${formatTime(activeSession.startedAt)}`;
+            updateTimerDisplay(activeSession.startedAt);
+            timerInterval = setInterval(() => updateTimerDisplay(activeSession.startedAt), 1000);
+        }
+
+        function updateTimerDisplay(startedAt) {
+            const elapsedMinutes = Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 60000));
+            const hours = Math.floor(elapsedMinutes / 60);
+            const minutes = elapsedMinutes % 60;
+            timerDisplay.textContent = `${hours}h ${String(minutes).padStart(2, "0")}m`;
+        }
+
+        function renderSummary(activeSession) {
+            const totalMinutes = getTodaySleepMinutes(activeSession);
+            totalSleepHours.textContent = String(Math.floor(totalMinutes / 60));
+            totalSleepMinutes.textContent = String(totalMinutes % 60).padStart(2, "0");
+            napCount.textContent = String(getTodaySleepLogs(activeSession).filter((log) => log.status !== "night_sleep").length);
+        }
+
+        function renderHistory(activeSession) {
+            const logs = getTodaySleepLogs(activeSession)
+                .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+
+            napHistoryList.innerHTML = logs.length
+                ? logs.map(renderNapCard).join("")
+                : renderEmptyHistory();
+        }
+
+        function getTodaySleepLogs(activeSession) {
+            const activeLogs = activeSession ? [{ ...activeSession, isActive: true }] : [];
+            return [...activeLogs, ...getLocalSleepLogs(), ...mockSleepLogs]
+                .filter((log) => isSameLocalDay(log.startedAt, new Date()) || (log.endedAt && isSameLocalDay(log.endedAt, new Date())));
+        }
+
+        function getTodaySleepMinutes(activeSession) {
+            const date = new Date();
+            const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
+
+            return getTodaySleepLogs(activeSession).reduce((total, log) => {
+                const start = new Date(log.startedAt);
+                const end = log.endedAt ? new Date(log.endedAt) : new Date();
+                const overlapStart = new Date(Math.max(start, dayStart));
+                const overlapEnd = new Date(Math.min(end, dayEnd));
+                return total + Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
+            }, 0);
+        }
+
+        function renderNapCard(log) {
+            const start = formatTime(log.startedAt);
+            const end = log.endedAt ? formatTime(log.endedAt) : "Now";
+            const minutes = Math.max(0, Math.round(((log.endedAt ? new Date(log.endedAt) : new Date()) - new Date(log.startedAt)) / 60000));
+            const icon = log.isActive ? "nights_stay" : log.status === "night_sleep" ? "nights_stay" : "bedtime";
+            const title = log.isActive ? "Sleeping now" : log.status === "night_sleep" ? "Night Sleep" : "Nap";
+            const dotColor = log.isActive ? "bg-primary-container text-on-primary-container" : "bg-tertiary-container text-on-tertiary-container";
+
+            return `
+                <div class="timeline-item relative pl-12 pb-8 timeline-line">
+                    <div class="absolute left-0 top-0 w-8 h-8 rounded-full ${dotColor} flex items-center justify-center z-10">
+                        <span class="material-symbols-outlined !text-base" style="font-variation-settings: 'FILL' 1;">${icon}</span>
+                    </div>
+                    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center">
+                        <div>
+                            <p class="font-label-md text-on-surface">${title}</p>
+                            <p class="text-label-sm text-on-surface-variant">${start} &mdash; ${end}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-label-md text-primary">${formatDuration(minutes)}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmptyHistory() {
+            return `
+                <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-primary-container/30 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-[#E0F2FE] text-[#0369A1] mx-auto flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[34px]">bedtime</span>
+                    </div>
+                    <div>
+                        <p class="font-headline-md text-on-surface">No sleep logs yet</p>
+                        <p class="text-body-md text-on-surface-variant">Start sleep when baby settles. Rough tracking is okay.</p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

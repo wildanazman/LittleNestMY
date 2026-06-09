@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Baby Profile - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #FFFDF8;
+            font-family: 'Nunito Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-input-focus:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 191, 163, 0.4);
+        }
+        .radio-tile-active {
+            background-color: #ffbfa3 !important;
+            color: #7a4b36 !important;
+            border-color: #83533c !important;
+        }
+        /* Custom date picker appearance */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: opacity(0.5);
+            cursor: pointer;
+        }
+        .shadow-soft {
+            box-shadow: 0 10px 25px -5px rgba(255, 191, 163, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen text-on-surface">
+<!-- Top App Bar -->
+<header class="docked full-width top-0 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14 sticky z-50">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">LittleNest MY</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border-2 border-primary-container">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsXkS-DzsW2IxuGaNlrZ1u-pGUCtB6uXCPPu2_-H5HuAyzUZRBVLpdD9WXQeVZjqh-oFL7oVR8BFArBbXy2dttyHilBNYDHX4mwEr68CqS9H7Ek-CbM0XNo6jjq-xDjUWUAtjeDO77D1pzgvMGAjw3niAWQ7E-DNKiqjuRMs9YGTHvigUfOT8fSjJsbelzCB0PmOX_zwEQIQnewpT1UOHJjoLdapKCLSHCtpvh7ca4YNiOshoFuI54HpaHN"/>
+</div>
+</header>
+<main class="max-w-md mx-auto px-container-padding pt-8 pb-32">
+<!-- Content Canvas -->
+<div class="space-y-8">
+<!-- Header Section -->
+<div class="text-center space-y-2">
+<h2 class="font-display-lg text-display-lg text-on-surface">New Arrival</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Let's start your baby's journey of growth and memories.</p>
+</div>
+<!-- Profile Form -->
+<form class="space-y-6" id="babyProfileForm">
+<!-- Avatar Upload Section -->
+<div class="flex flex-col items-center gap-4">
+<div class="relative group">
+<div class="w-32 h-32 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border-4 border-surface shadow-soft transition-transform group-active:scale-95">
+<img class="w-full h-full object-cover hidden" data-alt="A soft, heartwarming portrait of a newborn baby wrapped in a light cream-colored organic cotton blanket. The lighting is diffused and golden, creating a serene and angelic mood. The background is a blurred, warm wooden nursery setting, maintaining a professional and clean aesthetic typical of a high-end parenting application." id="babyAvatarPreview" src="https://lh3.googleusercontent.com/aida/AP1WRLs8THNt6xPiwBS3Z5K7wRrxj-0fzAirwZA1W47nZW0F-9xu36yvx5BH2w0PYcAi04ry_BvcXrNeptq5AAsaIKuXgV1VI2cZwufZA03v_8yzt9gSsJSIlrKpdR8Fk9I-OAGc8KKDBHxM7UCTvM_UYjG9HQLvSa82Glc2N0pIxF7yfJTXtjpTNPC7bpfYDlciLrLwPNOUxqaRBY4D_t-UFVttDwngV_L9e1yUN2HzlZatM5sLCUBkZbf8dE8"/>
+<span class="material-symbols-outlined text-4xl text-on-secondary-container" id="avatarPlaceholder">add_a_photo</span>
+</div>
+<label class="absolute bottom-1 right-1 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-lg cursor-pointer hover:scale-105 transition-transform" for="avatarInput">
+<span class="material-symbols-outlined">edit</span>
+<input accept="image/*" class="hidden" id="avatarInput" type="file"/>
+</label>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant">Upload baby photo</span>
+</div>
+<!-- Input Fields Group -->
+<div class="space-y-4">
+<!-- Baby Name -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="babyName">Baby Name</label>
+<input class="w-full h-14 px-4 rounded-xl border-none bg-[#FFF7ED] text-body-md form-input-focus transition-all placeholder:text-outline-variant" id="babyName" placeholder="e.g. Noah Liam" type="text"/>
+</div>
+<!-- Date of Birth -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="dob">Date of Birth</label>
+<div class="relative">
+<input class="w-full h-14 px-4 rounded-xl border-none bg-[#FFF7ED] text-body-md form-input-focus transition-all" id="dob" type="date"/>
+<span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">calendar_today</span>
+</div>
+</div>
+<!-- Gender Selection -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Gender (Optional)</label>
+<div class="flex gap-3">
+<button class="gender-btn flex-1 h-12 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Boy</button>
+<button class="gender-btn flex-1 h-12 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Girl</button>
+<button class="gender-btn flex-1 h-12 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Other</button>
+</div>
+</div>
+<!-- Feeding Preference -->
+<div class="space-y-3 pt-2">
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Feeding Preference</label>
+<div class="grid grid-cols-1 gap-3">
+<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">favorite</span> Breastfeeding</span>
+<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+</button>
+<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">sanitizer</span> Formula</span>
+<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+</button>
+<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-xl bg-[#FFF7ED] font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">all_inclusive</span> Mixed</span>
+<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Submit Button -->
+<div class="pt-6">
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+                        Create Baby Profile
+                        <span class="material-symbols-outlined">celebration</span>
+</button>
+</div>
+</form>
+</div>
+</main>
+<!-- Navigation suppressed for linear onboarding task -->
+<script>
+        // Image preview logic
+        const avatarInput = document.getElementById('avatarInput');
+        const babyAvatarPreview = document.getElementById('babyAvatarPreview');
+        const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    babyAvatarPreview.src = event.target.result;
+                    babyAvatarPreview.classList.remove('hidden');
+                    avatarPlaceholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Toggle selection for buttons
+        function toggleSelection(element, group) {
+            const buttons = document.querySelectorAll(`.${group}-btn`);
+            buttons.forEach(btn => btn.classList.remove('radio-tile-active'));
+            element.classList.add('radio-tile-active');
+        }
+
+        // Form submission animation
+        document.getElementById('babyProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = e.submitter;
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Setting up...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">done</span> Profile Created!';
+                btn.classList.replace('bg-primary-container', 'bg-tertiary-container');
+                btn.classList.replace('text-on-primary-container', 'text-on-tertiary-container');
+                
+                // Micro-interaction: redirect simulated
+                setTimeout(() => {
+                    alert('Profile successfully created! Welcome to LittleNest.');
+                }, 500);
+            }, 1500);
+        });
+    </script>
+</body></html>

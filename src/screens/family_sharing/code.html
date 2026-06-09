@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Family &amp; Caregivers | LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                    "display-lg": ["32px", { "lineHeight": "40px", "fontWeight": "800" }],
+                    "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                    "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "700" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "headline-lg-mobile": ["22px", { "lineHeight": "28px", "fontWeight": "700" }],
+                    "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "600" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fbf9f4;
+            font-family: 'Nunito Sans', sans-serif;
+            min-height: max(884px, 100dvh);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-shadow {
+            box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
+        }
+        .pill-button-inner-glow {
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+        .prototype-panel {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(-8px);
+            transition: max-height 220ms ease, opacity 180ms ease, transform 220ms ease;
+        }
+        .prototype-panel.is-open {
+            max-height: 560px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="text-on-surface pb-32">
+<header class="bg-surface sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-container-padding h-14 max-w-md mx-auto">
+<div class="flex items-center gap-2 min-w-0">
+<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" id="backButton" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary truncate">Family &amp; Caregivers</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" data-icon="diversity_1">diversity_1</span>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto px-container-padding pt-6 space-y-xl">
+<section class="space-y-sm">
+<div class="rounded-xl bg-primary-fixed p-5 soft-shadow">
+<div class="flex items-start gap-3">
+<div class="w-11 h-11 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="home_health">home_health</span>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-primary-container uppercase">Shared care</p>
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed">Aisyah's care circle</h2>
+<p class="font-body-md text-body-md text-on-primary-fixed-variant">Keep Mama, Papa, and trusted helpers clear on daily care without adding pressure.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="space-y-md">
+<div class="flex items-center justify-between gap-3">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Members</h2>
+<p class="font-label-md text-label-md text-on-surface-variant" id="memberSummary">Loading care circle...</p>
+</div>
+<button class="h-11 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 active:scale-95 transition-transform" id="inviteToggleButton" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
+<span>Invite</span>
+</button>
+</div>
+<div class="prototype-panel" id="invitePanel">
+<div class="rounded-xl bg-surface-container-low p-4 border border-outline-variant/40 soft-shadow space-y-sm">
+<div class="flex items-start justify-between gap-3">
+<div>
+<h3 class="font-headline-md text-body-lg text-on-surface">Prepare invite</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Prototype only. No message will be sent.</p>
+</div>
+<button aria-label="Close invite form" class="w-9 h-9 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center" id="inviteCloseButton" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
+</button>
+</div>
+<label class="block space-y-xs">
+<span class="font-label-md text-label-md text-on-surface">Name</span>
+<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteNameInput" placeholder="Example: Atuk"/>
+</label>
+<label class="block space-y-xs">
+<span class="font-label-md text-label-md text-on-surface">Email or phone</span>
+<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteContactInput" placeholder="name@example.my or +60..."/>
+</label>
+<label class="block space-y-xs">
+<span class="font-label-md text-label-md text-on-surface">Role</span>
+<select class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteRoleInput">
+<option value="parent">Parent</option>
+<option value="caregiver">Caregiver</option>
+<option value="viewer">Viewer</option>
+</select>
+</label>
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary-container font-headline-md text-body-md flex items-center justify-center gap-2 pill-button-inner-glow active:scale-95 transition-transform" id="prepareInviteButton" type="button">
+<span class="material-symbols-outlined" data-icon="draft">draft</span>
+Prepare Prototype Invite
+</button>
+<p class="min-h-5 font-label-md text-label-md text-tertiary" id="inviteFeedback"></p>
+</div>
+</div>
+<div class="space-y-sm" id="familyMembersList"></div>
+</section>
+<section class="space-y-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Permissions</h2>
+<p class="font-label-md text-label-md text-on-surface-variant">Simple access levels for an MVP prototype.</p>
+</div>
+<div class="grid gap-sm">
+<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="family_restroom">family_restroom</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Parent</h3>
+<p class="font-body-md text-label-md text-on-surface-variant">Can add logs, update calendar items, and help manage the care circle.</p>
+</div>
+</div>
+</article>
+<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Caregiver</h3>
+<p class="font-body-md text-label-md text-on-surface-variant">Can record practical care updates like feeding, sleep, diapers, and daycare notes.</p>
+</div>
+</div>
+</article>
+<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Viewer</h3>
+<p class="font-body-md text-label-md text-on-surface-variant">Can read shared updates and reminders, but cannot edit baby records.</p>
+</div>
+</div>
+</article>
+</div>
+</section>
+<section class="rounded-xl bg-surface-container-high p-5 soft-shadow space-y-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="privacy_tip">privacy_tip</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Prototype note</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Invites shown here are only a realistic frontend flow. A real app would add secure invite links, account checks, and permission controls later.</p>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { familyMembers } = await import(`${moduleBase}data/mockData.mjs`);
+
+        const familyMembersList = document.getElementById("familyMembersList");
+        const memberSummary = document.getElementById("memberSummary");
+        const invitePanel = document.getElementById("invitePanel");
+        const inviteToggleButton = document.getElementById("inviteToggleButton");
+        const inviteCloseButton = document.getElementById("inviteCloseButton");
+        const inviteNameInput = document.getElementById("inviteNameInput");
+        const inviteContactInput = document.getElementById("inviteContactInput");
+        const inviteRoleInput = document.getElementById("inviteRoleInput");
+        const prepareInviteButton = document.getElementById("prepareInviteButton");
+        const inviteFeedback = document.getElementById("inviteFeedback");
+        const backButton = document.getElementById("backButton");
+
+        let prototypeMembers = familyMembers.map(member => ({ ...member }));
+
+        inviteToggleButton.addEventListener("click", () => {
+            invitePanel.classList.toggle("is-open");
+            inviteNameInput.focus();
+        });
+
+        inviteCloseButton.addEventListener("click", () => {
+            invitePanel.classList.remove("is-open");
+        });
+
+        prepareInviteButton.addEventListener("click", () => {
+            const name = inviteNameInput.value.trim();
+            const contact = inviteContactInput.value.trim();
+            const selectedRole = inviteRoleInput.value;
+
+            if (!name || !contact) {
+                inviteFeedback.textContent = "Add a name and contact to preview the invite.";
+                return;
+            }
+
+            prototypeMembers = [
+                {
+                    id: `prototype-${Date.now()}`,
+                    name,
+                    role: selectedRole === "viewer" ? "family" : selectedRole,
+                    permission: selectedRole === "viewer" ? "viewer" : "editor",
+                    email: contact.includes("@") ? contact : undefined,
+                    phone: contact.includes("@") ? undefined : contact,
+                    invitedAt: new Date().toISOString(),
+                    isPrototype: true
+                },
+                ...prototypeMembers
+            ];
+
+            inviteFeedback.textContent = "Prototype invite added to the preview list.";
+            inviteNameInput.value = "";
+            inviteContactInput.value = "";
+            inviteRoleInput.value = "parent";
+            renderMembers();
+        });
+
+        backButton.addEventListener("click", () => {
+            window.location.href = "/assistant/";
+        });
+
+        function renderMembers() {
+            memberSummary.textContent = `${prototypeMembers.length} members in Aisyah's care circle`;
+            const hasHelpers = prototypeMembers.some(member => getDisplayRole(member) !== "Parent");
+            familyMembersList.innerHTML = [
+                ...prototypeMembers.map(renderMemberCard),
+                hasHelpers ? "" : renderNoHelpersCard()
+            ].join("");
+        }
+
+        function renderNoHelpersCard() {
+            return `
+                <article class="bg-surface-container-low rounded-xl p-6 soft-shadow border border-tertiary-container/40 text-center space-y-3">
+                    <div class="w-16 h-16 rounded-full bg-tertiary-fixed text-on-tertiary-fixed mx-auto flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[34px]">diversity_1</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-md text-headline-md text-on-surface">No caregivers or viewers yet</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant">When you are ready, invite a trusted caregiver or family viewer. Mama and Papa can start small.</p>
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderMemberCard(member) {
+            const role = getDisplayRole(member);
+            const style = getRoleStyle(role);
+            const contact = member.email || member.phone || "Contact not added";
+            const status = member.acceptedAt ? "Active" : member.isPrototype ? "Prototype invite" : "Pending";
+
+            return `
+                <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center font-headline-md text-body-lg shrink-0">
+                            ${getInitials(member.name)}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(member.name)}</h3>
+                                    <p class="font-label-md text-label-md text-on-surface-variant truncate">${escapeHtml(contact)}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full ${style.chip} font-label-sm text-label-sm whitespace-nowrap">${role}</span>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between gap-3">
+                                <p class="font-label-sm text-label-sm text-on-surface-variant">${getPermissionText(member)}</p>
+                                <span class="font-label-sm text-label-sm ${status === "Active" ? "text-tertiary" : "text-primary"}">${status}</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function getDisplayRole(member) {
+            if (member.permission === "viewer") return "Viewer";
+            if (member.role === "caregiver") return "Caregiver";
+            return "Parent";
+        }
+
+        function getRoleStyle(role) {
+            const styles = {
+                Parent: {
+                    avatar: "bg-primary-container text-on-primary-container",
+                    chip: "bg-primary-container text-on-primary-container"
+                },
+                Caregiver: {
+                    avatar: "bg-tertiary-fixed text-on-tertiary-fixed",
+                    chip: "bg-tertiary-fixed text-on-tertiary-fixed"
+                },
+                Viewer: {
+                    avatar: "bg-secondary-container text-secondary",
+                    chip: "bg-secondary-container text-secondary"
+                }
+            };
+            return styles[role] || styles.Viewer;
+        }
+
+        function getPermissionText(member) {
+            if (member.permission === "owner") return "Owner access";
+            if (member.permission === "viewer") return "View only";
+            return "Can add care updates";
+        }
+
+        function getInitials(name) {
+            return name
+                .split(" ")
+                .filter(Boolean)
+                .slice(0, 2)
+                .map(part => part[0].toUpperCase())
+                .join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        renderMembers();
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>
