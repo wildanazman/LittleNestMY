@@ -177,7 +177,7 @@
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
 <span class="font-label-sm text-label-sm">Today Sleep</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="todaySleepTotal">No sleep logs yet</p>
+<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="todaySleepTotal">No sleep yet</p>
 <span class="font-label-sm text-label-sm text-[#1E40AF]"></span>
 </div>
 <!-- Diaper -->
@@ -186,7 +186,7 @@
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
 <span class="font-label-sm text-label-sm">Diaper</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="lastDiaperTime">No diaper logs yet</p>
+<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
 <span class="font-label-sm text-label-sm text-[#166534]"></span>
 </div>
 <!-- Vaccine -->
@@ -195,7 +195,7 @@
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">vaccines</span>
 <span class="font-label-sm text-label-sm" id="nextEventLabel">Next Vaccine</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="nextEventDate">No appointments yet</p>
+<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextEventDate">No appts yet</p>
 <span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative"></span>
 </div>
 </section>
@@ -220,17 +220,29 @@
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Diaper</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-coming-soon="Medicine log" data-coming-soon-message="Medicine tracking will be added after the MVP health note flow is ready." role="button" tabindex="0" aria-label="Medicine log coming soon">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
-<span class="material-symbols-outlined">medication</span>
+<span class="material-symbols-outlined">monitor_weight</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Growth</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-coming-soon="Health note" data-coming-soon-message="A simple health note form is coming soon. For now, you can keep notes outside the app." role="button" tabindex="0" aria-label="Health note coming soon">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">edit_note</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Note</span>
+</div>
+</div>
+</section>
+<section>
+<div class="bg-surface-container-low p-4 rounded-[24px] soft-shadow border border-white/60 cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
+<div class="flex items-center justify-between gap-3">
+<div class="min-w-0">
+<p class="font-label-sm text-label-sm text-primary uppercase">Growth</p>
+<p class="font-headline-md text-headline-md text-on-surface truncate" id="growthSummaryTitle">No growth yet</p>
+<p class="font-body-md text-body-md text-on-surface-variant truncate" id="growthSummaryDetail">Add a first measurement when ready.</p>
+</div>
+<span class="material-symbols-outlined text-primary">show_chart</span>
 </div>
 </div>
 </section>
@@ -352,6 +364,7 @@
             diaperLogs,
             familyMembers,
             feedingLogs,
+            growthRecords,
             sleepLogs
         } = await import(`${moduleBase}data/mockData.mjs`);
         const {
@@ -367,6 +380,8 @@
             getPersistedCalendarEvents,
             getPersistedDiaperLogs,
             getPersistedFeedingLogs,
+            getPersistedGrowthRecords,
+            getPersistedReminders,
             getPersistedSleepLogs,
             getLogsForBaby,
             getSelectedBabyId,
@@ -375,6 +390,7 @@
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
+        const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
 
         const now = new Date();
         if (!isLoggedIn()) {
@@ -392,6 +408,8 @@
         const allSleepLogs = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId);
         const allDiaperLogs = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId);
         const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents(calendarEvents), selectedBabyId);
+        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords(growthRecords), selectedBabyId);
+        const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);
         const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
@@ -417,8 +435,8 @@
         setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
         const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
         setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feeds yet");
-        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "No sleep logs yet");
-        setText("lastDiaperTime", latestDiaper ? formatRelativeTime(latestDiaper.changedAt, now) : "No diaper logs yet");
+        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "No sleep yet");
+        setText("lastDiaperTime", latestDiaper ? formatRelativeTime(latestDiaper.changedAt, now) : "No diapers yet");
         setText("assistantTitle", latestFeed ? "Recent care logged" : "No activity yet");
         setText("assistantMessage", latestFeed ? "Your latest logs will appear in the timeline below." : "Add your first log when you are ready.");
         setText("babyMenuTitle", selectedBaby.name);
@@ -432,9 +450,11 @@
             setText("nextEventRelative", relativeLabel);
         } else {
             setText("nextEventLabel", "Next Appointment");
-            setText("nextEventDate", "No appointments yet");
+            setText("nextEventDate", "No appts yet");
             setText("nextEventRelative", "");
         }
+        renderGrowthSummary();
+        renderReminderBanner();
 
         renderTimeline(now);
         bindBabyProfileMenu();
@@ -452,6 +472,41 @@
                 const minutes = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
                 return total + minutes;
             }, 0);
+        }
+
+        function renderGrowthSummary() {
+            const latestGrowth = [...allGrowthRecords].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+            if (!latestGrowth) return;
+            const length = latestGrowth.heightCm || latestGrowth.lengthCm;
+            setText("growthSummaryTitle", latestGrowth.weightKg ? `${latestGrowth.weightKg} kg` : "Growth saved");
+            setText("growthSummaryDetail", [length ? `${length} cm` : "", latestGrowth.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm head` : ""].filter(Boolean).join(" · ") || "Latest measurement saved");
+        }
+
+        function renderReminderBanner() {
+            const nextReminder = [...allReminders]
+                .filter((reminder) => reminder.enabled && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
+                .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))[0];
+            if (nextReminder) {
+                setText("assistantTitle", "Upcoming reminder");
+                setText("assistantMessage", `${nextReminder.title} · ${formatRelativeTime(nextReminder.scheduledAt, now)}`);
+                return;
+            }
+            const enabledFeeding = allReminders.find((reminder) => reminder.type === "feeding" && reminder.enabled);
+            if (!latestFeed && !enabledFeeding) return;
+            const guide = getFeedingGuideForBaby(selectedBaby.dateOfBirth);
+            const reminderText = latestFeed
+                ? nextFeedReminderText(latestFeed.startedAt, enabledFeeding?.repeatRule?.intervalHours || guide.suggestedIntervalHours)
+                : "No feeds logged yet. Add what you remember.";
+            setText("assistantTitle", "Gentle feeding reminder");
+            setText("assistantMessage", reminderText);
+        }
+
+        function nextFeedReminderText(startedAt, intervalHours) {
+            const elapsedMinutes = Math.max(0, Math.round((now - new Date(startedAt)) / 60000));
+            const targetMinutes = Math.round(intervalHours * 60);
+            const remaining = targetMinutes - elapsedMinutes;
+            if (remaining > 0) return `Next gentle feed reminder around ${formatDuration(remaining)}.`;
+            return "A gentle feed check-in may be helpful soon.";
         }
 
         function renderTimeline(date) {

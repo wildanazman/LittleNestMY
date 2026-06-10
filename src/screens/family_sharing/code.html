@@ -206,6 +206,7 @@
 <option value="viewer">Viewer</option>
 </select>
 </label>
+<p class="font-label-md text-label-md text-on-surface-variant" id="permissionPreview">Parent: full access.</p>
 <button class="w-full h-12 rounded-full bg-primary-container text-on-primary-container font-headline-md text-body-md flex items-center justify-center gap-2 pill-button-inner-glow active:scale-95 transition-transform" id="prepareInviteButton" type="button">
 <span class="material-symbols-outlined" data-icon="draft">draft</span>
 Prepare Prototype Invite
@@ -290,9 +291,10 @@ Prepare Prototype Invite
 </nav>
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const { babyProfile, familyMembers } = await import(`${moduleBase}data/mockData.mjs`);
+        const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const { deleteLocalFamilyMember, getLogsForBaby, getPersistedFamilyMembers, getSelectedBabyId, getSelectedBabyProfile, saveLocalFamilyMember } = await import(`${moduleBase}utils/localState.mjs`);
         const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
 
         const familyMembersList = document.getElementById("familyMembersList");
         const memberSummary = document.getElementById("memberSummary");
@@ -302,6 +304,7 @@ Prepare Prototype Invite
         const inviteNameInput = document.getElementById("inviteNameInput");
         const inviteContactInput = document.getElementById("inviteContactInput");
         const inviteRoleInput = document.getElementById("inviteRoleInput");
+        const permissionPreview = document.getElementById("permissionPreview");
         const prepareInviteButton = document.getElementById("prepareInviteButton");
         const inviteFeedback = document.getElementById("inviteFeedback");
         const backButton = document.getElementById("backButton");
@@ -320,6 +323,8 @@ Prepare Prototype Invite
             invitePanel.classList.remove("is-open");
         });
 
+        inviteRoleInput.addEventListener("change", updatePermissionPreview);
+
         prepareInviteButton.addEventListener("click", () => {
             const name = inviteNameInput.value.trim();
             const contact = inviteContactInput.value.trim();
@@ -334,34 +339,37 @@ Prepare Prototype Invite
                 id: editingMemberId || `family-local-${Date.now()}`,
                 babyId: selectedBabyId,
                 name,
-                role: selectedRole === "viewer" ? "family" : selectedRole,
-                permission: selectedRole === "viewer" ? "viewer" : "editor",
+                role: selectedRole,
+                permission: getPermissionForRole(selectedRole),
                 email: contact.includes("@") ? contact : undefined,
                 phone: contact.includes("@") ? undefined : contact,
                 invitedAt: new Date().toISOString(),
                 isPrototype: true
             });
 
-            inviteFeedback.textContent = editingMemberId ? "Caregiver updated locally." : "Prototype caregiver added locally.";
+            inviteFeedback.textContent = editingMemberId ? "Member updated locally." : "Invitation saved locally. Real invite sending can be added later.";
       inviteNameInput.value = "";
       inviteContactInput.value = "";
             inviteRoleInput.value = "parent";
+            updatePermissionPreview();
             editingMemberId = "";
             prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="draft">draft</span>Prepare Prototype Invite';
             renderMembers();
         });
 
         backButton.addEventListener("click", () => {
-            goToScreen("assistant");
+            goToScreen("settings");
         });
 
         function renderMembers() {
-            const members = getLogsForBaby(getPersistedFamilyMembers(familyMembers), selectedBabyId);
-            memberSummary.textContent = members.length ? `${members.length} local members in care circle` : "No family members added yet";
-            familyMembersList.innerHTML = members.length
-                ? members.map(renderMemberCard).join("")
-                : renderNoHelpersCard();
-            bindMemberActions(members);
+            const invitedMembers = getLogsForBaby(getPersistedFamilyMembers([]), selectedBabyId);
+            const parent = getCurrentParentMember();
+            const members = [parent, ...invitedMembers];
+            memberSummary.textContent = invitedMembers.length
+                ? `${invitedMembers.length} invited member${invitedMembers.length === 1 ? "" : "s"} plus current parent`
+                : "Current parent only";
+            familyMembersList.innerHTML = members.map(renderMemberCard).join("") + (invitedMembers.length ? "" : renderNoHelpersCard());
+            bindMemberActions(invitedMembers);
         }
 
         function renderNoHelpersCard() {
@@ -372,7 +380,7 @@ Prepare Prototype Invite
                     </div>
                     <div>
                         <h3 class="font-headline-md text-headline-md text-on-surface">No caregivers or viewers yet</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant">When you are ready, invite a trusted caregiver or family viewer. Mama and Papa can start small.</p>
+                        <p class="font-body-md text-body-md text-on-surface-variant">No caregivers added yet. Invite someone you trust to help track baby care.</p>
                     </div>
                 </article>
             `;
@@ -382,7 +390,11 @@ Prepare Prototype Invite
             const role = getDisplayRole(member);
             const style = getRoleStyle(role);
             const contact = member.email || member.phone || "Contact not added";
-            const status = member.acceptedAt ? "Active" : member.isPrototype ? "Prototype invite" : "Pending";
+            const status = member.isCurrentUser ? "Current user" : member.acceptedAt ? "Active" : member.isPrototype ? "Prototype invite" : "Pending";
+            const actions = member.isCurrentUser
+                ? `<span class="font-label-sm text-label-sm text-on-surface-variant">Managed in Profile</span>`
+                : `<button class="font-label-sm text-label-sm text-primary" data-edit-member="${member.id}" type="button">Edit</button>
+                   <button class="font-label-sm text-label-sm text-error" data-delete-member="${member.id}" type="button">Remove</button>`;
 
             return `
                 <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
@@ -401,8 +413,7 @@ Prepare Prototype Invite
                             <div class="mt-3 flex items-center justify-between gap-3">
                                 <p class="font-label-sm text-label-sm text-on-surface-variant">${getPermissionText(member)}</p>
                                 <div class="flex items-center gap-2">
-                                    <button class="font-label-sm text-label-sm text-primary" data-edit-member="${member.id}" type="button">Edit</button>
-                                    <button class="font-label-sm text-label-sm text-error" data-delete-member="${member.id}" type="button">Remove</button>
+                                    ${actions}
                                 </div>
                             </div>
                             <p class="mt-1 font-label-sm text-label-sm ${status === "Active" ? "text-tertiary" : "text-primary"}">${status}</p>
@@ -421,6 +432,7 @@ Prepare Prototype Invite
                     inviteNameInput.value = member.name || "";
                     inviteContactInput.value = member.email || member.phone || "";
                     inviteRoleInput.value = getDisplayRole(member).toLowerCase();
+                    updatePermissionPreview();
                     prepareInviteButton.textContent = "Update Member";
                     invitePanel.classList.add("is-open");
                     inviteNameInput.focus();
@@ -461,18 +473,43 @@ Prepare Prototype Invite
         }
 
         function getPermissionText(member) {
-            if (member.permission === "owner") return "Owner access";
+            if (member.permission === "owner") return "Full access";
             if (member.permission === "viewer") return "View only";
-            return "Can add care updates";
+            return "Can add logs";
+        }
+
+        function getPermissionForRole(role) {
+            if (role === "viewer") return "viewer";
+            if (role === "caregiver") return "editor";
+            return "owner";
+        }
+
+        function updatePermissionPreview() {
+            const role = inviteRoleInput.value;
+            const descriptions = {
+                parent: "Parent: full access.",
+                caregiver: "Caregiver: can add feeding, sleep, diaper, and notes.",
+                viewer: "Viewer: view only."
+            };
+            permissionPreview.textContent = descriptions[role] || descriptions.parent;
+        }
+
+        function getCurrentParentMember() {
+            const parent = getParentProfile();
+            return {
+                id: "current-parent",
+                babyId: selectedBabyId,
+                name: parent.name || "Parent",
+                email: parent.email || "",
+                role: "parent",
+                permission: "owner",
+                acceptedAt: new Date().toISOString(),
+                isCurrentUser: true
+            };
         }
 
         function getInitials(name) {
-            return name
-                .split(" ")
-                .filter(Boolean)
-                .slice(0, 2)
-                .map(part => part[0].toUpperCase())
-          .join("");
+            return initialsForName(name);
         }
 
         function escapeHtml(value) {
@@ -484,6 +521,7 @@ Prepare Prototype Invite
                 .replaceAll("'", "&#039;");
         }
 
+        updatePermissionPreview();
         renderMembers();
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

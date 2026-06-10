@@ -99,6 +99,8 @@
   const { calculateBabyAge } = await import(`${moduleBase}utils/dateFormat.mjs`);
   const {
     getBabyProfiles,
+    getLogsForBaby,
+    getPersistedGrowthRecords,
     getSelectedBabyId,
     setSelectedBabyId
   } = await import(`${moduleBase}utils/localState.mjs`);
@@ -143,6 +145,7 @@
 
   function renderProfileCard(profile, isSelected, totalProfiles) {
     const age = calculateBabyAge(profile.dateOfBirth, new Date());
+    const latestGrowth = getLatestGrowthForBaby(profile.id);
     const dob = new Date(`${profile.dateOfBirth}T00:00:00`).toLocaleDateString("en-MY", {
       day: "numeric",
       month: "short",
@@ -165,6 +168,10 @@
             <p class="font-label-sm text-[12px] text-outline">Born ${dob}</p>
           </div>
         </div>
+        <button class="w-full rounded-2xl bg-surface-container-low p-3 text-left" data-growth-baby="${escapeHtml(profile.id)}" type="button">
+          <p class="font-label-sm text-[12px] text-on-surface-variant">Latest growth</p>
+          <p class="font-label-md text-[14px] text-on-surface">${escapeHtml(latestGrowth)}</p>
+        </button>
         <div class="grid ${isSelected ? "grid-cols-1" : "grid-cols-2"} gap-2">
           <button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>
           ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
@@ -172,6 +179,25 @@
         ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}
       </article>
     `;
+  }
+
+  profilesList.addEventListener("click", (event) => {
+    const growthButton = event.target.closest("[data-growth-baby]");
+    if (!growthButton) return;
+    setSelectedBabyId(growthButton.dataset.growthBaby, mockBabyProfile);
+    goToScreen("growth_tracker");
+  });
+
+  function getLatestGrowthForBaby(babyId) {
+    const latest = getLogsForBaby(getPersistedGrowthRecords([]), babyId)
+      .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+    if (!latest) return "No growth records yet";
+    const height = latest.heightCm || latest.lengthCm;
+    return [
+      latest.weightKg ? `${latest.weightKg} kg` : "",
+      height ? `${height} cm` : "",
+      latest.headCircumferenceCm ? `${latest.headCircumferenceCm} cm head` : ""
+    ].filter(Boolean).join(" / ") || "Measurement saved";
   }
 
   function renderEmptyState() {

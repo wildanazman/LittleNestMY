@@ -1,4 +1,4 @@
-const cacheName = "littlenest-my-static-v6";
+const cacheName = "littlenest-my-static-v7";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -13,6 +13,10 @@ self.addEventListener("install", (event) => {
       "/milestones/",
       "/assistant/",
       "/settings/",
+      "/family_sharing/",
+      "/growth_tracker/",
+      "/mommy_guide/",
+      "/privacy_safety/",
       "/manifest.json",
       "/src/utils/pwa-safe-area.css",
       "/src/utils/theme.css",

@@ -195,6 +195,15 @@
 <span class="font-label-md text-label-md text-on-surface-variant">Time</span>
 <input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTimeInput" type="time"/>
 </label>
+<label class="space-y-xs">
+<span class="font-label-md text-label-md text-on-surface-variant">Reminder</span>
+<select class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventReminderInput">
+<option value="0">At time of event</option>
+<option value="15">15 minutes before</option>
+<option value="60">1 hour before</option>
+<option value="1440">1 day before</option>
+</select>
+</label>
 </div>
 <label class="block space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Notes</span>
@@ -384,7 +393,7 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
-        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, getSelectedBabyId, saveLocalCalendarEvent } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, getSelectedBabyId, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const monthTitle = document.getElementById("monthTitle");
@@ -400,6 +409,7 @@
         const eventCategoryInput = document.getElementById("eventCategoryInput");
         const eventDateInput = document.getElementById("eventDateInput");
         const eventTimeInput = document.getElementById("eventTimeInput");
+        const eventReminderInput = document.getElementById("eventReminderInput");
         const eventNotesInput = document.getElementById("eventNotesInput");
         const eventFeedback = document.getElementById("eventFeedback");
         const saveEventButton = document.getElementById("saveEventButton");
@@ -546,6 +556,7 @@
                     eventCategoryInput.value = event.type || "other";
                     eventDateInput.value = date.toISOString().slice(0, 10);
                     eventTimeInput.value = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+                    eventReminderInput.value = String(event.reminderMinutesBefore ?? 60);
                     eventNotesInput.value = event.notes || "";
                     saveEventButton.textContent = "Update Event";
                     document.getElementById("addEventPanel").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -571,14 +582,27 @@
                 return;
             }
 
+            const eventId = editingEventId || `event-local-${Date.now()}`;
+            const startsAt = new Date(`${date}T${time}:00`).toISOString();
+            const reminderMinutesBefore = Number(eventReminderInput.value) || 0;
             saveLocalCalendarEvent({
-                id: editingEventId || `event-local-${Date.now()}`,
+                id: eventId,
                 babyId: selectedBabyId,
                 type: eventCategoryInput.value,
                 title,
-                startsAt: new Date(`${date}T${time}:00`).toISOString(),
+                startsAt,
+                reminderMinutesBefore,
                 notes: eventNotesInput.value.trim() || undefined,
                 isAllDay: false
+            });
+            saveLocalReminder({
+                id: `reminder-event-${eventId}`,
+                babyId: selectedBabyId,
+                type: eventCategoryInput.value === "medicine" ? "medicine" : "appointment",
+                title,
+                scheduledAt: new Date(new Date(startsAt).getTime() - reminderMinutesBefore * 60000).toISOString(),
+                enabled: true,
+                sourceId: eventId
             });
 
       eventTitleInput.value = "";

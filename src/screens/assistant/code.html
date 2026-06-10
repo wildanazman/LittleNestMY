@@ -164,12 +164,17 @@
 </header>
 <!-- Chat Canvas -->
 <main class="flex-1 mt-14 pb-44 px-container-padding overflow-y-auto pt-lg space-y-lg" id="assistantCanvas">
+<section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow border border-white/60">
+<p class="font-label-sm text-label-sm text-primary uppercase">Local assistant</p>
+<h2 class="font-headline-md text-headline-md text-on-primary-container" id="assistantBabyContext">Baby care summaries</h2>
+<p class="font-body-md text-body-md text-on-primary-container/80">Ask for gentle summaries, checklists, and routines from saved LittleNest data on this device.</p>
+</section>
 <!-- Safety Note -->
 <section class="rounded-xl bg-surface-container-low px-4 py-3 border border-outline-variant/40">
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-[20px] text-primary mt-0.5">health_and_safety</span>
 <p class="font-label-md text-label-md text-on-surface-variant">
-                    For medical concerns, please consult a doctor.
+                    For medical concerns, please consult Klinik Kesihatan or your doctor.
                 </p>
 </div>
 </section>
@@ -191,6 +196,15 @@
 <p class="font-label-md text-label-md text-on-surface-variant">Local summaries only. AI is not configured yet.</p>
 </div>
 <div class="grid grid-cols-1 gap-sm">
+<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="restaurant" data-prompt="Summarize today's feeding">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">restaurant</span>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Summarize today's feeding</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Review today's feeds gently.</p>
+</div>
+</div>
+</button>
 <button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="bedtime" data-prompt="Summarize baby's sleep this week">
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">bedtime</span>
@@ -295,7 +309,8 @@
             getPersistedFeedingLogs,
             getPersistedMilestones,
             getPersistedSleepLogs,
-            getSelectedBabyId
+            getSelectedBabyId,
+            getSelectedBabyProfile
         } = await import(`${moduleBase}utils/localState.mjs`);
 
         const assistantInput = document.getElementById("assistantInput");
@@ -305,6 +320,8 @@
         const addContextButton = document.getElementById("addContextButton");
         const assistantBackButton = document.getElementById("assistantBackButton");
         const selectedBabyId = getSelectedBabyId(babyProfile);
+        const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+        document.getElementById("assistantBabyContext").textContent = `${selectedBaby.name}'s local care assistant`;
         let selectedReply = localAssistantReply("");
 
         document.querySelectorAll(".prompt-card").forEach(card => {

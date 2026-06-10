@@ -33,6 +33,8 @@ export const healthNotes = [
   { id: "health-003", babyId: "baby-aisyah", type: "general", recordedAt: "2026-06-09T07:40:00+08:00", title: "Mild spit-up", details: "Small spit-up after feed. Keep upright for a few minutes after makan." }
 ];
 
+export const growthRecords = [];
+
 export const milestones = [
   { id: "milestone-001", babyId: "baby-aisyah", title: "First big smile", achievedAt: "2026-05-12", category: "social", notes: "Smiled at Mama during morning play." },
   { id: "milestone-002", babyId: "baby-aisyah", title: "Held head up during tummy time", achievedAt: "2026-06-02", category: "movement", notes: "Managed a few strong seconds. Good job, sayang." },
@@ -65,6 +67,7 @@ export const mockData = {
   sleepLogs,
   diaperLogs,
   healthNotes,
+  growthRecords,
   milestones,
   calendarEvents,
   familyMembers,

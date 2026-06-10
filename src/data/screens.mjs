@@ -17,11 +17,13 @@ export const screens = [
   { id: "diaper_log", title: "Diaper Log", group: "log", path: "diaper_log/code.html", preview: "diaper_log/screen.png" },
   { id: "diaper_log_dark", title: "Diaper Log Dark", group: "theme", path: "diaper_log_dark/code.html", preview: "diaper_log_dark/screen.png" },
   { id: "calendar", title: "Calendar", group: "core", path: "calendar/code.html", preview: "calendar/screen.png" },
+  { id: "growth_tracker", title: "Growth Tracker", group: "core", path: "growth_tracker/code.html", preview: "growth_tracker/screen.png" },
   { id: "weekly_insights", title: "Weekly Insights", group: "insight", path: "weekly_insights/code.html", preview: "weekly_insights/screen.png" },
   { id: "milestones", title: "Milestones", group: "core", path: "milestones/code.html", preview: "milestones/screen.png" },
   { id: "memory_book", title: "Memory Book", group: "core", path: "memory_book/code.html", preview: "memory_book/screen.png" },
   { id: "assistant", title: "Assistant", group: "core", path: "assistant/code.html", preview: "assistant/screen.png" },
   { id: "family_sharing", title: "Family Sharing", group: "settings", path: "family_sharing/code.html", preview: "family_sharing/screen.png" },
+  { id: "mommy_guide", title: "Mommy Guide", group: "settings", path: "mommy_guide/code.html", preview: "mommy_guide/screen.png" },
   { id: "privacy_safety", title: "Privacy & Safety", group: "settings", path: "privacy_safety/code.html", preview: "privacy_safety/screen.png" },
   { id: "settings", title: "Settings", group: "settings", path: "settings/code.html", preview: "settings/screen.png" }
 ];

@@ -20,6 +20,7 @@ const activeGroups = {
   sleep_log_dark: "log",
   diaper_log: "log",
   diaper_log_dark: "log",
+  growth_tracker: "log",
   calendar: "calendar",
   weekly_insights: "calendar",
   milestones: "milestones",
@@ -28,6 +29,7 @@ const activeGroups = {
   settings: "assistant",
   privacy_safety: "assistant",
   family_sharing: "assistant",
+  mommy_guide: "assistant",
   add_baby_profile: "assistant",
   baby_profiles: "assistant"
 };

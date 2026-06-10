@@ -9,6 +9,7 @@ const growthRecordsKey = "littlenest:growthRecords";
 const milestonesKey = "littlenest:milestones";
 const calendarEventsKey = "littlenest:calendarEvents";
 const familyMembersKey = "littlenest:familyMembers";
+const remindersKey = "littlenest:reminders";
 const babyProfilesKey = "littlenest:babyProfiles";
 const selectedBabyIdKey = "littlenest:selectedBabyId";
 const legacyBabyProfileKey = "littlenest:babyProfile";
@@ -114,7 +115,8 @@ export function migrateLogsToSelectedBaby(babyId) {
     growthRecordsKey,
     milestonesKey,
     calendarEventsKey,
-    familyMembersKey
+    familyMembersKey,
+    remindersKey
   ].forEach((key) => {
     const collection = readJson(key, null);
     if (!Array.isArray(collection) || !collection.some((item) => item && !item.babyId)) return;
@@ -251,6 +253,22 @@ export function deleteLocalFamilyMember(memberId) {
   return deleteCollectionItem(familyMembersKey, memberId);
 }
 
+export function getLocalReminders() {
+  return readJson(remindersKey, []);
+}
+
+export function getPersistedReminders(fallback = []) {
+  return readCollectionWithFallback(remindersKey, fallback);
+}
+
+export function saveLocalReminder(reminder) {
+  return upsertCollectionItem(remindersKey, reminder);
+}
+
+export function deleteLocalReminder(reminderId) {
+  return deleteCollectionItem(remindersKey, reminderId);
+}
+
 export function getMvpCollections(fallbacks = {}) {
   return {
     feedingLogs: getPersistedFeedingLogs(fallbacks.feedingLogs),
@@ -260,7 +278,8 @@ export function getMvpCollections(fallbacks = {}) {
     growthRecords: getPersistedGrowthRecords(fallbacks.growthRecords),
     milestones: getPersistedMilestones(fallbacks.milestones),
     calendarEvents: getPersistedCalendarEvents(fallbacks.calendarEvents),
-    familyMembers: getPersistedFamilyMembers(fallbacks.familyMembers)
+    familyMembers: getPersistedFamilyMembers(fallbacks.familyMembers),
+    reminders: getPersistedReminders(fallbacks.reminders)
   };
 }
 

@@ -1,25 +1,98 @@
 :root {
   color-scheme: light;
+  --ln-bg: #fff8f5;
+  --ln-card: #ffffff;
+  --ln-card-soft: #fff1ea;
+  --ln-text: #211a17;
+  --ln-muted: #665650;
+  --ln-border: rgba(83, 67, 61, 0.14);
+  --ln-primary: #83533c;
+  --ln-peach: #ffbfa3;
 }
 
 :root.dark {
   color-scheme: dark;
+  --ln-bg: #181514;
+  --ln-card: #24201E;
+  --ln-card-soft: #2D2825;
+  --ln-text: #FFF7ED;
+  --ln-muted: #D8CCC4;
+  --ln-border: rgba(255, 255, 255, 0.10);
+  --ln-primary: #FFBFA3;
+  --ln-peach: #F6A987;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body {
+    animation: littlenest-page-in 210ms ease-out both;
+  }
+
+  [id$="Modal"], .prototype-panel, #babyProfileMenu, #quickFormModal {
+    transition: opacity 180ms ease-out, transform 180ms ease-out;
+  }
+}
+
+@keyframes littlenest-page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body {
+  background: var(--ln-bg) !important;
+  color: var(--ln-text) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display-lg,
+.text-display-lg,
+.font-headline-lg-mobile,
+.text-headline-lg-mobile,
+.font-headline-lg,
+.text-headline-lg {
+  font-size: clamp(1.35rem, 5vw, 1.5rem) !important;
+  line-height: 1.18 !important;
+}
+
+.font-headline-md,
+.text-headline-md {
+  font-size: clamp(0.98rem, 3.8vw, 1.12rem) !important;
+  line-height: 1.28 !important;
+}
+
+.font-body-md,
+.text-body-md {
+  font-size: clamp(0.875rem, 3.4vw, 0.98rem) !important;
+  line-height: 1.45 !important;
+}
+
+.font-label-sm,
+.text-label-sm,
+.text-label-sm-mobile {
+  font-size: clamp(0.72rem, 2.7vw, 0.8rem) !important;
+  line-height: 1.25 !important;
+}
+
+.text-label-md,
+.font-label-md {
+  font-size: clamp(0.82rem, 3vw, 0.9rem) !important;
 }
 
 :root.dark body {
-  background: #1E1B1A !important;
+  background: #181514 !important;
   color: #FFF7ED !important;
 }
 
 :root.dark .bg-surface,
-:root.dark .bg-\[\#FFF8F5\] {
-  background-color: #1E1B1A !important;
+:root.dark .bg-background,
+:root.dark .bg-\[\#FFF8F5\],
+:root.dark .bg-\[\#fff8f5\] {
+  background-color: #181514 !important;
 }
 
 :root.dark .bg-surface-container,
 :root.dark .bg-surface-container-highest,
 :root.dark .bg-surface-container-high {
-  background-color: #242120 !important;
+  background-color: #24201E !important;
 }
 
 :root.dark .bg-surface-container-low,
@@ -29,19 +102,28 @@
 :root.dark .bg-\[\#EFF6FF\],
 :root.dark .bg-\[\#F0FDF4\],
 :root.dark .bg-\[\#FAF5FF\] {
-  background-color: #2D2927 !important;
+  background-color: #2D2825 !important;
 }
 
 :root.dark .text-on-surface,
+:root.dark .text-on-background,
 :root.dark .text-\[\#211A17\],
 :root.dark .text-\[\#211a17\] {
   color: #FFF7ED !important;
 }
 
 :root.dark .text-on-surface-variant,
+:root.dark .text-on-secondary-fixed-variant,
 :root.dark .text-outline,
-:root.dark .text-outline-variant {
-  color: #C8BDB5 !important;
+:root.dark .text-outline-variant,
+:root.dark .text-\[\#166534\],
+:root.dark .text-\[\#1E40AF\],
+:root.dark .text-\[\#6B21A8\],
+:root.dark .text-\[\#0369A1\],
+:root.dark .text-\[\#15803D\],
+:root.dark .text-\[\#581C87\],
+:root.dark .text-\[\#854D0E\] {
+  color: #D8CCC4 !important;
 }
 
 :root.dark .text-primary {
@@ -59,7 +141,15 @@
 }
 
 :root.dark .bg-secondary-container,
-:root.dark .bg-tertiary-container {
+:root.dark .bg-tertiary-container,
+:root.dark .bg-\[\#FFF7ED\],
+:root.dark .bg-\[\#EFF6FF\],
+:root.dark .bg-\[\#F0FDF4\],
+:root.dark .bg-\[\#FAF5FF\],
+:root.dark .bg-\[\#DBEAFE\],
+:root.dark .bg-\[\#F3E8FF\],
+:root.dark .bg-\[\#FEF9C3\],
+:root.dark .bg-\[\#FFDAD6\] {
   background-color: rgba(255, 191, 163, 0.16) !important;
 }
 
@@ -88,6 +178,35 @@
 :root.dark nav.fixed {
   background-color: rgba(36, 33, 32, 0.96) !important;
   border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+:root.dark .bg-surface-bright,
+:root.dark .bg-primary-fixed,
+:root.dark .bg-secondary-fixed,
+:root.dark .bg-tertiary-fixed,
+:root.dark .bg-primary-fixed-dim {
+  background-color: #2D2825 !important;
+  color: #FFF7ED !important;
+}
+
+:root.dark .text-error {
+  color: #FF9A9A !important;
+}
+
+:root.dark svg text,
+:root.dark .chart-label {
+  fill: #D8CCC4 !important;
+  color: #D8CCC4 !important;
+}
+
+.stat-compact,
+#lastFeedTime,
+#todaySleepTotal,
+#lastDiaperTime,
+#nextEventDate {
+  font-size: clamp(1rem, 4.2vw, 1.35rem) !important;
+  line-height: 1.15 !important;
+  overflow-wrap: normal;
 }
 
 :root.dark .shadow-xl,

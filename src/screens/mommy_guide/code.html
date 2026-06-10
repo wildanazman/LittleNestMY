@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<title>Mommy Guide - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script type="module" src="/src/utils/theme.mjs"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","primary-container":"#ffdcc8","on-primary-container":"#321304",surface:"#fff8f5","surface-container":"#f4ebe6","surface-container-low":"#fff1ea","surface-container-lowest":"#fff","on-surface":"#211a17","on-surface-variant":"#53433d",tertiary:"#5f6335","tertiary-container":"#e5e9ad"},fontFamily:{body:["Nunito Sans","sans-serif"]}}}};</script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-28">
+<header class="sticky top-0 z-40 bg-surface px-5 h-14 flex items-center gap-3">
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary" id="backButton" type="button" aria-label="Back">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Mommy Guide</h1>
+</header>
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+<section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow">
+<p class="font-label-sm text-label-sm text-primary uppercase">Gentle reference</p>
+<h2 class="font-headline-md text-headline-md text-on-primary-container">Breastfeeding and care guide</h2>
+<p class="font-body-md text-body-md text-on-primary-container/80">Use this as a calm reference. Follow baby's cues and your nurse or doctor advice.</p>
+</section>
+<section class="space-y-3">
+<h2 class="font-headline-md text-headline-md">Breastfeeding guide by age</h2>
+<div class="space-y-3" id="breastfeedingTable"></div>
+</section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-3">
+<h2 class="font-headline-md text-headline-md">Gentle feeding reminder</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" id="guideSuggestion">Loading guide...</p>
+<label class="flex items-center justify-between gap-3 rounded-2xl bg-surface-container-low p-3">
+<span class="font-label-md text-label-md">Enable local reminder</span>
+<input id="feedingReminderToggle" type="checkbox" class="rounded text-primary"/>
+</label>
+<label class="block"><span class="font-label-sm text-label-sm">Reminder interval hours</span><input id="feedingIntervalInput" class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" type="number" step="0.5" min="1" max="8"/></label>
+<p class="font-label-md text-label-md text-on-surface-variant">This is a gentle reminder. Follow baby's hunger cues and your nurse/doctor advice.</p>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="saveFeedingReminderButton" type="button">Save Reminder</button>
+<p class="hidden font-label-md text-label-md text-tertiary" id="reminderFeedback"></p>
+</section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-3">
+<h2 class="font-headline-md text-headline-md">Bottle / formula guide</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">For formula, follow the formula label and Klinik Kesihatan, nurse, or doctor guidance. For direct breastfeeding, ml amount is not required.</p>
+</section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-3">
+<h2 class="font-headline-md text-headline-md">Growth measurement guide</h2>
+<ul class="space-y-2 font-body-md text-body-md text-on-surface-variant">
+<li>Weight: kg</li>
+<li>Length under 2 years: cm</li>
+<li>Height 2 years and above: cm</li>
+<li>Head circumference: cm</li>
+<li>Measure regularly at Klinik Kesihatan or with your doctor.</li>
+</ul>
+</section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-3">
+<h2 class="font-headline-md text-headline-md">Appointment checklist</h2>
+<div class="space-y-2" id="appointmentChecklist"></div>
+</section>
+<section class="rounded-[24px] bg-surface-container-low p-4 border border-white/60">
+<p class="font-body-md text-body-md text-on-surface-variant">This guide is for general reference only. For medical concerns, please consult Klinik Kesihatan or your doctor.</p>
+</section>
+</main>
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+const { breastfeedingGuide, appointmentChecklist, getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
+const { getLogsForBaby, getPersistedReminders, getSelectedBabyId, getSelectedBabyProfile, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
+const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const selectedBabyId = getSelectedBabyId(babyProfile);
+const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+const guide = getFeedingGuideForBaby(selectedBaby.dateOfBirth);
+document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+document.getElementById("breastfeedingTable").innerHTML = breastfeedingGuide.map(row => `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow border border-white/60"><p class="font-label-md text-label-md text-primary">${row.age}</p><p class="font-body-md text-body-md text-on-surface"><strong>${row.pattern}</strong></p><p class="font-body-md text-body-md text-on-surface-variant">${row.solids}</p><p class="font-label-sm text-label-sm text-on-surface-variant">${row.notes}</p></article>`).join("");
+document.getElementById("appointmentChecklist").innerHTML = appointmentChecklist.map(item => `<div class="flex gap-2 rounded-2xl bg-surface-container-low p-3"><span class="material-symbols-outlined text-primary">check_circle</span><span class="font-body-md text-body-md text-on-surface-variant">${item}</span></div>`).join("");
+document.getElementById("guideSuggestion").textContent = `${selectedBaby.name}: ${guide.pattern}. ${guide.notes}`;
+const existing = getLogsForBaby(getPersistedReminders([]), selectedBabyId).find(r => r.type === "feeding");
+document.getElementById("feedingReminderToggle").checked = existing?.enabled ?? false;
+document.getElementById("feedingIntervalInput").value = existing?.repeatRule?.intervalHours || guide.suggestedIntervalHours;
+document.getElementById("saveFeedingReminderButton").addEventListener("click", () => {
+  const intervalHours = Number(document.getElementById("feedingIntervalInput").value) || guide.suggestedIntervalHours;
+  const next = new Date(Date.now() + intervalHours * 60 * 60 * 1000);
+  saveLocalReminder({ id: existing?.id || `reminder-feeding-${selectedBabyId}`, babyId: selectedBabyId, type: "feeding", title: "Gentle feeding reminder", scheduledAt: next.toISOString(), repeatRule: { intervalHours }, enabled: document.getElementById("feedingReminderToggle").checked, sourceId: "mommy_guide" });
+  const feedback = document.getElementById("reminderFeedback");
+  feedback.textContent = "Feeding reminder saved locally.";
+  feedback.classList.remove("hidden");
+});
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

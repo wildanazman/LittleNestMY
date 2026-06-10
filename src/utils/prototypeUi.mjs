@@ -79,10 +79,10 @@ export function bindBottomNavigationFallback(root = document) {
   };
   const activeScreen = getCurrentScreenId();
   const activeKey = Object.entries(navTargets).find(([, screenId]) => screenId === activeScreen)?.[0]
-    || (["feeding_log", "sleep_log", "diaper_log"].includes(activeScreen) ? "log" : "")
+    || (["feeding_log", "sleep_log", "diaper_log", "growth_tracker"].includes(activeScreen) ? "log" : "")
     || (activeScreen === "weekly_insights" ? "calendar" : "")
     || (activeScreen === "memory_book" ? "milestones" : "")
-    || (["settings", "privacy_safety", "family_sharing", "add_baby_profile", "baby_profiles"].includes(activeScreen) ? "assistant" : "")
+    || (["settings", "privacy_safety", "family_sharing", "mommy_guide", "add_baby_profile", "baby_profiles"].includes(activeScreen) ? "assistant" : "")
     || "home";
 
   root.querySelectorAll("nav.fixed a, nav.fixed button").forEach((item) => {

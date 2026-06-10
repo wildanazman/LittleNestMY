@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<title>Growth Tracker - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script type="module" src="/src/utils/theme.mjs"></script>
+<script>
+tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","primary-container":"#ffdcc8","on-primary-container":"#321304",surface:"#fff8f5","surface-container":"#f4ebe6","surface-container-low":"#fff1ea","surface-container-lowest":"#fff","on-surface":"#211a17","on-surface-variant":"#53433d",tertiary:"#5f6335","tertiary-container":"#e5e9ad",error:"#ba1a1a"},fontFamily:{body:["Nunito Sans","sans-serif"]}}}};
+</script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-28">
+<header class="sticky top-0 z-40 bg-surface px-5 h-14 flex items-center gap-3">
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary" id="backButton" type="button" aria-label="Back">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Growth Tracker</h1>
+</header>
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+<section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow">
+<p class="font-label-sm text-label-sm text-primary uppercase">Selected baby</p>
+<h2 class="font-headline-md text-headline-md text-on-primary-container" id="babyName">Baby</h2>
+<p class="font-body-md text-body-md text-on-primary-container/80" id="growthStatus">Add a first measurement to start a gentle trend.</p>
+</section>
+<section class="grid grid-cols-3 gap-3" id="latestCards"></section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Add measurement</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="lengthLabel">Length</span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<label><span class="font-label-sm text-label-sm">Weight kg</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="weightInput" type="number" min="0" step="0.01" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm" id="heightInputLabel">Length cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="heightInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm">Head cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="headInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm">Date</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="dateInput" type="date"/></label>
+</div>
+<textarea class="w-full min-h-20 rounded-2xl border-0 bg-surface-container px-3 py-3" id="notesInput" placeholder="Optional note"></textarea>
+<p class="hidden font-label-md text-label-md text-error" id="formError"></p>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="saveButton" type="button">Save Measurement</button>
+</section>
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4">
+<div class="flex gap-2 overflow-x-auto pb-1" id="graphTabs"></div>
+<div class="rounded-2xl bg-surface-container-low p-3 border border-white/60">
+<svg class="w-full h-56" id="growthGraph" viewBox="0 0 340 220" role="img" aria-label="Growth trend graph"></svg>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">WHO/MOH reference curves can be added after official reference tables are imported. This graph shows actual saved measurements only.</p>
+</section>
+<section class="space-y-3">
+<h2 class="font-headline-md text-headline-md">Measurement history</h2>
+<div class="space-y-3" id="historyList"></div>
+</section>
+<section class="rounded-[20px] bg-surface-container-low p-4 border border-white/60">
+<p class="font-body-md text-body-md text-on-surface-variant">Growth charts are guides to monitor trends. If you are concerned about your baby's growth, please check with Klinik Kesihatan or your doctor.</p>
+</section>
+</main>
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { getLogsForBaby, getPersistedGrowthRecords, getSelectedBabyId, getSelectedBabyProfile, saveLocalGrowthRecord, deleteLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
+const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
+const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const selectedBabyId = getSelectedBabyId(babyProfile);
+const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+const tabs = [
+  ["weight", "Weight-for-age", "weightKg", "kg"],
+  ["height", `${getMeasurementLabel(selectedBaby.dateOfBirth)}-for-age`, "heightCm", "cm"],
+  ["head", "Head circumference", "headCircumferenceCm", "cm"],
+  ["wfl", "Weight-for-length", "weightKg", "kg"],
+  ["bmi", "BMI-for-age", "bmi", ""]
+];
+let activeTab = "weight";
+document.getElementById("backButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
+document.getElementById("babyName").textContent = selectedBaby.name;
+document.getElementById("lengthLabel").textContent = getMeasurementLabel(selectedBaby.dateOfBirth);
+document.getElementById("heightInputLabel").textContent = `${getMeasurementLabel(selectedBaby.dateOfBirth)} cm`;
+document.getElementById("saveButton").addEventListener("click", saveMeasurement);
+renderTabs(); render();
+function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
+function saveMeasurement(){
+  const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
+  const measuredAt = document.getElementById("dateInput").value;
+  if (!weightKg && !heightValue && !headCircumferenceCm) return showError("Add at least one measurement.");
+  saveLocalGrowthRecord({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, heightCm: heightValue || undefined, lengthCm: heightValue || undefined, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
+  ["weightInput","heightInput","headInput","notesInput"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("formError").classList.add("hidden"); render();
+}
+function render(){
+  const items = records();
+  const latest = [...items].reverse().find(Boolean);
+  document.getElementById("growthStatus").textContent = latest ? `Latest saved ${calculateBabyAgeShort(selectedBaby.dateOfBirth, new Date(latest.measuredAt))}. Tracking steadily.` : "Add a first measurement to start a gentle trend.";
+  document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby.dateOfBirth), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
+  renderGraph(items);
+  document.getElementById("historyList").innerHTML = items.length ? [...items].reverse().map(renderHistory).join("") : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-headline-md text-headline-md">No growth records yet</p><p class="font-body-md text-body-md text-on-surface-variant">Your first measurement will appear here.</p></div>`;
+  document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",()=>{ if(confirm("Delete this growth record?")){ deleteLocalGrowthRecord(btn.dataset.deleteGrowth); render(); }}));
+}
+function renderTabs(){ document.getElementById("graphTabs").innerHTML = tabs.map(([id,label])=>`<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap ${id===activeTab?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant'}" data-tab="${id}" type="button">${label}</button>`).join(""); document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{activeTab=btn.dataset.tab; renderTabs(); render();})); }
+function renderGraph(items){
+  const tab = tabs.find(t=>t[0]===activeTab), key = tab[2], unit = tab[3];
+  const points = items.map((r,i)=>({x:i, y:key==="bmi" && r.weightKg && (r.heightCm||r.lengthCm) ? r.weightKg / Math.pow((r.heightCm||r.lengthCm)/100,2) : r[key] || (key==="heightCm" ? r.lengthCm : undefined)})).filter(p=>Number.isFinite(p.y));
+  const svg=document.getElementById("growthGraph");
+  if(points.length<1){ svg.innerHTML='<text x="170" y="110" text-anchor="middle" class="chart-label" fill="#8a746b">Add measurements to see trend</text>'; return; }
+  const ys=points.map(p=>p.y), min=Math.min(...ys), max=Math.max(...ys), span=Math.max(1,max-min);
+  const path=points.map((p,i)=>`${i?'L':'M'} ${30+(p.x/Math.max(1,points.length-1))*280} ${180-((p.y-min)/span)*140}`).join(" ");
+  svg.innerHTML=`<line x1="30" y1="180" x2="320" y2="180" stroke="rgba(131,83,60,.25)"/><line x1="30" y1="30" x2="30" y2="180" stroke="rgba(131,83,60,.25)"/><path d="${path}" fill="none" stroke="#83533c" stroke-width="4" stroke-linecap="round"/><text x="32" y="24" class="chart-label" fill="#665650">${max.toFixed(1)} ${unit}</text><text x="32" y="205" class="chart-label" fill="#665650">${min.toFixed(1)} ${unit}</text>${points.map((p,i)=>`<circle cx="${30+(p.x/Math.max(1,points.length-1))*280}" cy="${180-((p.y-min)/span)*140}" r="5" fill="#FFBFA3"/>`).join("")}`;
+}
+function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div><button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button></article>`; }
+function number(id){ const value=Number(document.getElementById(id).value); return Number.isFinite(value)&&value>0?value:0; }
+function showError(message){ const el=document.getElementById("formError"); el.textContent=message; el.classList.remove("hidden"); }
+function escapeHtml(v){ return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>
