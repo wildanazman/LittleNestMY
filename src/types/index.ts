@@ -1,1 +1,1 @@
-export * from "./parenting";
+export * from "./parenting.js";

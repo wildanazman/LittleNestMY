@@ -1,10 +1,88 @@
+import { shouldUseDemoData } from "./demoData.mjs";
+
 const feedingLogsKey = "littlenest:feedingLogs";
 const sleepLogsKey = "littlenest:sleepLogs";
 const activeSleepKey = "littlenest:activeSleep";
 const diaperLogsKey = "littlenest:diaperLogs";
 const healthNotesKey = "littlenest:healthNotes";
+const growthRecordsKey = "littlenest:growthRecords";
 const milestonesKey = "littlenest:milestones";
 const calendarEventsKey = "littlenest:calendarEvents";
+const familyMembersKey = "littlenest:familyMembers";
+const babyProfilesKey = "littlenest:babyProfiles";
+const selectedBabyIdKey = "littlenest:selectedBabyId";
+const legacyBabyProfileKey = "littlenest:babyProfile";
+
+export { babyProfilesKey, selectedBabyIdKey };
+
+export function getBabyProfiles(fallbackProfile) {
+  const existingProfiles = readJson(babyProfilesKey, null);
+  if (Array.isArray(existingProfiles) && existingProfiles.length > 0) {
+    ensureSelectedBaby(existingProfiles);
+    return existingProfiles;
+  }
+
+  const legacyProfile = readJson(legacyBabyProfileKey, null);
+  const initialProfile = normalizeBabyProfile(legacyProfile || (shouldUseDemoData() ? fallbackProfile : null));
+  if (!initialProfile) return [];
+
+  writeJson(babyProfilesKey, [initialProfile]);
+  writeJson(selectedBabyIdKey, initialProfile.id);
+  return [initialProfile];
+}
+
+export function getSelectedBabyId(fallbackProfile) {
+  const profiles = getBabyProfiles(fallbackProfile);
+  const savedId = readJson(selectedBabyIdKey, "");
+  if (profiles.some((profile) => profile.id === savedId)) {
+    migrateLogsToSelectedBaby(savedId);
+    return savedId;
+  }
+  const fallbackId = profiles[0]?.id || "";
+  if (fallbackId) writeJson(selectedBabyIdKey, fallbackId);
+  migrateLogsToSelectedBaby(fallbackId);
+  return fallbackId;
+}
+
+export function getSelectedBabyProfile(fallbackProfile) {
+  const profiles = getBabyProfiles(fallbackProfile);
+  const selectedId = getSelectedBabyId(fallbackProfile);
+  return profiles.find((profile) => profile.id === selectedId) || profiles[0] || (shouldUseDemoData() ? fallbackProfile : null);
+}
+
+export function saveBabyProfile(profile, fallbackProfile) {
+  const profiles = getBabyProfiles(fallbackProfile);
+  const now = new Date().toISOString();
+  const normalized = normalizeBabyProfile({
+    ...profile,
+    createdAt: profile.createdAt || now,
+    updatedAt: now
+  });
+  const nextProfiles = profiles.some((item) => item.id === normalized.id)
+    ? profiles.map((item) => item.id === normalized.id ? normalized : item)
+    : [...profiles, normalized];
+  writeJson(babyProfilesKey, nextProfiles);
+  return normalized;
+}
+
+export function createBabyProfile(profile, fallbackProfile) {
+  const now = new Date().toISOString();
+  const created = saveBabyProfile({
+    ...profile,
+    id: profile.id || `baby-${Date.now()}`,
+    createdAt: now,
+    updatedAt: now
+  }, fallbackProfile);
+  setSelectedBabyId(created.id, fallbackProfile);
+  return created;
+}
+
+export function setSelectedBabyId(babyId, fallbackProfile) {
+  const profiles = getBabyProfiles(fallbackProfile);
+  if (!profiles.some((profile) => profile.id === babyId)) return getSelectedBabyId(fallbackProfile);
+  writeJson(selectedBabyIdKey, babyId);
+  return babyId;
+}
 
 export function getLocalFeedingLogs() {
   return readJson(feedingLogsKey, []);
@@ -15,10 +93,33 @@ export function getPersistedFeedingLogs(fallback = []) {
 }
 
 export function saveLocalFeedingLog(log) {
-  const logs = getLocalFeedingLogs();
-  const nextLogs = [log, ...logs.filter((item) => item.id !== log.id)];
-  writeJson(feedingLogsKey, nextLogs);
-  return nextLogs;
+  return upsertCollectionItem(feedingLogsKey, log);
+}
+
+export function deleteLocalFeedingLog(logId) {
+  return deleteCollectionItem(feedingLogsKey, logId);
+}
+
+export function getLogsForBaby(logs, babyId) {
+  return (logs || []).filter((log) => !log.babyId || log.babyId === babyId);
+}
+
+export function migrateLogsToSelectedBaby(babyId) {
+  if (!babyId) return;
+  [
+    feedingLogsKey,
+    sleepLogsKey,
+    diaperLogsKey,
+    healthNotesKey,
+    growthRecordsKey,
+    milestonesKey,
+    calendarEventsKey,
+    familyMembersKey
+  ].forEach((key) => {
+    const collection = readJson(key, null);
+    if (!Array.isArray(collection) || !collection.some((item) => item && !item.babyId)) return;
+    writeJson(key, collection.map((item) => item && !item.babyId ? { ...item, babyId } : item));
+  });
 }
 
 export function getLocalSleepLogs() {
@@ -30,10 +131,11 @@ export function getPersistedSleepLogs(fallback = []) {
 }
 
 export function saveLocalSleepLog(log) {
-  const logs = getLocalSleepLogs();
-  const nextLogs = [log, ...logs.filter((item) => item.id !== log.id)];
-  writeJson(sleepLogsKey, nextLogs);
-  return nextLogs;
+  return upsertCollectionItem(sleepLogsKey, log);
+}
+
+export function deleteLocalSleepLog(logId) {
+  return deleteCollectionItem(sleepLogsKey, logId);
 }
 
 export function getActiveSleepSession() {
@@ -62,10 +164,11 @@ export function getPersistedDiaperLogs(fallback = []) {
 }
 
 export function saveLocalDiaperLog(log) {
-  const logs = getLocalDiaperLogs();
-  const nextLogs = [log, ...logs.filter((item) => item.id !== log.id)];
-  writeJson(diaperLogsKey, nextLogs);
-  return nextLogs;
+  return upsertCollectionItem(diaperLogsKey, log);
+}
+
+export function deleteLocalDiaperLog(logId) {
+  return deleteCollectionItem(diaperLogsKey, logId);
 }
 
 export function getLocalHealthNotes() {
@@ -77,10 +180,27 @@ export function getPersistedHealthNotes(fallback = []) {
 }
 
 export function saveLocalHealthNote(note) {
-  const notes = getLocalHealthNotes();
-  const nextNotes = [note, ...notes.filter((item) => item.id !== note.id)];
-  writeJson(healthNotesKey, nextNotes);
-  return nextNotes;
+  return upsertCollectionItem(healthNotesKey, note);
+}
+
+export function deleteLocalHealthNote(noteId) {
+  return deleteCollectionItem(healthNotesKey, noteId);
+}
+
+export function getLocalGrowthRecords() {
+  return readJson(growthRecordsKey, []);
+}
+
+export function getPersistedGrowthRecords(fallback = []) {
+  return readCollectionWithFallback(growthRecordsKey, fallback);
+}
+
+export function saveLocalGrowthRecord(record) {
+  return upsertCollectionItem(growthRecordsKey, record);
+}
+
+export function deleteLocalGrowthRecord(recordId) {
+  return deleteCollectionItem(growthRecordsKey, recordId);
 }
 
 export function getLocalMilestones() {
@@ -92,10 +212,11 @@ export function getPersistedMilestones(fallback = []) {
 }
 
 export function saveLocalMilestone(milestone) {
-  const milestones = getLocalMilestones();
-  const nextMilestones = [milestone, ...milestones.filter((item) => item.id !== milestone.id)];
-  writeJson(milestonesKey, nextMilestones);
-  return nextMilestones;
+  return upsertCollectionItem(milestonesKey, milestone);
+}
+
+export function deleteLocalMilestone(milestoneId) {
+  return deleteCollectionItem(milestonesKey, milestoneId);
 }
 
 export function getLocalCalendarEvents() {
@@ -107,10 +228,27 @@ export function getPersistedCalendarEvents(fallback = []) {
 }
 
 export function saveLocalCalendarEvent(event) {
-  const events = getLocalCalendarEvents();
-  const nextEvents = [event, ...events.filter((item) => item.id !== event.id)];
-  writeJson(calendarEventsKey, nextEvents);
-  return nextEvents;
+  return upsertCollectionItem(calendarEventsKey, event);
+}
+
+export function deleteLocalCalendarEvent(eventId) {
+  return deleteCollectionItem(calendarEventsKey, eventId);
+}
+
+export function getLocalFamilyMembers() {
+  return readJson(familyMembersKey, []);
+}
+
+export function getPersistedFamilyMembers(fallback = []) {
+  return readCollectionWithFallback(familyMembersKey, fallback);
+}
+
+export function saveLocalFamilyMember(member) {
+  return upsertCollectionItem(familyMembersKey, member);
+}
+
+export function deleteLocalFamilyMember(memberId) {
+  return deleteCollectionItem(familyMembersKey, memberId);
 }
 
 export function getMvpCollections(fallbacks = {}) {
@@ -119,8 +257,10 @@ export function getMvpCollections(fallbacks = {}) {
     sleepLogs: getPersistedSleepLogs(fallbacks.sleepLogs),
     diaperLogs: getPersistedDiaperLogs(fallbacks.diaperLogs),
     healthNotes: getPersistedHealthNotes(fallbacks.healthNotes),
+    growthRecords: getPersistedGrowthRecords(fallbacks.growthRecords),
     milestones: getPersistedMilestones(fallbacks.milestones),
-    calendarEvents: getPersistedCalendarEvents(fallbacks.calendarEvents)
+    calendarEvents: getPersistedCalendarEvents(fallbacks.calendarEvents),
+    familyMembers: getPersistedFamilyMembers(fallbacks.familyMembers)
   };
 }
 
@@ -135,7 +275,7 @@ function readJson(key, fallback) {
 
 function readCollectionWithFallback(key, fallback = []) {
   const value = readJson(key, null);
-  return Array.isArray(value) ? value : fallback;
+  return Array.isArray(value) ? value : (shouldUseDemoData() ? fallback : []);
 }
 
 function writeJson(key, value) {
@@ -144,4 +284,49 @@ function writeJson(key, value) {
   } catch {
     // Local storage can be unavailable in private or restricted contexts.
   }
+}
+
+function upsertCollectionItem(key, item) {
+  const items = readJson(key, []);
+  const now = new Date().toISOString();
+  const nextItem = {
+    ...item,
+    id: item.id || `${key.split(":").pop()}-${Date.now()}`,
+    updatedAt: now,
+    createdAt: item.createdAt || now
+  };
+  const nextItems = [nextItem, ...items.filter((existing) => existing.id !== nextItem.id)];
+  writeJson(key, nextItems);
+  return nextItems;
+}
+
+function deleteCollectionItem(key, itemId) {
+  const items = readJson(key, []);
+  const nextItems = items.filter((item) => item.id !== itemId);
+  writeJson(key, nextItems);
+  return nextItems;
+}
+
+function ensureSelectedBaby(profiles) {
+  const selectedId = readJson(selectedBabyIdKey, "");
+  if (!profiles.some((profile) => profile.id === selectedId) && profiles[0]?.id) {
+    writeJson(selectedBabyIdKey, profiles[0].id);
+  }
+}
+
+function normalizeBabyProfile(profile) {
+  if (!profile) return null;
+  const now = new Date().toISOString();
+  const name = String(profile.name || "Baby").trim() || "Baby";
+  return {
+    id: profile.id || `baby-${Date.now()}`,
+    name,
+    dateOfBirth: profile.dateOfBirth || profile.dob || new Date().toISOString().slice(0, 10),
+    gender: profile.gender || "",
+    photoUrl: profile.photoUrl || profile.avatarUrl || profile.avatar || "",
+    feedingPreference: profile.feedingPreference || "",
+    notes: profile.notes || "",
+    createdAt: profile.createdAt || now,
+    updatedAt: profile.updatedAt || now
+  };
 }

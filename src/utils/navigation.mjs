@@ -1,4 +1,5 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
+import { isLoggedIn } from "./localAuth.mjs";
 
 const routes = {
   home: "/home_dashboard/",
@@ -25,7 +26,10 @@ const activeGroups = {
   memory_book: "milestones",
   assistant: "assistant",
   settings: "assistant",
-  family_sharing: "assistant"
+  privacy_safety: "assistant",
+  family_sharing: "assistant",
+  add_baby_profile: "assistant",
+  baby_profiles: "assistant"
 };
 
 export function setupBottomNavigation(currentPath = window.location.pathname) {
@@ -41,9 +45,12 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
 
     if (!route) return;
 
+    const labelElement = link.querySelector("span:last-child");
+    if (!labelElement) return;
+
     link.dataset.navKey = key;
-    link.dataset.i18n = `navigation.${key}`;
-    link.querySelector("span:last-child").textContent = t(`navigation.${key}`);
+    labelElement.dataset.i18n = `navigation.${key}`;
+    labelElement.textContent = t(`navigation.${key}`);
 
     if (link.tagName === "A") {
       link.href = route;
@@ -54,6 +61,8 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
       });
     }
     link.setAttribute("data-nav-item", key);
+
+    normalizeNavItem(link, key === activeKey);
 
     if (key === activeKey) {
       link.setAttribute("aria-current", "page");
@@ -75,7 +84,7 @@ function ensureNavigationStyles() {
   const style = document.createElement("style");
   style.id = "bottom-navigation-styles";
   style.textContent = `
-    nav.fixed a.nav-tab-active {
+    nav.fixed .nav-tab-active {
       outline: 2px solid rgba(131, 83, 60, 0.24);
       outline-offset: 2px;
     }
@@ -83,13 +92,55 @@ function ensureNavigationStyles() {
   document.head.appendChild(style);
 }
 
+guardAuthenticatedRoutes();
 setupBottomNavigation();
 
 function getNavKey(link) {
   if (link.dataset.navKey) return link.dataset.navKey;
-  const label = link.textContent.trim().toLowerCase();
+  const labelElement = link.querySelector("span:last-child");
+  const label = (labelElement?.textContent || link.textContent).trim().toLowerCase();
   const language = getLanguage();
   return Object.keys(routes).find((key) => label === t(`navigation.${key}`, language).toLowerCase())
     || Object.keys(routes).find((key) => label === t(`navigation.${key}`, "en").toLowerCase())
     || "";
+}
+
+function normalizeNavItem(item, isActive) {
+  const nav = item.closest("nav.fixed");
+  if (nav) {
+    nav.className = "fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center";
+  }
+
+  item.className = [
+    "flex flex-col items-center justify-center rounded-full transition-colors active:scale-90 duration-150",
+    "w-[68px] h-[52px] px-2 py-1 shrink-0",
+    isActive
+      ? "bg-primary-container text-on-primary-container"
+      : "text-on-secondary-fixed-variant hover:bg-secondary-container"
+  ].join(" ");
+
+  const icon = item.querySelector(".material-symbols-outlined");
+  if (icon) {
+    icon.classList.add("text-[24px]");
+    icon.style.fontVariationSettings = isActive ? "'FILL' 1" : "'FILL' 0";
+  }
+
+  const label = item.querySelector("span:last-child");
+  if (label) {
+    label.className = "font-label-sm text-[10px] leading-4 whitespace-nowrap";
+  }
+}
+
+function guardAuthenticatedRoutes() {
+  const screenId = getCurrentScreenId();
+  if (!["auth_welcome", "login", "signup"].includes(screenId) && !isLoggedIn()) {
+    window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
+  }
+}
+
+function getCurrentScreenId() {
+  const path = window.location.pathname.replaceAll("\\", "/");
+  const fileMatch = path.match(/\/src\/screens\/([^/]+)\/code\.html$/);
+  if (fileMatch) return fileMatch[1];
+  return path.split("/").filter(Boolean)[0] || "auth_welcome";
 }

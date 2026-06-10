@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Baby Profiles - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          "surface": "#fbf9f4",
+          "surface-container": "#efeee9",
+          "surface-container-low": "#f5f3ee",
+          "surface-container-lowest": "#ffffff",
+          "surface-container-highest": "#e4e2de",
+          "primary": "#83533c",
+          "primary-container": "#ffbfa3",
+          "on-primary": "#ffffff",
+          "on-primary-container": "#7a4b36",
+          "on-surface": "#1b1c19",
+          "on-surface-variant": "#51443e",
+          "outline": "#84746d",
+          "tertiary-container": "#b5d6af",
+          "on-tertiary-container": "#415e3f"
+        },
+        fontFamily: {
+          "headline-md": ["Nunito Sans"],
+          "headline-lg": ["Nunito Sans"],
+          "body-md": ["Nunito Sans"],
+          "label-md": ["Nunito Sans"],
+          "label-sm": ["Nunito Sans"]
+        }
+      }
+    }
+  };
+</script>
+<style>
+  body { background-color: #fbf9f4; font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="bg-surface sticky top-0 z-40 flex items-center justify-between w-full px-5 h-14">
+  <div class="flex items-center gap-3">
+    <button aria-label="Back to settings" class="w-10 h-10 rounded-full flex items-center justify-center text-primary active:scale-95 transition-transform" id="backButton" type="button">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1 class="font-headline-lg text-[24px] leading-8 font-bold text-primary">Baby Profiles</h1>
+  </div>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+  <section class="bg-surface-container-low rounded-[24px] p-4 soft-shadow">
+    <div class="flex items-start gap-3">
+      <div class="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">child_care</span>
+      </div>
+      <div>
+        <h2 class="font-headline-md text-[20px] leading-7 font-bold">Manage your little ones</h2>
+        <p class="font-body-md text-[15px] leading-6 text-on-surface-variant">View, edit, add, and switch baby profiles without losing existing logs.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="hidden rounded-2xl bg-tertiary-container text-on-tertiary-container p-3 font-label-md text-[14px]" id="feedback" aria-live="polite"></p>
+
+  <section class="space-y-3" id="profilesList"></section>
+
+  <button class="w-full h-14 rounded-full bg-primary text-on-primary font-headline-md text-[18px] font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform" id="addBabyButton" type="button">
+    <span class="material-symbols-outlined">add</span>
+    Add New Baby
+  </button>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+  <button><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button><span class="material-symbols-outlined">add_circle</span><span>Log</span></button>
+  <button><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+</nav>
+
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { calculateBabyAge } = await import(`${moduleBase}utils/dateFormat.mjs`);
+  const {
+    getBabyProfiles,
+    getSelectedBabyId,
+    setSelectedBabyId
+  } = await import(`${moduleBase}utils/localState.mjs`);
+  const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+
+  const profilesList = document.getElementById("profilesList");
+  const feedback = document.getElementById("feedback");
+
+  document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+  document.getElementById("addBabyButton").addEventListener("click", () => {
+    window.location.href = `${screenUrl("add_baby_profile")}?mode=create`;
+  });
+
+  render();
+
+  function render() {
+    const profiles = getBabyProfiles(mockBabyProfile);
+    const selectedBabyId = getSelectedBabyId(mockBabyProfile);
+
+    profilesList.innerHTML = profiles.length
+      ? profiles.map((profile) => renderProfileCard(profile, profile.id === selectedBabyId, profiles.length)).join("")
+      : renderEmptyState();
+
+    profilesList.querySelectorAll("[data-edit-baby]").forEach((button) => {
+      button.addEventListener("click", () => {
+        window.location.href = `${screenUrl("add_baby_profile")}?mode=edit&id=${encodeURIComponent(button.dataset.editBaby)}`;
+      });
+    });
+
+    profilesList.querySelectorAll("[data-switch-baby]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (profiles.length < 2) {
+          showFeedback("Only one baby profile for now. Add another baby to switch.");
+          return;
+        }
+        setSelectedBabyId(button.dataset.switchBaby, mockBabyProfile);
+        showFeedback("Current baby updated.");
+        render();
+      });
+    });
+  }
+
+  function renderProfileCard(profile, isSelected, totalProfiles) {
+    const age = calculateBabyAge(profile.dateOfBirth, new Date());
+    const dob = new Date(`${profile.dateOfBirth}T00:00:00`).toLocaleDateString("en-MY", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+    const photo = profile.photoUrl || "/src/screens/home_dashboard/screen.png";
+
+    return `
+      <article class="bg-surface-container-lowest rounded-[24px] p-4 soft-shadow border ${isSelected ? "border-primary-container" : "border-transparent"} space-y-4">
+        <div class="flex gap-4">
+          <div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container shrink-0 border-4 border-white">
+            <img class="w-full h-full object-cover" src="${escapeHtml(photo)}" alt="${escapeHtml(profile.name)} profile photo"/>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="font-headline-md text-[20px] leading-7 font-bold truncate">${escapeHtml(profile.name)}</h2>
+              ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2 py-0.5 text-[11px] font-bold">Current baby</span>' : ""}
+            </div>
+            <p class="font-body-md text-[15px] text-on-surface-variant">${age}</p>
+            <p class="font-label-sm text-[12px] text-outline">Born ${dob}</p>
+          </div>
+        </div>
+        <div class="grid ${isSelected ? "grid-cols-1" : "grid-cols-2"} gap-2">
+          <button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>
+          ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
+        </div>
+        ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}
+      </article>
+    `;
+  }
+
+  function renderEmptyState() {
+    return `
+      <div class="bg-surface-container-lowest rounded-[24px] p-6 soft-shadow text-center space-y-3">
+        <div class="w-16 h-16 rounded-full bg-primary-container/40 text-primary mx-auto flex items-center justify-center">
+          <span class="material-symbols-outlined text-[34px]">child_care</span>
+        </div>
+        <p class="font-headline-md text-[20px] font-bold">No baby profile yet</p>
+        <p class="font-body-md text-[15px] text-on-surface-variant">Create one to get started.</p>
+      </div>
+    `;
+  }
+
+  function showFeedback(message) {
+    feedback.textContent = message;
+    feedback.classList.remove("hidden");
+    setTimeout(() => feedback.classList.add("hidden"), 2600);
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

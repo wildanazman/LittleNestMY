@@ -2,7 +2,15 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Calendar</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -123,12 +131,13 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="bg-background text-on-surface min-h-screen pb-32">
 <!-- Top App Bar -->
 <header class="docked full-width top-0 z-50 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14">
 <div class="flex items-center gap-2">
-<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" data-icon="arrow_back">arrow_back</button>
+<button aria-label="Back to home" class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" data-icon="arrow_back" id="calendarBackButton" type="button">arrow_back</button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Calendar</h1>
 </div>
 <div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
@@ -174,6 +183,8 @@
 <option value="daycare">Daycare</option>
 <option value="school">School</option>
 <option value="family">Family</option>
+<option value="medicine">Medicine</option>
+<option value="other">Other</option>
 </select>
 </label>
 <label class="space-y-xs">
@@ -277,7 +288,7 @@
 <section class="space-y-md">
 <div class="flex justify-between items-center">
 <h3 class="font-headline-md text-headline-md text-on-surface">Upcoming Events</h3>
-<button class="text-primary font-label-md">See All</button>
+<button class="text-primary font-label-md" id="seeAllEventsButton" type="button">See All</button>
 </div>
 <div class="space-y-sm" id="upcomingEventsList">
 <!-- Event 1 -->
@@ -373,7 +384,8 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
-        const { getPersistedCalendarEvents, saveLocalCalendarEvent } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, getSelectedBabyId, saveLocalCalendarEvent } = await import(`${moduleBase}utils/localState.mjs`);
+        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const monthTitle = document.getElementById("monthTitle");
         const todaySubtitle = document.getElementById("todaySubtitle");
@@ -392,7 +404,11 @@
         const eventFeedback = document.getElementById("eventFeedback");
         const saveEventButton = document.getElementById("saveEventButton");
         const addEventJumpButton = document.getElementById("addEventJumpButton");
+        const seeAllEventsButton = document.getElementById("seeAllEventsButton");
+        const backButton = document.getElementById("calendarBackButton");
         const visibleMonth = new Date();
+        const selectedBabyId = getSelectedBabyId(babyProfile);
+        let editingEventId = "";
 
         eventDateInput.value = new Date().toISOString().slice(0, 10);
         eventTimeInput.value = "09:00";
@@ -405,6 +421,8 @@
         });
         monthViewButton.addEventListener("click", () => setView("month"));
         upcomingViewButton.addEventListener("click", () => setView("upcoming"));
+        seeAllEventsButton.addEventListener("click", () => setView("upcoming"));
+        backButton.addEventListener("click", () => goToScreen("home_dashboard"));
 
         render();
 
@@ -415,7 +433,7 @@
         }
 
         function getEvents() {
-            return getPersistedCalendarEvents(mockCalendarEvents)
+            return getLogsForBaby(getPersistedCalendarEvents(mockCalendarEvents), selectedBabyId)
                 .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt));
         }
 
@@ -450,14 +468,22 @@
                 ].join(" ");
 
                 return `
-                    <button class="${classes}" type="button" aria-label="${date.toDateString()}">
+                    <button class="${classes}" type="button" aria-label="${date.toDateString()}" data-calendar-date="${date.toISOString().slice(0, 10)}">
                         <span>${date.getDate()}</span>
                         <span class="flex gap-0.5 mt-1 min-h-[6px]">
-                            ${dayEvents.slice(0, 3).map((event) => `<span class="w-1.5 h-1.5 rounded-full ${tagForCategory(event.type).dot}"></span>`).join("")}
+            ${dayEvents.slice(0, 3).map((event) => `<span class="w-1.5 h-1.5 rounded-full ${tagForCategory(event.type).dot}"></span>`).join("")}
                         </span>
                     </button>
                 `;
-            }).join("");
+        }).join("");
+
+            calendarDays.querySelectorAll("[data-calendar-date]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    eventDateInput.value = button.dataset.calendarDate;
+                    document.getElementById("addEventPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+                    eventTitleInput.focus();
+                });
+            });
         }
 
         function renderUpcoming() {
@@ -467,7 +493,7 @@
                 .slice(0, 8);
 
             upcomingEventsList.innerHTML = events.length
-                ? events.map(renderEventCard).join("")
+        ? events.map(renderEventCard).join("")
                 : `<div class="bg-surface-bright p-6 rounded-[24px] soft-shadow border border-primary-container/30 text-center space-y-3">
                     <div class="w-16 h-16 rounded-full bg-secondary-container text-secondary mx-auto flex items-center justify-center">
                         <span class="material-symbols-outlined text-[34px]">calendar_month</span>
@@ -477,6 +503,7 @@
                         <p class="font-body-md text-body-md text-on-surface-variant">Add clinic, daycare, school, or family reminders here. Simple reminders are enough.</p>
                     </div>
                 </div>`;
+            bindEventDetailCards();
         }
 
         function renderEventCard(event) {
@@ -491,7 +518,10 @@
                     <div class="flex-1 space-y-1 min-w-0">
                         <div class="flex justify-between items-start gap-2">
                             <h4 class="font-headline-md text-label-md text-on-surface truncate">${escapeHtml(event.title)}</h4>
-                            <span class="material-symbols-outlined text-outline text-[20px]">more_vert</span>
+                            <div class="flex gap-2 shrink-0">
+                                <button class="text-label-sm text-primary" data-edit-event="${event.id}" type="button">Edit</button>
+                                <button class="text-label-sm text-error" data-delete-event="${event.id}" type="button">Delete</button>
+                            </div>
                         </div>
                         <div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
                             <span class="material-symbols-outlined text-[16px]">schedule</span>
@@ -502,6 +532,33 @@
                     </div>
                 </div>
             `;
+        }
+
+        function bindEventDetailCards() {
+            const events = getEvents();
+            upcomingEventsList.querySelectorAll("[data-edit-event]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const event = events.find((item) => item.id === button.dataset.editEvent);
+                    if (!event) return;
+                    editingEventId = event.id;
+                    const date = new Date(event.startsAt);
+                    eventTitleInput.value = event.title || "";
+                    eventCategoryInput.value = event.type || "other";
+                    eventDateInput.value = date.toISOString().slice(0, 10);
+                    eventTimeInput.value = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+                    eventNotesInput.value = event.notes || "";
+                    saveEventButton.textContent = "Update Event";
+                    document.getElementById("addEventPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            });
+            upcomingEventsList.querySelectorAll("[data-delete-event]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    if (!confirm("Delete this calendar event?")) return;
+                    deleteLocalCalendarEvent(button.dataset.deleteEvent);
+                    render();
+                    showFeedback("Event deleted.");
+                });
+            });
         }
 
         function saveEvent() {
@@ -515,8 +572,8 @@
             }
 
             saveLocalCalendarEvent({
-                id: `event-local-${Date.now()}`,
-                babyId: babyProfile.id,
+                id: editingEventId || `event-local-${Date.now()}`,
+                babyId: selectedBabyId,
                 type: eventCategoryInput.value,
                 title,
                 startsAt: new Date(`${date}T${time}:00`).toISOString(),
@@ -524,8 +581,10 @@
                 isAllDay: false
             });
 
-            eventTitleInput.value = "";
-            eventNotesInput.value = "";
+      eventTitleInput.value = "";
+      eventNotesInput.value = "";
+            editingEventId = "";
+            saveEventButton.textContent = "Save Event";
             render();
             showFeedback("Event saved locally.");
         }
@@ -551,7 +610,9 @@
                 clinic: { className: "bg-[#DBEAFE] text-[#1E40AF]", dateBg: "bg-[#DBEAFE] text-[#1E40AF]", dot: "bg-[#60A5FA]" },
                 daycare: { className: "bg-tertiary-container text-on-tertiary-container", dateBg: "bg-tertiary-container text-on-tertiary-container", dot: "bg-tertiary-container" },
                 school: { className: "bg-[#FEF9C3] text-[#854D0E]", dateBg: "bg-[#FEF9C3] text-[#854D0E]", dot: "bg-[#FACC15]" },
-                family: { className: "bg-secondary-fixed text-on-secondary-fixed", dateBg: "bg-secondary-fixed text-on-secondary-fixed", dot: "bg-secondary-fixed" }
+                family: { className: "bg-secondary-fixed text-on-secondary-fixed", dateBg: "bg-secondary-fixed text-on-secondary-fixed", dot: "bg-secondary-fixed" },
+                medicine: { className: "bg-[#FFE4E6] text-[#9F1239]", dateBg: "bg-[#FFE4E6] text-[#9F1239]", dot: "bg-[#FB7185]" },
+                other: { className: "bg-surface-container text-on-surface", dateBg: "bg-surface-container text-on-surface", dot: "bg-outline" }
             }[category] || { className: "bg-surface-container text-on-surface", dateBg: "bg-surface-container text-on-surface", dot: "bg-outline" };
         }
 
@@ -562,7 +623,9 @@
                 clinic: "Clinic",
                 daycare: "Daycare",
                 school: "School",
-                family: "Family"
+                family: "Family",
+                medicine: "Medicine",
+                other: "Other"
             }[category] || "Event";
         }
 
@@ -597,4 +660,9 @@
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

@@ -2,7 +2,15 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Settings</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -124,18 +132,20 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="bg-background text-on-surface antialiased overflow-x-hidden">
 <!-- Top Navigation Bar -->
 <header class="bg-surface sticky top-0 z-40 flex justify-between items-center w-full px-container-padding h-14">
 <div class="flex items-center gap-4">
-<button class="hover:opacity-80 transition-opacity flex items-center justify-center p-2 rounded-full Active: scale-95 transition-transform duration-200">
-<span class="material-symbols-outlined text-primary font-headline-md text-headline-md">arrow_back</span>
+<button aria-label="Back to home" class="hover:opacity-80 transition-opacity flex items-center justify-center p-2 rounded-full active:scale-95 transition-transform duration-200" id="settingsBackButton" type="button">
+<span class="material-symbols-outlined text-primary text-[24px]">arrow_back</span>
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary" data-i18n="settings.title">Settings</h1>
 </div>
 <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-primary/10">
-<img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A close-up, heartwarming portrait of a sleeping newborn baby wrapped in a soft, cream-colored knitted blanket. The lighting is ethereal and soft, capturing the delicate textures of the skin and wool. The background is a gentle blur of warm peach and ivory tones, creating a calm, sanctuary-like atmosphere consistent with a premium parenting app's visual identity." src="https://lh3.googleusercontent.com/aida/AP1WRLsos-Y3I7L-KLYW8_S9IXAh8Ao72HFhlTyDywsmLGPsD6NuvFDPyj_ZSdhKYng_7-A7vpRYys4Gv0pojLCzQxh863ewvheZ5PJsFXzjwQoS0dGXjsGKTfySRueV93094B79DE2_yeYGOBKvj3YFkeKy8y_YgpH2CUD2y7XKvlArNpUWjPUD1R4Q1tiG7Dx_oDcMSav25loPCsANXVb9U-Tj03tzjmBgM0HyaqeY3-xB0m7DGWI2g1M5JYs"/>
+<img alt="Parent Avatar" class="w-full h-full object-cover hidden" id="topParentPhoto"/>
+<span class="font-headline-md text-headline-md text-primary" id="topParentInitials">P</span>
 </div>
 </header>
 <main class="max-w-md mx-auto px-container-padding pb-32 pt-6">
@@ -143,20 +153,21 @@
 <section class="mb-lg flex flex-col items-center text-center">
 <div class="relative mb-md">
 <div class="w-24 h-24 rounded-full overflow-hidden soft-shadow border-4 border-white">
-<img alt="Parent Portrait" class="w-full h-full object-cover" data-alt="A professional and warm portrait of a smiling young mother in her late 20s, looking directly at the camera with a gentle and trustworthy expression. She is wearing a soft linen shirt in a neutral beige tone. The background is a brightly lit, minimalist modern home interior with soft natural lighting and warm cream accents, evoking a sense of security and domestic peace." src="https://lh3.googleusercontent.com/aida/AP1WRLs6t7T8wvYhQ5JxDkwnyBNFEZau1Iv3IcsvSm36oRLgn-XRLdaqB_fes-6jr43ieVmV5g2zqUsrs7MU43OAg9onnjgyYLwlf6jpUU6iuV5sHwLM_FkHrjmjGnPwCmYyn33d9_X8Yq0RSpNZ_VQdnpMlG8dRbBlL1bGq3bq0yOoIEpfi7w3rCYnT7OMOcECNdJTGGJZ9xHBwhE2TLIF1Z4HSITZeeJYTsgb3LSjKAAztu2clEdvvczcP4Uxr"/>
+<img alt="Parent Portrait" class="w-full h-full object-cover hidden" id="parentPhoto"/>
+<div class="w-full h-full bg-primary-container text-primary flex items-center justify-center font-headline-md text-headline-md" id="parentInitials">P</div>
 </div>
-<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-md">
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-md" id="editParentProfileButton" type="button" aria-label="Edit parent profile">
 <span class="material-symbols-outlined text-[18px]">edit</span>
 </button>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Sarah Mitchell</h2>
-<p class="font-label-md text-label-md text-on-surface-variant">sarah.m@littlenest.my</p>
+<h2 class="font-headline-md text-headline-md text-on-surface" id="parentName">Parent</h2>
+<p class="font-label-md text-label-md text-on-surface-variant" id="parentEmail">Local prototype</p>
 </section>
 <!-- Menu Groups -->
 <div class="space-y-sm">
 <!-- Group: Account & Profiles -->
 <div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="baby_profiles">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary">child_care</span>
@@ -182,10 +193,28 @@
 </div>
 <p class="min-h-5 mt-2 text-[11px] font-label-sm text-tertiary" id="languageFeedback"></p>
 </div>
+<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
+<div class="p-4 rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">contrast</span>
+</div>
+<div class="flex flex-col flex-1">
+<span class="font-label-md text-label-md text-on-surface">Theme</span>
+<span class="text-[11px] font-label-sm text-outline uppercase tracking-wider">Choose app appearance</span>
+</div>
+</div>
+<div class="mt-4 bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Theme">
+<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="light" type="button">Light</button>
+<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="dark" type="button">Dark</button>
+<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="system" type="button">System</button>
+</div>
+<p class="min-h-5 mt-2 text-[11px] font-label-sm text-tertiary" id="themeFeedback"></p>
+</div>
 </div>
 <!-- Group: App Preferences -->
 <div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="calendar">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">notifications_active</span>
@@ -195,7 +224,7 @@
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="privacy_safety">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">verified_user</span>
@@ -205,7 +234,7 @@
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Export data" data-coming-soon-message="Export will generate a local report in a later MVP step.">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">ios_share</span>
@@ -217,7 +246,7 @@
 </div>
 <!-- Group: Subscription & Help -->
 <div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Subscription" data-coming-soon-message="Subscription is only a prototype placeholder for now.">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -230,7 +259,7 @@
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Help & Support" data-coming-soon-message="Help content will be added before release.">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant">help</span>
@@ -242,13 +271,13 @@
 </div>
 <!-- Danger Zone -->
 <div class="pt-md pb-md">
-<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group">
+<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group" id="logoutButton" type="button">
 <div class="w-10 h-10 rounded-full bg-error-container/30 flex items-center justify-center">
 <span class="material-symbols-outlined text-error">logout</span>
 </div>
 <span class="font-label-md text-label-md text-error">Logout</span>
 </button>
-<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group mt-2">
+<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group mt-2" data-screen-target="privacy_safety" type="button">
 <div class="w-10 h-10 rounded-full bg-error-container/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-error/60">delete_forever</span>
 </div>
@@ -261,6 +290,33 @@
 <p class="font-label-sm text-label-sm mt-1">Made with ♥ for parents</p>
 </div>
 </main>
+<div class="fixed inset-0 z-[100] hidden items-end justify-center bg-black/25 px-5 pb-6" id="parentProfileModal">
+<form class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-4" id="parentProfileForm">
+<div class="flex items-start justify-between gap-3">
+<div>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Parent profile</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">Update your details</h2>
+</div>
+<button aria-label="Close parent profile" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center" id="closeParentProfileButton" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<label class="block">
+<span class="font-label-md text-label-md text-on-surface">Display name</span>
+<input class="mt-2 w-full h-12 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="parentNameInput" type="text"/>
+</label>
+<label class="block">
+<span class="font-label-md text-label-md text-on-surface">Email</span>
+<input class="mt-2 w-full h-12 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="parentEmailInput" inputmode="email" type="email"/>
+</label>
+<label class="block">
+<span class="font-label-md text-label-md text-on-surface">Profile photo</span>
+<input class="mt-2 w-full rounded-2xl bg-surface-container px-4 py-3 text-label-md" id="parentPhotoInput" accept="image/*" type="file"/>
+</label>
+<p class="hidden text-label-md text-error" id="parentProfileError" aria-live="polite"></p>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" type="submit">Save profile</button>
+</form>
+</div>
 <!-- Bottom Navigation Bar - Hidden for transactional sub-page according to rules, but kept for context if this is a top-level settings -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
 <button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1">
@@ -293,12 +349,35 @@
             setLanguage,
             t
         } = await import(`${moduleBase}utils/i18n.mjs`);
+        const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
+        const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
         const languageButtons = document.querySelectorAll("[data-language-option]");
         const languageFeedback = document.getElementById("languageFeedback");
+        const themeButtons = document.querySelectorAll("[data-theme-option]");
+        const themeFeedback = document.getElementById("themeFeedback");
+        const parentModal = document.getElementById("parentProfileModal");
+        const parentForm = document.getElementById("parentProfileForm");
+        const parentError = document.getElementById("parentProfileError");
+        let parentPhotoDataUrl = "";
 
         applyTranslations();
+        bindPrototypeActions();
         renderLanguageSelection(getLanguage());
+        renderThemeSelection(getThemePreference());
+        renderParentProfile();
+
+        document.getElementById("settingsBackButton")?.addEventListener("click", () => {
+            window.location.href = screenUrl("home_dashboard");
+        });
+
+        document.getElementById("logoutButton")?.addEventListener("click", () => {
+            logoutLocalUser();
+            window.location.href = screenUrl("auth_welcome");
+        });
 
         languageButtons.forEach((button) => {
             button.addEventListener("click", () => {
@@ -307,6 +386,54 @@
                 renderLanguageSelection(language);
                 languageFeedback.textContent = t("settings.languageSaved", language);
             });
+        });
+
+        themeButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                const theme = setThemePreference(button.dataset.themeOption);
+                renderThemeSelection(theme);
+                themeFeedback.textContent = "Theme saved.";
+            });
+        });
+
+        document.getElementById("editParentProfileButton")?.addEventListener("click", () => {
+            const profile = getParentProfile();
+            parentPhotoDataUrl = profile.photoUrl || "";
+            document.getElementById("parentNameInput").value = profile.name || "";
+            document.getElementById("parentEmailInput").value = profile.email || "";
+            parentError.classList.add("hidden");
+            parentModal.classList.remove("hidden");
+            parentModal.classList.add("flex");
+        });
+
+        document.getElementById("closeParentProfileButton")?.addEventListener("click", closeParentProfileModal);
+        parentModal.addEventListener("click", (event) => {
+            if (event.target === parentModal) closeParentProfileModal();
+        });
+
+        document.getElementById("parentPhotoInput")?.addEventListener("change", async (event) => {
+            parentError.classList.add("hidden");
+            try {
+                parentPhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 640, quality: 0.82 });
+            } catch (error) {
+                parentPhotoDataUrl = "";
+                parentError.textContent = error.message;
+                parentError.classList.remove("hidden");
+            }
+        });
+
+        parentForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const name = document.getElementById("parentNameInput").value.trim();
+            const email = document.getElementById("parentEmailInput").value.trim();
+            if (!name) {
+                parentError.textContent = "Add a display name to save your profile.";
+                parentError.classList.remove("hidden");
+                return;
+            }
+            saveParentProfile({ name, email, photoUrl: parentPhotoDataUrl });
+            renderParentProfile();
+            closeParentProfileModal();
         });
 
         document.querySelectorAll(".list-item-hover").forEach(item => {
@@ -328,6 +455,52 @@
                 button.setAttribute("aria-pressed", String(isActive));
             });
         }
+
+        function renderThemeSelection(theme) {
+            themeButtons.forEach((button) => {
+                const isActive = button.dataset.themeOption === theme;
+                button.classList.toggle("bg-white", isActive);
+                button.classList.toggle("text-primary", isActive);
+                button.classList.toggle("soft-shadow", isActive);
+                button.classList.toggle("text-on-surface-variant", !isActive);
+                button.setAttribute("aria-pressed", String(isActive));
+            });
+        }
+
+        function renderParentProfile() {
+            const profile = getParentProfile();
+            const initials = initialsForName(profile.name);
+            document.getElementById("parentName").textContent = profile.name || "Parent";
+            document.getElementById("parentEmail").textContent = profile.email || "Guest data saved on this device";
+            document.getElementById("parentInitials").textContent = initials;
+            document.getElementById("topParentInitials").textContent = initials;
+            renderPhoto("parentPhoto", "parentInitials", profile.photoUrl);
+            renderPhoto("topParentPhoto", "topParentInitials", profile.photoUrl);
+        }
+
+        function renderPhoto(photoId, initialsId, photoUrl) {
+            const photo = document.getElementById(photoId);
+            const initials = document.getElementById(initialsId);
+            if (!photo || !initials) return;
+            if (photoUrl) {
+                photo.src = photoUrl;
+                photo.classList.remove("hidden");
+                initials.classList.add("hidden");
+            } else {
+                photo.classList.add("hidden");
+                initials.classList.remove("hidden");
+            }
+        }
+
+        function closeParentProfileModal() {
+            parentModal.classList.add("hidden");
+            parentModal.classList.remove("flex");
+        }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

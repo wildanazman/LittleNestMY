@@ -2,7 +2,15 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Home</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -113,14 +121,16 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="bg-background text-on-background min-h-screen pb-32">
 <!-- Top App Bar -->
 <header class="bg-surface sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-14">
 <h1 class="font-headline-lg text-headline-lg text-primary">LittleNest MY</h1>
-<div class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center">
-<img class="w-full h-full object-cover" data-alt="A professional headshot of a friendly young father in his early 30s with a warm smile. The image is set against a soft-focus minimalist domestic interior background with warm cream and peach tones. High-key lighting creates a gentle, trustworthy, and empathetic atmosphere consistent with a parental digital sanctuary brand." src="https://lh3.googleusercontent.com/aida/AP1WRLtq7msd86mPJ5Rpn40ROXOXa_zj0ygq1n0I9rvNHA0MS0pI9C-z4cYyItj5IEYdsDxiEgI-anCGWgskhODoaI5JROaiurcoht6Hqu7xRz9ZFPLLmStJcn5QiuAd3Q_s_tEeluIwTHok-dT4fQ8NL3FPqBO2Y4hGvbPNCTsxBevtW4SKBIGt8_ep4WuoxsKH8ugaYsvFCL7JJ2bixqJBSHotLBe1dKkyd0UWJnbhzUmAsmCsKk-8Gy-zQUc"/>
-</div>
+<button aria-label="Open settings and reminders" class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button">
+<img class="w-full h-full object-cover hidden" id="homeParentPhoto" alt="Parent profile"/>
+<span class="font-headline-md text-headline-md text-primary" id="homeParentInitials">P</span>
+</button>
 </header>
 <main class="px-container-padding pt-6 space-y-lg">
 <!-- Greeting & Profile -->
@@ -135,16 +145,16 @@
                 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow">
+<div class="bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow cursor-pointer" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
 <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
-<img class="w-full h-full object-cover" data-alt="A close-up portrait of a beautiful 3-month-old infant with soft features and a peaceful expression. The baby is resting on a soft cream-colored linen texture. The lighting is ethereal and natural, highlighting the delicate skin tones and wispy hair. The color palette is composed of warm whites, subtle peaches, and muted earthy neutrals." src="https://lh3.googleusercontent.com/aida/AP1WRLuscSZ5G5liQO0GTmulxDac_-ms_OpzX7belNBSxC9HBCdymdfP81lANA4NL3WDliXRTzUdOpoP1qivD4_kaAgq_Gl1PZThUjNecr1dkx24mq1e-neVBc0see9jr-5uLxgI16ZlFHEzbuURWVuSFmkQNPrTfpgWeZU4TE7hj5EAME1UHtWxoWiAVuL2f_FwQm8g7FZsqj2AXmm2fFUGiLHMU-gdXq8GrvL_JJBoxfVm0nDp2KVIWt2HMbwz"/>
+<img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="/icons/icon-192.png"/>
 </div>
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">Aisyah</h3>
-<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">3 months 12 days</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">Baby</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a profile to begin</p>
 </div>
 <div class="ml-auto">
-<button class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary">
+<button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
 </button>
 </div>
@@ -153,70 +163,70 @@
 <!-- Status Grid -->
 <section class="grid grid-cols-2 gap-gutter">
 <!-- Feed -->
-<div class="bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="flex items-center gap-2 text-on-primary-container">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
 <span class="font-label-sm text-label-sm">Last Feed</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="lastFeedTime">2h 30m</p>
-<span class="font-label-sm text-label-sm text-primary">ago</span>
+<p class="font-headline-md text-headline-md text-on-surface" id="lastFeedTime">No feeds yet</p>
+<span class="font-label-sm text-label-sm text-primary"></span>
 </div>
 <!-- Sleep -->
-<div class="bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="flex items-center gap-2 text-[#1E40AF]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
 <span class="font-label-sm text-label-sm">Today Sleep</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="todaySleepTotal">8h 20m</p>
-<span class="font-label-sm text-label-sm text-[#1E40AF]">total</span>
+<p class="font-headline-md text-headline-md text-on-surface" id="todaySleepTotal">No sleep logs yet</p>
+<span class="font-label-sm text-label-sm text-[#1E40AF]"></span>
 </div>
 <!-- Diaper -->
-<div class="bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="flex items-center gap-2 text-[#166534]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
 <span class="font-label-sm text-label-sm">Diaper</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="lastDiaperTime">45m</p>
-<span class="font-label-sm text-label-sm text-[#166534]">ago</span>
+<p class="font-headline-md text-headline-md text-on-surface" id="lastDiaperTime">No diaper logs yet</p>
+<span class="font-label-sm text-label-sm text-[#166534]"></span>
 </div>
 <!-- Vaccine -->
-<div class="bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform">
+<div class="bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar">
 <div class="flex items-center gap-2 text-[#6B21A8]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">vaccines</span>
 <span class="font-label-sm text-label-sm" id="nextEventLabel">Next Vaccine</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="nextEventDate">12 June</p>
-<span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative">in 24 days</span>
+<p class="font-headline-md text-headline-md text-on-surface" id="nextEventDate">No appointments yet</p>
+<span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative"></span>
 </div>
 </section>
 <!-- Quick Actions -->
 <section>
 <div class="flex justify-between items-center px-2">
-<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">restaurant</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Feed</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0369A1] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">bedtime</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Sleep</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="w-14 h-14 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">baby_changing_station</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Diaper</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-coming-soon="Medicine log" data-coming-soon-message="Medicine tracking will be added after the MVP health note flow is ready." role="button" tabindex="0" aria-label="Medicine log coming soon">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">medication</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-coming-soon="Health note" data-coming-soon-message="A simple health note form is coming soon. For now, you can keep notes outside the app." role="button" tabindex="0" aria-label="Health note coming soon">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">edit_note</span>
 </div>
@@ -226,7 +236,7 @@
 </section>
 <!-- Reminder Banner -->
 <section>
-<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
+<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar reminders">
 <div class="absolute right-0 top-0 opacity-10 scale-150 rotate-12">
 <span class="material-symbols-outlined text-[120px]">notifications_active</span>
 </div>
@@ -234,8 +244,8 @@
 <span class="material-symbols-outlined">alarm_on</span>
 </div>
 <div class="z-10">
-<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">Next feed may be soon</p>
-<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Based on Aisyah's typical 3h schedule</p>
+<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">No activity yet</p>
+<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Add your first log when you are ready.</p>
 </div>
 </div>
 </section>
@@ -250,13 +260,13 @@
 <div class="w-2 h-2 rounded-full bg-primary"></div>
 </div>
 <div>
-<p class="font-label-md text-label-md text-on-surface">8:00 AM</p>
+<p class="font-label-md text-label-md text-on-surface"></p>
 <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
-<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Bottle</span> · 90ml Breastmilk</p>
+<p class="font-body-md text-body-md text-on-surface-variant">No activity yet. Add your first log.</p>
 </div>
 </div>
 </div>
-<div class="relative">
+<div class="relative hidden">
 <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-[#E0F2FE] flex items-center justify-center border-2 border-white">
 <div class="w-2 h-2 rounded-full bg-[#0369A1]"></div>
 </div>
@@ -267,7 +277,7 @@
 </div>
 </div>
 </div>
-<div class="relative">
+<div class="relative hidden">
 <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-[#DCFCE7] flex items-center justify-center border-2 border-white">
 <div class="w-2 h-2 rounded-full bg-[#15803D]"></div>
 </div>
@@ -282,9 +292,35 @@
 </section>
 </main>
 <!-- FAB -->
-<button class="fixed bottom-24 right-container-padding w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40">
+<button aria-label="Open quick log" class="fixed bottom-24 right-container-padding w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40" data-screen-target="quick_log" type="button">
 <span class="material-symbols-outlined text-[32px]">add</span>
 </button>
+<div class="fixed inset-0 z-[90] hidden items-end justify-center bg-black/25 px-5 pb-6" id="babyProfileMenu">
+<div class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-3">
+<div class="flex items-start justify-between gap-3">
+<div>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Baby profile</p>
+<h2 class="font-headline-md text-headline-md text-on-surface" id="babyMenuTitle">Manage baby profile</h2>
+</div>
+<button aria-label="Close baby profile menu" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center" id="babyProfileMenuClose" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<button class="w-full h-12 rounded-2xl bg-primary-container text-on-primary-container font-label-md text-label-md flex items-center justify-between px-4" id="editCurrentBabyButton" type="button">
+<span>Edit Baby Profile</span><span class="material-symbols-outlined">edit</span>
+</button>
+<button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="switchBabyButton" type="button">
+<span>Switch Baby</span><span class="material-symbols-outlined">sync_alt</span>
+</button>
+<button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="addNewBabyButton" type="button">
+<span>Add New Baby</span><span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="manageBabyProfilesButton" type="button">
+<span>Manage Baby Profiles</span><span class="material-symbols-outlined">chevron_right</span>
+</button>
+<p class="hidden font-label-md text-label-md text-tertiary px-1" id="babyMenuFeedback" aria-live="polite"></p>
+</div>
+</div>
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
 <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
@@ -311,7 +347,6 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const {
-            assistantSuggestions,
             babyProfile,
             calendarEvents,
             diaperLogs,
@@ -328,24 +363,41 @@
             isSameLocalDay
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
+            getBabyProfiles,
             getPersistedCalendarEvents,
             getPersistedDiaperLogs,
             getPersistedFeedingLogs,
-            getPersistedSleepLogs
+            getPersistedSleepLogs,
+            getLogsForBaby,
+            getSelectedBabyId,
+            getSelectedBabyProfile
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
 
         const now = new Date();
-        const allFeedingLogs = getPersistedFeedingLogs(feedingLogs);
-        const allSleepLogs = getPersistedSleepLogs(sleepLogs);
-        const allDiaperLogs = getPersistedDiaperLogs(diaperLogs);
-        const allCalendarEvents = getPersistedCalendarEvents(calendarEvents);
-        const primaryParent = familyMembers.find(member => member.permission === "owner") || familyMembers[0];
+        if (!isLoggedIn()) {
+            window.location.replace(screenUrl("auth_welcome"));
+            await new Promise(() => {});
+        }
+        const profiles = getBabyProfiles(babyProfile);
+        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const selectedBaby = getSelectedBabyProfile(babyProfile);
+        if (!profiles.length || !selectedBabyId || !selectedBaby) {
+            window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
+            await new Promise(() => {});
+        }
+        const allFeedingLogs = getLogsForBaby(getPersistedFeedingLogs(feedingLogs), selectedBabyId);
+        const allSleepLogs = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId);
+        const allDiaperLogs = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId);
+        const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents(calendarEvents), selectedBabyId);
+        const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
         const nextEvent = [...allCalendarEvents]
             .filter(event => ["vaccine", "clinic"].includes(event.type) && new Date(event.startsAt) >= now)
-            .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0] || calendarEvents[0];
-        const feedSuggestion = assistantSuggestions.find(suggestion => suggestion.category === "feeding") || assistantSuggestions[0];
+            .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
 
         const setText = (id, value) => {
             const element = document.getElementById(id);
@@ -353,22 +405,39 @@
         };
 
         setText("parentName", primaryParent?.name || "Mama");
-        setText("babyName", babyProfile.name);
-        setText("babyAge", calculateBabyAge(babyProfile.dateOfBirth, now));
-        setText("lastFeedTime", formatRelativeTime(latestFeed.startedAt, now));
-        setText("todaySleepTotal", formatDuration(getTodaySleepMinutes(allSleepLogs, now)));
-        setText("lastDiaperTime", formatRelativeTime(latestDiaper.changedAt, now));
-        setText("assistantTitle", feedSuggestion.title);
-        setText("assistantMessage", feedSuggestion.message);
+        const homeParentPhoto = document.getElementById("homeParentPhoto");
+        const homeParentInitials = document.getElementById("homeParentInitials");
+        homeParentInitials.textContent = initialsForName(primaryParent?.name);
+        if (primaryParent?.photoUrl) {
+            homeParentPhoto.src = primaryParent.photoUrl;
+            homeParentPhoto.classList.remove("hidden");
+            homeParentInitials.classList.add("hidden");
+        }
+        setText("babyName", selectedBaby.name);
+        setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
+        const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
+        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feeds yet");
+        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "No sleep logs yet");
+        setText("lastDiaperTime", latestDiaper ? formatRelativeTime(latestDiaper.changedAt, now) : "No diaper logs yet");
+        setText("assistantTitle", latestFeed ? "Recent care logged" : "No activity yet");
+        setText("assistantMessage", latestFeed ? "Your latest logs will appear in the timeline below." : "Add your first log when you are ready.");
+        setText("babyMenuTitle", selectedBaby.name);
+        const babyPhoto = document.getElementById("babyPhoto");
+        if (babyPhoto && selectedBaby.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
         if (nextEvent) {
             const { dateLabel, relativeLabel } = formatEventDate(nextEvent.startsAt, now);
             setText("nextEventLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
             setText("nextEventDate", dateLabel);
             setText("nextEventRelative", relativeLabel);
+        } else {
+            setText("nextEventLabel", "Next Appointment");
+            setText("nextEventDate", "No appointments yet");
+            setText("nextEventRelative", "");
         }
 
         renderTimeline(now);
+        bindBabyProfileMenu();
 
         function getTodaySleepMinutes(logs, date) {
             const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -392,6 +461,7 @@
                     .map(log => ({
                         at: log.startedAt,
                         type: "feed",
+                        detailTitle: "Feeding detail",
                         title: labelFeedingType(log.type),
                         detail: log.amountGrams ? `${log.amountGrams}g solid food` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} feeding` : log.notes || "Feeding logged"
                     })),
@@ -400,6 +470,7 @@
                     .map(log => ({
                         at: log.startedAt,
                         type: "sleep",
+                        detailTitle: "Sleep detail",
                         title: log.status === "nap" ? "Nap" : "Sleep",
                         detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
                     })),
@@ -408,6 +479,7 @@
                     .map(log => ({
                         at: log.changedAt,
                         type: "diaper",
+                        detailTitle: "Diaper detail",
                         title: "Diaper",
                         detail: `${capitalize(log.type)} changed`
                     }))
@@ -417,7 +489,7 @@
             if (!timeline) return;
 
             timeline.innerHTML = '<div class="absolute left-3 top-2 bottom-2 w-[2px] timeline-line rounded-full"></div>' +
-                events.map(renderTimelineItem).join("");
+        (events.length ? events.map(renderTimelineItem).join("") : renderEmptyTimeline());
         }
 
         function renderTimelineItem(event) {
@@ -435,7 +507,7 @@
                     </div>
                     <div>
                         <p class="font-label-md text-label-md text-on-surface">${formatTime(event.at)}</p>
-                        <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
+                        <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant cursor-pointer" data-coming-soon="${event.detailTitle}" data-coming-soon-message="Detail views will open here in the next prototype pass." role="button" tabindex="0">
                             <p class="font-body-md text-body-md text-on-surface"><span class="font-bold">${event.title}</span> &middot; ${event.detail}</p>
                         </div>
                     </div>
@@ -460,12 +532,63 @@
             return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
         }
 
-        // Micro-interactions and simple effects
-        document.querySelectorAll('a, button').forEach(el => {
-            el.addEventListener('click', (e) => {
-                // Subtle tactile feedback simulation if needed
+        function renderEmptyTimeline() {
+            return `
+                <div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant">
+                    <p class="font-body-md text-body-md text-on-surface-variant">No activity yet. Add your first log.</p>
+                </div>
+            `;
+        }
+
+        function bindBabyProfileMenu() {
+            const menu = document.getElementById("babyProfileMenu");
+            const feedback = document.getElementById("babyMenuFeedback");
+            const openMenu = () => {
+                feedback.classList.add("hidden");
+                menu.classList.remove("hidden");
+                menu.classList.add("flex");
+            };
+            const closeMenu = () => {
+                menu.classList.add("hidden");
+                menu.classList.remove("flex");
+            };
+            const showFeedback = (message) => {
+                feedback.textContent = message;
+                feedback.classList.remove("hidden");
+            };
+
+            document.getElementById("babyProfileMenuButton")?.addEventListener("click", (event) => {
+                event.stopPropagation();
+                openMenu();
             });
-        });
+            document.getElementById("babyProfileMenuClose")?.addEventListener("click", closeMenu);
+            menu.addEventListener("click", (event) => {
+                if (event.target === menu) closeMenu();
+            });
+            document.getElementById("editCurrentBabyButton")?.addEventListener("click", () => {
+                window.location.href = `${screenUrl("add_baby_profile")}?mode=edit&id=${encodeURIComponent(selectedBabyId)}`;
+            });
+            document.getElementById("switchBabyButton")?.addEventListener("click", () => {
+                if (profiles.length < 2) {
+                    showFeedback("Only one baby profile for now. Add another baby to switch.");
+                    return;
+                }
+                window.location.href = screenUrl("baby_profiles");
+            });
+            document.getElementById("addNewBabyButton")?.addEventListener("click", () => {
+                window.location.href = `${screenUrl("add_baby_profile")}?mode=create`;
+            });
+            document.getElementById("manageBabyProfilesButton")?.addEventListener("click", () => {
+                window.location.href = screenUrl("baby_profiles");
+            });
+        }
+
+        bindPrototypeActions();
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

@@ -2,7 +2,15 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Quick Log - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -131,7 +139,8 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="min-h-screen flex flex-col overflow-hidden">
 <!-- Background Simulation (Dashboard) -->
 <div class="fixed inset-0 z-0 opacity-40 pointer-events-none p-container-padding space-y-lg">
@@ -234,8 +243,51 @@
 <span class="font-label-sm text-label-sm-mobile">Assistant</span>
 </a>
 </nav>
+<div class="fixed inset-0 z-[90] hidden items-end justify-center bg-black/25 px-5 pb-6" id="quickFormModal">
+<form class="w-full max-w-md rounded-[28px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-4" id="quickForm">
+<div class="flex items-start justify-between gap-3">
+<div>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider" id="quickFormEyebrow">Quick log</p>
+<h2 class="font-headline-md text-headline-md text-on-surface" id="quickFormTitle">Add note</h2>
+</div>
+<button aria-label="Close quick form" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center" id="quickFormClose" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-3 hidden" id="growthFields">
+<label class="block"><span class="font-label-sm text-label-sm">Weight kg</span><input class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="growthWeight" inputmode="decimal" type="number" min="0" step="0.01"/></label>
+<label class="block"><span class="font-label-sm text-label-sm">Height cm</span><input class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="growthHeight" inputmode="decimal" type="number" min="0" step="0.1"/></label>
+<label class="block col-span-2"><span class="font-label-sm text-label-sm">Head cm</span><input class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="growthHead" inputmode="decimal" type="number" min="0" step="0.1"/></label>
+</div>
+<div class="grid grid-cols-2 gap-3 hidden" id="healthFields">
+<label class="block col-span-2"><span class="font-label-sm text-label-sm">Title</span><input class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="healthTitle" type="text" placeholder="Temperature, cough, clinic note"/></label>
+<label class="block"><span class="font-label-sm text-label-sm">Temp C</span><input class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="healthTemp" inputmode="decimal" type="number" min="30" max="45" step="0.1"/></label>
+<label class="block"><span class="font-label-sm text-label-sm">Type</span><select class="mt-1 w-full h-11 rounded-2xl border-0 bg-surface-container px-3" id="healthType"><option value="general">General</option><option value="temperature">Temperature</option><option value="clinic">Clinic</option><option value="medicine">Medicine</option></select></label>
+</div>
+<label class="block">
+<span class="font-label-sm text-label-sm text-on-surface" id="quickNoteLabel">Note</span>
+<textarea class="mt-1 w-full min-h-24 rounded-2xl border-0 bg-surface-container px-3 py-3" id="quickNoteText" placeholder="Add what you remember. Rough tracking is okay."></textarea>
+</label>
+<p class="hidden text-label-md text-error" id="quickFormError" aria-live="polite"></p>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" type="submit">Save</button>
+</form>
+</div>
 <!-- Micro-interactions Script -->
-<script>
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+        const {
+            getSelectedBabyId,
+            saveLocalGrowthRecord,
+            saveLocalHealthNote
+        } = await import(`${moduleBase}utils/localState.mjs`);
+        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const modal = document.getElementById("quickFormModal");
+        const form = document.getElementById("quickForm");
+        const error = document.getElementById("quickFormError");
+        let activeQuickType = "";
+
         document.querySelectorAll('.category-card').forEach(button => {
             button.addEventListener('touchstart', () => {
                 // Haptic feedback simulation can go here if supported
@@ -244,6 +296,7 @@
             button.addEventListener('click', (e) => {
                 const label = button.querySelector('span:last-child').innerText;
                 const target = button.dataset.logTarget;
+                const logType = button.dataset.logType;
                 const feedback = document.getElementById('quickLogFeedback');
                 
                 // Visual confirmation ripple effect or similar
@@ -253,25 +306,118 @@
                 }, 300);
 
                 if (feedback) {
-                    feedback.textContent = target ? `Opening ${label} log.` : `${label} selected. Form coming next.`;
+                    feedback.textContent = target ? `Opening ${label} log.` : `${label} selected. Form coming soon.`;
                 }
 
                 if (target) {
                     setTimeout(() => {
-                        window.location.href = target;
+                        goToScreen(target.replaceAll("/", ""));
                     }, 120);
+                } else if (logType) {
+                    openQuickForm(logType);
                 }
             });
         });
+
+        document.getElementById("quickFormClose").addEventListener("click", closeQuickForm);
+        modal.addEventListener("click", (event) => {
+            if (event.target === modal) closeQuickForm();
+        });
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            error.classList.add("hidden");
+            if (!selectedBabyId) {
+                showQuickError("Create a baby profile first, then add logs.");
+                return;
+            }
+            if (activeQuickType === "Growth") saveGrowth();
+            else saveHealthOrNote();
+        });
+
+        function openQuickForm(type) {
+            activeQuickType = type;
+            document.getElementById("quickFormEyebrow").textContent = type === "Growth" ? "Growth tracker" : type === "Health" ? "Health note" : "General note";
+            document.getElementById("quickFormTitle").textContent = type === "Growth" ? "Add growth record" : type === "Health" ? "Add health note" : "Add note";
+            document.getElementById("growthFields").classList.toggle("hidden", type !== "Growth");
+            document.getElementById("healthFields").classList.toggle("hidden", type !== "Health");
+            document.getElementById("quickNoteLabel").textContent = type === "Growth" ? "Growth note" : "Note";
+            form.reset();
+            error.classList.add("hidden");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+        }
+
+        function closeQuickForm() {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        function saveGrowth() {
+            const weightKg = parseNumber("growthWeight");
+            const heightCm = parseNumber("growthHeight");
+            const headCircumferenceCm = parseNumber("growthHead");
+            if (!weightKg && !heightCm && !headCircumferenceCm) {
+                showQuickError("Add at least one growth measurement.");
+                return;
+            }
+            saveLocalGrowthRecord({
+                id: `growth-local-${Date.now()}`,
+                babyId: selectedBabyId,
+                measuredAt: new Date().toISOString(),
+                weightKg: weightKg || undefined,
+                heightCm: heightCm || undefined,
+                headCircumferenceCm: headCircumferenceCm || undefined,
+                notes: document.getElementById("quickNoteText").value.trim() || undefined
+            });
+            document.getElementById("quickLogFeedback").textContent = "Growth record saved.";
+            closeQuickForm();
+        }
+
+        function saveHealthOrNote() {
+            const note = document.getElementById("quickNoteText").value.trim();
+            const title = activeQuickType === "Health"
+                ? document.getElementById("healthTitle").value.trim()
+                : "General note";
+            if (!note && !title) {
+                showQuickError("Add a short note to save.");
+                return;
+            }
+            saveLocalHealthNote({
+                id: `health-local-${Date.now()}`,
+                babyId: selectedBabyId,
+                type: activeQuickType === "Health" ? document.getElementById("healthType").value : "note",
+                recordedAt: new Date().toISOString(),
+                title: title || "Health note",
+                temperatureC: activeQuickType === "Health" ? parseNumber("healthTemp") || undefined : undefined,
+                details: note || undefined
+            });
+            document.getElementById("quickLogFeedback").textContent = `${activeQuickType} saved.`;
+            closeQuickForm();
+        }
+
+        function parseNumber(id) {
+            const value = Number(document.getElementById(id).value);
+            return Number.isFinite(value) && value > 0 ? value : 0;
+        }
+
+        function showQuickError(message) {
+            error.textContent = message;
+            error.classList.remove("hidden");
+        }
 
         // Close button functionality
         document.querySelector('header button').addEventListener('click', () => {
             document.querySelector('main').style.transform = 'translateY(100%)';
             document.querySelector('main').style.transition = 'transform 0.4s cubic-bezier(0.32, 0, 0.67, 0)';
             setTimeout(() => {
-                window.history.back();
+                goToScreen("home_dashboard");
             }, 400);
         });
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

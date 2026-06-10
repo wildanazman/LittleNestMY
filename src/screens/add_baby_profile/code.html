@@ -2,7 +2,15 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Create Baby Profile - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -134,12 +142,13 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="min-h-screen text-on-surface">
 <!-- Top App Bar -->
 <header class="docked full-width top-0 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14 sticky z-50">
 <div class="flex items-center gap-4">
-<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<button aria-label="Back to home" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" id="babyProfileBackButton" type="button">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">LittleNest MY</h1>
@@ -153,8 +162,8 @@
 <div class="space-y-8">
 <!-- Header Section -->
 <div class="text-center space-y-2">
-<h2 class="font-display-lg text-display-lg text-on-surface">New Arrival</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">Let's start your baby's journey of growth and memories.</p>
+<h2 class="font-display-lg text-display-lg text-on-surface" id="formTitle">New Arrival</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" id="formSubtitle">Let's start your baby's journey of growth and memories.</p>
 </div>
 <!-- Profile Form -->
 <form class="space-y-6" id="babyProfileForm">
@@ -217,7 +226,8 @@
 </div>
 <!-- Submit Button -->
 <div class="pt-6">
-<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+<p class="hidden text-center font-label-md text-label-md text-tertiary" id="saveFeedback" aria-live="polite"></p>
+<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md rounded-full shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2" id="saveBabyButton" type="submit">
                         Create Baby Profile
                         <span class="material-symbols-outlined">celebration</span>
 </button>
@@ -226,22 +236,52 @@
 </div>
 </main>
 <!-- Navigation suppressed for linear onboarding task -->
-<script>
-        // Image preview logic
+<script type="module">
+        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+        const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+        const {
+            createBabyProfile,
+            getBabyProfiles,
+            getSelectedBabyProfile,
+            saveBabyProfile,
+            setSelectedBabyId
+        } = await import(`${moduleBase}utils/localState.mjs`);
+        const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+
+        if (!isLoggedIn()) {
+            window.location.replace(screenUrl("auth_welcome"));
+            await new Promise(() => {});
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get("mode") === "edit" ? "edit" : "create";
+        const editId = params.get("id");
         const avatarInput = document.getElementById('avatarInput');
         const babyAvatarPreview = document.getElementById('babyAvatarPreview');
         const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+        const nameInput = document.getElementById("babyName");
+        const dobInput = document.getElementById("dob");
+        const formTitle = document.getElementById("formTitle");
+        const formSubtitle = document.getElementById("formSubtitle");
+        const saveButton = document.getElementById("saveBabyButton");
+        const saveFeedback = document.getElementById("saveFeedback");
+        let avatarDataUrl = "";
+        let editingProfile = null;
 
-        avatarInput.addEventListener('change', function(e) {
+        avatarInput.addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    babyAvatarPreview.src = event.target.result;
+                try {
+                    avatarDataUrl = await fileToResizedDataUrl(file, { maxSize: 720, quality: 0.82 });
+                    babyAvatarPreview.src = avatarDataUrl;
                     babyAvatarPreview.classList.remove('hidden');
                     avatarPlaceholder.classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
+                } catch (error) {
+                    showFeedback(error.message);
+                    avatarInput.value = "";
+                }
             }
         });
 
@@ -251,26 +291,102 @@
             buttons.forEach(btn => btn.classList.remove('radio-tile-active'));
             element.classList.add('radio-tile-active');
         }
+        window.toggleSelection = toggleSelection;
 
-        // Form submission animation
+        setupMode();
+
         document.getElementById('babyProfileForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = e.submitter;
-            const originalContent = btn.innerHTML;
-            
-            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Setting up...';
+            const btn = saveButton;
+            const name = nameInput.value.trim();
+            const dateOfBirth = dobInput.value;
+
+            if (!name || !dateOfBirth) {
+                showFeedback("Add baby name and date of birth to save.");
+                return;
+            }
+
+            const selectedGender = document.querySelector(".gender-btn.radio-tile-active")?.textContent.trim().toLowerCase() || "";
+            const selectedFeeding = document.querySelector(".feeding-btn.radio-tile-active")?.textContent.trim().replace(/\s+/g, " ") || "";
+            const profileData = {
+                ...(editingProfile || {}),
+                name,
+                dateOfBirth,
+                gender: selectedGender,
+                feedingPreference: selectedFeeding,
+                photoUrl: avatarDataUrl || editingProfile?.photoUrl || ""
+            };
+
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Saving...';
             btn.disabled = true;
 
             setTimeout(() => {
-                btn.innerHTML = '<span class="material-symbols-outlined">done</span> Profile Created!';
+                const saved = mode === "edit"
+                    ? saveBabyProfile(profileData, mockBabyProfile)
+                    : createBabyProfile(profileData, mockBabyProfile);
+                setSelectedBabyId(saved.id, mockBabyProfile);
+                btn.innerHTML = mode === "edit"
+                    ? '<span class="material-symbols-outlined">done</span> Profile Updated'
+                    : '<span class="material-symbols-outlined">done</span> Profile Created';
                 btn.classList.replace('bg-primary-container', 'bg-tertiary-container');
                 btn.classList.replace('text-on-primary-container', 'text-on-tertiary-container');
                 
-                // Micro-interaction: redirect simulated
                 setTimeout(() => {
-                    alert('Profile successfully created! Welcome to LittleNest.');
-                }, 500);
-            }, 1500);
+                    goToScreen("home_dashboard");
+                }, 450);
+            }, 350);
         });
+
+        document.getElementById("babyProfileBackButton").addEventListener("click", () => {
+            window.location.href = screenUrl("baby_profiles");
+        });
+
+        function setupMode() {
+            const profiles = getBabyProfiles(mockBabyProfile);
+            editingProfile = mode === "edit"
+                ? profiles.find((profile) => profile.id === editId) || getSelectedBabyProfile(mockBabyProfile)
+                : null;
+
+            if (mode === "edit" && editingProfile) {
+                document.title = "Edit Baby Profile - LittleNest MY";
+                formTitle.textContent = "Edit Baby Profile";
+                formSubtitle.textContent = "Update details for the current baby profile.";
+                saveButton.innerHTML = 'Save Changes <span class="material-symbols-outlined">check_circle</span>';
+                nameInput.value = editingProfile.name || "";
+                dobInput.value = editingProfile.dateOfBirth || "";
+                avatarDataUrl = editingProfile.photoUrl || "";
+                if (avatarDataUrl) {
+                    babyAvatarPreview.src = avatarDataUrl;
+                    babyAvatarPreview.classList.remove("hidden");
+                    avatarPlaceholder.classList.add("hidden");
+                }
+                activateButton(".gender-btn", editingProfile.gender);
+                activateButton(".feeding-btn", editingProfile.feedingPreference);
+                return;
+            }
+
+            document.title = "Add New Baby - LittleNest MY";
+            formTitle.textContent = "Add New Baby";
+            formSubtitle.textContent = "Create another baby profile without losing existing profiles.";
+            saveButton.innerHTML = 'Create Baby Profile <span class="material-symbols-outlined">celebration</span>';
+        }
+
+        function activateButton(selector, value) {
+            if (!value) return;
+            const normalized = String(value).toLowerCase();
+            const button = [...document.querySelectorAll(selector)].find((item) => item.textContent.trim().toLowerCase().includes(normalized));
+            if (button) toggleSelection(button, selector.includes("gender") ? "gender" : "feeding");
+        }
+
+        function showFeedback(message) {
+            saveFeedback.textContent = message;
+            saveFeedback.classList.remove("hidden");
+            setTimeout(() => saveFeedback.classList.add("hidden"), 2600);
+        }
     </script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Privacy &amp; Safety | LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#efeee9",
+              "surface-container-low": "#f5f3ee",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#eae8e3",
+              "background": "#fbf9f4",
+              "surface": "#fbf9f4",
+              "primary": "#83533c",
+              "primary-container": "#ffbfa3",
+              "primary-fixed": "#ffdbcc",
+              "primary-fixed-dim": "#f7b89d",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#7a4b36",
+              "on-primary-fixed": "#331203",
+              "on-primary-fixed-variant": "#673c27",
+              "secondary": "#625e56",
+              "secondary-container": "#e6dfd5",
+              "tertiary": "#486646",
+              "tertiary-container": "#b5d6af",
+              "tertiary-fixed": "#caecc4",
+              "on-tertiary-fixed": "#052108",
+              "on-surface": "#1b1c19",
+              "on-surface-variant": "#51443e",
+              "outline": "#84746d",
+              "outline-variant": "#d6c2bb",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "on-error-container": "#93000a"
+            },
+            spacing: {
+              md: "24px",
+              base: "8px",
+              xl: "48px",
+              lg: "32px",
+              xs: "4px",
+              "container-padding": "20px",
+              gutter: "16px",
+              sm: "12px"
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px"
+            },
+            fontFamily: {
+              "headline-lg": ["Nunito Sans"],
+              "display-lg": ["Nunito Sans"],
+              "headline-md": ["Nunito Sans"],
+              "label-sm": ["Nunito Sans"],
+              "body-lg": ["Nunito Sans"],
+              "headline-lg-mobile": ["Nunito Sans"],
+              "label-md": ["Nunito Sans"],
+              "body-md": ["Nunito Sans"]
+            },
+            fontSize: {
+              "display-lg": ["32px", { lineHeight: "40px", fontWeight: "800" }],
+              "headline-md": ["20px", { lineHeight: "28px", fontWeight: "700" }],
+              "headline-lg-mobile": ["22px", { lineHeight: "28px", fontWeight: "700" }],
+              "label-sm": ["12px", { lineHeight: "16px", fontWeight: "700" }],
+              "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],
+              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      body {
+        min-height: max(884px, 100dvh);
+        font-family: 'Nunito Sans', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .soft-shadow {
+        box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
+      }
+    </style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-background text-on-surface pb-28">
+<header class="sticky top-0 z-40 bg-surface flex items-center justify-between w-full px-container-padding h-14">
+<div class="flex items-center gap-3 min-w-0">
+<button aria-label="Back to settings" class="w-10 h-10 rounded-full text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Privacy &amp; Safety</h1>
+</div>
+<div class="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+</header>
+<main class="max-w-md mx-auto px-container-padding pt-6 space-y-lg">
+<section class="rounded-xl bg-primary-fixed p-5 soft-shadow">
+<div class="flex items-start gap-3">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<div class="space-y-1">
+<p class="font-label-sm text-label-sm text-on-primary-fixed-variant uppercase">Prototype privacy</p>
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed">Your baby data stays private in this prototype</h2>
+<p class="font-body-md text-body-md text-on-primary-fixed-variant">LittleNest MY stores MVP data in this browser only. There is no backend account sync in this prototype.</p>
+</div>
+</div>
+</section>
+<section class="space-y-sm">
+<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">health_and_safety</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">No medical diagnosis</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">LittleNest can help organize notes and reminders, but it does not diagnose, treat, or replace professional care.</p>
+</div>
+</div>
+</article>
+<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">ios_share</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Export data</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">A future MVP step can turn local logs into a simple report for parents, caregivers, or clinic visits.</p>
+</div>
+</div>
+</article>
+<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">delete</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">Delete local data</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">You can clear locally saved feeding, sleep, diaper, calendar, milestone, and preference data from this browser.</p>
+</div>
+</div>
+</article>
+<article class="rounded-xl bg-surface-container-high p-4 soft-shadow border border-white/60">
+<div class="flex gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">stethoscope</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-md text-on-surface">For medical concerns, please consult a doctor</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">If something feels urgent or worrying, contact your doctor, Klinik Kesihatan, or local emergency services.</p>
+</div>
+</div>
+</article>
+</section>
+<section class="rounded-xl bg-surface-container-low p-5 soft-shadow border border-outline-variant/40 space-y-sm">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Clear local app data</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">This only clears LittleNest data saved in this browser. After clearing, you will start again by creating a baby profile.</p>
+</div>
+<button class="w-full h-14 rounded-full bg-error-container text-on-error-container font-headline-md text-body-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="clearDataButton" type="button">
+<span class="material-symbols-outlined">delete_forever</span>
+Clear local app data
+</button>
+<p class="min-h-6 font-label-md text-label-md text-tertiary" id="clearDataFeedback"></p>
+</section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
+<script type="module">
+      const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+      const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+
+      const clearDataButton = document.getElementById("clearDataButton");
+      const clearDataFeedback = document.getElementById("clearDataFeedback");
+      const backButton = document.getElementById("backButton");
+      let clearArmed = false;
+
+      backButton.addEventListener("click", () => {
+        goToScreen("settings");
+      });
+
+      clearDataButton.addEventListener("click", () => {
+        if (!clearArmed) {
+          clearArmed = true;
+          clearDataFeedback.textContent = "Tap once more to clear local LittleNest data from this browser.";
+          clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Confirm clear local data';
+          setTimeout(() => {
+            clearArmed = false;
+            clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Clear local app data';
+          }, 5000);
+          return;
+        }
+
+        Object.keys(window.localStorage)
+          .filter((key) => key.startsWith("littlenest:"))
+          .forEach((key) => window.localStorage.removeItem(key));
+        window.localStorage.removeItem("isLoggedIn");
+        window.localStorage.removeItem("currentUser");
+
+        clearArmed = false;
+        clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Clear local app data';
+        clearDataFeedback.textContent = "Local LittleNest data has been cleared on this browser.";
+        setTimeout(() => goToScreen("auth_welcome"), 700);
+      });
+    </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

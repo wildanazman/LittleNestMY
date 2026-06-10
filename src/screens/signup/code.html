@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Create Account - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fff8f5",
+        "surface-container": "#f4ebe6",
+        "surface-container-low": "#fff1ea",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>.soft-shadow{box-shadow:0 18px 45px rgba(131,83,60,.12)} input{font-size:16px}</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen">
+<main class="min-h-screen px-6 py-6 max-w-md mx-auto flex flex-col">
+<header class="h-14 flex items-center gap-3">
+<button aria-label="Back to welcome" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary" data-screen-target="auth_welcome" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-extrabold text-primary">LittleNest MY</span>
+</header>
+<section class="flex-1 flex flex-col justify-center space-y-5">
+<div class="space-y-2">
+<h1 class="text-3xl font-extrabold text-primary leading-tight">Create your nest</h1>
+<p class="text-base leading-6 text-on-surface-variant">Start with a parent account, then add your baby's profile.</p>
+</div>
+<form class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-4" id="signupForm">
+<div class="space-y-2">
+<label class="font-bold text-sm" for="name">Name</label>
+<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="name" placeholder="Mama" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-bold text-sm" for="email">Email</label>
+<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="email" inputmode="email" placeholder="mama@example.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="font-bold text-sm" for="password">Password</label>
+<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="password" placeholder="Create a password" type="password"/>
+</div>
+<div class="space-y-2">
+<label class="font-bold text-sm" for="confirmPassword">Confirm Password</label>
+<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="confirmPassword" placeholder="Repeat password" type="password"/>
+</div>
+<p class="hidden text-sm text-error" id="signupError" aria-live="polite"></p>
+<button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform" type="submit">Create Account</button>
+</form>
+<p class="text-center text-sm text-on-surface-variant">Already have an account? <button class="font-extrabold text-primary" data-screen-target="login" type="button">Log In</button></p>
+</section>
+</main>
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { getBabyProfiles } = await import(`${moduleBase}utils/localState.mjs`);
+  const { isValidEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+
+  bindPrototypeActions();
+  const error = document.getElementById("signupError");
+  document.getElementById("signupForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    let message = "";
+    if (!name) message = "Add your name to create an account.";
+    else if (!isValidEmail(email)) message = "Enter a valid email address.";
+    else if (!password.trim()) message = "Add a password to continue.";
+    else if (password !== confirmPassword) message = "Passwords need to match.";
+
+    if (message) {
+      error.textContent = message;
+      error.classList.remove("hidden");
+      return;
+    }
+
+    signupLocalUser({ name, email });
+    window.location.href = routeAfterAuth(getBabyProfiles(babyProfile).length > 0, screenUrl);
+  });
+</script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

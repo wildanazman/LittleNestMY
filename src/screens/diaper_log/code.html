@@ -2,7 +2,16 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Diaper Log - LittleNest MY</title>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -135,11 +144,12 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col">
 <!-- TopAppBar -->
 <header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-40">
-<button class="text-primary hover:opacity-80 transition-opacity flex items-center justify-center p-2 active:scale-95 transition-transform duration-200">
+<button aria-label="Back to quick log" class="text-primary hover:opacity-80 transition-opacity flex items-center justify-center p-2 active:scale-95 transition-transform duration-200" id="diaperBackButton" type="button">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Diaper Change</h1>
@@ -255,13 +265,15 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, diaperLogs: mockDiaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { getLocalDiaperLogs, saveLocalDiaperLog } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalDiaperLog, getLogsForBaby, getPersistedDiaperLogs, getSelectedBabyId, saveLocalDiaperLog } = await import(`${moduleBase}utils/localState.mjs`);
+        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const state = {
             diaperType: "wet",
             color: "",
             texture: "Normal"
         };
+        const selectedBabyId = getSelectedBabyId(babyProfile);
         const segmentButtons = [...document.querySelectorAll("[data-diaper-type]")];
         const detailButtons = [...document.querySelectorAll("[data-color], [data-texture]")];
         const notesInput = document.getElementById("diaperNotesInput");
@@ -269,6 +281,7 @@
         const saveFeedback = document.getElementById("diaperSaveFeedback");
         const historyList = document.getElementById("diaperHistoryList");
         const timeLabel = document.getElementById("diaperTimeLabel");
+        const backButton = document.getElementById("diaperBackButton");
 
         segmentButtons.forEach((button, index) => {
             button.addEventListener("click", () => {
@@ -286,6 +299,7 @@
         });
 
         saveButton.addEventListener("click", saveDiaperLog);
+        backButton.addEventListener("click", () => goToScreen("quick_log"));
         updateSegment(0);
         updateNowLabel();
         setInterval(updateNowLabel, 30000);
@@ -325,7 +339,7 @@
         function saveDiaperLog() {
             const log = {
                 id: `diaper-local-${Date.now()}`,
-                babyId: babyProfile.id,
+                babyId: selectedBabyId,
                 type: state.diaperType,
                 changedAt: new Date().toISOString(),
                 color: state.color || undefined,
@@ -334,19 +348,20 @@
             };
 
             saveLocalDiaperLog(log);
-            notesInput.value = "";
+      notesInput.value = "";
             renderHistory();
             showSavedFeedback();
         }
 
         function renderHistory() {
-            const logs = [...getLocalDiaperLogs(), ...mockDiaperLogs]
+            const logs = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId)
                 .sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))
                 .slice(0, 5);
 
             historyList.innerHTML = logs.length
-                ? logs.map(renderHistoryCard).join("")
+        ? logs.map(renderHistoryCard).join("")
                 : renderEmptyHistory();
+            bindHistoryCards();
         }
 
         function renderEmptyHistory() {
@@ -366,7 +381,7 @@
         function renderHistoryCard(log) {
             const detail = [labelForType(log.type), log.texture, log.color].filter(Boolean).join(" · ");
             return `
-                <div class="bg-surface-container-lowest rounded-2xl p-4 soft-shadow flex items-center justify-between">
+                <div class="bg-surface-container-lowest rounded-2xl p-4 soft-shadow flex items-center justify-between cursor-pointer" data-diaper-detail="${detail}" role="button" tabindex="0">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="w-11 h-11 rounded-2xl ${toneForType(log.type)} flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
@@ -377,9 +392,28 @@
                             ${log.notes ? `<p class="font-label-sm text-label-sm text-on-surface-variant truncate">${escapeHtml(log.notes)}</p>` : ""}
                         </div>
                     </div>
-                    <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+                    <button class="text-label-sm text-error shrink-0" data-delete-diaper="${log.id}" type="button">Delete</button>
                 </div>
             `;
+        }
+
+        function bindHistoryCards() {
+            historyList.querySelectorAll("[data-delete-diaper]").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    if (!confirm("Delete this diaper log?")) return;
+                    deleteLocalDiaperLog(button.dataset.deleteDiaper);
+                    renderHistory();
+                    saveFeedback.textContent = "Diaper log deleted.";
+                    saveFeedback.classList.remove("hidden");
+                });
+            });
+            historyList.querySelectorAll("[data-diaper-detail]").forEach((card) => {
+                card.addEventListener("click", () => showComingSoon(
+                    "Diaper detail",
+                    `${card.dataset.diaperDetail} detail view is coming soon.`
+                ));
+            });
         }
 
         function updateNowLabel() {
@@ -428,4 +462,9 @@
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

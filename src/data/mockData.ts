@@ -9,7 +9,7 @@ import type {
   HealthNote,
   Milestone,
   SleepLog
-} from "../types";
+} from "../types/index.js";
 
 export const babyProfile: BabyProfile = {
   id: "baby-aisyah",

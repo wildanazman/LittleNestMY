@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Family &amp; Caregivers | LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -129,6 +137,7 @@
             transform: translateY(0);
         }
     </style>
+<script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="text-on-surface pb-32">
 <header class="bg-surface sticky top-0 z-50">
@@ -153,7 +162,7 @@
 </div>
 <div class="space-y-1">
 <p class="font-label-sm text-label-sm text-on-primary-container uppercase">Shared care</p>
-<h2 class="font-headline-md text-headline-md text-on-primary-fixed">Aisyah's care circle</h2>
+<h2 class="font-headline-md text-headline-md text-on-primary-fixed" id="careCircleTitle">Care circle</h2>
 <p class="font-body-md text-body-md text-on-primary-fixed-variant">Keep Mama, Papa, and trusted helpers clear on daily care without adding pressure.</p>
 </div>
 </div>
@@ -281,7 +290,9 @@ Prepare Prototype Invite
 </nav>
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const { familyMembers } = await import(`${moduleBase}data/mockData.mjs`);
+        const { babyProfile, familyMembers } = await import(`${moduleBase}data/mockData.mjs`);
+        const { deleteLocalFamilyMember, getLogsForBaby, getPersistedFamilyMembers, getSelectedBabyId, getSelectedBabyProfile, saveLocalFamilyMember } = await import(`${moduleBase}utils/localState.mjs`);
+        const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const familyMembersList = document.getElementById("familyMembersList");
         const memberSummary = document.getElementById("memberSummary");
@@ -294,8 +305,11 @@ Prepare Prototype Invite
         const prepareInviteButton = document.getElementById("prepareInviteButton");
         const inviteFeedback = document.getElementById("inviteFeedback");
         const backButton = document.getElementById("backButton");
+        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const selectedBaby = getSelectedBabyProfile(babyProfile);
+        let editingMemberId = "";
 
-        let prototypeMembers = familyMembers.map(member => ({ ...member }));
+        document.getElementById("careCircleTitle").textContent = `${selectedBaby?.name || "Baby"}'s care circle`;
 
         inviteToggleButton.addEventListener("click", () => {
             invitePanel.classList.toggle("is-open");
@@ -316,38 +330,38 @@ Prepare Prototype Invite
                 return;
             }
 
-            prototypeMembers = [
-                {
-                    id: `prototype-${Date.now()}`,
-                    name,
-                    role: selectedRole === "viewer" ? "family" : selectedRole,
-                    permission: selectedRole === "viewer" ? "viewer" : "editor",
-                    email: contact.includes("@") ? contact : undefined,
-                    phone: contact.includes("@") ? undefined : contact,
-                    invitedAt: new Date().toISOString(),
-                    isPrototype: true
-                },
-                ...prototypeMembers
-            ];
+            saveLocalFamilyMember({
+                id: editingMemberId || `family-local-${Date.now()}`,
+                babyId: selectedBabyId,
+                name,
+                role: selectedRole === "viewer" ? "family" : selectedRole,
+                permission: selectedRole === "viewer" ? "viewer" : "editor",
+                email: contact.includes("@") ? contact : undefined,
+                phone: contact.includes("@") ? undefined : contact,
+                invitedAt: new Date().toISOString(),
+                isPrototype: true
+            });
 
-            inviteFeedback.textContent = "Prototype invite added to the preview list.";
-            inviteNameInput.value = "";
-            inviteContactInput.value = "";
+            inviteFeedback.textContent = editingMemberId ? "Caregiver updated locally." : "Prototype caregiver added locally.";
+      inviteNameInput.value = "";
+      inviteContactInput.value = "";
             inviteRoleInput.value = "parent";
+            editingMemberId = "";
+            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="draft">draft</span>Prepare Prototype Invite';
             renderMembers();
         });
 
         backButton.addEventListener("click", () => {
-            window.location.href = "/assistant/";
+            goToScreen("assistant");
         });
 
         function renderMembers() {
-            memberSummary.textContent = `${prototypeMembers.length} members in Aisyah's care circle`;
-            const hasHelpers = prototypeMembers.some(member => getDisplayRole(member) !== "Parent");
-            familyMembersList.innerHTML = [
-                ...prototypeMembers.map(renderMemberCard),
-                hasHelpers ? "" : renderNoHelpersCard()
-            ].join("");
+            const members = getLogsForBaby(getPersistedFamilyMembers(familyMembers), selectedBabyId);
+            memberSummary.textContent = members.length ? `${members.length} local members in care circle` : "No family members added yet";
+            familyMembersList.innerHTML = members.length
+                ? members.map(renderMemberCard).join("")
+                : renderNoHelpersCard();
+            bindMemberActions(members);
         }
 
         function renderNoHelpersCard() {
@@ -386,12 +400,40 @@ Prepare Prototype Invite
                             </div>
                             <div class="mt-3 flex items-center justify-between gap-3">
                                 <p class="font-label-sm text-label-sm text-on-surface-variant">${getPermissionText(member)}</p>
-                                <span class="font-label-sm text-label-sm ${status === "Active" ? "text-tertiary" : "text-primary"}">${status}</span>
+                                <div class="flex items-center gap-2">
+                                    <button class="font-label-sm text-label-sm text-primary" data-edit-member="${member.id}" type="button">Edit</button>
+                                    <button class="font-label-sm text-label-sm text-error" data-delete-member="${member.id}" type="button">Remove</button>
+                                </div>
                             </div>
+                            <p class="mt-1 font-label-sm text-label-sm ${status === "Active" ? "text-tertiary" : "text-primary"}">${status}</p>
                         </div>
                     </div>
                 </article>
             `;
+        }
+
+        function bindMemberActions(members) {
+            familyMembersList.querySelectorAll("[data-edit-member]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const member = members.find((item) => item.id === button.dataset.editMember);
+                    if (!member) return;
+                    editingMemberId = member.id;
+                    inviteNameInput.value = member.name || "";
+                    inviteContactInput.value = member.email || member.phone || "";
+                    inviteRoleInput.value = getDisplayRole(member).toLowerCase();
+                    prepareInviteButton.textContent = "Update Member";
+                    invitePanel.classList.add("is-open");
+                    inviteNameInput.focus();
+                });
+            });
+            familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    if (!confirm("Remove this family member from the local care circle?")) return;
+                    deleteLocalFamilyMember(button.dataset.deleteMember);
+                    renderMembers();
+                    inviteFeedback.textContent = "Family member removed locally.";
+                });
+            });
         }
 
         function getDisplayRole(member) {
@@ -430,7 +472,7 @@ Prepare Prototype Invite
                 .filter(Boolean)
                 .slice(0, 2)
                 .map(part => part[0].toUpperCase())
-                .join("");
+          .join("");
         }
 
         function escapeHtml(value) {
@@ -445,4 +487,9 @@ Prepare Prototype Invite
         renderMembers();
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>

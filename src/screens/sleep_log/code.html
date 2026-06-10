@@ -2,7 +2,16 @@
 
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Sleep Log - LittleNest MY</title>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -128,12 +137,15 @@
       min-height: max(884px, 100dvh);
     }
   </style>
-  </head>
+  <script type="module" src="/src/utils/theme.mjs"></script>
+</head>
 <body class="bg-surface text-on-surface font-body-md min-h-screen pb-24">
 <!-- Top App Bar -->
 <header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-50">
 <div class="flex items-center gap-base">
-<span class="material-symbols-outlined text-primary" data-icon="arrow_back">arrow_back</span>
+<button aria-label="Back to quick log" class="text-primary active:scale-95 transition-transform" id="sleepBackButton" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Sleep Tracker</h1>
 </div>
 <div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden">
@@ -204,7 +216,7 @@
 <section class="space-y-md">
 <div class="flex justify-between items-center">
 <h3 class="font-headline-md text-headline-md text-on-surface">Today's Timeline</h3>
-<button class="text-primary font-label-md hover:opacity-70">View Stats</button>
+<button class="text-primary font-label-md hover:opacity-70" id="viewSleepStatsButton" type="button">View Stats</button>
 </div>
 <div class="space-y-0" id="napHistoryList">
 <!-- Timeline Item 1 -->
@@ -296,11 +308,15 @@
         const { formatDuration, formatTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             clearActiveSleepSession,
+            deleteLocalSleepLog,
             getActiveSleepSession,
-            getLocalSleepLogs,
+            getLogsForBaby,
+            getPersistedSleepLogs,
+            getSelectedBabyId,
             saveActiveSleepSession,
             saveLocalSleepLog
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const idle = document.getElementById("idle-state");
         const active = document.getElementById("active-state");
@@ -313,16 +329,21 @@
         const totalSleepMinutes = document.getElementById("totalSleepMinutes");
         const napCount = document.getElementById("napCount");
         const napHistoryList = document.getElementById("napHistoryList");
+        const backButton = document.getElementById("sleepBackButton");
+        const viewStatsButton = document.getElementById("viewSleepStatsButton");
+        const selectedBabyId = getSelectedBabyId(babyProfile);
         let timerInterval;
 
         startButton.addEventListener("click", startSleep);
         wakeButton.addEventListener("click", wakeUp);
+        backButton.addEventListener("click", () => goToScreen("quick_log"));
+        viewStatsButton.addEventListener("click", () => goToScreen("weekly_insights"));
         render();
 
         function startSleep() {
             const session = {
                 id: `sleep-active-${Date.now()}`,
-                babyId: babyProfile.id,
+                babyId: selectedBabyId,
                 status: "started",
                 startedAt: new Date().toISOString()
             };
@@ -337,7 +358,7 @@
             const endedAt = new Date().toISOString();
             saveLocalSleepLog({
                 id: `sleep-local-${Date.now()}`,
-                babyId: babyProfile.id,
+                babyId: selectedBabyId,
                 status: "nap",
                 startedAt: session.startedAt,
                 endedAt,
@@ -394,13 +415,14 @@
                 .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
 
             napHistoryList.innerHTML = logs.length
-                ? logs.map(renderNapCard).join("")
+        ? logs.map(renderNapCard).join("")
                 : renderEmptyHistory();
+            bindSleepDetailCards();
         }
 
         function getTodaySleepLogs(activeSession) {
             const activeLogs = activeSession ? [{ ...activeSession, isActive: true }] : [];
-            return [...activeLogs, ...getLocalSleepLogs(), ...mockSleepLogs]
+            return getLogsForBaby([...activeLogs, ...getPersistedSleepLogs(mockSleepLogs)], selectedBabyId)
                 .filter((log) => isSameLocalDay(log.startedAt, new Date()) || (log.endedAt && isSameLocalDay(log.endedAt, new Date())));
         }
 
@@ -432,17 +454,35 @@
                     <div class="absolute left-0 top-0 w-8 h-8 rounded-full ${dotColor} flex items-center justify-center z-10">
                         <span class="material-symbols-outlined !text-base" style="font-variation-settings: 'FILL' 1;">${icon}</span>
                     </div>
-                    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center">
+                    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex justify-between items-center cursor-pointer" data-sleep-detail="${title}" role="button" tabindex="0">
                         <div>
                             <p class="font-label-md text-on-surface">${title}</p>
                             <p class="text-label-sm text-on-surface-variant">${start} &mdash; ${end}</p>
                         </div>
                         <div class="text-right">
                             <p class="font-label-md text-primary">${formatDuration(minutes)}</p>
+                            ${log.isActive ? "" : `<button class="mt-1 text-label-sm text-error" data-delete-sleep="${log.id}" type="button">Delete</button>`}
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        function bindSleepDetailCards() {
+            napHistoryList.querySelectorAll("[data-delete-sleep]").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    if (!confirm("Delete this sleep log?")) return;
+                    deleteLocalSleepLog(button.dataset.deleteSleep);
+                    render();
+                });
+            });
+            napHistoryList.querySelectorAll("[data-sleep-detail]").forEach((card) => {
+                card.addEventListener("click", () => showComingSoon(
+                    "Sleep detail",
+                    `${card.dataset.sleepDetail} detail view is coming soon.`
+                ));
+            });
         }
 
         function renderEmptyHistory() {
@@ -460,4 +500,9 @@
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
 </body></html>
