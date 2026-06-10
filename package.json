@@ -4,6 +4,9 @@
   "private": true,
   "description": "Static local runner for the Stitch-generated LittleNest MY UI prototype.",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "node scripts/serve-static.mjs",
     "start": "node scripts/serve-static.mjs",
