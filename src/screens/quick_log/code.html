@@ -133,6 +133,54 @@
         .soft-shadow {
             box-shadow: 0 10px 25px -5px rgba(255, 191, 163, 0.15);
         }
+        :root.dark body {
+            background: #050506 !important;
+        }
+        :root.dark .quick-log-bg {
+            display: none;
+        }
+        :root.dark .quick-log-overlay {
+            backdrop-filter: none;
+            background: #050506 !important;
+        }
+        :root.dark .quick-log-shell {
+            justify-content: flex-start !important;
+            padding-top: 14px;
+        }
+        :root.dark .category-card {
+            min-height: 96px !important;
+            aspect-ratio: auto !important;
+            border-radius: 8px !important;
+            background: #121214 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: none !important;
+            gap: 10px !important;
+        }
+        :root.dark .category-card > div {
+            width: 40px !important;
+            height: 40px !important;
+            background: rgba(155, 124, 246, 0.08) !important;
+            border: 1px solid rgba(155, 124, 246, 0.34) !important;
+            color: #9b7cf6 !important;
+        }
+        :root.dark .category-card .material-symbols-outlined,
+        :root.dark .category-card span:last-child {
+            color: #9b7cf6 !important;
+        }
+        :root.dark .category-card .material-symbols-outlined {
+            font-size: 22px !important;
+        }
+        :root.dark .quick-log-card {
+            background: #121214 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 8px !important;
+        }
+        :root.dark .quick-log-purple {
+            color: #9b7cf6 !important;
+        }
+        :root.dark .quick-log-muted {
+            color: #a8a7b3 !important;
+        }
     </style>
 <style>
     body {
@@ -141,9 +189,9 @@
   </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="min-h-screen flex flex-col overflow-hidden">
+<body class="min-h-screen flex flex-col overflow-x-hidden overflow-y-auto">
 <!-- Background Simulation (Dashboard) -->
-<div class="fixed inset-0 z-0 opacity-40 pointer-events-none p-container-padding space-y-lg">
+<div class="quick-log-bg fixed inset-0 z-0 opacity-40 pointer-events-none p-container-padding space-y-lg">
 <div class="h-40 w-full bg-secondary-container rounded-3xl"></div>
 <div class="grid grid-cols-2 gap-gutter">
 <div class="h-32 bg-surface-container rounded-3xl"></div>
@@ -152,22 +200,25 @@
 <div class="h-64 w-full bg-surface-container rounded-3xl"></div>
 </div>
 <!-- Quick Log Content Shell -->
-<main class="relative z-10 flex-1 flex flex-col quick-log-overlay">
+<main class="relative z-10 flex-1 flex flex-col quick-log-overlay w-full max-w-md mx-auto">
 <!-- Header Section -->
-<header class="flex justify-between items-center px-container-padding h-14 mt-4">
+<header class="flex justify-between items-center px-container-padding h-14 mt-2">
 <div class="flex items-center gap-xs">
 <button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-200">
 <span class="material-symbols-outlined text-[28px]">close</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Quick Log</h1>
+<h1 class="font-headline-md text-headline-md text-on-surface">LittleNest MY</h1>
 </div>
-<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container flex items-center justify-center">
-<img class="w-full h-full object-cover" data-alt="A close-up portrait of a peaceful, happy infant with soft morning light filtering through a window. The style is warm, minimalist, and organic, featuring soft textures and a gentle bokeh background. The colors are dominated by muted peaches and creams, reflecting a calm and loving nursery atmosphere." src="https://lh3.googleusercontent.com/aida/AP1WRLs2yK4zR-HEe7LguItEq9LEogMq63PKSAFsXrp9A7qoVgC9eQVhBnkt9G3h5Y-agBe7eNIlpL3OvpsYJVN_5ItyS2cPjyRZPm4yT89UCwYZVbfT6EExsYXALQUTbu_ftWUZh_NxFPC_XKihZNRS07ZXC7fjqEbMr8CeGA3dGNorN8gUBrAStb4cZUmKhvg_e0-qpJdU6ZLP4r8kxXKHpbJQxCICp8EGN1gScvmswMcJ1sg6jRzCo23Ft9WV"/>
-</div>
+<button class="w-10 h-10 rounded-full text-on-surface-variant flex items-center justify-center" data-screen-target="settings" type="button" aria-label="Open settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
 </header>
 <!-- Main Category Grid (One-Handed Focus) -->
-<div class="flex-1 flex flex-col justify-end px-container-padding pb-32">
-<p class="text-on-surface-variant font-label-md text-label-md mb-lg ml-2">What happened just now?</p>
+<div class="quick-log-shell flex-1 flex flex-col justify-end px-container-padding pb-32">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Quick Log</h2>
+<p class="text-on-surface-variant font-label-md text-label-md mt-1 max-w-xs">Log baby's activity instantly. One-tap tracking for night-time care.</p>
+</div>
 <p class="sr-only" aria-live="polite" id="quickLogFeedback">Choose a log type to continue.</p>
 <div class="grid grid-cols-2 gap-gutter">
 <!-- Feeding Card -->
@@ -213,6 +264,51 @@
 <span class="font-headline-md text-headline-md text-on-secondary-fixed">Note</span>
 </button>
 </div>
+<section class="mt-xl space-y-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-md text-headline-md text-on-surface">Recent Logs</h3>
+<button class="font-label-sm text-label-sm quick-log-purple" data-coming-soon="Recent logs" data-coming-soon-message="A full filtered history view can be added in the next step." type="button">VIEW ALL</button>
+</div>
+<div class="space-y-sm">
+<article class="quick-log-card p-3 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface">Feeding (Bottle)</p>
+<p class="font-label-sm text-label-sm quick-log-muted">120ml - 15 mins ago</p>
+</div>
+<span class="material-symbols-outlined quick-log-muted text-[18px]">chevron_right</span>
+</article>
+<article class="quick-log-card p-3 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface">Sleep Start</p>
+<p class="font-label-sm text-label-sm quick-log-muted">Nap - 2 hours ago</p>
+</div>
+<span class="material-symbols-outlined quick-log-muted text-[18px]">chevron_right</span>
+</article>
+</div>
+</section>
+<section class="quick-log-card mt-lg p-5 border-l-4 border-l-primary">
+<p class="font-label-sm text-label-sm quick-log-muted uppercase tracking-wider mb-3">Daily Summary</p>
+<div class="grid grid-cols-3 divide-x divide-white/10 text-center">
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">850ml</p>
+<p class="font-label-sm text-label-sm quick-log-muted uppercase">Feeding</p>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">12h</p>
+<p class="font-label-sm text-label-sm quick-log-muted uppercase">Sleep</p>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface">6</p>
+<p class="font-label-sm text-label-sm quick-log-muted uppercase">Diapers</p>
+</div>
+</div>
+</section>
 </div>
 </main>
 <!-- Bottom Navigation Bar (Shell Component) -->
@@ -275,7 +371,7 @@
 <!-- Micro-interactions Script -->
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const {
             getSelectedBabyId,
@@ -287,6 +383,7 @@
         const form = document.getElementById("quickForm");
         const error = document.getElementById("quickFormError");
         let activeQuickType = "";
+        bindPrototypeActions();
 
         document.querySelectorAll('.category-card').forEach(button => {
             button.addEventListener('touchstart', () => {
