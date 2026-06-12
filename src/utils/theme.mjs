@@ -29,7 +29,7 @@ export function applyTheme(theme = getThemePreference()) {
   document.documentElement.classList.toggle("dark", resolved === "dark");
   document.documentElement.dataset.theme = resolved;
   const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) metaTheme.setAttribute("content", resolved === "dark" ? "#1E1B1A" : "#ffbfa3");
+  if (metaTheme) metaTheme.setAttribute("content", resolved === "dark" ? "#050506" : "#ffbfa3");
   window.dispatchEvent(new CustomEvent("littlenest:themechange", { detail: { theme, resolved } }));
   return resolved;
 }
