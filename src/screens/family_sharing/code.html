@@ -371,8 +371,9 @@ Send Invite
                 inviteFeedback.textContent = error.message || "Could not load care circle.";
                 careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] };
             }
-            const invitedMembers = careCircle.members.filter((member) => !member.isCurrentUser);
-            const invitations = careCircle.invitations || [];
+            const invitedMembers = dedupeMembers(careCircle.members.filter((member) => !member.isCurrentUser));
+            const memberEmails = new Set(invitedMembers.map((member) => String(member.email || "").toLowerCase()).filter(Boolean));
+            const invitations = dedupePendingInvitations(careCircle.invitations || [], memberEmails);
             const parent = getCurrentParentMember();
             const members = [parent, ...invitedMembers.filter((member) => member.userId !== parent.userId)];
             memberSummary.textContent = invitedMembers.length || invitations.length
@@ -474,26 +475,57 @@ Send Invite
             familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
                 button.addEventListener("click", async () => {
                     if (!confirm("Remove this family member from the care circle?")) return;
+                    button.disabled = true;
+                    button.textContent = "Removing...";
                     try {
                         await removeFamilyInviteRemote({ babyId: selectedBabyId, userId: button.dataset.deleteMember });
                         inviteFeedback.textContent = "Family member removed.";
                         await renderMembers();
                     } catch (error) {
                         inviteFeedback.textContent = error.message || "Could not remove member.";
+                        button.disabled = false;
+                        button.textContent = "Remove";
                     }
                 });
             });
             familyMembersList.querySelectorAll("[data-delete-invite]").forEach((button) => {
                 button.addEventListener("click", async () => {
                     if (!confirm("Remove this invitation?")) return;
+                    button.disabled = true;
+                    button.textContent = "Removing...";
                     try {
                         await removeFamilyInviteRemote({ babyId: selectedBabyId, invitationId: button.dataset.deleteInvite });
                         inviteFeedback.textContent = "Invitation removed.";
                         await renderMembers();
                     } catch (error) {
                         inviteFeedback.textContent = error.message || "Could not remove invitation.";
+                        button.disabled = false;
+                        button.textContent = "Remove";
                     }
                 });
+            });
+        }
+
+        function dedupeMembers(members) {
+            const seen = new Set();
+            return members.filter((member) => {
+                const key = member.userId || String(member.email || "").toLowerCase();
+                if (!key || seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
+        function dedupePendingInvitations(invitations, memberEmails) {
+            const seen = new Set();
+            return invitations.filter((invitation) => {
+                const email = String(invitation.email || "").toLowerCase();
+                if ((invitation.status || "").toLowerCase() !== "pending") return false;
+                if (email && memberEmails.has(email)) return false;
+                const key = invitation.id || email;
+                if (!key || seen.has(key)) return false;
+                seen.add(key);
+                return true;
             });
         }
 

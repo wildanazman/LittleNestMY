@@ -79,7 +79,7 @@ tailwind.config = {
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getAuthConfigMessage, hasSupabaseConfig, isValidEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getAuthConfigMessage, getPendingInviteToken, hasSupabaseConfig, isValidEmail, normalizeEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
@@ -95,7 +95,7 @@ tailwind.config = {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
+    const email = normalizeEmail(document.getElementById("email").value);
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
     let message = "";
@@ -123,9 +123,12 @@ tailwind.config = {
         submitButton.textContent = "Create Account";
         return;
       }
-      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+      const pendingInviteToken = getPendingInviteToken();
+      window.location.href = pendingInviteToken
+        ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
+        : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
     } catch (authError) {
-      error.textContent = authError.message || "Could not create account. Please try again.";
+      error.textContent = authError.message || "Could not create account. If this email already has an account, please log in or reset your password.";
       error.classList.remove("hidden");
       submitButton.disabled = false;
       submitButton.textContent = "Create Account";

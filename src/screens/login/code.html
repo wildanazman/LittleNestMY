@@ -86,8 +86,8 @@ Remember me
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getAuthConfigMessage, hasSupabaseConfig, isValidEmail, loginLocalUser, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
-  const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { getAuthConfigMessage, getPendingInviteToken, hasSupabaseConfig, isValidEmail, loginLocalUser, normalizeEmail, routeAfterAuth, sendPasswordReset } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
   const form = document.getElementById("loginForm");
@@ -99,13 +99,26 @@ Remember me
     error.classList.remove("hidden");
   }
 
-  document.getElementById("forgotButton").addEventListener("click", () => {
-    showComingSoon("Forgot Password", "Password reset will be connected when real accounts are added.");
+  document.getElementById("forgotButton").addEventListener("click", async () => {
+    const email = normalizeEmail(document.getElementById("email").value);
+    if (!isValidEmail(email)) {
+      error.textContent = "Enter your email first, then tap Forgot Password.";
+      error.classList.remove("hidden");
+      return;
+    }
+    try {
+      await sendPasswordReset(email, `${window.location.origin}${screenUrl("login")}`);
+      error.textContent = "Password reset email sent. Please check your inbox.";
+      error.classList.remove("hidden");
+    } catch (resetError) {
+      error.textContent = resetError.message || "Could not send reset email. Please try again.";
+      error.classList.remove("hidden");
+    }
   });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const email = document.getElementById("email").value.trim();
+    const email = normalizeEmail(document.getElementById("email").value);
     const password = document.getElementById("password").value;
     if (!hasSupabaseConfig()) {
       error.textContent = getAuthConfigMessage();
@@ -119,14 +132,15 @@ Remember me
     }
     submitButton.disabled = true;
     submitButton.textContent = "Logging in...";
-      error.classList.add("hidden");
+    error.classList.add("hidden");
     try {
       await loginLocalUser({ email, password });
-      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+      const pendingInviteToken = getPendingInviteToken();
+      window.location.href = pendingInviteToken
+        ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
+        : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
     } catch (authError) {
-      error.textContent = authError.message?.toLowerCase().includes("email not confirmed")
-        ? "Please confirm your email before logging in."
-        : authError.message || "Login failed. Please check your email and password.";
+      error.textContent = authError.message || "Email or password is incorrect. If this account was created from an invitation, please set or reset your password first.";
       error.classList.remove("hidden");
       submitButton.disabled = false;
       submitButton.textContent = "Log In";

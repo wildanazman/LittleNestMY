@@ -176,7 +176,7 @@ async function migrateCoreLogsOnce(selectedBabyId, local) {
     local.sleepLogs,
     local.diaperLogs,
     local.healthNotes
-  ].some((items) => items.some((item) => aliases.includes(item.babyId) || !item.babyId));
+  ].some((items) => items.some((item) => item.babyId && aliases.includes(item.babyId)));
 
   if (!hasAny) {
     writeMigrationMarker(selectedBabyId);

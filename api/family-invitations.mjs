@@ -57,6 +57,7 @@ async function listCareCircle(req, res, service, user) {
       .from("family_invitations")
       .select("id,baby_id,email,role,status,invited_by,accepted_by,expires_at,created_at,updated_at")
       .eq("baby_id", babyId)
+      .eq("status", "pending")
       .order("created_at", { ascending: false });
     if (invitationError) throw invitationError;
     invitations = invitationRows || [];
@@ -153,12 +154,40 @@ async function removeCareCircleItem(req, res, service, user) {
 
   if (body.userId) {
     if (body.userId === user.id) return sendJson(res, 400, { error: "Parents cannot remove themselves here." });
+    const { data: targetMember, error: targetError } = await service
+      .from("baby_members")
+      .select("user_id,role")
+      .eq("baby_id", babyId)
+      .eq("user_id", body.userId)
+      .maybeSingle();
+    if (targetError) throw targetError;
+    if (!targetMember) return sendJson(res, 404, { error: "Family member was not found." });
+    if (targetMember.role === "parent") {
+      const { count, error: parentCountError } = await service
+        .from("baby_members")
+        .select("user_id", { count: "exact", head: true })
+        .eq("baby_id", babyId)
+        .eq("role", "parent");
+      if (parentCountError) throw parentCountError;
+      if ((count || 0) <= 1) {
+        return sendJson(res, 400, { error: "This baby needs at least one parent before removing this member." });
+      }
+    }
+
     const { error } = await service
       .from("baby_members")
       .delete()
       .eq("baby_id", babyId)
       .eq("user_id", body.userId);
     if (error) throw error;
+
+    const { error: inviteCleanupError } = await service
+      .from("family_invitations")
+      .delete()
+      .eq("baby_id", babyId)
+      .eq("accepted_by", body.userId);
+    if (inviteCleanupError) throw inviteCleanupError;
+
     return sendJson(res, 200, { message: "Member removed." });
   }
 

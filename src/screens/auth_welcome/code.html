@@ -85,11 +85,14 @@ body { min-height: 100dvh; }
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getPendingInviteToken, isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   if (await isLoggedIn()) {
-    window.location.replace(routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl));
+    const pendingInviteToken = getPendingInviteToken();
+    window.location.replace(pendingInviteToken
+      ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
+      : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl));
     await new Promise(() => {});
   }
 

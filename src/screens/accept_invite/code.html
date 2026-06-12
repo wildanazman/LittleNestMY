@@ -52,43 +52,64 @@ tailwind.config = {
 </div>
 <button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform" id="acceptButton" type="button">Accept Invite</button>
 <button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform" id="loginButton" type="button">Log In / Create Account</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="signupButton" type="button">Create Account</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="resetButton" type="button">Set / Reset Password</button>
 <p class="text-sm text-error hidden" id="inviteError" aria-live="polite"></p>
 </section>
 </main>
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { acceptFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
-  const { setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-  const { screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { clearPendingInviteToken, isLoggedIn, rememberPendingInviteToken } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   const params = new URLSearchParams(window.location.search);
-  const token = params.get("token") || params.get("invite_token") || "";
+  const token = rememberPendingInviteToken(params.get("token") || params.get("invite_token") || "");
   const message = document.getElementById("inviteMessage");
   const error = document.getElementById("inviteError");
   const acceptButton = document.getElementById("acceptButton");
+  const loginButton = document.getElementById("loginButton");
+  const signupButton = document.getElementById("signupButton");
+  const resetButton = document.getElementById("resetButton");
 
   if (!token) {
     showError("This invite link is missing a token.");
     acceptButton.disabled = true;
   } else if (!(await isLoggedIn())) {
-    message.textContent = "Log in or create an account with the invited email, then return to this invite link.";
+    message.textContent = "Log in or create an account with the invited email. We'll bring you back here after sign in.";
+    acceptButton.classList.add("hidden");
+    loginButton.textContent = "Log In";
+    signupButton.classList.remove("hidden");
+    resetButton.classList.remove("hidden");
   } else {
-    message.textContent = "You're signed in. Tap accept to join the care circle.";
+    acceptInvite();
   }
 
-  document.getElementById("loginButton").addEventListener("click", () => {
+  loginButton.addEventListener("click", () => {
     window.location.href = screenUrl("login");
   });
+  signupButton.addEventListener("click", () => {
+    window.location.href = screenUrl("signup");
+  });
+  resetButton.addEventListener("click", () => {
+    showComingSoon("Set / Reset Password", "Use the password setup link from your email, then return to this invite.");
+  });
 
-  acceptButton.addEventListener("click", async () => {
+  acceptButton.addEventListener("click", acceptInvite);
+
+  async function acceptInvite() {
     if (!token) return;
     acceptButton.disabled = true;
     acceptButton.textContent = "Accepting...";
+    message.textContent = "Accepting your invitation...";
     error.classList.add("hidden");
     try {
       const result = await acceptFamilyInviteRemote(token);
       setSelectedBabyIdRemote(result.babyId);
+      clearPendingInviteToken();
+      await loadBabyProfilesRemote(babyProfile).catch(() => null);
       message.textContent = "Invite accepted. Welcome to the care circle.";
       acceptButton.textContent = "Opening Home...";
       setTimeout(() => window.location.href = screenUrl("home_dashboard"), 700);
@@ -97,7 +118,7 @@ tailwind.config = {
       acceptButton.disabled = false;
       acceptButton.textContent = "Accept Invite";
     }
-  });
+  }
 
   function showError(text) {
     error.textContent = text;

@@ -360,12 +360,6 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const {
             babyProfile,
-            calendarEvents,
-            diaperLogs,
-            familyMembers,
-            feedingLogs,
-            growthRecords,
-            sleepLogs
         } = await import(`${moduleBase}data/mockData.mjs`);
         const {
             calculateBabyAge,
@@ -401,12 +395,12 @@
             window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
             await new Promise(() => {});
         }
-        const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs, sleepLogs, diaperLogs });
+        const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
         const allFeedingLogs = coreLogs.feedingLogs;
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
-        const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents(calendarEvents), selectedBabyId);
-        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords(growthRecords), selectedBabyId);
+        const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId);
+        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId);
         const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);
         const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];

@@ -1,5 +1,4 @@
 import {
-  babyProfilesKey,
   cacheSupabaseBabyProfiles,
   getBabyIdMap,
   getBabyProfiles,
@@ -15,25 +14,22 @@ const babyProfileMigrationKey = "littlenest:babyProfilesSupabaseMigratedAt";
 export { babyProfileMigrationKey };
 
 export async function loadBabyProfilesRemote(fallbackProfile) {
-  const fallbackProfiles = getBabyProfiles(fallbackProfile);
-
   if (!isSupabaseConfigured) {
+    const fallbackProfiles = getBabyProfiles(fallbackProfile);
     return fallbackResult(fallbackProfiles, "Supabase is not configured. Using local baby profiles for now.");
   }
 
   const session = await getAuthSession();
   if (!session) {
+    const fallbackProfiles = getBabyProfiles(fallbackProfile);
     return fallbackResult(fallbackProfiles, "Please log in to load synced baby profiles.");
   }
 
   try {
-    let profiles = await fetchRemoteBabyProfiles();
-    if (!profiles.length && fallbackProfiles.length) {
-      profiles = await migrateLocalBabyProfiles(fallbackProfiles);
-    }
-
-    const selectedBabyId = chooseSelectedBabyId(profiles);
+    const profiles = await fetchRemoteBabyProfiles();
+    const selectedBabyId = chooseSelectedBabyId(profiles, session.user.id);
     cacheSupabaseBabyProfiles(profiles, selectedBabyId);
+    cacheUserBabyProfiles(session.user.id, profiles, selectedBabyId);
 
     return {
       profiles,
@@ -44,10 +40,14 @@ export async function loadBabyProfilesRemote(fallbackProfile) {
     };
   } catch (error) {
     console.warn("Supabase baby profile load failed.", error);
-    return fallbackResult(
-      fallbackProfiles,
-      `${error.message || "Could not load Supabase baby profiles."} Using local baby profiles for now.`
-    );
+    const cached = readUserBabyProfiles(session.user.id);
+    return {
+      profiles: cached.profiles,
+      selectedBabyId: cached.selectedBabyId,
+      selectedBaby: cached.profiles.find((profile) => profile.id === cached.selectedBabyId) || cached.profiles[0] || null,
+      source: "supabase-cache",
+      error: `${error.message || "Could not load Supabase baby profiles."} Using this account's cached baby profiles for now.`
+    };
   }
 }
 
@@ -60,10 +60,12 @@ export async function createBabyProfileRemote(profile, fallbackProfile) {
   if (!isSupabaseConfigured) throw new Error(supabaseConfigMessage);
   const session = await getAuthSession();
   if (!session) throw new Error("Please log in before creating a baby profile.");
+  const babyRow = toBabyRow(profile, session.user.id);
+  console.log("Creating baby row:", babyRow);
 
   const { data, error } = await supabase
     .from("babies")
-    .insert(toBabyRow(profile, session.user.id))
+    .insert(babyRow)
     .select("*")
     .single();
 
@@ -72,7 +74,9 @@ export async function createBabyProfileRemote(profile, fallbackProfile) {
   await ensureParentMembership(data.id, session.user.id);
   const baby = fromBabyRow(data);
   setSelectedBabyIdRemote(baby.id);
-  cacheSupabaseBabyProfiles(await fetchRemoteBabyProfiles(), baby.id);
+  const profiles = await fetchRemoteBabyProfiles();
+  cacheSupabaseBabyProfiles(profiles, baby.id);
+  cacheUserBabyProfiles(session.user.id, profiles, baby.id);
   return baby;
 }
 
@@ -95,7 +99,9 @@ export async function updateBabyProfileRemote(profile, fallbackProfile) {
   const baby = fromBabyRow(data);
   rememberSupabaseBabyMapping(profile.id, baby.id);
   setSelectedBabyIdRemote(baby.id);
-  cacheSupabaseBabyProfiles(await fetchRemoteBabyProfiles(), baby.id);
+  const profiles = await fetchRemoteBabyProfiles();
+  cacheSupabaseBabyProfiles(profiles, baby.id);
+  cacheUserBabyProfiles(session.user.id, profiles, baby.id);
   return baby;
 }
 
@@ -112,6 +118,14 @@ export function setSelectedBabyIdRemote(babyId) {
   } catch {
     // Local selected-baby persistence is a UI convenience.
   }
+  getAuthSession().then((session) => {
+    if (!session?.user?.id) return;
+    try {
+      window.localStorage.setItem(userSelectedBabyKey(session.user.id), JSON.stringify(resolvedBabyId || ""));
+    } catch {
+      // User-scoped selected baby is a sync fallback only.
+    }
+  }).catch(() => {});
   return resolvedBabyId;
 }
 
@@ -163,9 +177,12 @@ async function migrateLocalBabyProfiles(localProfiles) {
   const migrated = [];
 
   for (const localProfile of localProfiles) {
+    const babyRow = toBabyRow(localProfile, session.user.id);
+    console.log("Creating baby row:", babyRow);
+
     const { data, error } = await supabase
       .from("babies")
-      .insert(toBabyRow(localProfile, session.user.id))
+      .insert(babyRow)
       .select("*")
       .single();
 
@@ -200,8 +217,9 @@ async function ensureParentMembership(babyId, userId) {
   }
 }
 
-function chooseSelectedBabyId(profiles) {
-  const selectedBabyId = readSelectedBabyId();
+function chooseSelectedBabyId(profiles, userId = "") {
+  const userSelectedBabyId = readUserSelectedBabyId(userId);
+  const selectedBabyId = userSelectedBabyId || readSelectedBabyId();
   const mappedSelectedBabyId = resolveSupabaseBabyId(selectedBabyId, { allowMissing: true });
   if (profiles.some((profile) => profile.id === mappedSelectedBabyId)) return mappedSelectedBabyId;
   if (profiles.some((profile) => profile.id === selectedBabyId)) return selectedBabyId;
@@ -247,4 +265,40 @@ function resolveSupabaseBabyId(babyId, options = {}) {
 
 function isUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
+function userCacheKey(userId) {
+  return `littlenest:user:${userId}:babyProfiles`;
+}
+
+function userSelectedBabyKey(userId) {
+  return `littlenest:user:${userId}:selectedBabyId`;
+}
+
+function cacheUserBabyProfiles(userId, profiles, selectedBabyId = "") {
+  if (!userId) return;
+  try {
+    window.localStorage.setItem(userCacheKey(userId), JSON.stringify(profiles || []));
+    window.localStorage.setItem(userSelectedBabyKey(userId), JSON.stringify(selectedBabyId || ""));
+  } catch {
+    // User-scoped baby cache is a sync fallback only.
+  }
+}
+
+function readUserBabyProfiles(userId) {
+  if (!userId) return { profiles: [], selectedBabyId: "" };
+  try {
+    const profiles = JSON.parse(window.localStorage.getItem(userCacheKey(userId)) || "[]");
+    const selectedBabyId = JSON.parse(window.localStorage.getItem(userSelectedBabyKey(userId)) || "\"\"");
+    return {
+      profiles: Array.isArray(profiles) ? profiles : [],
+      selectedBabyId: typeof selectedBabyId === "string" ? selectedBabyId : ""
+    };
+  } catch {
+    return { profiles: [], selectedBabyId: "" };
+  }
+}
+
+function readUserSelectedBabyId(userId) {
+  return readUserBabyProfiles(userId).selectedBabyId;
 }

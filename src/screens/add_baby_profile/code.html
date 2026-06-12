@@ -371,8 +371,10 @@
             }
 
             document.title = "Add New Baby - LittleNest MY";
-            formTitle.textContent = "Add New Baby";
-            formSubtitle.textContent = "Create another baby profile without losing existing profiles.";
+            formTitle.textContent = babyState.profiles.length ? "Add New Baby" : "No baby profile yet";
+            formSubtitle.textContent = babyState.profiles.length
+                ? "Create another baby profile without losing existing profiles."
+                : "Create your first baby profile to start tracking care.";
             saveButton.innerHTML = 'Create Baby Profile <span class="material-symbols-outlined">celebration</span>';
         }
 

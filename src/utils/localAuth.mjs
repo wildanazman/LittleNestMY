@@ -1,6 +1,7 @@
 import { isSupabaseConfigured, requireSupabaseClient, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
 
 let cachedSession = null;
+export const pendingInviteTokenKey = "littlenest:pendingInviteToken";
 
 export function hasSupabaseConfig() {
   return isSupabaseConfigured;
@@ -34,8 +35,9 @@ export async function getCurrentUser() {
 
 export async function loginLocalUser({ email, password }) {
   const client = requireSupabaseClient();
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
-  if (error) throw error;
+  const cleanEmail = normalizeEmail(email);
+  const { data, error } = await client.auth.signInWithPassword({ email: cleanEmail, password });
+  if (error) throw friendlyAuthError(error, "login");
 
   cachedSession = data.session || null;
   if (data.user) await upsertProfileForUser(data.user);
@@ -44,8 +46,9 @@ export async function loginLocalUser({ email, password }) {
 
 export async function signupLocalUser({ name, email, password }) {
   const client = requireSupabaseClient();
+  const cleanEmail = normalizeEmail(email);
   const { data, error } = await client.auth.signUp({
-    email,
+    email: cleanEmail,
     password,
     options: {
       data: {
@@ -55,11 +58,23 @@ export async function signupLocalUser({ name, email, password }) {
     }
   });
 
-  if (error) throw error;
+  if (error) throw friendlyAuthError(error, "signup");
+  if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error("An account already exists for this email. Please log in or reset your password.");
+  }
 
   cachedSession = data.session || null;
   if (data.user) await upsertProfileForUser(data.user, { displayName: name });
   return data;
+}
+
+export async function sendPasswordReset(email, redirectTo = "") {
+  const client = requireSupabaseClient();
+  const cleanEmail = normalizeEmail(email);
+  const options = redirectTo ? { redirectTo } : undefined;
+  const { error } = await client.auth.resetPasswordForEmail(cleanEmail, options);
+  if (error) throw friendlyAuthError(error, "reset");
+  return true;
 }
 
 export async function loginAsGuest() {
@@ -77,8 +92,43 @@ export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
 }
 
+export function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
 export function routeAfterAuth(hasBabyProfiles, screenUrl) {
+  const pendingInviteToken = getPendingInviteToken();
+  if (pendingInviteToken) {
+    return `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`;
+  }
   return hasBabyProfiles ? screenUrl("home_dashboard") : `${screenUrl("add_baby_profile")}?mode=create`;
+}
+
+export function rememberPendingInviteToken(token) {
+  const cleanToken = String(token || "").trim();
+  if (!cleanToken) return "";
+  try {
+    window.localStorage.setItem(pendingInviteTokenKey, cleanToken);
+  } catch {
+    // Invite resume is best-effort local navigation state.
+  }
+  return cleanToken;
+}
+
+export function getPendingInviteToken() {
+  try {
+    return String(window.localStorage.getItem(pendingInviteTokenKey) || "").trim();
+  } catch {
+    return "";
+  }
+}
+
+export function clearPendingInviteToken() {
+  try {
+    window.localStorage.removeItem(pendingInviteTokenKey);
+  } catch {
+    // Invite resume is best-effort local navigation state.
+  }
 }
 
 export function getCachedAuthUser() {
@@ -128,4 +178,21 @@ function rememberParentProfile(profile) {
   } catch {
     // Parent profile cache is only for local UI display.
   }
+}
+
+function friendlyAuthError(error, mode) {
+  const message = String(error?.message || error || "");
+  if (/invalid login credentials|invalid credentials/i.test(message)) {
+    return new Error("Email or password is incorrect. If this account was created from an invitation, please set or reset your password first.");
+  }
+  if (/already registered|already exists|user already/i.test(message)) {
+    return new Error("An account already exists for this email. Please log in or reset your password.");
+  }
+  if (/email not confirmed/i.test(message)) {
+    return new Error("Please confirm your email before logging in.");
+  }
+  if (mode === "signup" && /signup/i.test(message)) {
+    return new Error(message);
+  }
+  return error;
 }

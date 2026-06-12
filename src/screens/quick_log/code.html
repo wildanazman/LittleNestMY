@@ -269,26 +269,10 @@
 <h3 class="font-headline-md text-headline-md text-on-surface">Recent Logs</h3>
 <button class="font-label-sm text-label-sm quick-log-purple" data-coming-soon="Recent logs" data-coming-soon-message="A full filtered history view can be added in the next step." type="button">VIEW ALL</button>
 </div>
-<div class="space-y-sm">
-<article class="quick-log-card p-3 flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-</div>
-<div class="flex-1 min-w-0">
-<p class="font-label-md text-label-md text-on-surface">Feeding (Bottle)</p>
-<p class="font-label-sm text-label-sm quick-log-muted">120ml - 15 mins ago</p>
-</div>
-<span class="material-symbols-outlined quick-log-muted text-[18px]">chevron_right</span>
-</article>
-<article class="quick-log-card p-3 flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-</div>
-<div class="flex-1 min-w-0">
-<p class="font-label-md text-label-md text-on-surface">Sleep Start</p>
-<p class="font-label-sm text-label-sm quick-log-muted">Nap - 2 hours ago</p>
-</div>
-<span class="material-symbols-outlined quick-log-muted text-[18px]">chevron_right</span>
+<div class="space-y-sm" id="recentLogsList">
+<article class="quick-log-card p-4 text-center">
+<p class="font-label-md text-label-md text-on-surface">No logs yet</p>
+<p class="font-label-sm text-label-sm quick-log-muted">Add your first feed, sleep, or diaper log.</p>
 </article>
 </div>
 </section>
@@ -296,15 +280,15 @@
 <p class="font-label-sm text-label-sm quick-log-muted uppercase tracking-wider mb-3">Daily Summary</p>
 <div class="grid grid-cols-3 divide-x divide-white/10 text-center">
 <div>
-<p class="font-headline-md text-headline-md text-on-surface">850ml</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="summaryFeeding">0ml</p>
 <p class="font-label-sm text-label-sm quick-log-muted uppercase">Feeding</p>
 </div>
 <div>
-<p class="font-headline-md text-headline-md text-on-surface">12h</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="summarySleep">0h</p>
 <p class="font-label-sm text-label-sm quick-log-muted uppercase">Sleep</p>
 </div>
 <div>
-<p class="font-headline-md text-headline-md text-on-surface">6</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="summaryDiapers">0</p>
 <p class="font-label-sm text-label-sm quick-log-muted uppercase">Diapers</p>
 </div>
 </div>
@@ -374,16 +358,19 @@
         const { bindPrototypeActions, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const {
-            getSelectedBabyId,
             saveLocalGrowthRecord,
         } = await import(`${moduleBase}utils/localState.mjs`);
-        const { saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+        const { loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+        const { formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
         const modal = document.getElementById("quickFormModal");
         const form = document.getElementById("quickForm");
         const error = document.getElementById("quickFormError");
         let activeQuickType = "";
         bindPrototypeActions();
+        await renderRecentLogs();
 
         document.querySelectorAll('.category-card').forEach(button => {
             button.addEventListener('touchstart', () => {
@@ -490,10 +477,112 @@
                 details: note || undefined
               });
               document.getElementById("quickLogFeedback").textContent = `${activeQuickType} saved.`;
+              await renderRecentLogs();
             } catch (error) {
               document.getElementById("quickLogFeedback").textContent = `${error.message || "Could not sync note."} Saved locally for now.`;
             }
             closeQuickForm();
+        }
+
+        async function renderRecentLogs() {
+            const list = document.getElementById("recentLogsList");
+            const now = new Date();
+            if (!selectedBabyId) {
+                renderEmptyRecentLogs(list);
+                setSummary(0, 0, 0);
+                return;
+            }
+            const logs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+            const recent = [
+                ...logs.feedingLogs.map((log) => ({
+                    at: log.startedAt,
+                    icon: "restaurant",
+                    title: `Feeding (${labelFeedingType(log.type)})`,
+                    detail: [log.amountMl ? `${log.amountMl}ml` : "", log.durationMinutes ? formatDuration(log.durationMinutes) : "", formatRelativeTime(log.startedAt, now)].filter(Boolean).join(" - ")
+                })),
+                ...logs.sleepLogs.map((log) => ({
+                    at: log.startedAt,
+                    icon: "bedtime",
+                    title: log.endedAt ? "Sleep" : "Sleep Start",
+                    detail: [log.endedAt && log.durationMinutes ? formatDuration(log.durationMinutes) : "Nap", formatRelativeTime(log.startedAt, now)].filter(Boolean).join(" - ")
+                })),
+                ...logs.diaperLogs.map((log) => ({
+                    at: log.changedAt,
+                    icon: "baby_changing_station",
+                    title: "Diaper",
+                    detail: `${capitalize(log.type || "diaper")} - ${formatRelativeTime(log.changedAt, now)}`
+                })),
+                ...logs.healthNotes.map((note) => ({
+                    at: note.recordedAt,
+                    icon: "medical_information",
+                    title: note.title || "Health note",
+                    detail: formatRelativeTime(note.recordedAt, now)
+                }))
+            ].filter((item) => item.at).sort((a, b) => new Date(b.at) - new Date(a.at)).slice(0, 3);
+
+            if (!recent.length) renderEmptyRecentLogs(list);
+            else list.innerHTML = recent.map(renderRecentLogItem).join("");
+
+            const todayFeedsMl = logs.feedingLogs
+                .filter((log) => isSameLocalDay(log.startedAt, now))
+                .reduce((total, log) => total + (Number(log.amountMl) || 0), 0);
+            const todaySleepMinutes = logs.sleepLogs
+                .filter((log) => isSameLocalDay(log.startedAt, now))
+                .reduce((total, log) => total + (Number(log.durationMinutes) || durationMinutes(log.startedAt, log.endedAt) || 0), 0);
+            const todayDiapers = logs.diaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
+            setSummary(todayFeedsMl, todaySleepMinutes, todayDiapers);
+        }
+
+        function renderEmptyRecentLogs(list) {
+            list.innerHTML = `
+                <article class="quick-log-card p-4 text-center">
+                    <p class="font-label-md text-label-md text-on-surface">No logs yet</p>
+                    <p class="font-label-sm text-label-sm quick-log-muted">Add your first feed, sleep, or diaper log.</p>
+                </article>
+            `;
+        }
+
+        function renderRecentLogItem(item) {
+            return `
+                <article class="quick-log-card p-3 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">${item.icon}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-label-md text-label-md text-on-surface">${escapeHtml(item.title)}</p>
+                        <p class="font-label-sm text-label-sm quick-log-muted">${escapeHtml(item.detail)}</p>
+                    </div>
+                </article>
+            `;
+        }
+
+        function setSummary(feedingMl, sleepMinutes, diapers) {
+            document.getElementById("summaryFeeding").textContent = `${Math.round(feedingMl || 0)}ml`;
+            document.getElementById("summarySleep").textContent = sleepMinutes ? formatDuration(sleepMinutes) : "0h";
+            document.getElementById("summaryDiapers").textContent = String(diapers || 0);
+        }
+
+        function durationMinutes(startedAt, endedAt) {
+            if (!startedAt || !endedAt) return 0;
+            return Math.max(0, Math.round((new Date(endedAt) - new Date(startedAt)) / 60000));
+        }
+
+        function labelFeedingType(type) {
+            return { bottle: "Bottle", breast: "Breast", formula: "Formula", solid: "Solid" }[type] || "Feed";
+        }
+
+        function capitalize(value) {
+            const text = String(value || "");
+            return text.charAt(0).toUpperCase() + text.slice(1);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
         }
 
         function parseNumber(id) {

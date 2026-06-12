@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       return sendJson(res, 400, { error: "Invite has expired." });
     }
     if (invitation.email.toLowerCase() !== String(auth.user.email || "").toLowerCase()) {
-      return sendJson(res, 403, { error: "Please log in with the email address that received this invite." });
+      return sendJson(res, 403, { error: "This invitation was sent to another email address." });
     }
 
     await service.from("profiles").upsert({

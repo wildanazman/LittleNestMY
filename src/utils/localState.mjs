@@ -116,7 +116,7 @@ export function deleteLocalFeedingLog(logId) {
 
 export function getLogsForBaby(logs, babyId) {
   const aliases = getBabyIdAliases(babyId);
-  return (logs || []).filter((log) => !log.babyId || aliases.includes(log.babyId));
+  return (logs || []).filter((log) => log.babyId && aliases.includes(log.babyId));
 }
 
 export function migrateLogsToSelectedBaby(babyId) {
@@ -175,6 +175,7 @@ export function cacheSupabaseBabyProfiles(profiles, selectedBabyId = "") {
   const normalized = profiles.map((profile) => normalizeBabyProfile(profile)).filter(Boolean);
   writeJson(babyProfilesKey, normalized);
   if (selectedBabyId) writeJson(selectedBabyIdKey, selectedBabyId);
+  else if (!normalized.length) writeJson(selectedBabyIdKey, "");
   else ensureSelectedBaby(normalized);
   return normalized;
 }

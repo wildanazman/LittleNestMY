@@ -6,7 +6,9 @@ export { themeKey };
 export function getThemePreference() {
   try {
     const value = window.localStorage.getItem(themeKey);
-    return allowedThemes.has(value) ? value : "light";
+    if (allowedThemes.has(value)) return value;
+    window.localStorage.setItem(themeKey, "light");
+    return "light";
   } catch {
     return "light";
   }
