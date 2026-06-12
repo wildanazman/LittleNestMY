@@ -20,18 +20,21 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        primary: "#b75f67",
+        primary: "#d81b60",
         "on-primary": "#ffffff",
-        "primary-container": "#ffdbe1",
-        "on-primary-container": "#3b0710",
-        surface: "#fff8f8",
-        "surface-container": "#f8e9ea",
-        "surface-container-low": "#fff0f2",
+        "primary-container": "#fce4ec",
+        "on-primary-container": "#4a041c",
+        surface: "#fffafa",
+        "surface-container": "#fff1f5",
+        "surface-container-low": "#fffbfb",
         "surface-container-lowest": "#ffffff",
-        "surface-container-highest": "#efe1e2",
-        "on-surface": "#23191a",
-        "on-surface-variant": "#6b4b4f",
-        error: "#ba1a1a"
+        "surface-container-highest": "#f8dfe7",
+        "on-surface": "#26191c",
+        "on-surface-variant": "#63424a",
+        tertiary: "#ec407a",
+        "tertiary-container": "#f8bbd0",
+        error: "#b71c1c",
+        "error-container": "#ffebee"
       },
       fontFamily: { body: ["Nunito Sans", "sans-serif"] }
     }
@@ -39,110 +42,154 @@ tailwind.config = {
 };
 </script>
 <style>
-  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; }
+  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .soft-shadow { box-shadow: 0 20px 50px rgba(183, 95, 103, 0.12); }
-  .mama-card { background: rgba(255,255,255,.84); border: 1px solid rgba(183,95,103,.12); }
-  :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(216, 27, 96, 0.10); }
+  .mama-card { background: rgba(255,255,255,.88); border: 1px solid rgba(216,27,96,.12); }
+  .mama-input { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(216,27,96,.12); background: #fffafa; padding: 0 14px; color: #26191c; font-size: 16px; }
+  textarea.mama-input { min-height: 96px; padding-top: 12px; }
+  .status-chip { border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
   :root.dark body { background: #1f1a1a; color: #fff7ed; }
+  :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
+  :root.dark .mama-input { background: #1f1a1a; color: #fff7ed; border-color: rgba(255,255,255,.12); -webkit-text-fill-color: #fff7ed; }
+  :root.dark .mama-input::placeholder { color: rgba(255,247,237,.55); -webkit-text-fill-color: rgba(255,247,237,.55); }
+  :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
+  :root.dark input[type="time"]::-webkit-calendar-picker-indicator,
+  :root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.35); }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32">
-<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between shadow-[0_4px_20px_rgba(216,27,96,0.06)]">
   <button class="h-10 rounded-full px-3 bg-surface-container text-primary font-bold flex items-center gap-1 active:scale-95 transition-transform" id="backToBaby" type="button">
     <span class="material-symbols-outlined text-[20px]">arrow_back</span>
     <span>Back to Baby</span>
   </button>
   <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
-    <span class="material-symbols-outlined">account_circle</span>
+    <span class="material-symbols-outlined">settings</span>
   </button>
 </header>
 
-<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5" id="mamaApp">
   <section class="space-y-2">
     <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
     <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Care for baby. Care for mama too.</h1>
-    <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">A calm space for mother-focused notes and support.</p>
+    <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.</p>
   </section>
+
+  <p class="hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
   <section class="rounded-[28px] bg-primary-container p-5 soft-shadow">
-    <div class="flex items-center gap-4">
-      <div class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-[30px]" style="font-variation-settings:'FILL' 1;">favorite</span>
-      </div>
+    <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container">Today's Mama Check-in</h2>
-        <p class="text-[15px] leading-6 text-on-primary-container/80">No check-in yet.</p>
+        <p class="text-[15px] leading-6 text-on-primary-container/80" id="checkinSubtitle">No check-in yet.</p>
       </div>
+      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary text-[13px] font-extrabold active:scale-95 transition-transform" id="addCheckinButton" type="button">Add</button>
     </div>
-    <div class="grid grid-cols-3 gap-2 mt-4">
+    <div class="grid grid-cols-2 gap-3 mt-4">
       <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <span class="material-symbols-outlined text-primary">sentiment_satisfied</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Mood</p>
-        <p class="text-[14px] font-extrabold text-on-primary-container">Not checked</p>
+        <p class="text-[17px] font-extrabold text-on-primary-container" id="moodValue">Not checked</p>
       </div>
       <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <span class="material-symbols-outlined text-primary">healing</span>
+        <p class="text-[12px] font-bold text-on-primary-container/70">Pain</p>
+        <p class="text-[17px] font-extrabold text-on-primary-container" id="painValue">Not logged</p>
+      </div>
+      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <span class="material-symbols-outlined text-primary">bedtime</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Rest</p>
-        <p class="text-[14px] font-extrabold text-on-primary-container">Not logged</p>
+        <p class="text-[17px] font-extrabold text-on-primary-container" id="restValue">Not logged</p>
       </div>
       <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <span class="material-symbols-outlined text-primary">pill</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Meds</p>
-        <p class="text-[14px] font-extrabold text-on-primary-container">0/0</p>
+        <p class="text-[17px] font-extrabold text-on-primary-container" id="medsValue">0/0</p>
       </div>
     </div>
-    <button class="mama-action mt-4 w-full h-12 rounded-full bg-primary text-on-primary font-bold active:scale-95 transition-transform" data-coming-soon="Mama check-in" data-coming-soon-message="Mama Care storage is not connected yet. This will become a private check-in flow in a later phase." type="button">Add Check-in</button>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-3">
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Support Crew</p>
+        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Husband Support Checklist</h2>
+        <p class="text-[14px] leading-5 text-on-surface-variant">Helping Mama recover starts with the small things today.</p>
+      </div>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addTaskButton" type="button">Add</button>
+    </div>
+    <div class="space-y-3" id="supportTaskList"></div>
+  </section>
+
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
-      <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Husband Support Checklist</h2>
-      <span class="text-[12px] font-extrabold text-primary">Empty</span>
+      <div>
+        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Mama Medication</h2>
+        <p class="text-[14px] text-on-surface-variant" id="medicationSummary">No medication logged yet.</p>
+      </div>
+      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold" id="addMedicationButton" type="button">Add</button>
     </div>
-    <p class="text-[15px] leading-6 text-on-surface-variant">No support tasks yet. Add gentle reminders like water, meals, or rest when this feature is connected.</p>
-    <button class="mama-action h-11 rounded-full bg-primary-container px-4 text-primary font-bold active:scale-95 transition-transform" data-coming-soon="Support checklist" data-coming-soon-message="Support tasks will be saved in a later Mama Care data phase." type="button">Add Support Task</button>
+    <div class="space-y-3" id="medicationList"></div>
   </section>
 
-  <section class="grid grid-cols-1 gap-4">
-    <article class="mama-card rounded-[26px] p-5 soft-shadow">
-      <div class="flex items-center gap-3">
-        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">medication</span>
-        <div>
-          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Mama Medication</h2>
-          <p class="text-[15px] leading-6 text-on-surface-variant">No medication logged yet.</p>
-        </div>
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Mama Appointments</h2>
+        <p class="text-[14px] text-on-surface-variant" id="appointmentSummary">No appointments yet.</p>
       </div>
-    </article>
-    <article class="mama-card rounded-[26px] p-5 soft-shadow">
-      <div class="flex items-center gap-3">
-        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">calendar_add_on</span>
-        <div>
-          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Mama Appointments</h2>
-          <p class="text-[15px] leading-6 text-on-surface-variant">No appointments yet.</p>
-        </div>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addAppointmentButton" type="button">Add</button>
+    </div>
+    <div class="space-y-3" id="appointmentList"></div>
+  </section>
+
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Recovery Notes</h2>
+        <p class="text-[14px] text-on-surface-variant">Private notes for recovery changes and reminders.</p>
       </div>
-    </article>
-    <article class="mama-card rounded-[26px] p-5 soft-shadow">
-      <div class="flex items-center gap-3">
-        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">edit_note</span>
-        <div>
-          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Recovery Notes</h2>
-          <p class="text-[15px] leading-6 text-on-surface-variant">No recovery notes yet.</p>
-        </div>
-      </div>
-    </article>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addNoteButton" type="button">Add</button>
+    </div>
+    <div class="space-y-3" id="recoveryNoteList"></div>
   </section>
 
   <section class="rounded-[26px] bg-[#ffe5e5] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
     <div class="flex items-start gap-3">
       <span class="material-symbols-outlined text-error mt-1">info</span>
-      <p class="text-[16px] leading-7 text-error">Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
+      <p class="text-[16px] leading-7 text-error">For tracking and family support only. Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
     </div>
   </section>
 </main>
 
+<main class="hidden max-w-md mx-auto px-5 pt-8 text-center space-y-4" id="noBabyState">
+  <div class="mx-auto w-16 h-16 rounded-full bg-primary-container text-primary flex items-center justify-center">
+    <span class="material-symbols-outlined text-[34px]">favorite</span>
+  </div>
+  <h1 class="text-[24px] leading-8 font-extrabold text-on-surface">Create a baby profile first to use Mama Care.</h1>
+  <button class="h-12 rounded-full bg-primary px-6 text-on-primary font-extrabold" id="noBabyBackButton" type="button">Back to Baby Dashboard</button>
+</main>
+
+<div class="fixed inset-0 z-[120] hidden items-end justify-center bg-black/35 px-4 pb-4" id="mamaModal">
+  <div class="w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[28px] bg-surface-container-lowest p-5 soft-shadow dark:bg-[#2d2425]">
+    <div class="flex items-start justify-between gap-3 mb-4">
+      <div>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
+        <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="modalTitle">Add record</h2>
+      </div>
+      <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center" id="closeModalButton" type="button" aria-label="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form class="space-y-3" id="mamaForm"></form>
+  </div>
+</div>
+
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
   <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
-  <button class="bg-primary-container text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">health_and_safety</span><span>Mama Care</span></button>
+  <button class="bg-primary-container text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">self_care</span><span>Mama Care</span></button>
   <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
   <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
   <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
@@ -155,34 +202,494 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+const {
+  deleteMamaAppointment,
+  deleteMamaMedication,
+  deleteMamaRecoveryNote,
+  deleteMamaSupportTask,
+  loadMamaCareData,
+  saveMamaAppointment,
+  saveMamaCheckin,
+  saveMamaMedication,
+  saveMamaRecoveryNote,
+  saveMamaSupportTask,
+  updateMamaMedicationStatus,
+  updateMamaSupportTaskStatus
+} = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
+
+const today = localDate(new Date());
+let selectedBabyId = "";
+let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
+let mamaData = emptyMamaData();
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
   await new Promise(() => {});
 }
 
-const babyState = await loadBabyProfilesRemote(babyProfile);
-const selectedBabyId = babyState.selectedBabyId;
-const permissions = await getBabyPermissions(selectedBabyId);
-
 document.getElementById("backToBaby").addEventListener("click", () => goToScreen("home_dashboard"));
-document.getElementById("roleHint").textContent = permissions.role === "viewer"
-  ? "You have view-only access for this baby."
-  : "A calm space for mother-focused notes and support.";
+document.getElementById("noBabyBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("closeModalButton").addEventListener("click", closeModal);
+document.getElementById("mamaModal").addEventListener("click", (event) => {
+  if (event.target.id === "mamaModal") closeModal();
+});
 
-if (permissions.role === "viewer") {
-  document.querySelectorAll(".mama-action").forEach((button) => {
-    button.removeAttribute("data-coming-soon");
-    button.removeAttribute("data-coming-soon-message");
-    button.classList.add("opacity-60");
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      showViewOnlyNotice(viewOnlyMessage);
+document.getElementById("addCheckinButton").addEventListener("click", () => openCheckinForm());
+document.getElementById("addTaskButton").addEventListener("click", () => openTaskForm());
+document.getElementById("addMedicationButton").addEventListener("click", () => openMedicationForm());
+document.getElementById("addAppointmentButton").addEventListener("click", () => openAppointmentForm());
+document.getElementById("addNoteButton").addEventListener("click", () => openNoteForm());
+
+await bootstrap();
+bindPrototypeActions();
+
+async function bootstrap() {
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  selectedBabyId = babyState.selectedBabyId;
+  if (!selectedBabyId || !babyState.selectedBaby) {
+    document.getElementById("mamaApp").classList.add("hidden");
+    document.getElementById("noBabyState").classList.remove("hidden");
+    return;
+  }
+
+  permissions = await getBabyPermissions(selectedBabyId);
+  document.getElementById("roleHint").textContent = permissions.role === "viewer"
+    ? "You have view-only access for this baby."
+    : "For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.";
+  if (!permissions.canAddLogs) {
+    document.querySelectorAll(".mama-action").forEach((button) => {
+      button.classList.add("opacity-60");
+    });
+  }
+  await refreshMamaCare();
+}
+
+async function refreshMamaCare() {
+  mamaData = await loadMamaCareData(selectedBabyId);
+  if (mamaData.error) showFeedback(mamaData.error, true);
+  renderAll();
+}
+
+function renderAll() {
+  renderCheckin();
+  renderSupportTasks();
+  renderMedications();
+  renderAppointments();
+  renderRecoveryNotes();
+}
+
+function renderCheckin() {
+  const checkin = mamaData.checkins.find((item) => item.checkinDate === today);
+  const meds = todayItems(mamaData.medications, (item) => item.medicationTime);
+  const taken = meds.filter((item) => item.status === "taken").length;
+  document.getElementById("checkinSubtitle").textContent = checkin ? "Updated today." : "No check-in yet.";
+  document.getElementById("moodValue").textContent = checkin?.mood || "Not checked";
+  document.getElementById("painValue").textContent = checkin?.painLevel !== "" && checkin?.painLevel !== undefined ? `${checkin.painLevel}/10` : "Not logged";
+  document.getElementById("restValue").textContent = checkin?.sleepHours ? `${checkin.sleepHours} hrs` : "Not logged";
+  document.getElementById("medsValue").textContent = `${taken}/${meds.length}`;
+}
+
+function renderSupportTasks() {
+  const tasks = mamaData.supportTasks.filter((task) => task.taskDate === today);
+  const list = document.getElementById("supportTaskList");
+  if (!tasks.length) {
+    list.innerHTML = emptyState("volunteer_activism", "No support tasks yet.", "Add water, meals, rest, or other gentle support tasks.");
+    return;
+  }
+  list.innerHTML = tasks.map((task) => `
+    <article class="rounded-[24px] bg-surface-container-lowest p-4 border border-primary-container/40 dark:bg-white/5">
+      <div class="flex items-start justify-between gap-3">
+        <div class="w-11 h-11 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined">${taskIcon(task.taskTitle)}</span>
+        </div>
+        ${statusChip(task.status)}
+      </div>
+      <h3 class="mt-3 text-[18px] leading-6 font-extrabold text-on-surface">${escapeHtml(task.taskTitle)}</h3>
+      ${task.notes ? `<p class="mt-1 text-[14px] leading-5 text-on-surface-variant">${escapeHtml(task.notes)}</p>` : ""}
+      ${editButton("task", task.id)}
+      ${actionButtons("task", task.id, task.status)}
+    </article>
+  `).join("");
+}
+
+function renderMedications() {
+  const meds = todayItems(mamaData.medications, (item) => item.medicationTime);
+  const taken = meds.filter((item) => item.status === "taken").length;
+  document.getElementById("medicationSummary").textContent = meds.length ? `${taken}/${meds.length} taken today` : "No medication logged yet.";
+  const list = document.getElementById("medicationList");
+  if (!meds.length) {
+    list.innerHTML = emptyState("pill", "No medication logged yet.", "Add Mama medication, dose, and time when ready.");
+    return;
+  }
+  list.innerHTML = meds.map((med) => `
+    <article class="rounded-[24px] bg-surface-container-lowest p-4 border border-primary-container/40 dark:bg-white/5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-12 h-12 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined">pill</span>
+          </div>
+          <div class="min-w-0">
+            <h3 class="text-[18px] leading-6 font-extrabold text-on-surface truncate">${escapeHtml(med.medicationName)}</h3>
+            <p class="text-[14px] text-on-surface-variant">${escapeHtml([med.dose, med.medicationTime ? formatTime(med.medicationTime) : ""].filter(Boolean).join(" - "))}</p>
+          </div>
+        </div>
+        ${statusChip(med.status)}
+      </div>
+      ${med.notes ? `<p class="mt-2 text-[14px] leading-5 text-on-surface-variant">${escapeHtml(med.notes)}</p>` : ""}
+      ${editButton("med", med.id)}
+      ${actionButtons("med", med.id, med.status)}
+    </article>
+  `).join("");
+}
+
+function renderAppointments() {
+  const upcoming = mamaData.appointments.filter((item) => !item.appointmentTime || new Date(item.appointmentTime) >= startOfToday()).sort((a, b) => new Date(a.appointmentTime || 0) - new Date(b.appointmentTime || 0));
+  const next = upcoming[0];
+  document.getElementById("appointmentSummary").textContent = next ? `Next: ${next.title}` : "No appointments yet.";
+  const list = document.getElementById("appointmentList");
+  if (!upcoming.length) {
+    list.innerHTML = emptyState("calendar_add_on", "No appointments yet.", "Klinik Kesihatan, checkups, or recovery appointments will appear here.");
+    return;
+  }
+  list.innerHTML = upcoming.slice(0, 3).map((appt) => `
+    <article class="rounded-[24px] bg-surface-container-lowest p-4 border border-primary-container/40 dark:bg-white/5">
+      <div class="flex items-start gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined">event_available</span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h3 class="text-[18px] leading-6 font-extrabold text-on-surface">${escapeHtml(appt.title)}</h3>
+          <p class="text-[14px] text-on-surface-variant">${appt.appointmentTime ? formatDateTime(appt.appointmentTime) : "Date not set"}</p>
+          ${appt.location ? `<p class="text-[14px] text-on-surface-variant">${escapeHtml(appt.location)}</p>` : ""}
+          ${appt.reminderEnabled ? `<p class="mt-1 text-[12px] font-extrabold text-primary">Reminder on</p>` : ""}
+        </div>
+      </div>
+      ${editButton("appointment", appt.id)}
+      ${deleteButton("appointment", appt.id)}
+    </article>
+  `).join("");
+}
+
+function renderRecoveryNotes() {
+  const list = document.getElementById("recoveryNoteList");
+  if (!mamaData.recoveryNotes.length) {
+    list.innerHTML = emptyState("edit_note", "No recovery notes yet.", "Add a note about wound care, comfort, mood, or reminders.");
+    return;
+  }
+  list.innerHTML = mamaData.recoveryNotes.slice(0, 3).map((note) => `
+    <article class="rounded-[24px] bg-surface-container-lowest p-4 border border-primary-container/40 dark:bg-white/5">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">${escapeHtml(note.noteType || "Recovery note")}</p>
+          <p class="text-[13px] text-on-surface-variant">${formatDate(note.noteDate)}</p>
+        </div>
+        ${deleteButton("note", note.id)}
+      </div>
+      ${editButton("note", note.id)}
+      <p class="mt-2 text-[15px] leading-6 text-on-surface whitespace-pre-wrap">${escapeHtml(note.note)}</p>
+    </article>
+  `).join("");
+}
+
+document.body.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-action]");
+  if (!button) return;
+  if (!canWrite()) return;
+  button.disabled = true;
+  try {
+    const { action, id } = button.dataset;
+    if (action === "task-edit") return openTaskForm(mamaData.supportTasks.find((item) => item.id === id));
+    if (action === "med-edit") return openMedicationForm(mamaData.medications.find((item) => item.id === id));
+    if (action === "appointment-edit") return openAppointmentForm(mamaData.appointments.find((item) => item.id === id));
+    if (action === "note-edit") return openNoteForm(mamaData.recoveryNotes.find((item) => item.id === id));
+    if (action === "task-done") await updateMamaSupportTaskStatus(id, "done");
+    if (action === "task-skip") await updateMamaSupportTaskStatus(id, "skipped");
+    if (action === "task-reset") await updateMamaSupportTaskStatus(id, "pending");
+    if (action === "task-delete") await deleteMamaSupportTask(id);
+    if (action === "med-taken") await updateMamaMedicationStatus(id, "taken");
+    if (action === "med-skip") await updateMamaMedicationStatus(id, "skipped");
+    if (action === "med-reset") await updateMamaMedicationStatus(id, "pending");
+    if (action === "med-delete") await deleteMamaMedication(id);
+    if (action === "appointment-delete") await deleteMamaAppointment(id);
+    if (action === "note-delete") await deleteMamaRecoveryNote(id);
+    await refreshMamaCare();
+  } catch (error) {
+    showFeedback(error.message || "Could not update Mama Care.", true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+function openCheckinForm() {
+  if (!canWrite()) return;
+  const existing = mamaData.checkins.find((item) => item.checkinDate === today) || {};
+  openModal("Today&apos;s Mama Check-in", `
+    ${selectField("mood", "Mood", ["Calm", "Tired", "Sad", "Anxious", "Overwhelmed", "Angry"], existing.mood)}
+    ${numberField("painLevel", "Pain level (0-10)", existing.painLevel, 0, 10, "1")}
+    ${selectField("bleeding", "Bleeding", ["Light", "Normal", "Heavy"], existing.bleeding)}
+    ${numberField("sleepHours", "Sleep / rest hours", existing.sleepHours, 0, 24, "0.5")}
+    ${numberField("waterCups", "Water cups", existing.waterCups, 0, 30, "1")}
+    ${numberField("mealsCount", "Meals count", existing.mealsCount, 0, 10, "1")}
+    ${selectField("breastfeedingComfort", "Breastfeeding comfort", ["Comfortable", "Sore", "Painful", "Not breastfeeding"], existing.breastfeedingComfort)}
+    ${textareaField("woundNote", "Wound note", existing.woundNote, "Optional wound or incision note")}
+    ${textareaField("toiletNote", "Toilet / constipation note", existing.toiletNote, "Optional toilet or constipation note")}
+    ${textareaField("notes", "Notes", existing.notes, "Anything Mama wants family to remember")}
+    ${submitButton("Save Check-in")}
+  `, async (form) => {
+    await saveMamaCheckin({
+      babyId: selectedBabyId,
+      checkinDate: today,
+      mood: form.mood.value,
+      painLevel: form.painLevel.value,
+      bleeding: form.bleeding.value.toLowerCase(),
+      sleepHours: form.sleepHours.value,
+      waterCups: form.waterCups.value,
+      mealsCount: form.mealsCount.value,
+      breastfeedingComfort: form.breastfeedingComfort.value,
+      woundNote: form.woundNote.value,
+      toiletNote: form.toiletNote.value,
+      notes: form.notes.value
     });
   });
 }
 
-bindPrototypeActions();
+function openTaskForm(existing = {}) {
+  if (!canWrite()) return;
+  openModal(existing.id ? "Edit Support Task" : "Add Support Task", `
+    ${inputField("taskTitle", "Task title", existing.taskTitle || "", "Prepare water bottle")}
+    ${inputField("taskDate", "Task date", existing.taskDate || today, "", "date")}
+    ${textareaField("notes", "Notes", existing.notes || "", "Keep her hydrated, especially while nursing.")}
+    ${submitButton("Save Task")}
+  `, async (form) => {
+    if (!form.taskTitle.value.trim()) throw new Error("Add a task title.");
+    await saveMamaSupportTask({ id: existing.id, babyId: selectedBabyId, taskTitle: form.taskTitle.value, taskDate: form.taskDate.value || today, status: existing.status || "pending", notes: form.notes.value });
+  });
+}
+
+function openMedicationForm(existing = {}) {
+  if (!canWrite()) return;
+  openModal(existing.id ? "Edit Mama Medication" : "Add Mama Medication", `
+    ${inputField("medicationName", "Medication name", existing.medicationName || "", "Iron, vitamins, prescribed medicine")}
+    ${inputField("dose", "Dose", existing.dose || "", "1 tablet or 5 ml")}
+    ${inputField("medicationTime", "Time", existing.medicationTime ? toDatetimeLocal(new Date(existing.medicationTime)) : toDatetimeLocal(new Date()), "", "datetime-local")}
+    ${selectField("status", "Status", ["Pending", "Taken", "Skipped"], existing.status || "Pending")}
+    ${textareaField("notes", "Notes", existing.notes || "", "Optional medication note")}
+    ${submitButton("Save Medication")}
+  `, async (form) => {
+    if (!form.medicationName.value.trim()) throw new Error("Add a medication name.");
+    await saveMamaMedication({
+      id: existing.id,
+      babyId: selectedBabyId,
+      medicationName: form.medicationName.value,
+      dose: form.dose.value,
+      medicationTime: fromDatetimeLocal(form.medicationTime.value),
+      status: form.status.value.toLowerCase(),
+      notes: form.notes.value
+    });
+  });
+}
+
+function openAppointmentForm(existing = {}) {
+  if (!canWrite()) return;
+  openModal(existing.id ? "Edit Mama Appointment" : "Add Mama Appointment", `
+    ${inputField("title", "Title", existing.title || "", "Postnatal checkup")}
+    ${inputField("appointmentTime", "Date and time", existing.appointmentTime ? toDatetimeLocal(new Date(existing.appointmentTime)) : toDatetimeLocal(new Date()), "", "datetime-local")}
+    ${inputField("location", "Location", existing.location || "", "Klinik Kesihatan")}
+    <label class="flex items-center justify-between rounded-2xl bg-surface-container-low p-3">
+      <span class="font-bold text-on-surface">Reminder</span>
+      <input class="w-5 h-5 text-primary" name="reminderEnabled" type="checkbox" ${existing.reminderEnabled ? "checked" : ""}/>
+    </label>
+    ${textareaField("notes", "Notes", existing.notes || "", "Optional appointment note")}
+    ${submitButton("Save Appointment")}
+  `, async (form) => {
+    if (!form.title.value.trim()) throw new Error("Add an appointment title.");
+    await saveMamaAppointment({
+      id: existing.id,
+      babyId: selectedBabyId,
+      title: form.title.value,
+      appointmentTime: fromDatetimeLocal(form.appointmentTime.value),
+      location: form.location.value,
+      reminderEnabled: form.reminderEnabled.checked,
+      notes: form.notes.value
+    });
+  });
+}
+
+function openNoteForm(existing = {}) {
+  if (!canWrite()) return;
+  openModal(existing.id ? "Edit Recovery Note" : "Add Recovery Note", `
+    ${inputField("noteType", "Note type", existing.noteType || "", "Wound, mood, rest, general")}
+    ${inputField("noteDate", "Date", existing.noteDate || today, "", "date")}
+    ${textareaField("note", "Note", existing.note || "", "Write what Mama wants to remember")}
+    ${submitButton("Save Note")}
+  `, async (form) => {
+    if (!form.note.value.trim()) throw new Error("Add a note.");
+    await saveMamaRecoveryNote({ id: existing.id, babyId: selectedBabyId, noteType: form.noteType.value, noteDate: form.noteDate.value || today, note: form.note.value });
+  });
+}
+
+function openModal(title, body, onSubmit) {
+  document.getElementById("modalTitle").innerHTML = title;
+  const form = document.getElementById("mamaForm");
+  form.innerHTML = body + `<p class="hidden text-[14px] font-extrabold text-error" id="modalError"></p>`;
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const submit = form.querySelector("button[type='submit']");
+    submit.disabled = true;
+    try {
+      await onSubmit(form);
+      closeModal();
+      showFeedback("Saved.");
+      await refreshMamaCare();
+    } catch (error) {
+      const errorEl = document.getElementById("modalError");
+      errorEl.textContent = error.message || "Could not save.";
+      errorEl.classList.remove("hidden");
+    } finally {
+      submit.disabled = false;
+    }
+  };
+  document.getElementById("mamaModal").classList.remove("hidden");
+  document.getElementById("mamaModal").classList.add("flex");
+}
+
+function closeModal() {
+  document.getElementById("mamaModal").classList.add("hidden");
+  document.getElementById("mamaModal").classList.remove("flex");
+}
+
+function canWrite() {
+  if (permissions.canAddLogs) return true;
+  showViewOnlyNotice(viewOnlyMessage);
+  return false;
+}
+
+function actionButtons(kind, id, status) {
+  if (!permissions.canAddLogs) return "";
+  const reset = status !== "pending" ? `<button class="h-10 rounded-full bg-surface-container px-3 text-on-surface-variant font-bold" data-action="${kind}-reset" data-id="${id}" type="button">Reset</button>` : "";
+  const primary = kind === "med" ? "Taken" : "Done";
+  const primaryAction = kind === "med" ? "med-taken" : "task-done";
+  const skipAction = kind === "med" ? "med-skip" : "task-skip";
+  const deleteAction = kind === "med" ? "med-delete" : "task-delete";
+  return `
+    <div class="mt-4 flex gap-2">
+      ${status === "pending" ? `<button class="flex-1 h-10 rounded-full bg-primary text-on-primary font-bold" data-action="${primaryAction}" data-id="${id}" type="button">${primary}</button>
+      <button class="h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-bold" data-action="${skipAction}" data-id="${id}" type="button">Skip</button>` : reset}
+      <button class="h-10 rounded-full bg-error-container px-3 text-error font-bold" data-action="${deleteAction}" data-id="${id}" type="button">Delete</button>
+    </div>
+  `;
+}
+
+function deleteButton(kind, id) {
+  if (!permissions.canAddLogs) return "";
+  return `<button class="mt-3 text-[13px] font-extrabold text-error" data-action="${kind}-delete" data-id="${id}" type="button">Delete</button>`;
+}
+
+function editButton(kind, id) {
+  if (!permissions.canAddLogs) return "";
+  return `<button class="mt-3 mr-3 text-[13px] font-extrabold text-primary" data-action="${kind}-edit" data-id="${id}" type="button">Edit</button>`;
+}
+
+function emptyState(icon, title, detail) {
+  return `
+    <div class="rounded-[22px] bg-surface-container-low p-5 text-center border border-primary-container/30">
+      <span class="material-symbols-outlined text-primary text-[32px]">${icon}</span>
+      <p class="mt-1 font-extrabold text-on-surface">${title}</p>
+      <p class="text-[14px] leading-5 text-on-surface-variant">${detail}</p>
+    </div>
+  `;
+}
+
+function statusChip(status) {
+  const label = { pending: "Pending", done: "Done", skipped: "Skipped", taken: "Taken" }[status] || status;
+  const tone = status === "pending" ? "bg-primary-container text-primary" : status === "skipped" ? "bg-error-container text-error" : "bg-tertiary-container text-primary";
+  return `<span class="status-chip ${tone}">${label}</span>`;
+}
+
+function inputField(name, label, value = "", placeholder = "", type = "text") {
+  return `<label class="block space-y-1"><span class="text-[13px] font-extrabold text-on-surface">${label}</span><input class="mama-input" name="${name}" type="${type}" value="${escapeAttr(value)}" placeholder="${escapeAttr(placeholder)}"/></label>`;
+}
+
+function numberField(name, label, value = "", min = "", max = "", step = "1") {
+  return `<label class="block space-y-1"><span class="text-[13px] font-extrabold text-on-surface">${label}</span><input class="mama-input" name="${name}" type="number" min="${min}" max="${max}" step="${step}" value="${escapeAttr(value)}"/></label>`;
+}
+
+function selectField(name, label, options, value = "") {
+  const normalized = String(value || "").toLowerCase();
+  return `<label class="block space-y-1"><span class="text-[13px] font-extrabold text-on-surface">${label}</span><select class="mama-input" name="${name}">${options.map((option) => `<option value="${escapeAttr(option)}" ${option.toLowerCase() === normalized ? "selected" : ""}>${option}</option>`).join("")}</select></label>`;
+}
+
+function textareaField(name, label, value = "", placeholder = "") {
+  return `<label class="block space-y-1"><span class="text-[13px] font-extrabold text-on-surface">${label}</span><textarea class="mama-input" name="${name}" placeholder="${escapeAttr(placeholder)}">${escapeHtml(value)}</textarea></label>`;
+}
+
+function submitButton(label) {
+  return `<button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" type="submit">${label}</button>`;
+}
+
+function todayItems(items, getDate) {
+  return items.filter((item) => getDate(item) && localDate(new Date(getDate(item))) === today);
+}
+
+function taskIcon(title) {
+  const lower = String(title || "").toLowerCase();
+  if (lower.includes("water")) return "water_drop";
+  if (lower.includes("meal") || lower.includes("food")) return "restaurant";
+  if (lower.includes("sleep") || lower.includes("nap") || lower.includes("rest")) return "bedtime";
+  if (lower.includes("med")) return "pill";
+  return "volunteer_activism";
+}
+
+function localDate(date) {
+  const copy = new Date(date);
+  copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+  return copy.toISOString().slice(0, 10);
+}
+
+function startOfToday() {
+  return new Date(`${today}T00:00:00`);
+}
+
+function toDatetimeLocal(date) {
+  const copy = new Date(date);
+  copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+  return copy.toISOString().slice(0, 16);
+}
+
+function fromDatetimeLocal(value) {
+  return value ? new Date(value).toISOString() : null;
+}
+
+function formatTime(value) {
+  return new Date(value).toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit" });
+}
+
+function formatDate(value) {
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function formatDateTime(value) {
+  return new Date(value).toLocaleString("en-MY", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+function showFeedback(message, persistent = false) {
+  const feedback = document.getElementById("feedback");
+  feedback.textContent = message;
+  feedback.classList.remove("hidden");
+  if (!persistent) setTimeout(() => feedback.classList.add("hidden"), 2500);
+}
+
+function emptyMamaData() {
+  return { checkins: [], supportTasks: [], medications: [], appointments: [], recoveryNotes: [] };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replaceAll("`", "&#096;");
+}
 </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 </body></html>

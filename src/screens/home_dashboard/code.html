@@ -214,15 +214,15 @@
 <div class="grid grid-cols-3 gap-2 mt-4">
 <div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
 <p class="font-label-sm text-label-sm text-on-surface">Mood</p>
-<p class="font-label-md text-label-md text-error">Not checked</p>
+<p class="font-label-md text-label-md text-error" id="mamaMoodPreview">Not checked</p>
 </div>
 <div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
 <p class="font-label-sm text-label-sm text-on-surface">Rest</p>
-<p class="font-label-md text-label-md text-error">Not logged</p>
+<p class="font-label-md text-label-md text-error" id="mamaRestPreview">Not logged</p>
 </div>
 <div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
 <p class="font-label-sm text-label-sm text-on-surface">Meds</p>
-<p class="font-label-md text-label-md text-error">0/0</p>
+<p class="font-label-md text-label-md text-error" id="mamaMedsPreview">0/0</p>
 </div>
 </div>
 <button class="mt-4 h-12 w-full rounded-full border border-[#fb7185] bg-white/70 text-error font-label-md text-label-md active:scale-95 transition-transform dark:bg-white/5" data-screen-target="mama_care" type="button">Check on Mama</button>
@@ -398,6 +398,7 @@
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
+        const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 
         const now = new Date();
         if (!(await isLoggedIn())) {
@@ -470,6 +471,7 @@
 
         renderTimeline(now);
         applyPermissions();
+        renderMamaCarePreview();
         bindBabyProfileMenu();
 
         function applyPermissions() {
@@ -542,6 +544,26 @@
                 : "No feeds logged yet. Add what you remember.";
             setText("assistantTitle", "Next feed may be soon");
             setText("assistantMessage", latestFeed ? `Based on ${selectedBaby.name}'s recent feeding pattern. ${reminderText}` : reminderText);
+        }
+
+        async function renderMamaCarePreview() {
+            if (!selectedBabyId) return;
+            const mamaCare = await loadMamaCareData(selectedBabyId);
+            if (mamaCare.error) return;
+            const today = new Date();
+            const todayKey = localDate(today);
+            const todayCheckin = mamaCare.checkins.find((checkin) => checkin.checkinDate === todayKey);
+            const todayMeds = mamaCare.medications.filter((medication) => medication.medicationTime && localDate(new Date(medication.medicationTime)) === todayKey);
+            const taken = todayMeds.filter((medication) => medication.status === "taken").length;
+            setText("mamaMoodPreview", todayCheckin?.mood || "Not checked");
+            setText("mamaRestPreview", todayCheckin?.sleepHours ? `${todayCheckin.sleepHours} hrs` : "Not logged");
+            setText("mamaMedsPreview", `${taken}/${todayMeds.length}`);
+        }
+
+        function localDate(date) {
+            const copy = new Date(date);
+            copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+            return copy.toISOString().slice(0, 10);
         }
 
         function nextFeedReminderText(startedAt, intervalHours) {
