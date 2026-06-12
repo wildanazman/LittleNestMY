@@ -128,10 +128,10 @@
 <h2 class="font-display-lg text-display-lg text-primary">This Week's Pattern</h2>
 <p class="font-body-md text-body-md text-on-surface-variant opacity-80" id="weekRangeLabel">Loading this week's care rhythm...</p>
 </section>
-<div class="bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Timeframe">
-<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 bg-white text-primary soft-shadow" type="button">Week</button>
-<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" type="button">Month</button>
-<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" type="button">Year</button>
+<div class="bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Timeframe" id="timeframeTabs">
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 bg-white text-primary soft-shadow" data-period="week" type="button">Week</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" data-period="month" type="button">Month</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all duration-300 text-on-surface-variant" data-period="year" type="button">Year</button>
 </div>
 <section class="grid grid-cols-2 gap-gutter">
 <article class="col-span-2 bg-surface-container-lowest p-md rounded-[24px] soft-shadow border border-white/40 space-y-sm">
@@ -192,8 +192,19 @@
 <div class="space-y-xs">
 <h4 class="font-headline-md text-headline-md text-on-primary-fixed">Recent pattern summary</h4>
 <p class="font-body-md text-body-md text-on-primary-fixed-variant leading-relaxed" id="patternSummary">Gathering this week's pattern gently.</p>
+<button class="mt-2 inline-flex items-center gap-1 text-primary font-label-md text-label-md" id="openDailySummaryButton" type="button">
+<span>See daily summary</span><span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
 </div>
 </section>
+<section class="space-y-sm">
+<button class="w-full h-14 rounded-full bg-primary text-on-primary font-headline-md text-headline-md soft-shadow active:scale-95 transition-transform flex items-center justify-center gap-2" id="generateReportButton" type="button">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+<span>Generate PDF Report</span>
+</button>
+<button class="w-full h-12 rounded-full bg-surface-container-low text-primary font-label-md text-label-md border border-primary-container active:scale-95 transition-transform" id="copyWeeklySummaryButton" type="button">Copy Weekly Summary</button>
+</section>
+<p class="hidden rounded-2xl bg-tertiary-container p-3 text-center font-label-md text-label-md text-tertiary" id="feedback" aria-live="polite"></p>
 <section class="bg-surface-container-low p-md rounded-[24px] soft-shadow border border-white/40">
 <div class="flex items-start gap-sm">
 <span class="material-symbols-outlined text-primary mt-1">favorite</span>
@@ -226,101 +237,168 @@
 </nav>
 <script type="module">
       const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-      const { feedingLogs, sleepLogs, diaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
-      const {
-        getPersistedFeedingLogs,
-        getPersistedSleepLogs,
-        getPersistedDiaperLogs
-      } = await import(`${moduleBase}utils/localState.mjs`);
+      const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+      const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+      const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+      const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
       const { formatDuration } = await import(`${moduleBase}utils/dateFormat.mjs`);
+      const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+      const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
       const now = new Date();
-      const weekStart = startOfDay(addDays(now, -6));
-      const weekEnd = endOfDay(now);
-      const weekDays = 7;
+      let currentPeriod = "week";
+      let baby = null;
+      let babyId = "";
+      let coreLogs = { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] };
+      let mamaCare = { checkins: [], supportTasks: [], medications: [], appointments: [], recoveryNotes: [] };
+      let reportText = "";
 
-      const weeklyFeeds = getPersistedFeedingLogs(feedingLogs).filter(log => isWithinWeek(log.startedAt));
-      const weeklySleep = getPersistedSleepLogs(sleepLogs).filter(log => log.endedAt && isWithinWeek(log.startedAt));
-      const weeklyDiapers = getPersistedDiaperLogs(diaperLogs).filter(log => isWithinWeek(log.changedAt));
-      const sleepDurations = weeklySleep
-        .map(log => Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)))
-        .filter(minutes => minutes > 0);
-      const totalSleepMinutes = sleepDurations.reduce((sum, minutes) => sum + minutes, 0);
-      const averageSleepMinutes = sleepDurations.length ? Math.round(totalSleepMinutes / weekDays) : 0;
-      const longestSleepMinutes = sleepDurations.length ? Math.max(...sleepDurations) : 0;
-
-      document.getElementById("weekRangeLabel").textContent = `${formatDate(weekStart)} - ${formatDate(weekEnd)}`;
-      document.getElementById("averageSleepValue").textContent = averageSleepMinutes ? formatDuration(averageSleepMinutes) : "No sleep logs yet";
-      document.getElementById("sleepDaysValue").textContent = `${countUniqueDays(weeklySleep, "startedAt")} days`;
-      document.getElementById("sleepNote").textContent = weeklySleep.length
-        ? `${weeklySleep.length} sleep entries are included for this week.`
-        : "When sleep is logged, weekly rest patterns will appear here.";
-      document.getElementById("totalFeedingValue").textContent = weeklyFeeds.length;
-      document.getElementById("feedingAverageValue").textContent = `${formatDecimal(weeklyFeeds.length / weekDays)} per day`;
-      document.getElementById("diaperFrequencyValue").textContent = formatDecimal(weeklyDiapers.length / weekDays);
-      document.getElementById("diaperTotalValue").textContent = `${weeklyDiapers.length} changes`;
-      document.getElementById("longestSleepValue").textContent = longestSleepMinutes ? formatDuration(longestSleepMinutes) : "No completed sleep yet";
-      document.getElementById("longestSleepNote").textContent = longestSleepMinutes
-        ? "Longest completed stretch from this week's logs."
-        : "Start and wake a sleep log to see the longest stretch.";
-      document.getElementById("patternSummary").textContent = buildPatternSummary({
-        averageSleepMinutes,
-        longestSleepMinutes,
-        feedCount: weeklyFeeds.length,
-        diaperCount: weeklyDiapers.length,
-        sleepEntries: weeklySleep.length
-      });
-
-      document.getElementById("backButton").addEventListener("click", () => {
-        window.location.href = "/calendar/";
-      });
-
-      document.querySelectorAll("main .bg-surface-container-low button").forEach(button => {
-        button.addEventListener("click", () => {
-          button.parentElement.querySelectorAll("button").forEach(item => {
-            item.classList.remove("bg-white", "text-primary", "soft-shadow");
-            item.classList.add("text-on-surface-variant");
-          });
-          button.classList.add("bg-white", "text-primary", "soft-shadow");
-          button.classList.remove("text-on-surface-variant");
-        });
-      });
-
-      window.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".soft-shadow").forEach((card, index) => {
-          card.style.opacity = "0";
-          card.style.transform = "translateY(16px)";
-          card.style.transition = `all 0.45s ease ${index * 0.06}s`;
-          setTimeout(() => {
-            card.style.opacity = "1";
-            card.style.transform = "translateY(0)";
-          }, 10);
-        });
-      });
-
-      function buildPatternSummary(stats) {
-        if (!stats.sleepEntries && !stats.feedCount && !stats.diaperCount) {
-          return "There is not much logged for this week yet. As you add a few more entries, LittleNest will show gentle patterns here.";
-        }
-
-        if (stats.sleepEntries >= 3 && stats.averageSleepMinutes < 10 * 60) {
-          return "Sleep was more interrupted this week. You may want to review nap timing and keep the evening routine calm where possible.";
-        }
-
-        if (stats.longestSleepMinutes >= 6 * 60) {
-          return "There was at least one longer sleep stretch this week. That may be a helpful rhythm to notice when planning bedtime.";
-        }
-
-        if (stats.feedCount >= 14 && stats.diaperCount >= 14) {
-          return "Feeding and diaper logs look steady this week. The pattern can help Mama, Papa, and caregivers stay aligned.";
-        }
-
-        return "This week had a mix of care moments. Keep logging the basics, and the pattern will become easier to review.";
+      if (!(await isLoggedIn())) {
+        window.location.replace(screenUrl("auth_welcome"));
+        await new Promise(() => {});
       }
 
-      function isWithinWeek(dateTime) {
+      document.getElementById("backButton").addEventListener("click", () => goToScreen("daily_summary"));
+      document.getElementById("openDailySummaryButton").addEventListener("click", () => goToScreen("daily_summary"));
+      document.getElementById("generateReportButton").addEventListener("click", generatePdfReport);
+      document.getElementById("copyWeeklySummaryButton").addEventListener("click", copyWeeklySummary);
+      document.querySelectorAll("[data-period]").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentPeriod = button.dataset.period;
+          setActivePeriod(button);
+          renderInsights();
+        });
+      });
+
+      await bootstrap();
+      bindPrototypeActions();
+
+      async function bootstrap() {
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        baby = babyState.selectedBaby;
+        babyId = babyState.selectedBabyId;
+        if (!baby || !babyId) {
+          document.getElementById("weekRangeLabel").textContent = "Create a baby profile first.";
+          document.getElementById("averageSleepValue").textContent = "No baby yet";
+          document.getElementById("sleepDaysValue").textContent = "--";
+          document.getElementById("sleepNote").textContent = "Insights will appear after you create a baby profile.";
+          document.getElementById("patternSummary").textContent = "No baby profile yet. Create one first, then LittleNest can show weekly patterns.";
+          return;
+        }
+
+        coreLogs = await loadCoreLogsRemote(babyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+        mamaCare = await loadMamaCareData(babyId);
+        renderInsights();
+      }
+
+      function renderInsights() {
+        const range = getRange(currentPeriod);
+        const dayCount = Math.max(1, Math.round((range.end - range.start) / 86400000) + 1);
+        const feeds = coreLogs.feedingLogs.filter(log => isWithinRange(log.startedAt, range));
+        const sleeps = coreLogs.sleepLogs.filter(log => log.endedAt && isWithinRange(log.startedAt, range));
+        const diapers = coreLogs.diaperLogs.filter(log => isWithinRange(log.changedAt, range));
+        const health = coreLogs.healthNotes.filter(note => isWithinRange(note.recordedAt || note.loggedAt, range));
+        const mamaCheckins = mamaCare.error ? [] : mamaCare.checkins.filter(checkin => isWithinRange(`${checkin.checkinDate}T12:00:00`, range));
+        const mamaMeds = mamaCare.error ? [] : mamaCare.medications.filter(med => med.medicationTime && isWithinRange(med.medicationTime, range));
+        const sleepDurations = sleeps
+          .map(log => Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)))
+          .filter(minutes => minutes > 0);
+        const totalSleepMinutes = sleepDurations.reduce((sum, minutes) => sum + minutes, 0);
+        const averageSleepMinutes = sleepDurations.length ? Math.round(totalSleepMinutes / dayCount) : 0;
+        const longestSleepMinutes = sleepDurations.length ? Math.max(...sleepDurations) : 0;
+        const takenMeds = mamaMeds.filter(med => med.status === "taken").length;
+
+        document.getElementById("weekRangeLabel").textContent = `${capitalize(currentPeriod)} insights from ${formatDate(range.start)} - ${formatDate(range.end)}`;
+        document.getElementById("averageSleepValue").textContent = averageSleepMinutes ? formatDuration(averageSleepMinutes) : "No sleep logs yet";
+        document.getElementById("sleepDaysValue").textContent = `${countUniqueDays(sleeps, "startedAt")} days`;
+        document.getElementById("sleepNote").textContent = sleeps.length
+          ? `${sleeps.length} completed sleep entr${sleeps.length === 1 ? "y is" : "ies are"} included.`
+          : "When sleep is logged, rest patterns will appear here.";
+        document.getElementById("totalFeedingValue").textContent = feeds.length;
+        document.getElementById("feedingAverageValue").textContent = `${formatDecimal(feeds.length / dayCount)} per day`;
+        document.getElementById("diaperFrequencyValue").textContent = formatDecimal(diapers.length / dayCount);
+        document.getElementById("diaperTotalValue").textContent = `${diapers.length} changes`;
+        document.getElementById("longestSleepValue").textContent = longestSleepMinutes ? formatDuration(longestSleepMinutes) : "No completed sleep yet";
+        document.getElementById("longestSleepNote").textContent = longestSleepMinutes
+          ? "Longest completed stretch from this period's logs."
+          : "Start and wake a sleep log to see the longest stretch.";
+        const summary = buildPatternSummary({ averageSleepMinutes, longestSleepMinutes, feedCount: feeds.length, diaperCount: diapers.length, sleepEntries: sleeps.length, healthCount: health.length, mamaCheckins: mamaCheckins.length });
+        document.getElementById("patternSummary").textContent = summary;
+        reportText = [
+          "LittleNest MY Pattern Report",
+          baby ? `${baby.name} - ${capitalize(currentPeriod)} view` : "No baby selected",
+          `${formatDate(range.start)} - ${formatDate(range.end)}`,
+          `Average sleep: ${averageSleepMinutes ? formatDuration(averageSleepMinutes) : "No sleep logs yet"}`,
+          `Longest sleep: ${longestSleepMinutes ? formatDuration(longestSleepMinutes) : "No completed sleep yet"}`,
+          `Feeding: ${feeds.length} total, ${formatDecimal(feeds.length / dayCount)} per day`,
+          `Diapers: ${diapers.length} total, ${formatDecimal(diapers.length / dayCount)} per day`,
+          `Health notes: ${health.length}`,
+          `Mama Care: ${mamaCheckins.length} check-in(s), meds ${takenMeds}/${mamaMeds.length}`,
+          `Observation: ${summary}`,
+          "Note: These insights support family coordination and are not medical advice."
+        ].join("\n");
+      }
+
+      function buildPatternSummary(stats) {
+        if (!stats.sleepEntries && !stats.feedCount && !stats.diaperCount && !stats.mamaCheckins) {
+          return "There is not much logged for this period yet. As you add a few more entries, LittleNest will show gentle patterns here.";
+        }
+        if (stats.sleepEntries >= 3 && stats.averageSleepMinutes < 10 * 60) {
+          return "Sleep looked more interrupted in this period. You may want to review nap timing and keep the evening routine calm where possible.";
+        }
+        if (stats.longestSleepMinutes >= 6 * 60) {
+          return "There was at least one longer sleep stretch. That rhythm may be useful when planning bedtime.";
+        }
+        if (stats.feedCount >= 14 && stats.diaperCount >= 14) {
+          return "Feeding and diaper logs look steady. This can help Mama, Papa, and caregivers stay aligned.";
+        }
+        if (stats.mamaCheckins) {
+          return "Mama Care check-ins are included too. Baby care and Mama support can be reviewed together.";
+        }
+        return "This period had a mix of care moments. Keep logging the basics, and the pattern will become easier to review.";
+      }
+
+      async function copyWeeklySummary() {
+        try {
+          await navigator.clipboard.writeText(reportText);
+          showFeedback("Pattern summary copied.");
+        } catch {
+          showFeedback("Copy did not work here. Use Generate PDF Report or Daily Summary.", true);
+        }
+      }
+
+      function generatePdfReport() {
+        const printWindow = window.open("", "_blank", "noopener,noreferrer");
+        if (!printWindow) {
+          showFeedback("Popup blocked. Please allow popups to generate the report.", true);
+          return;
+        }
+        printWindow.document.write(`
+          <html><head><title>LittleNest MY Pattern Report</title>
+          <style>body{font-family:Arial,sans-serif;padding:32px;line-height:1.55;color:#2b211d} pre{white-space:pre-wrap;font-size:15px}</style></head>
+          <body><h1>LittleNest MY Pattern Report</h1><pre>${escapeHtml(reportText)}</pre><script>window.print();<\/script></body></html>
+        `);
+        printWindow.document.close();
+      }
+
+      function getRange(period) {
+        if (period === "month") return { start: startOfDay(addDays(now, -29)), end: endOfDay(now) };
+        if (period === "year") return { start: startOfDay(addDays(now, -364)), end: endOfDay(now) };
+        return { start: startOfDay(addDays(now, -6)), end: endOfDay(now) };
+      }
+
+      function setActivePeriod(activeButton) {
+        document.querySelectorAll("[data-period]").forEach(button => {
+          button.classList.remove("bg-white", "text-primary", "soft-shadow");
+          button.classList.add("text-on-surface-variant");
+        });
+        activeButton.classList.add("bg-white", "text-primary", "soft-shadow");
+        activeButton.classList.remove("text-on-surface-variant");
+      }
+
+      function isWithinRange(dateTime, range) {
         const date = new Date(dateTime);
-        return date >= weekStart && date <= weekEnd;
+        return date >= range.start && date <= range.end;
       }
 
       function countUniqueDays(items, field) {
@@ -347,6 +425,21 @@
         const nextDate = new Date(date);
         nextDate.setDate(nextDate.getDate() + amount);
         return nextDate;
+      }
+
+      function capitalize(value) {
+        return `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+      }
+
+      function showFeedback(message, persistent = false) {
+        const feedback = document.getElementById("feedback");
+        feedback.textContent = message;
+        feedback.classList.remove("hidden");
+        if (!persistent) setTimeout(() => feedback.classList.add("hidden"), 2400);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
       }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
