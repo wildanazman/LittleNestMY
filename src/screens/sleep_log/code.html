@@ -308,14 +308,13 @@
         const { formatDuration, formatTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             clearActiveSleepSession,
-            deleteLocalSleepLog,
             getActiveSleepSession,
             getLogsForBaby,
             getPersistedSleepLogs,
             getSelectedBabyId,
-            saveActiveSleepSession,
-            saveLocalSleepLog
+            saveActiveSleepSession
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteSleepLogRemote, loadCoreLogsRemote, saveSleepLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const idle = document.getElementById("idle-state");
@@ -333,12 +332,13 @@
         const viewStatsButton = document.getElementById("viewSleepStatsButton");
         const selectedBabyId = getSelectedBabyId(babyProfile);
         let timerInterval;
+        let sleepLogItems = getLogsForBaby(getPersistedSleepLogs(mockSleepLogs), selectedBabyId);
 
         startButton.addEventListener("click", startSleep);
         wakeButton.addEventListener("click", wakeUp);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
         viewStatsButton.addEventListener("click", () => goToScreen("weekly_insights"));
-        render();
+        await refreshLogs();
 
         function startSleep() {
             const session = {
@@ -351,20 +351,30 @@
             render();
         }
 
-        function wakeUp() {
+        async function wakeUp() {
             const session = getActiveSleepSession();
             if (!session) return;
 
             const endedAt = new Date().toISOString();
-            saveLocalSleepLog({
+            try {
+              await saveSleepLogRemote({
                 id: `sleep-local-${Date.now()}`,
                 babyId: selectedBabyId,
                 status: "nap",
                 startedAt: session.startedAt,
                 endedAt,
                 notes: "Logged from Sleep Tracker"
-            });
+              });
+            } catch (error) {
+              console.warn("Sleep log saved locally but could not sync.", error);
+            }
             clearActiveSleepSession();
+            await refreshLogs();
+        }
+
+        async function refreshLogs() {
+            const result = await loadCoreLogsRemote(selectedBabyId, { sleepLogs: mockSleepLogs });
+            sleepLogItems = result.sleepLogs;
             render();
         }
 
@@ -422,7 +432,7 @@
 
         function getTodaySleepLogs(activeSession) {
             const activeLogs = activeSession ? [{ ...activeSession, isActive: true }] : [];
-            return getLogsForBaby([...activeLogs, ...getPersistedSleepLogs(mockSleepLogs)], selectedBabyId)
+            return getLogsForBaby([...activeLogs, ...sleepLogItems], selectedBabyId)
                 .filter((log) => isSameLocalDay(log.startedAt, new Date()) || (log.endedAt && isSameLocalDay(log.endedAt, new Date())));
         }
 
@@ -470,11 +480,15 @@
 
         function bindSleepDetailCards() {
             napHistoryList.querySelectorAll("[data-delete-sleep]").forEach((button) => {
-                button.addEventListener("click", (event) => {
+                button.addEventListener("click", async (event) => {
                     event.stopPropagation();
                     if (!confirm("Delete this sleep log?")) return;
-                    deleteLocalSleepLog(button.dataset.deleteSleep);
-                    render();
+                    try {
+                      await deleteSleepLogRemote(button.dataset.deleteSleep);
+                    } catch (error) {
+                      console.warn("Sleep delete removed locally but could not sync.", error);
+                    }
+                    await refreshLogs();
                 });
             });
             napHistoryList.querySelectorAll("[data-sleep-detail]").forEach((card) => {

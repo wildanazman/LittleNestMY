@@ -376,8 +376,8 @@
         const {
             getSelectedBabyId,
             saveLocalGrowthRecord,
-            saveLocalHealthNote
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const selectedBabyId = getSelectedBabyId(babyProfile);
         const modal = document.getElementById("quickFormModal");
         const form = document.getElementById("quickForm");
@@ -420,7 +420,7 @@
         modal.addEventListener("click", (event) => {
             if (event.target === modal) closeQuickForm();
         });
-        form.addEventListener("submit", (event) => {
+        form.addEventListener("submit", async (event) => {
             event.preventDefault();
             error.classList.add("hidden");
             if (!selectedBabyId) {
@@ -428,7 +428,7 @@
                 return;
             }
             if (activeQuickType === "Growth") saveGrowth();
-            else saveHealthOrNote();
+            else await saveHealthOrNote();
         });
 
         function openQuickForm(type) {
@@ -470,7 +470,7 @@
             closeQuickForm();
         }
 
-        function saveHealthOrNote() {
+        async function saveHealthOrNote() {
             const note = document.getElementById("quickNoteText").value.trim();
             const title = activeQuickType === "Health"
                 ? document.getElementById("healthTitle").value.trim()
@@ -479,7 +479,8 @@
                 showQuickError("Add a short note to save.");
                 return;
             }
-            saveLocalHealthNote({
+            try {
+              await saveHealthNoteRemote({
                 id: `health-local-${Date.now()}`,
                 babyId: selectedBabyId,
                 type: activeQuickType === "Health" ? document.getElementById("healthType").value : "note",
@@ -487,8 +488,11 @@
                 title: title || "Health note",
                 temperatureC: activeQuickType === "Health" ? parseNumber("healthTemp") || undefined : undefined,
                 details: note || undefined
-            });
-            document.getElementById("quickLogFeedback").textContent = `${activeQuickType} saved.`;
+              });
+              document.getElementById("quickLogFeedback").textContent = `${activeQuickType} saved.`;
+            } catch (error) {
+              document.getElementById("quickLogFeedback").textContent = `${error.message || "Could not sync note."} Saved locally for now.`;
+            }
             closeQuickForm();
         }
 

@@ -377,14 +377,12 @@
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             getPersistedCalendarEvents,
-            getPersistedDiaperLogs,
-            getPersistedFeedingLogs,
             getPersistedGrowthRecords,
             getPersistedReminders,
-            getPersistedSleepLogs,
             getLogsForBaby
         } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+        const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
@@ -403,9 +401,10 @@
             window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
             await new Promise(() => {});
         }
-        const allFeedingLogs = getLogsForBaby(getPersistedFeedingLogs(feedingLogs), selectedBabyId);
-        const allSleepLogs = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId);
-        const allDiaperLogs = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId);
+        const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs, sleepLogs, diaperLogs });
+        const allFeedingLogs = coreLogs.feedingLogs;
+        const allSleepLogs = coreLogs.sleepLogs;
+        const allDiaperLogs = coreLogs.diaperLogs;
         const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents(calendarEvents), selectedBabyId);
         const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords(growthRecords), selectedBabyId);
         const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);

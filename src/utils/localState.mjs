@@ -16,7 +16,18 @@ const legacyBabyProfileKey = "littlenest:babyProfile";
 const legacyBabyProfilesBackupKey = "littlenest:legacyBabyProfilesBeforeSupabase";
 const babyIdMapKey = "littlenest:babyIdMap";
 
-export { babyProfilesKey, babyIdMapKey, legacyBabyProfilesBackupKey, selectedBabyIdKey };
+export {
+  babyProfilesKey,
+  babyIdMapKey,
+  calendarEventsKey,
+  diaperLogsKey,
+  feedingLogsKey,
+  healthNotesKey,
+  legacyBabyProfilesBackupKey,
+  remindersKey,
+  selectedBabyIdKey,
+  sleepLogsKey
+};
 
 export function getBabyProfiles(fallbackProfile) {
   const existingProfiles = readJson(babyProfilesKey, null);
@@ -146,6 +157,10 @@ export function rememberSupabaseBabyMapping(localBabyId, supabaseBabyId) {
     ...map,
     [localBabyId]: supabaseBabyId
   });
+}
+
+export function getBabyIdMap() {
+  return readJson(babyIdMapKey, {});
 }
 
 export function cacheSupabaseBabyProfiles(profiles, selectedBabyId = "") {

@@ -1,4 +1,4 @@
-const cacheName = "littlenest-my-static-v14";
+const cacheName = "littlenest-my-static-v16";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -7,6 +7,7 @@ self.addEventListener("install", (event) => {
       "/auth_welcome/",
       "/login/",
       "/signup/",
+      "/accept_invite/",
       "/home_dashboard/",
       "/quick_log/",
       "/calendar/",

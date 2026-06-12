@@ -265,7 +265,8 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, diaperLogs: mockDiaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { deleteLocalDiaperLog, getLogsForBaby, getPersistedDiaperLogs, getSelectedBabyId, saveLocalDiaperLog } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedDiaperLogs, getSelectedBabyId } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const state = {
@@ -282,6 +283,7 @@
         const historyList = document.getElementById("diaperHistoryList");
         const timeLabel = document.getElementById("diaperTimeLabel");
         const backButton = document.getElementById("diaperBackButton");
+        let diaperLogItems = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId);
 
         segmentButtons.forEach((button, index) => {
             button.addEventListener("click", () => {
@@ -303,7 +305,7 @@
         updateSegment(0);
         updateNowLabel();
         setInterval(updateNowLabel, 30000);
-        renderHistory();
+        await refreshLogs();
 
         function updateSegment(index) {
             const indicator = document.getElementById('segment-indicator');
@@ -336,7 +338,7 @@
             activeButton.querySelector("span")?.classList.remove("text-on-surface-variant");
         }
 
-        function saveDiaperLog() {
+        async function saveDiaperLog() {
             const log = {
                 id: `diaper-local-${Date.now()}`,
                 babyId: selectedBabyId,
@@ -347,14 +349,29 @@
                 notes: notesInput.value.trim() || undefined
             };
 
-            saveLocalDiaperLog(log);
-      notesInput.value = "";
-            renderHistory();
+            try {
+                await saveDiaperLogRemote(log);
+            } catch (error) {
+                saveFeedback.textContent = `${error.message || "Could not sync diaper log."} Saved locally for now.`;
+                saveFeedback.classList.remove("hidden");
+            }
+            notesInput.value = "";
+            await refreshLogs();
             showSavedFeedback();
         }
 
+        async function refreshLogs() {
+            const result = await loadCoreLogsRemote(selectedBabyId, { diaperLogs: mockDiaperLogs });
+            diaperLogItems = result.diaperLogs;
+            if (result.error) {
+                saveFeedback.textContent = result.error;
+                saveFeedback.classList.remove("hidden");
+            }
+            renderHistory();
+        }
+
         function renderHistory() {
-            const logs = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId)
+            const logs = diaperLogItems
                 .sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))
                 .slice(0, 5);
 
@@ -399,11 +416,16 @@
 
         function bindHistoryCards() {
             historyList.querySelectorAll("[data-delete-diaper]").forEach((button) => {
-                button.addEventListener("click", (event) => {
+                button.addEventListener("click", async (event) => {
                     event.stopPropagation();
                     if (!confirm("Delete this diaper log?")) return;
-                    deleteLocalDiaperLog(button.dataset.deleteDiaper);
-                    renderHistory();
+                    try {
+                        await deleteDiaperLogRemote(button.dataset.deleteDiaper);
+                    } catch (error) {
+                        saveFeedback.textContent = `${error.message || "Could not sync delete."} Removed locally for now.`;
+                        saveFeedback.classList.remove("hidden");
+                    }
+                    await refreshLogs();
                     saveFeedback.textContent = "Diaper log deleted.";
                     saveFeedback.classList.remove("hidden");
                 });

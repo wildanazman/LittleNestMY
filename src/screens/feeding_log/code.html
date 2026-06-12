@@ -283,7 +283,8 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, feedingLogs: mockFeedingLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatDuration, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { deleteLocalFeedingLog, getLogsForBaby, getPersistedFeedingLogs, getSelectedBabyId, saveLocalFeedingLog } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedFeedingLogs, getSelectedBabyId } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const state = { feedingType: "bottle" };
@@ -301,6 +302,7 @@
         const historyList = document.getElementById("feedingHistoryList");
         const backButton = document.getElementById("feedingBackButton");
         const seeAllButton = document.getElementById("feedingSeeAllButton");
+        let feedingLogItems = getLogsForBaby(getPersistedFeedingLogs(mockFeedingLogs), selectedBabyId);
 
         typeButtons.forEach((button, index) => {
             button.addEventListener("click", () => {
@@ -316,7 +318,7 @@
         timeInput.value = getCurrentTimeValue();
         moveIndicator(1);
         updateRelevantFields();
-        renderHistory();
+        await refreshLogs();
 
         function moveIndicator(index) {
             const indicator = document.getElementById("active-indicator");
@@ -341,7 +343,7 @@
             durationInput.placeholder = state.feedingType === "breast" ? "15" : "10";
         }
 
-        function saveEntry() {
+        async function saveEntry() {
             const startedAt = buildDateTime(timeInput.value);
             const amountValue = Number(amountInput.value);
             const durationValue = Number(durationInput.value);
@@ -369,17 +371,32 @@
                 notes: noteInput.value.trim() || undefined
             };
 
-            saveLocalFeedingLog(log);
-      amountInput.value = "";
-      durationInput.value = "";
-      noteInput.value = "";
+            try {
+                await saveFeedingLogRemote(log);
+            } catch (error) {
+                saveFeedback.textContent = `${error.message || "Could not sync feeding log."} Saved locally for now.`;
+                saveFeedback.classList.remove("hidden");
+            }
+            amountInput.value = "";
+            durationInput.value = "";
+            noteInput.value = "";
             timeInput.value = getCurrentTimeValue();
-            renderHistory();
+            await refreshLogs();
             showSavedFeedback();
         }
 
+        async function refreshLogs() {
+            const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: mockFeedingLogs });
+            feedingLogItems = result.feedingLogs;
+            if (result.error) {
+                saveFeedback.textContent = result.error;
+                saveFeedback.classList.remove("hidden");
+            }
+            renderHistory();
+        }
+
         function renderHistory() {
-            const logs = getLogsForBaby(getPersistedFeedingLogs(mockFeedingLogs), selectedBabyId)
+            const logs = feedingLogItems
                 .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
                 .slice(0, 5);
 
@@ -436,10 +453,15 @@
 
         function bindHistoryActions() {
             historyList.querySelectorAll("[data-delete-feed]").forEach((button) => {
-                button.addEventListener("click", () => {
+                button.addEventListener("click", async () => {
                     if (!confirm("Delete this feeding log?")) return;
-                    deleteLocalFeedingLog(button.dataset.deleteFeed);
-                    renderHistory();
+                    try {
+                        await deleteFeedingLogRemote(button.dataset.deleteFeed);
+                    } catch (error) {
+                        saveFeedback.textContent = `${error.message || "Could not sync delete."} Removed locally for now.`;
+                        saveFeedback.classList.remove("hidden");
+                    }
+                    await refreshLogs();
                     saveFeedback.textContent = "Feeding log deleted.";
                     saveFeedback.classList.remove("hidden");
                 });

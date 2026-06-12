@@ -192,7 +192,7 @@ function normalizeNavItem(item, isActive) {
 
 async function guardAuthenticatedRoutes() {
   const screenId = getCurrentScreenId();
-  if (!["auth_welcome", "login", "signup"].includes(screenId) && !(await isLoggedIn())) {
+  if (!["auth_welcome", "login", "signup", "accept_invite"].includes(screenId) && !(await isLoggedIn())) {
     window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
   }
 }

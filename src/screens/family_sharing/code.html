@@ -183,8 +183,8 @@
 <div class="rounded-xl bg-surface-container-low p-4 border border-outline-variant/40 soft-shadow space-y-sm">
 <div class="flex items-start justify-between gap-3">
 <div>
-<h3 class="font-headline-md text-body-lg text-on-surface">Prepare invite</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Prototype only. No message will be sent.</p>
+<h3 class="font-headline-md text-body-lg text-on-surface">Send Invite</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Send an invite to join this baby's care circle.</p>
 </div>
 <button aria-label="Close invite form" class="w-9 h-9 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center" id="inviteCloseButton" type="button">
 <span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
@@ -195,8 +195,8 @@
 <input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteNameInput" placeholder="Example: Atuk"/>
 </label>
 <label class="block space-y-xs">
-<span class="font-label-md text-label-md text-on-surface">Email or phone</span>
-<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteContactInput" placeholder="name@example.my or +60..."/>
+<span class="font-label-md text-label-md text-on-surface">Email</span>
+<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteContactInput" inputmode="email" placeholder="name@example.my"/>
 </label>
 <label class="block space-y-xs">
 <span class="font-label-md text-label-md text-on-surface">Role</span>
@@ -208,8 +208,8 @@
 </label>
 <p class="font-label-md text-label-md text-on-surface-variant" id="permissionPreview">Parent: full access.</p>
 <button class="w-full h-12 rounded-full bg-primary-container text-on-primary-container font-headline-md text-body-md flex items-center justify-center gap-2 pill-button-inner-glow active:scale-95 transition-transform" id="prepareInviteButton" type="button">
-<span class="material-symbols-outlined" data-icon="draft">draft</span>
-Prepare Prototype Invite
+<span class="material-symbols-outlined" data-icon="send">send</span>
+Send Invite
 </button>
 <p class="min-h-5 font-label-md text-label-md text-tertiary" id="inviteFeedback"></p>
 </div>
@@ -219,7 +219,7 @@ Prepare Prototype Invite
 <section class="space-y-md">
 <div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Permissions</h2>
-<p class="font-label-md text-label-md text-on-surface-variant">Simple access levels for an MVP prototype.</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Simple access levels for shared baby care.</p>
 </div>
 <div class="grid gap-sm">
 <article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
@@ -262,9 +262,9 @@ Prepare Prototype Invite
 <div class="w-10 h-10 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center">
 <span class="material-symbols-outlined" data-icon="privacy_tip">privacy_tip</span>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Prototype note</h2>
+<h2 class="font-headline-md text-headline-md text-on-surface">Invite note</h2>
 </div>
-<p class="font-body-md text-body-md text-on-surface-variant">Invites shown here are only a realistic frontend flow. A real app would add secure invite links, account checks, and permission controls later.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Invite emails are sent through Supabase Auth. The invited person must log in with the invited email to join this baby's care circle.</p>
 </section>
 </main>
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
@@ -292,7 +292,8 @@ Prepare Prototype Invite
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-        const { deleteLocalFamilyMember, getLogsForBaby, getPersistedFamilyMembers, getSelectedBabyId, getSelectedBabyProfile, saveLocalFamilyMember } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+        const { loadCareCircleRemote, removeFamilyInviteRemote, sendFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
         const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
 
@@ -308,9 +309,10 @@ Prepare Prototype Invite
         const prepareInviteButton = document.getElementById("prepareInviteButton");
         const inviteFeedback = document.getElementById("inviteFeedback");
         const backButton = document.getElementById("backButton");
-        const selectedBabyId = getSelectedBabyId(babyProfile);
-        const selectedBaby = getSelectedBabyProfile(babyProfile);
-        let editingMemberId = "";
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
+        const selectedBaby = babyState.selectedBaby;
+        let careCircle = { currentRole: "viewer", members: [], invitations: [] };
 
         document.getElementById("careCircleTitle").textContent = `${selectedBaby?.name || "Baby"}'s care circle`;
 
@@ -325,51 +327,65 @@ Prepare Prototype Invite
 
         inviteRoleInput.addEventListener("change", updatePermissionPreview);
 
-        prepareInviteButton.addEventListener("click", () => {
+        prepareInviteButton.addEventListener("click", async () => {
             const name = inviteNameInput.value.trim();
-            const contact = inviteContactInput.value.trim();
+            const contact = inviteContactInput.value.trim().toLowerCase();
             const selectedRole = inviteRoleInput.value;
 
-            if (!name || !contact) {
-                inviteFeedback.textContent = "Add a name and contact to preview the invite.";
+            if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
+                inviteFeedback.textContent = "Add a name and valid email address.";
                 return;
             }
 
-            saveLocalFamilyMember({
-                id: editingMemberId || `family-local-${Date.now()}`,
-                babyId: selectedBabyId,
-                name,
-                role: selectedRole,
-                permission: getPermissionForRole(selectedRole),
-                email: contact.includes("@") ? contact : undefined,
-                phone: contact.includes("@") ? undefined : contact,
-                invitedAt: new Date().toISOString(),
-                isPrototype: true
-            });
-
-            inviteFeedback.textContent = editingMemberId ? "Member updated locally." : "Invitation saved locally. Real invite sending can be added later.";
-      inviteNameInput.value = "";
-      inviteContactInput.value = "";
+            prepareInviteButton.disabled = true;
+            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Sending...';
+            try {
+                await sendFamilyInviteRemote({
+                    babyId: selectedBabyId,
+                    name,
+                    email: contact,
+                    role: selectedRole
+                });
+                inviteFeedback.textContent = "Invitation sent.";
+                inviteNameInput.value = "";
+                inviteContactInput.value = "";
+                await renderMembers();
+            } catch (error) {
+                inviteFeedback.textContent = error.message || "Invite failed. Please try again.";
+            }
             inviteRoleInput.value = "parent";
             updatePermissionPreview();
-            editingMemberId = "";
-            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="draft">draft</span>Prepare Prototype Invite';
-            renderMembers();
+            prepareInviteButton.disabled = false;
+            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="send">send</span>Send Invite';
         });
 
         backButton.addEventListener("click", () => {
             goToScreen("settings");
         });
 
-        function renderMembers() {
-            const invitedMembers = getLogsForBaby(getPersistedFamilyMembers([]), selectedBabyId);
+        async function renderMembers() {
+            try {
+                careCircle = await loadCareCircleRemote(selectedBabyId);
+                inviteFeedback.textContent = "";
+            } catch (error) {
+                inviteFeedback.textContent = error.message || "Could not load care circle.";
+                careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] };
+            }
+            const invitedMembers = careCircle.members.filter((member) => !member.isCurrentUser);
+            const invitations = careCircle.invitations || [];
             const parent = getCurrentParentMember();
-            const members = [parent, ...invitedMembers];
-            memberSummary.textContent = invitedMembers.length
-                ? `${invitedMembers.length} invited member${invitedMembers.length === 1 ? "" : "s"} plus current parent`
+            const members = [parent, ...invitedMembers.filter((member) => member.userId !== parent.userId)];
+            memberSummary.textContent = invitedMembers.length || invitations.length
+                ? `${invitedMembers.length} member${invitedMembers.length === 1 ? "" : "s"} and ${invitations.length} invite${invitations.length === 1 ? "" : "s"}`
                 : "Current parent only";
-            familyMembersList.innerHTML = members.map(renderMemberCard).join("") + (invitedMembers.length ? "" : renderNoHelpersCard());
-            bindMemberActions(invitedMembers);
+            familyMembersList.innerHTML = members.map(renderMemberCard).join("")
+                + invitations.map(renderInvitationCard).join("")
+                + (invitedMembers.length || invitations.length ? "" : renderNoHelpersCard());
+            bindMemberActions();
+            const canInvite = careCircle.currentRole === "parent";
+            inviteToggleButton.disabled = !canInvite;
+            inviteToggleButton.classList.toggle("opacity-50", !canInvite);
+            if (!canInvite) inviteFeedback.textContent = "Only a parent can invite caregivers.";
         }
 
         function renderNoHelpersCard() {
@@ -389,12 +405,13 @@ Prepare Prototype Invite
         function renderMemberCard(member) {
             const role = getDisplayRole(member);
             const style = getRoleStyle(role);
-            const contact = member.email || member.phone || "Contact not added";
-            const status = member.isCurrentUser ? "Current user" : member.acceptedAt ? "Active" : member.isPrototype ? "Prototype invite" : "Pending";
+            const contact = member.email || "Email not shared";
+            const status = member.isCurrentUser ? "Current user" : "Accepted";
             const actions = member.isCurrentUser
                 ? `<span class="font-label-sm text-label-sm text-on-surface-variant">Managed in Profile</span>`
-                : `<button class="font-label-sm text-label-sm text-primary" data-edit-member="${member.id}" type="button">Edit</button>
-                   <button class="font-label-sm text-label-sm text-error" data-delete-member="${member.id}" type="button">Remove</button>`;
+                : careCircle.currentRole === "parent"
+                  ? `<button class="font-label-sm text-label-sm text-error" data-delete-member="${member.userId}" type="button">Remove</button>`
+                  : `<span class="font-label-sm text-label-sm text-on-surface-variant">Shared access</span>`;
 
             return `
                 <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
@@ -423,33 +440,66 @@ Prepare Prototype Invite
             `;
         }
 
-        function bindMemberActions(members) {
-            familyMembersList.querySelectorAll("[data-edit-member]").forEach((button) => {
-                button.addEventListener("click", () => {
-                    const member = members.find((item) => item.id === button.dataset.editMember);
-                    if (!member) return;
-                    editingMemberId = member.id;
-                    inviteNameInput.value = member.name || "";
-                    inviteContactInput.value = member.email || member.phone || "";
-                    inviteRoleInput.value = getDisplayRole(member).toLowerCase();
-                    updatePermissionPreview();
-                    prepareInviteButton.textContent = "Update Member";
-                    invitePanel.classList.add("is-open");
-                    inviteNameInput.focus();
+        function renderInvitationCard(invitation) {
+            const role = capitalize(invitation.role);
+            const style = getRoleStyle(role);
+            const status = capitalize(invitation.status || "pending");
+            return `
+                <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(invitation.email)}</h3>
+                                    <p class="font-label-md text-label-md text-on-surface-variant truncate">Email invitation</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full ${style.chip} font-label-sm text-label-sm whitespace-nowrap">${role}</span>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between gap-3">
+                                <p class="font-label-sm text-label-sm ${status === "Failed" ? "text-error" : "text-primary"}">${status}</p>
+                                ${careCircle.currentRole === "parent" && ["Pending", "Failed", "Expired"].includes(status)
+                                    ? `<button class="font-label-sm text-label-sm text-error" data-delete-invite="${invitation.id}" type="button">Remove</button>`
+                                    : ""}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        function bindMemberActions() {
+            familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
+                button.addEventListener("click", async () => {
+                    if (!confirm("Remove this family member from the care circle?")) return;
+                    try {
+                        await removeFamilyInviteRemote({ babyId: selectedBabyId, userId: button.dataset.deleteMember });
+                        inviteFeedback.textContent = "Family member removed.";
+                        await renderMembers();
+                    } catch (error) {
+                        inviteFeedback.textContent = error.message || "Could not remove member.";
+                    }
                 });
             });
-            familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
-                button.addEventListener("click", () => {
-                    if (!confirm("Remove this family member from the local care circle?")) return;
-                    deleteLocalFamilyMember(button.dataset.deleteMember);
-                    renderMembers();
-                    inviteFeedback.textContent = "Family member removed locally.";
+            familyMembersList.querySelectorAll("[data-delete-invite]").forEach((button) => {
+                button.addEventListener("click", async () => {
+                    if (!confirm("Remove this invitation?")) return;
+                    try {
+                        await removeFamilyInviteRemote({ babyId: selectedBabyId, invitationId: button.dataset.deleteInvite });
+                        inviteFeedback.textContent = "Invitation removed.";
+                        await renderMembers();
+                    } catch (error) {
+                        inviteFeedback.textContent = error.message || "Could not remove invitation.";
+                    }
                 });
             });
         }
 
         function getDisplayRole(member) {
             if (member.permission === "viewer") return "Viewer";
+            if (member.role === "viewer") return "Viewer";
             if (member.role === "caregiver") return "Caregiver";
             return "Parent";
         }
@@ -482,6 +532,11 @@ Prepare Prototype Invite
             if (role === "viewer") return "viewer";
             if (role === "caregiver") return "editor";
             return "owner";
+        }
+
+        function capitalize(value) {
+            const text = String(value || "");
+            return text.charAt(0).toUpperCase() + text.slice(1);
         }
 
         function updatePermissionPreview() {
@@ -522,7 +577,7 @@ Prepare Prototype Invite
         }
 
         updatePermissionPreview();
-        renderMembers();
+        await renderMembers();
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
