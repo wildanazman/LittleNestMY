@@ -24,7 +24,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   body {
-    animation: littlenest-page-in 210ms ease-out both;
+    animation: littlenest-page-in 180ms ease-out both;
   }
 
   [id$="Modal"], .prototype-panel, #babyProfileMenu, #quickFormModal {
@@ -33,14 +33,15 @@
 }
 
 @keyframes littlenest-page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 body {
   background: var(--ln-bg) !important;
   color: var(--ln-text) !important;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 .font-display-lg,
@@ -107,6 +108,9 @@ body {
 
 :root.dark .text-on-surface,
 :root.dark .text-on-background,
+:root.dark .text-on-primary-fixed,
+:root.dark .text-on-secondary-fixed,
+:root.dark .text-on-tertiary-fixed,
 :root.dark .text-\[\#211A17\],
 :root.dark .text-\[\#211a17\] {
   color: #FFF7ED !important;
@@ -114,6 +118,13 @@ body {
 
 :root.dark .text-on-surface-variant,
 :root.dark .text-on-secondary-fixed-variant,
+:root.dark .text-on-primary-fixed-variant,
+:root.dark .text-on-secondary-fixed-variant,
+:root.dark .text-on-tertiary-fixed-variant,
+:root.dark .text-secondary,
+:root.dark .text-tertiary,
+:root.dark .text-secondary-fixed-dim,
+:root.dark .dark\:text-secondary-fixed-dim,
 :root.dark .text-outline,
 :root.dark .text-outline-variant,
 :root.dark .text-\[\#166534\],
@@ -130,6 +141,11 @@ body {
   color: #FFBFA3 !important;
 }
 
+:root.dark .dark\:text-primary-fixed-dim,
+:root.dark .text-primary-fixed-dim {
+  color: #FFBFA3 !important;
+}
+
 :root.dark .bg-primary,
 :root.dark .bg-primary-container {
   background-color: #FFBFA3 !important;
@@ -142,6 +158,8 @@ body {
 
 :root.dark .bg-secondary-container,
 :root.dark .bg-tertiary-container,
+:root.dark .bg-secondary-fixed,
+:root.dark .bg-tertiary-fixed,
 :root.dark .bg-\[\#FFF7ED\],
 :root.dark .bg-\[\#EFF6FF\],
 :root.dark .bg-\[\#F0FDF4\],
@@ -178,6 +196,73 @@ body {
 :root.dark nav.fixed {
   background-color: rgba(36, 33, 32, 0.96) !important;
   border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+nav.fixed.bottom-0 {
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  min-height: calc(4.75rem + env(safe-area-inset-bottom)) !important;
+  padding: 0.5rem 0.5rem max(1rem, env(safe-area-inset-bottom)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  gap: 0.125rem !important;
+  border-top-left-radius: 0.75rem !important;
+  border-top-right-radius: 0.75rem !important;
+  z-index: 80 !important;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+nav.fixed.bottom-0 > a,
+nav.fixed.bottom-0 > button {
+  width: 68px !important;
+  height: 52px !important;
+  min-width: 68px !important;
+  max-width: 68px !important;
+  flex: 0 0 68px !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  line-height: 1 !important;
+}
+
+nav.fixed.bottom-0 > a span:last-child,
+nav.fixed.bottom-0 > button span:last-child {
+  font-size: 10px !important;
+  line-height: 1rem !important;
+  white-space: nowrap !important;
+}
+
+nav.fixed.bottom-0 .material-symbols-outlined {
+  font-size: 24px !important;
+  line-height: 1 !important;
+}
+
+:root.dark nav.fixed.bottom-0 > a:not(.nav-tab-active):not([aria-current="page"]),
+:root.dark nav.fixed.bottom-0 > button:not(.nav-tab-active):not([aria-current="page"]) {
+  color: #D8CCC4 !important;
+}
+
+:root.dark nav.fixed.bottom-0 .nav-tab-active,
+:root.dark nav.fixed.bottom-0 [aria-current="page"] {
+  background-color: #FFBFA3 !important;
+  color: #321304 !important;
+}
+
+:root.dark .opacity-30,
+:root.dark .opacity-40,
+:root.dark .opacity-50,
+:root.dark .text-error\/60 {
+  opacity: 1 !important;
 }
 
 :root.dark .bg-surface-bright,

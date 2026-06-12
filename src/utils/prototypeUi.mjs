@@ -112,6 +112,12 @@ function normalizeNavItem(item, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
     nav.className = "fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center";
+    nav.style.position = "fixed";
+    nav.style.left = "0";
+    nav.style.right = "0";
+    nav.style.bottom = "0";
+    nav.style.width = "100%";
+    nav.style.minHeight = "calc(4.75rem + env(safe-area-inset-bottom))";
   }
 
   item.className = [
@@ -122,6 +128,12 @@ function normalizeNavItem(item, isActive) {
       : "text-on-secondary-fixed-variant hover:bg-secondary-container"
   ].join(" ");
   item.setAttribute("aria-current", isActive ? "page" : "false");
+  item.style.width = "68px";
+  item.style.height = "52px";
+  item.style.minWidth = "68px";
+  item.style.maxWidth = "68px";
+  item.style.flex = "0 0 68px";
+  item.style.borderRadius = "9999px";
 
   const icon = item.querySelector(".material-symbols-outlined");
   if (icon) {

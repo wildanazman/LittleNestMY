@@ -86,6 +86,51 @@ function ensureNavigationStyles() {
   const style = document.createElement("style");
   style.id = "bottom-navigation-styles";
   style.textContent = `
+    nav.fixed.bottom-0 {
+      position: fixed !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      min-height: calc(4.75rem + env(safe-area-inset-bottom)) !important;
+      padding: 0.5rem 0.5rem max(1rem, env(safe-area-inset-bottom)) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-around !important;
+      gap: 0.125rem !important;
+      border-top-left-radius: 0.75rem !important;
+      border-top-right-radius: 0.75rem !important;
+      z-index: 80 !important;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    nav.fixed.bottom-0 > a,
+    nav.fixed.bottom-0 > button {
+      width: 68px !important;
+      height: 52px !important;
+      min-width: 68px !important;
+      max-width: 68px !important;
+      flex: 0 0 68px !important;
+      padding: 0.25rem 0.5rem !important;
+      border-radius: 9999px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0 !important;
+      line-height: 1 !important;
+    }
+    nav.fixed.bottom-0 > a span:last-child,
+    nav.fixed.bottom-0 > button span:last-child {
+      font-size: 10px !important;
+      line-height: 1rem !important;
+      white-space: nowrap !important;
+    }
+    nav.fixed.bottom-0 .material-symbols-outlined {
+      font-size: 24px !important;
+      line-height: 1 !important;
+    }
     nav.fixed .nav-tab-active {
       outline: 2px solid rgba(131, 83, 60, 0.24);
       outline-offset: 2px;
@@ -111,6 +156,12 @@ function normalizeNavItem(item, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
     nav.className = "fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center";
+    nav.style.position = "fixed";
+    nav.style.left = "0";
+    nav.style.right = "0";
+    nav.style.bottom = "0";
+    nav.style.width = "100%";
+    nav.style.minHeight = "calc(4.75rem + env(safe-area-inset-bottom))";
   }
 
   item.className = [
@@ -120,6 +171,12 @@ function normalizeNavItem(item, isActive) {
       ? "bg-primary-container text-on-primary-container"
       : "text-on-secondary-fixed-variant hover:bg-secondary-container"
   ].join(" ");
+  item.style.width = "68px";
+  item.style.height = "52px";
+  item.style.minWidth = "68px";
+  item.style.maxWidth = "68px";
+  item.style.flex = "0 0 68px";
+  item.style.borderRadius = "9999px";
 
   const icon = item.querySelector(".material-symbols-outlined");
   if (icon) {
