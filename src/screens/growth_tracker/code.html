@@ -91,7 +91,10 @@ function saveMeasurement(){
   const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
   const measuredAt = document.getElementById("dateInput").value;
   if (!weightKg && !heightValue && !headCircumferenceCm) return showError("Add at least one measurement.");
-  saveLocalGrowthRecord({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, heightCm: heightValue || undefined, lengthCm: heightValue || undefined, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
+  const heightFields = getMeasurementLabel(selectedBaby.dateOfBirth, new Date(`${measuredAt}T09:00:00`)) === "Length"
+    ? { lengthCm: heightValue || undefined }
+    : { heightCm: heightValue || undefined };
+  saveLocalGrowthRecord({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, ...heightFields, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
   ["weightInput","heightInput","headInput","notesInput"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("formError").classList.add("hidden"); render();
 }

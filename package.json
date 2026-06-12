@@ -12,6 +12,7 @@
     "start": "node scripts/serve-static.mjs",
     "build": "node scripts/build-static.mjs"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.1"
+  }
 }
