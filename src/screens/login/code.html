@@ -85,29 +85,52 @@ Remember me
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { getBabyProfiles } = await import(`${moduleBase}utils/localState.mjs`);
-  const { isValidEmail, loginLocalUser, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { getAuthConfigMessage, hasSupabaseConfig, isValidEmail, loginLocalUser, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
   const form = document.getElementById("loginForm");
   const error = document.getElementById("loginError");
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  if (!hasSupabaseConfig()) {
+    error.textContent = getAuthConfigMessage();
+    error.classList.remove("hidden");
+  }
 
   document.getElementById("forgotButton").addEventListener("click", () => {
     showComingSoon("Forgot Password", "Password reset will be connected when real accounts are added.");
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
+    if (!hasSupabaseConfig()) {
+      error.textContent = getAuthConfigMessage();
+      error.classList.remove("hidden");
+      return;
+    }
     if (!isValidEmail(email) || !password.trim()) {
       error.textContent = "Enter a valid email and password to continue.";
       error.classList.remove("hidden");
       return;
     }
-    loginLocalUser({ email });
-    window.location.href = routeAfterAuth(getBabyProfiles(babyProfile).length > 0, screenUrl);
+    submitButton.disabled = true;
+    submitButton.textContent = "Logging in...";
+      error.classList.add("hidden");
+    try {
+      await loginLocalUser({ email, password });
+      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+    } catch (authError) {
+      error.textContent = authError.message?.toLowerCase().includes("email not confirmed")
+        ? "Please confirm your email before logging in."
+        : authError.message || "Login failed. Please check your email and password.";
+      error.classList.remove("hidden");
+      submitButton.disabled = false;
+      submitButton.textContent = "Log In";
+    }
   });
 </script>
 <script type="module">

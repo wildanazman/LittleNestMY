@@ -13,8 +13,10 @@ const remindersKey = "littlenest:reminders";
 const babyProfilesKey = "littlenest:babyProfiles";
 const selectedBabyIdKey = "littlenest:selectedBabyId";
 const legacyBabyProfileKey = "littlenest:babyProfile";
+const legacyBabyProfilesBackupKey = "littlenest:legacyBabyProfilesBeforeSupabase";
+const babyIdMapKey = "littlenest:babyIdMap";
 
-export { babyProfilesKey, selectedBabyIdKey };
+export { babyProfilesKey, babyIdMapKey, legacyBabyProfilesBackupKey, selectedBabyIdKey };
 
 export function getBabyProfiles(fallbackProfile) {
   const existingProfiles = readJson(babyProfilesKey, null);
@@ -102,7 +104,8 @@ export function deleteLocalFeedingLog(logId) {
 }
 
 export function getLogsForBaby(logs, babyId) {
-  return (logs || []).filter((log) => !log.babyId || log.babyId === babyId);
+  const aliases = getBabyIdAliases(babyId);
+  return (logs || []).filter((log) => !log.babyId || aliases.includes(log.babyId));
 }
 
 export function migrateLogsToSelectedBaby(babyId) {
@@ -122,6 +125,47 @@ export function migrateLogsToSelectedBaby(babyId) {
     if (!Array.isArray(collection) || !collection.some((item) => item && !item.babyId)) return;
     writeJson(key, collection.map((item) => item && !item.babyId ? { ...item, babyId } : item));
   });
+}
+
+export function getBabyIdAliases(babyId) {
+  const map = readJson(babyIdMapKey, {});
+  const aliases = new Set([babyId].filter(Boolean));
+
+  Object.entries(map || {}).forEach(([localId, remoteId]) => {
+    if (localId === babyId) aliases.add(remoteId);
+    if (remoteId === babyId) aliases.add(localId);
+  });
+
+  return [...aliases];
+}
+
+export function rememberSupabaseBabyMapping(localBabyId, supabaseBabyId) {
+  if (!localBabyId || !supabaseBabyId || localBabyId === supabaseBabyId) return;
+  const map = readJson(babyIdMapKey, {});
+  writeJson(babyIdMapKey, {
+    ...map,
+    [localBabyId]: supabaseBabyId
+  });
+}
+
+export function cacheSupabaseBabyProfiles(profiles, selectedBabyId = "") {
+  if (!Array.isArray(profiles)) return [];
+
+  const existingProfiles = readJson(babyProfilesKey, []);
+  const hasBackup = readJson(legacyBabyProfilesBackupKey, null);
+  if (!hasBackup && Array.isArray(existingProfiles) && existingProfiles.length > 0) {
+    writeJson(legacyBabyProfilesBackupKey, existingProfiles);
+  }
+
+  const normalized = profiles.map((profile) => normalizeBabyProfile(profile)).filter(Boolean);
+  writeJson(babyProfilesKey, normalized);
+  if (selectedBabyId) writeJson(selectedBabyIdKey, selectedBabyId);
+  else ensureSelectedBaby(normalized);
+  return normalized;
+}
+
+export function readSelectedBabyId() {
+  return readJson(selectedBabyIdKey, "");
 }
 
 export function getLocalSleepLogs() {

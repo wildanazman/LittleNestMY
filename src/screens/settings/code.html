@@ -407,8 +407,12 @@
             window.location.href = screenUrl("home_dashboard");
         });
 
-        document.getElementById("logoutButton")?.addEventListener("click", () => {
-            logoutLocalUser();
+        document.getElementById("logoutButton")?.addEventListener("click", async () => {
+            try {
+                await logoutLocalUser();
+            } catch (error) {
+                console.warn("Logout failed.", error);
+            }
             window.location.href = screenUrl("auth_welcome");
         });
 

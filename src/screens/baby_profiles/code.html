@@ -98,12 +98,10 @@
   const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { calculateBabyAge } = await import(`${moduleBase}utils/dateFormat.mjs`);
   const {
-    getBabyProfiles,
     getLogsForBaby,
-    getPersistedGrowthRecords,
-    getSelectedBabyId,
-    setSelectedBabyId
+    getPersistedGrowthRecords
   } = await import(`${moduleBase}utils/localState.mjs`);
+  const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   const profilesList = document.getElementById("profilesList");
@@ -116,9 +114,12 @@
 
   render();
 
-  function render() {
-    const profiles = getBabyProfiles(mockBabyProfile);
-    const selectedBabyId = getSelectedBabyId(mockBabyProfile);
+  async function render() {
+    profilesList.innerHTML = renderLoadingState();
+    const babyState = await loadBabyProfilesRemote(mockBabyProfile);
+    const profiles = babyState.profiles;
+    const selectedBabyId = babyState.selectedBabyId;
+    if (babyState.error) showFeedback(babyState.error);
 
     profilesList.innerHTML = profiles.length
       ? profiles.map((profile) => renderProfileCard(profile, profile.id === selectedBabyId, profiles.length)).join("")
@@ -136,7 +137,7 @@
           showFeedback("Only one baby profile for now. Add another baby to switch.");
           return;
         }
-        setSelectedBabyId(button.dataset.switchBaby, mockBabyProfile);
+        setSelectedBabyIdRemote(button.dataset.switchBaby);
         showFeedback("Current baby updated.");
         render();
       });
@@ -184,7 +185,7 @@
   profilesList.addEventListener("click", (event) => {
     const growthButton = event.target.closest("[data-growth-baby]");
     if (!growthButton) return;
-    setSelectedBabyId(growthButton.dataset.growthBaby, mockBabyProfile);
+    setSelectedBabyIdRemote(growthButton.dataset.growthBaby);
     goToScreen("growth_tracker");
   });
 
@@ -208,6 +209,18 @@
         </div>
         <p class="font-headline-md text-[20px] font-bold">No baby profile yet</p>
         <p class="font-body-md text-[15px] text-on-surface-variant">Create one to get started.</p>
+      </div>
+    `;
+  }
+
+  function renderLoadingState() {
+    return `
+      <div class="bg-surface-container-lowest rounded-[24px] p-6 soft-shadow text-center space-y-3">
+        <div class="w-16 h-16 rounded-full bg-primary-container/40 text-primary mx-auto flex items-center justify-center">
+          <span class="material-symbols-outlined text-[34px] animate-pulse">sync</span>
+        </div>
+        <p class="font-headline-md text-[20px] font-bold">Loading baby profiles...</p>
+        <p class="font-body-md text-[15px] text-on-surface-variant">Checking your synced baby profiles.</p>
       </div>
     `;
   }

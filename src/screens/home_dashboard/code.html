@@ -376,30 +376,29 @@
             isSameLocalDay
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
-            getBabyProfiles,
             getPersistedCalendarEvents,
             getPersistedDiaperLogs,
             getPersistedFeedingLogs,
             getPersistedGrowthRecords,
             getPersistedReminders,
             getPersistedSleepLogs,
-            getLogsForBaby,
-            getSelectedBabyId,
-            getSelectedBabyProfile
+            getLogsForBaby
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
 
         const now = new Date();
-        if (!isLoggedIn()) {
+        if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
             await new Promise(() => {});
         }
-        const profiles = getBabyProfiles(babyProfile);
-        const selectedBabyId = getSelectedBabyId(babyProfile);
-        const selectedBaby = getSelectedBabyProfile(babyProfile);
+        const babyProfileState = await loadBabyProfilesRemote(babyProfile);
+        const profiles = babyProfileState.profiles;
+        const selectedBabyId = babyProfileState.selectedBabyId;
+        const selectedBaby = babyProfileState.selectedBaby;
         if (!profiles.length || !selectedBabyId || !selectedBaby) {
             window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
             await new Promise(() => {});

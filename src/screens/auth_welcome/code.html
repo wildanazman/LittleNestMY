@@ -84,19 +84,22 @@ body { min-height: 100dvh; }
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { getBabyProfiles } = await import(`${moduleBase}utils/localState.mjs`);
+  const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
-  const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
-  if (isLoggedIn()) {
-    window.location.replace(routeAfterAuth(getBabyProfiles(babyProfile).length > 0, screenUrl));
+  if (await isLoggedIn()) {
+    window.location.replace(routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl));
     await new Promise(() => {});
   }
 
   bindPrototypeActions();
-  document.getElementById("guestButton").addEventListener("click", () => {
-    loginAsGuest();
-    window.location.href = routeAfterAuth(getBabyProfiles(babyProfile).length > 0, screenUrl);
+  document.getElementById("guestButton").addEventListener("click", async () => {
+    try {
+      await loginAsGuest();
+    } catch (error) {
+      showComingSoon("Guest mode paused", error.message || "Please log in or create an account to continue.");
+    }
   });
 </script>
 <script type="module">

@@ -78,20 +78,29 @@ tailwind.config = {
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { getBabyProfiles } = await import(`${moduleBase}utils/localState.mjs`);
-  const { isValidEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { getAuthConfigMessage, hasSupabaseConfig, isValidEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
   const error = document.getElementById("signupError");
-  document.getElementById("signupForm").addEventListener("submit", (event) => {
+  const form = document.getElementById("signupForm");
+  const submitButton = form.querySelector('button[type="submit"]');
+
+  if (!hasSupabaseConfig()) {
+    error.textContent = getAuthConfigMessage();
+    error.classList.remove("hidden");
+  }
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
     let message = "";
-    if (!name) message = "Add your name to create an account.";
+    if (!hasSupabaseConfig()) message = getAuthConfigMessage();
+    else if (!name) message = "Add your name to create an account.";
     else if (!isValidEmail(email)) message = "Enter a valid email address.";
     else if (!password.trim()) message = "Add a password to continue.";
     else if (password !== confirmPassword) message = "Passwords need to match.";
@@ -102,8 +111,25 @@ tailwind.config = {
       return;
     }
 
-    signupLocalUser({ name, email });
-    window.location.href = routeAfterAuth(getBabyProfiles(babyProfile).length > 0, screenUrl);
+    submitButton.disabled = true;
+    submitButton.textContent = "Creating...";
+    error.classList.add("hidden");
+    try {
+      const result = await signupLocalUser({ name, email, password });
+      if (!result.session) {
+        error.textContent = "Account created. Please check your email to confirm your account before logging in.";
+        error.classList.remove("hidden");
+        submitButton.disabled = false;
+        submitButton.textContent = "Create Account";
+        return;
+      }
+      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+    } catch (authError) {
+      error.textContent = authError.message || "Could not create account. Please try again.";
+      error.classList.remove("hidden");
+      submitButton.disabled = false;
+      submitButton.textContent = "Create Account";
+    }
   });
 </script>
 <script type="module">

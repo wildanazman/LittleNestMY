@@ -240,17 +240,16 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const {
-            createBabyProfile,
-            getBabyProfiles,
-            getSelectedBabyProfile,
-            saveBabyProfile,
-            setSelectedBabyId
-        } = await import(`${moduleBase}utils/localState.mjs`);
+            createBabyProfileRemote,
+            getBabyProfileByIdRemote,
+            loadBabyProfilesRemote,
+            updateBabyProfileRemote
+        } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
 
-        if (!isLoggedIn()) {
+        if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
             await new Promise(() => {});
         }
@@ -293,9 +292,9 @@
         }
         window.toggleSelection = toggleSelection;
 
-        setupMode();
+        await setupMode();
 
-        document.getElementById('babyProfileForm').addEventListener('submit', function(e) {
+        document.getElementById('babyProfileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = saveButton;
             const name = nameInput.value.trim();
@@ -320,11 +319,10 @@
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Saving...';
             btn.disabled = true;
 
-            setTimeout(() => {
+            try {
                 const saved = mode === "edit"
-                    ? saveBabyProfile(profileData, mockBabyProfile)
-                    : createBabyProfile(profileData, mockBabyProfile);
-                setSelectedBabyId(saved.id, mockBabyProfile);
+                    ? await updateBabyProfileRemote(profileData, mockBabyProfile)
+                    : await createBabyProfileRemote(profileData, mockBabyProfile);
                 btn.innerHTML = mode === "edit"
                     ? '<span class="material-symbols-outlined">done</span> Profile Updated'
                     : '<span class="material-symbols-outlined">done</span> Profile Created';
@@ -334,17 +332,24 @@
                 setTimeout(() => {
                     goToScreen("home_dashboard");
                 }, 450);
-            }, 350);
+            } catch (error) {
+                showFeedback(error.message || "Could not save baby profile.");
+                btn.innerHTML = mode === "edit"
+                    ? 'Save Changes <span class="material-symbols-outlined">check_circle</span>'
+                    : 'Create Baby Profile <span class="material-symbols-outlined">celebration</span>';
+                btn.disabled = false;
+            }
         });
 
         document.getElementById("babyProfileBackButton").addEventListener("click", () => {
             window.location.href = screenUrl("baby_profiles");
         });
 
-        function setupMode() {
-            const profiles = getBabyProfiles(mockBabyProfile);
+        async function setupMode() {
+            const babyState = await loadBabyProfilesRemote(mockBabyProfile);
+            if (babyState.error) showFeedback(babyState.error);
             editingProfile = mode === "edit"
-                ? profiles.find((profile) => profile.id === editId) || getSelectedBabyProfile(mockBabyProfile)
+                ? await getBabyProfileByIdRemote(editId, mockBabyProfile)
                 : null;
 
             if (mode === "edit" && editingProfile) {

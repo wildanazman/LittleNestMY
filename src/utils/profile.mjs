@@ -1,4 +1,4 @@
-import { getCurrentUser } from "./localAuth.mjs";
+import { getCachedAuthUser } from "./localAuth.mjs";
 
 const parentProfileKey = "littlenest:parentProfile";
 
@@ -6,9 +6,9 @@ export { parentProfileKey };
 
 export function getParentProfile() {
   const saved = readJson(parentProfileKey, null);
-  const user = getCurrentUser() || {};
+  const user = getCachedAuthUser() || {};
   return {
-    name: saved?.name || user.name || "Parent",
+    name: saved?.name || user.user_metadata?.display_name || user.user_metadata?.name || "Parent",
     email: saved?.email || user.email || "",
     photoUrl: saved?.photoUrl || "",
     updatedAt: saved?.updatedAt || ""

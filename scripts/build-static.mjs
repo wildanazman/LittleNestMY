@@ -2,10 +2,12 @@ import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { screens } from "../src/data/screens.mjs";
+import { loadRuntimeEnv } from "./runtime-env.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const dist = join(root, "dist");
 const screensRoot = join(root, "src", "screens");
+loadRuntimeEnv();
 
 const missingScreens = screens
   .filter((screen) => !existsSync(join(screensRoot, screen.path)) || !existsSync(join(screensRoot, screen.preview)))

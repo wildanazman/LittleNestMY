@@ -4,10 +4,12 @@ import { extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defaultScreenId, getScreenById } from "../src/data/screens.mjs";
 import { resolveDirectoryIndex, resolveSafePath } from "../src/utils/paths.mjs";
+import { loadRuntimeEnv } from "./runtime-env.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const screensRoot = join(root, "src", "screens");
 const port = Number(process.env.PORT || 5173);
+loadRuntimeEnv();
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",

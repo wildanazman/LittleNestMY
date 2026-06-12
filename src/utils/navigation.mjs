@@ -190,9 +190,9 @@ function normalizeNavItem(item, isActive) {
   }
 }
 
-function guardAuthenticatedRoutes() {
+async function guardAuthenticatedRoutes() {
   const screenId = getCurrentScreenId();
-  if (!["auth_welcome", "login", "signup"].includes(screenId) && !isLoggedIn()) {
+  if (!["auth_welcome", "login", "signup"].includes(screenId) && !(await isLoggedIn())) {
     window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
   }
 }
