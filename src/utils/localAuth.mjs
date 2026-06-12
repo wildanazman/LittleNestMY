@@ -2,6 +2,8 @@ import { isSupabaseConfigured, requireSupabaseClient, supabase, supabaseConfigMe
 
 let cachedSession = null;
 export const pendingInviteTokenKey = "littlenest:pendingInviteToken";
+export const needsPasswordSetupKey = "littlenest:needsPasswordSetup";
+const lastAuthUserIdKey = "littlenest:lastAuthUserId";
 
 export function hasSupabaseConfig() {
   return isSupabaseConfigured;
@@ -24,6 +26,7 @@ export async function getAuthSession() {
     return null;
   }
 
+  clearStaleProfileCacheForSession(data.session || null);
   cachedSession = data.session || null;
   return cachedSession;
 }
@@ -77,6 +80,15 @@ export async function sendPasswordReset(email, redirectTo = "") {
   return true;
 }
 
+export async function updateCurrentUserPassword(password) {
+  const client = requireSupabaseClient();
+  const { data, error } = await client.auth.updateUser({ password });
+  if (error) throw friendlyAuthError(error, "reset");
+  cachedSession = data?.user ? cachedSession : cachedSession;
+  clearNeedsPasswordSetup();
+  return data;
+}
+
 export async function loginAsGuest() {
   throw new Error("Guest mode is not available while Supabase Auth is enabled. Please log in or create an account.");
 }
@@ -86,6 +98,7 @@ export async function logoutLocalUser() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
   cachedSession = null;
+  clearSessionDisplayCache();
 }
 
 export function isValidEmail(email) {
@@ -131,6 +144,33 @@ export function clearPendingInviteToken() {
   }
 }
 
+export function markNeedsPasswordSetup(email = "") {
+  try {
+    window.localStorage.setItem(needsPasswordSetupKey, JSON.stringify({
+      email,
+      createdAt: new Date().toISOString()
+    }));
+  } catch {
+    // Password reminder is local UI state only.
+  }
+}
+
+export function getNeedsPasswordSetup() {
+  try {
+    return JSON.parse(window.localStorage.getItem(needsPasswordSetupKey) || "null");
+  } catch {
+    return null;
+  }
+}
+
+export function clearNeedsPasswordSetup() {
+  try {
+    window.localStorage.removeItem(needsPasswordSetupKey);
+  } catch {
+    // Password reminder is local UI state only.
+  }
+}
+
 export function getCachedAuthUser() {
   return cachedSession?.user || null;
 }
@@ -167,16 +207,46 @@ export async function upsertProfileForUser(user, options = {}) {
 
 function rememberParentProfile(profile) {
   try {
-    const existing = JSON.parse(window.localStorage.getItem("littlenest:parentProfile") || "{}");
-    window.localStorage.setItem("littlenest:parentProfile", JSON.stringify({
+    const userId = profile.id || cachedSession?.user?.id || "";
+    const storageKey = userId ? `littlenest:parentProfile:${userId}` : "littlenest:parentProfile";
+    const existing = JSON.parse(window.localStorage.getItem(storageKey) || "{}");
+    window.localStorage.setItem(storageKey, JSON.stringify({
       ...existing,
-      name: existing.name || profile.display_name || "Parent",
+      name: profile.display_name || existing.name || "Parent",
       email: profile.email || existing.email || "",
       photoUrl: existing.photoUrl || profile.avatar_url || "",
       updatedAt: new Date().toISOString()
     }));
+    window.localStorage.removeItem("currentUser");
+    const legacy = JSON.parse(window.localStorage.getItem("littlenest:parentProfile") || "null");
+    if (legacy?.email && String(legacy.email).toLowerCase() !== String(profile.email || "").toLowerCase()) {
+      window.localStorage.removeItem("littlenest:parentProfile");
+    }
   } catch {
     // Parent profile cache is only for local UI display.
+  }
+}
+
+function clearStaleProfileCacheForSession(session) {
+  try {
+    const nextUserId = session?.user?.id || "";
+    const previousUserId = window.localStorage.getItem(lastAuthUserIdKey) || "";
+    if (nextUserId && previousUserId && previousUserId !== nextUserId) {
+      window.localStorage.removeItem("currentUser");
+      window.localStorage.removeItem("littlenest:parentProfile");
+    }
+    if (nextUserId) window.localStorage.setItem(lastAuthUserIdKey, nextUserId);
+  } catch {
+    // Local display cache cleanup is best effort.
+  }
+}
+
+function clearSessionDisplayCache() {
+  try {
+    window.localStorage.removeItem("currentUser");
+    window.localStorage.removeItem("littlenest:parentProfile");
+  } catch {
+    // Local display cache cleanup is best effort.
   }
 }
 

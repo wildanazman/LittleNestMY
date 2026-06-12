@@ -21,6 +21,7 @@ const activeGroups = {
   diaper_log: "log",
   diaper_log_dark: "log",
   growth_tracker: "log",
+  health_records: "log",
   calendar: "calendar",
   weekly_insights: "calendar",
   milestones: "milestones",
@@ -141,6 +142,7 @@ function ensureNavigationStyles() {
 
 guardAuthenticatedRoutes();
 setupBottomNavigation();
+bindHeaderProfileButtons();
 
 function getNavKey(link) {
   if (link.dataset.navKey) return link.dataset.navKey;
@@ -192,9 +194,31 @@ function normalizeNavItem(item, isActive) {
 
 async function guardAuthenticatedRoutes() {
   const screenId = getCurrentScreenId();
-  if (!["auth_welcome", "login", "signup", "accept_invite"].includes(screenId) && !(await isLoggedIn())) {
+  if (!["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId) && !(await isLoggedIn())) {
     window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
   }
+}
+
+function bindHeaderProfileButtons(root = document) {
+  root.querySelectorAll("header img[alt*='Avatar'], header img[alt*='Profile'], header img[alt*='Baby']").forEach((image) => {
+    const target = image.closest("button") || image.parentElement;
+    if (!target || target.dataset.profileNavBound === "true") return;
+    target.dataset.profileNavBound = "true";
+    target.setAttribute("role", target.tagName === "BUTTON" ? "button" : "button");
+    target.setAttribute("tabindex", target.getAttribute("tabindex") || "0");
+    target.setAttribute("aria-label", target.getAttribute("aria-label") || "Open settings");
+    target.className = "w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform cursor-pointer";
+    image.className = "w-full h-full object-cover";
+    target.addEventListener("click", () => {
+      window.location.href = window.location.protocol === "file:" ? "../settings/code.html" : "/settings/";
+    });
+    target.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        window.location.href = window.location.protocol === "file:" ? "../settings/code.html" : "/settings/";
+      }
+    });
+  });
 }
 
 function getCurrentScreenId() {

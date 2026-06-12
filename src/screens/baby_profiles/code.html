@@ -103,12 +103,19 @@
   } = await import(`${moduleBase}utils/localState.mjs`);
   const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
   const profilesList = document.getElementById("profilesList");
   const feedback = document.getElementById("feedback");
 
   document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
-  document.getElementById("addBabyButton").addEventListener("click", () => {
+  document.getElementById("addBabyButton").addEventListener("click", async () => {
+    const babyState = await loadBabyProfilesRemote(mockBabyProfile);
+    const permissions = await getBabyPermissions(babyState.selectedBabyId);
+    if (babyState.profiles.length && !permissions.canManageBaby) {
+      showFeedback(viewOnlyMessage);
+      return;
+    }
     window.location.href = `${screenUrl("add_baby_profile")}?mode=create`;
   });
 
@@ -119,11 +126,15 @@
     const babyState = await loadBabyProfilesRemote(mockBabyProfile);
     const profiles = babyState.profiles;
     const selectedBabyId = babyState.selectedBabyId;
+    const permissions = await getBabyPermissions(selectedBabyId);
+    const canManageBaby = permissions.canManageBaby || profiles.length === 0;
     if (babyState.error) showFeedback(babyState.error);
 
     profilesList.innerHTML = profiles.length
-      ? profiles.map((profile) => renderProfileCard(profile, profile.id === selectedBabyId, profiles.length)).join("")
+      ? profiles.map((profile) => renderProfileCard(profile, profile.id === selectedBabyId, profiles.length, canManageBaby)).join("")
       : renderEmptyState();
+    document.getElementById("addBabyButton").classList.toggle("hidden", profiles.length > 0 && !canManageBaby);
+    if (profiles.length > 0 && !canManageBaby) showFeedback("View-only access");
 
     profilesList.querySelectorAll("[data-edit-baby]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -144,7 +155,7 @@
     });
   }
 
-  function renderProfileCard(profile, isSelected, totalProfiles) {
+  function renderProfileCard(profile, isSelected, totalProfiles, canManageBaby) {
     const age = calculateBabyAge(profile.dateOfBirth, new Date());
     const latestGrowth = getLatestGrowthForBaby(profile.id);
     const dob = new Date(`${profile.dateOfBirth}T00:00:00`).toLocaleDateString("en-MY", {
@@ -173,8 +184,8 @@
           <p class="font-label-sm text-[12px] text-on-surface-variant">Latest growth</p>
           <p class="font-label-md text-[14px] text-on-surface">${escapeHtml(latestGrowth)}</p>
         </button>
-        <div class="grid ${isSelected ? "grid-cols-1" : "grid-cols-2"} gap-2">
-          <button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>
+        <div class="grid ${isSelected || !canManageBaby ? "grid-cols-1" : "grid-cols-2"} gap-2">
+          ${canManageBaby ? `<button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>` : `<p class="h-11 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
           ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
         </div>
         ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}

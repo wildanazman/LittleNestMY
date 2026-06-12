@@ -243,7 +243,7 @@
 <span class="font-headline-md text-headline-md text-on-tertiary-container">Diaper</span>
 </button>
 <!-- Health Card -->
-<button class="category-card aspect-square min-h-[150px] bg-[#FFDAD6] rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-type="Health" type="button">
+<button class="category-card aspect-square min-h-[150px] bg-[#FFDAD6] rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-target="/health_records/" type="button">
 <div class="w-16 h-16 rounded-full bg-[#FFB4AB] flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-[#690005]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
 </div>
@@ -363,14 +363,17 @@
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
+        const permissions = await getBabyPermissions(selectedBabyId);
         const modal = document.getElementById("quickFormModal");
         const form = document.getElementById("quickForm");
         const error = document.getElementById("quickFormError");
         let activeQuickType = "";
         bindPrototypeActions();
         await renderRecentLogs();
+        applyPermissions();
 
         document.querySelectorAll('.category-card').forEach(button => {
             button.addEventListener('touchstart', () => {
@@ -389,6 +392,12 @@
                     button.classList.remove('ring-4', 'ring-primary/20');
                 }, 300);
 
+                if (!permissions.canAddLogs) {
+                    if (feedback) feedback.textContent = "View-only access";
+                    showViewOnlyNotice(viewOnlyMessage);
+                    return;
+                }
+
                 if (feedback) {
                     feedback.textContent = target ? `Opening ${label} log.` : `${label} selected. Form coming soon.`;
                 }
@@ -402,6 +411,18 @@
                 }
             });
         });
+
+        function applyPermissions() {
+            if (permissions.canAddLogs) return;
+            document.querySelectorAll(".category-card").forEach((button) => {
+                button.classList.add("opacity-60");
+                button.setAttribute("aria-disabled", "true");
+            });
+            const heading = document.querySelector("main h1");
+            if (heading && !document.getElementById("viewOnlyQuickLogLabel")) {
+                heading.insertAdjacentHTML("afterend", '<p id="viewOnlyQuickLogLabel" class="font-label-md text-label-md quick-log-purple mt-2">View-only access</p>');
+            }
+        }
 
         document.getElementById("quickFormClose").addEventListener("click", closeQuickForm);
         modal.addEventListener("click", (event) => {
@@ -419,6 +440,10 @@
         });
 
         function openQuickForm(type) {
+            if (!permissions.canAddLogs) {
+                showViewOnlyNotice(viewOnlyMessage);
+                return;
+            }
             activeQuickType = type;
             document.getElementById("quickFormEyebrow").textContent = type === "Growth" ? "Growth tracker" : type === "Health" ? "Health note" : "General note";
             document.getElementById("quickFormTitle").textContent = type === "Growth" ? "Add growth record" : type === "Health" ? "Add health note" : "Add note";

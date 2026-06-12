@@ -383,7 +383,7 @@
             t
         } = await import(`${moduleBase}utils/i18n.mjs`);
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
@@ -399,9 +399,11 @@
 
         applyTranslations();
         bindPrototypeActions();
+        await getAuthSession();
         renderLanguageSelection(getLanguage());
         renderThemeSelection(getThemePreference());
         renderParentProfile();
+        renderPasswordReminder();
 
         document.getElementById("settingsBackButton")?.addEventListener("click", () => {
             window.location.href = screenUrl("home_dashboard");
@@ -513,6 +515,18 @@
             document.getElementById("topParentInitials").textContent = initials;
             renderPhoto("parentPhoto", "parentInitials", profile.photoUrl);
             renderPhoto("topParentPhoto", "topParentInitials", profile.photoUrl);
+        }
+
+        function renderPasswordReminder() {
+            if (!getNeedsPasswordSetup() || document.getElementById("passwordSetupReminder")) return;
+            document.querySelector("section.mb-lg")?.insertAdjacentHTML("beforeend", `
+                <button class="mt-4 h-11 px-4 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md active:scale-95 transition-transform" id="passwordSetupReminder" type="button">
+                    Set password for this account
+                </button>
+            `);
+            document.getElementById("passwordSetupReminder")?.addEventListener("click", () => {
+                window.location.href = screenUrl("set_password");
+            });
         }
 
         function renderPhoto(photoId, initialsId, photoUrl) {

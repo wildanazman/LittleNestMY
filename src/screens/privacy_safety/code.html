@@ -209,17 +209,26 @@ Clear local app data
 <script type="module">
       const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
       const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+      const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+      const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+      const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
       const clearDataButton = document.getElementById("clearDataButton");
       const clearDataFeedback = document.getElementById("clearDataFeedback");
       const backButton = document.getElementById("backButton");
       let clearArmed = false;
+      const babyState = await loadBabyProfilesRemote(babyProfile);
+      const permissions = await getBabyPermissions(babyState.selectedBabyId);
 
       backButton.addEventListener("click", () => {
         goToScreen("settings");
       });
 
       clearDataButton.addEventListener("click", () => {
+        if (babyState.profiles.length > 0 && !permissions.canManageBaby) {
+          clearDataFeedback.textContent = viewOnlyMessage;
+          return;
+        }
         if (!clearArmed) {
           clearArmed = true;
           clearDataFeedback.textContent = "Tap once more to clear local LittleNest data from this browser.";

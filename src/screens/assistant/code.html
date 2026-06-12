@@ -131,6 +131,40 @@
         .input-glow:focus-within {
             box-shadow: 0 0 0 4px rgba(255, 191, 163, 0.3);
         }
+        :root.dark .prompt-card .material-symbols-outlined {
+            background: rgba(255, 191, 163, 0.16) !important;
+            color: #FFBFA3 !important;
+            border: 1px solid rgba(255, 191, 163, 0.28);
+        }
+        :root.dark #addContextButton {
+            background: #2D2927;
+            color: #FFBFA3;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
+        }
+        :root.dark #sendPreviewButton {
+            background: #FFBFA3 !important;
+            color: #1E1B1A !important;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+        :root.dark #assistantInput {
+            background: transparent !important;
+            color: #FFF7ED !important;
+            -webkit-text-fill-color: #FFF7ED !important;
+        }
+        :root.dark #assistantInput::placeholder {
+            color: rgba(255, 247, 237, 0.56) !important;
+            -webkit-text-fill-color: rgba(255, 247, 237, 0.56) !important;
+        }
+        :root.dark .assistant-input-shell {
+            background: #121214 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+        :root.dark .assistant-local-summary {
+            background: #121214 !important;
+            color: #FFF7ED !important;
+            border-color: rgba(255, 255, 255, 0.10) !important;
+        }
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -266,8 +300,8 @@
 <section class="space-y-sm" id="prototypeConversation" aria-live="polite"></section>
 </main>
 <!-- Bottom Controls (Floating above Nav) -->
-<div class="fixed bottom-[88px] left-0 w-full px-container-padding pointer-events-none">
-<div class="bg-surface-bright p-3 rounded-3xl shadow-lg border border-surface-container input-glow pointer-events-auto flex items-center gap-base">
+<div class="fixed bottom-[88px] left-0 w-full px-container-padding pointer-events-none z-[70]">
+<div class="assistant-input-shell bg-surface-bright p-3 rounded-3xl shadow-lg border border-surface-container input-glow pointer-events-auto flex items-center gap-base">
 <button aria-label="Add context" class="w-10 h-10 flex items-center justify-center text-outline hover:text-primary transition-colors" id="addContextButton" type="button">
 <span class="material-symbols-outlined">add_circle</span>
 </button>
@@ -324,13 +358,12 @@
         const selectedBabyId = getSelectedBabyId(babyProfile);
         const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
         document.getElementById("assistantBabyContext").textContent = `${selectedBaby.name}'s local care assistant`;
-        let selectedReply = localAssistantReply("");
+        updateSendButtonState();
 
         document.querySelectorAll(".prompt-card").forEach(card => {
             card.addEventListener("click", () => {
                 assistantInput.value = card.dataset.prompt;
-                selectedReply = localAssistantReply(card.dataset.prompt);
-                renderPrototypeTurn(card.dataset.prompt, selectedReply);
+                updateSendButtonState();
                 assistantInput.focus();
             });
         });
@@ -344,6 +377,8 @@
             renderPrototypeTurn(prompt, localAssistantReply(prompt));
         });
 
+        assistantInput.addEventListener("input", updateSendButtonState);
+
         addContextButton.addEventListener("click", () => {
             showComingSoon("Attach context", "Adding photos or files to the assistant is coming soon.");
         });
@@ -355,9 +390,17 @@
         assistantInput.addEventListener("keydown", event => {
             if (event.key === "Enter") {
                 event.preventDefault();
+                if (!assistantInput.value.trim()) return;
                 sendPreviewButton.click();
             }
         });
+
+        function updateSendButtonState() {
+            const hasPrompt = Boolean(assistantInput.value.trim());
+            sendPreviewButton.disabled = !hasPrompt;
+            sendPreviewButton.classList.toggle("opacity-50", !hasPrompt);
+            sendPreviewButton.classList.toggle("cursor-not-allowed", !hasPrompt);
+        }
 
         function renderPrototypeTurn(prompt, reply) {
             prototypeConversation.innerHTML = `
@@ -370,7 +413,7 @@
                     <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
                         <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
                     </div>
-                    <div class="max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container space-y-2">
+                    <div class="assistant-local-summary max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container space-y-2">
                         <p class="font-label-sm text-label-sm text-primary uppercase">Local summary</p>
                         <p class="font-body-md text-body-md text-on-surface">${escapeHtml(reply)}</p>
                         <p class="font-label-md text-label-md text-on-surface-variant">AI is not configured yet. This answer is generated from local logs on this device.</p>

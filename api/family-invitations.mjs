@@ -92,9 +92,45 @@ async function createInvitation(req, res, service, user) {
   const parent = await requireParentForBaby(service, babyId, user.id);
   if (!parent.ok) return sendJson(res, 403, { error: parent.error, currentRole: parent.role });
 
+  const existingUser = await findAuthUserByEmail(service, email);
+  if (existingUser) {
+    const { data: existingMember, error: existingMemberError } = await service
+      .from("baby_members")
+      .select("user_id,role")
+      .eq("baby_id", babyId)
+      .eq("user_id", existingUser.id)
+      .maybeSingle();
+    if (existingMemberError) throw existingMemberError;
+    if (existingMember) {
+      return sendJson(res, 409, {
+        error: "This person is already in this baby's care circle.",
+        alreadyMember: true
+      });
+    }
+  }
+
+  const { data: pendingInvitation, error: pendingError } = await service
+    .from("family_invitations")
+    .select("id,email,role,status,token,expires_at,created_at")
+    .eq("baby_id", babyId)
+    .eq("email", email)
+    .eq("status", "pending")
+    .maybeSingle();
+  if (pendingError) throw pendingError;
+
+  if (pendingInvitation) {
+    const inviteUrl = buildInviteUrl(req, pendingInvitation.token);
+    return sendJson(res, 200, {
+      message: "Invitation is already pending.",
+      emailDelivery: existingUser ? "existing_user" : "pending",
+      inviteUrl,
+      invitation: pendingInvitation
+    });
+  }
+
   const { data: invitation, error: inviteError } = await service
     .from("family_invitations")
-    .upsert({
+    .insert({
       baby_id: babyId,
       email,
       role,
@@ -102,14 +138,13 @@ async function createInvitation(req, res, service, user) {
       invited_by: user.id,
       accepted_by: null,
       expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-    }, { onConflict: "baby_id,email,status" })
+    })
     .select("id,email,role,status,token,expires_at,created_at")
     .single();
 
   if (inviteError) throw inviteError;
 
-  const origin = getRequestOrigin(req);
-  const redirectTo = `${origin}/accept_invite/?token=${encodeURIComponent(invitation.token)}`;
+  const redirectTo = buildInviteUrl(req, invitation.token);
   const { error: emailError } = await service.auth.admin.inviteUserByEmail(email, {
     redirectTo,
     data: {
@@ -121,6 +156,15 @@ async function createInvitation(req, res, service, user) {
   });
 
   if (emailError) {
+    if (isExistingUserInviteError(emailError)) {
+      return sendJson(res, 200, {
+        message: "Invitation link ready.",
+        emailDelivery: "existing_user",
+        inviteUrl: redirectTo,
+        invitation: { ...invitation, status: "pending" }
+      });
+    }
+
     await service.from("family_invitations").update({ status: "failed" }).eq("id", invitation.id);
     return sendJson(res, 502, {
       error: `Invite failed. ${emailError.message}`,
@@ -130,8 +174,30 @@ async function createInvitation(req, res, service, user) {
 
   return sendJson(res, 200, {
     message: "Invitation sent.",
+    emailDelivery: "sent",
+    inviteUrl: redirectTo,
     invitation: { ...invitation, status: "pending" }
   });
+}
+
+async function findAuthUserByEmail(service, email) {
+  for (let page = 1; page <= 10; page += 1) {
+    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) return null;
+    const match = data?.users?.find((authUser) => String(authUser.email || "").toLowerCase() === email);
+    if (match) return match;
+    if (!data?.users || data.users.length < 1000) return null;
+  }
+  return null;
+}
+
+function buildInviteUrl(req, token) {
+  const origin = getRequestOrigin(req);
+  return `${origin}/accept_invite/?token=${encodeURIComponent(token)}`;
+}
+
+function isExistingUserInviteError(error) {
+  return /already|registered|exists/i.test(String(error?.message || error || ""));
 }
 
 async function removeCareCircleItem(req, res, service, user) {

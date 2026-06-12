@@ -138,7 +138,7 @@
 <div class="flex items-end justify-between">
 <div>
 <span class="font-label-md text-label-md text-on-surface-variant">Good morning,</span>
-<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName">Wildan</h2>
+<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName">Loading...</h2>
 </div>
 <div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm">
                     Today
@@ -226,11 +226,11 @@
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Growth</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-coming-soon="Health note" data-coming-soon-message="A simple health note form is coming soon. For now, you can keep notes outside the app." role="button" tabindex="0" aria-label="Health note coming soon">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
-<span class="material-symbols-outlined">edit_note</span>
+<span class="material-symbols-outlined">medical_information</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Note</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Health</span>
 </div>
 </div>
 </section>
@@ -378,15 +378,17 @@
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
+        const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const now = new Date();
         if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
             await new Promise(() => {});
         }
+        await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
         const profiles = babyProfileState.profiles;
         const selectedBabyId = babyProfileState.selectedBabyId;
@@ -396,6 +398,7 @@
             await new Promise(() => {});
         }
         const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+        const permissions = await getBabyPermissions(selectedBabyId);
         const allFeedingLogs = coreLogs.feedingLogs;
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
@@ -414,7 +417,7 @@
             if (element) element.textContent = value;
         };
 
-        setText("parentName", primaryParent?.name || "Mama");
+        setText("parentName", primaryParent?.name || "Parent");
         const homeParentPhoto = document.getElementById("homeParentPhoto");
         const homeParentInitials = document.getElementById("homeParentInitials");
         homeParentInitials.textContent = initialsForName(primaryParent?.name);
@@ -449,7 +452,36 @@
         renderReminderBanner();
 
         renderTimeline(now);
+        applyPermissions();
         bindBabyProfileMenu();
+
+        function applyPermissions() {
+            if (permissions.canAddLogs) return;
+            document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"]').forEach((element) => {
+                element.removeAttribute("data-screen-target");
+                element.setAttribute("aria-disabled", "true");
+                element.classList.add("opacity-60");
+                element.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    showViewOnlyNotice(viewOnlyMessage);
+                });
+            });
+            document.querySelectorAll("[data-coming-soon]").forEach((element) => {
+                if ((element.textContent || "").toLowerCase().includes("note")) {
+                    element.removeAttribute("data-coming-soon");
+                    element.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        showViewOnlyNotice(viewOnlyMessage);
+                    });
+                }
+            });
+            const quickActionSection = document.querySelector("section .flex.justify-between.items-center.px-2");
+            if (quickActionSection && !document.getElementById("viewOnlyHomeLabel")) {
+                quickActionSection.insertAdjacentHTML("beforebegin", '<p id="viewOnlyHomeLabel" class="px-2 pb-2 font-label-md text-label-md text-primary">View-only access</p>');
+            }
+        }
 
         function getTodaySleepMinutes(logs, date) {
             const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -606,6 +638,10 @@
 
             document.getElementById("babyProfileMenuButton")?.addEventListener("click", (event) => {
                 event.stopPropagation();
+                if (!permissions.canManageBaby) {
+                    showViewOnlyNotice(viewOnlyMessage);
+                    return;
+                }
                 openMenu();
             });
             document.getElementById("babyProfileMenuClose")?.addEventListener("click", closeMenu);

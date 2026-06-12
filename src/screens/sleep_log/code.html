@@ -311,11 +311,12 @@
             getActiveSleepSession,
             getLogsForBaby,
             getPersistedSleepLogs,
-            getSelectedBabyId,
             saveActiveSleepSession
         } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteSleepLogRemote, loadCoreLogsRemote, saveSleepLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const idle = document.getElementById("idle-state");
         const active = document.getElementById("active-state");
@@ -330,7 +331,13 @@
         const napHistoryList = document.getElementById("napHistoryList");
         const backButton = document.getElementById("sleepBackButton");
         const viewStatsButton = document.getElementById("viewSleepStatsButton");
-        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
+        const permissions = await getBabyPermissions(selectedBabyId);
+        if (!permissions.canAddLogs) {
+            redirectViewOnly((screenId) => window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}/`);
+            await new Promise(() => {});
+        }
         let timerInterval;
         let sleepLogItems = getLogsForBaby(getPersistedSleepLogs(mockSleepLogs), selectedBabyId);
 

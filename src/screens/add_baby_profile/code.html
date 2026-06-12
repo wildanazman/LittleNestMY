@@ -248,6 +248,7 @@
         const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { getBabyPermissions, redirectViewOnly, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
         if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
@@ -296,6 +297,12 @@
 
         document.getElementById('babyProfileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const currentState = await loadBabyProfilesRemote(mockBabyProfile);
+            const currentPermissions = await getBabyPermissions(currentState.selectedBabyId);
+            if ((mode === "edit" || currentState.profiles.length > 0) && !currentPermissions.canManageBaby) {
+                showFeedback(viewOnlyMessage);
+                return;
+            }
             const btn = saveButton;
             const name = nameInput.value.trim();
             const dateOfBirth = dobInput.value;
@@ -348,6 +355,11 @@
         async function setupMode() {
             const babyState = await loadBabyProfilesRemote(mockBabyProfile);
             if (babyState.error) showFeedback(babyState.error);
+            const permissions = await getBabyPermissions(babyState.selectedBabyId);
+            if ((mode === "edit" || babyState.profiles.length > 0) && !permissions.canManageBaby) {
+                redirectViewOnly(screenUrl);
+                await new Promise(() => {});
+            }
             editingProfile = mode === "edit"
                 ? await getBabyProfileByIdRemote(editId, mockBabyProfile)
                 : null;

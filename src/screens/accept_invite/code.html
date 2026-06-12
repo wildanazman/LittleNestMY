@@ -62,11 +62,14 @@ tailwind.config = {
   const { acceptFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { clearPendingInviteToken, isLoggedIn, rememberPendingInviteToken } = await import(`${moduleBase}utils/localAuth.mjs`);
-  const { screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { clearPendingInviteToken, getAuthSession, isLoggedIn, markNeedsPasswordSetup, rememberPendingInviteToken } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   const params = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const token = rememberPendingInviteToken(params.get("token") || params.get("invite_token") || "");
+  const cameFromSupabaseInvite = ["invite", "recovery"].includes(String(params.get("type") || hashParams.get("type") || "").toLowerCase())
+    || Boolean(hashParams.get("access_token") && token);
   const message = document.getElementById("inviteMessage");
   const error = document.getElementById("inviteError");
   const acceptButton = document.getElementById("acceptButton");
@@ -94,7 +97,7 @@ tailwind.config = {
     window.location.href = screenUrl("signup");
   });
   resetButton.addEventListener("click", () => {
-    showComingSoon("Set / Reset Password", "Use the password setup link from your email, then return to this invite.");
+    window.location.href = screenUrl("login");
   });
 
   acceptButton.addEventListener("click", acceptInvite);
@@ -111,6 +114,13 @@ tailwind.config = {
       clearPendingInviteToken();
       await loadBabyProfilesRemote(babyProfile).catch(() => null);
       message.textContent = "Invite accepted. Welcome to the care circle.";
+      if (cameFromSupabaseInvite || result.passwordSetupRecommended) {
+        const session = await getAuthSession();
+        markNeedsPasswordSetup(session?.user?.email || "");
+        acceptButton.textContent = "Set Password...";
+        setTimeout(() => window.location.href = screenUrl("set_password"), 700);
+        return;
+      }
       acceptButton.textContent = "Opening Home...";
       setTimeout(() => window.location.href = screenUrl("home_dashboard"), 700);
     } catch (inviteError) {

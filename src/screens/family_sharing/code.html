@@ -211,6 +211,10 @@
 <span class="material-symbols-outlined" data-icon="send">send</span>
 Send Invite
 </button>
+<button class="hidden w-full h-11 rounded-full bg-surface-container-lowest text-primary border border-primary-container font-label-md text-label-md active:scale-95 transition-transform" id="copyInviteLinkButton" type="button">
+<span class="material-symbols-outlined text-[18px] align-middle">content_copy</span>
+Copy Invite Link
+</button>
 <p class="min-h-5 font-label-md text-label-md text-tertiary" id="inviteFeedback"></p>
 </div>
 </div>
@@ -308,6 +312,7 @@ Send Invite
         const permissionPreview = document.getElementById("permissionPreview");
         const prepareInviteButton = document.getElementById("prepareInviteButton");
         const inviteFeedback = document.getElementById("inviteFeedback");
+        const copyInviteLinkButton = document.getElementById("copyInviteLinkButton");
         const backButton = document.getElementById("backButton");
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
@@ -340,13 +345,23 @@ Send Invite
             prepareInviteButton.disabled = true;
             prepareInviteButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Sending...';
             try {
-                await sendFamilyInviteRemote({
+                const inviteResult = await sendFamilyInviteRemote({
                     babyId: selectedBabyId,
                     name,
                     email: contact,
                     role: selectedRole
                 });
-                inviteFeedback.textContent = "Invitation sent.";
+                rememberInviteLink(inviteResult.inviteUrl || "");
+                if (inviteResult.emailDelivery === "existing_user") {
+                    inviteFeedback.textContent = "This user already has an account. Share this invite link with them.";
+                    copyInviteLinkButton.classList.remove("hidden");
+                } else if (inviteResult.emailDelivery === "pending") {
+                    inviteFeedback.textContent = "Invitation is already pending. You can copy the invite link.";
+                    copyInviteLinkButton.classList.remove("hidden");
+                } else {
+                    inviteFeedback.textContent = "Invitation sent.";
+                    copyInviteLinkButton.classList.toggle("hidden", !inviteResult.inviteUrl);
+                }
                 inviteNameInput.value = "";
                 inviteContactInput.value = "";
                 await renderMembers();
@@ -357,6 +372,17 @@ Send Invite
             updatePermissionPreview();
             prepareInviteButton.disabled = false;
             prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="send">send</span>Send Invite';
+        });
+
+        copyInviteLinkButton.addEventListener("click", async () => {
+            const link = copyInviteLinkButton.dataset.inviteUrl || "";
+            if (!link) return;
+            try {
+                await navigator.clipboard.writeText(link);
+                inviteFeedback.textContent = "Invite link copied.";
+            } catch {
+                inviteFeedback.textContent = link;
+            }
         });
 
         backButton.addEventListener("click", () => {
@@ -579,6 +605,11 @@ Send Invite
                 viewer: "Viewer: view only."
             };
             permissionPreview.textContent = descriptions[role] || descriptions.parent;
+        }
+
+        function rememberInviteLink(link) {
+            copyInviteLinkButton.dataset.inviteUrl = link;
+            copyInviteLinkButton.classList.toggle("hidden", !link);
         }
 
         function getCurrentParentMember() {

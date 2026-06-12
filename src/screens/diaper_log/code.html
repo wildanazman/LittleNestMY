@@ -265,16 +265,24 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, diaperLogs: mockDiaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { getLogsForBaby, getPersistedDiaperLogs, getSelectedBabyId } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = {
             diaperType: "wet",
             color: "",
             texture: "Normal"
         };
-        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
+        const permissions = await getBabyPermissions(selectedBabyId);
+        if (!permissions.canAddLogs) {
+            redirectViewOnly((screenId) => window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}/`);
+            await new Promise(() => {});
+        }
         const segmentButtons = [...document.querySelectorAll("[data-diaper-type]")];
         const detailButtons = [...document.querySelectorAll("[data-color], [data-texture]")];
         const notesInput = document.getElementById("diaperNotesInput");

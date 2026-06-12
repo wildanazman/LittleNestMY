@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Health Records - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fff8f5",
+        "surface-container": "#f4ebe6",
+        "surface-container-low": "#fff1ea",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        "tertiary-container": "#b5d6af",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
+  input, textarea, select { font-size: 16px; }
+  :root.dark #healthForm input,
+  :root.dark #healthForm textarea,
+  :root.dark #healthForm select {
+    background: #121214 !important;
+    color: #FFF7ED !important;
+    -webkit-text-fill-color: #FFF7ED !important;
+    border: 1px solid rgba(255,255,255,.12) !important;
+  }
+  :root.dark #healthForm input::placeholder,
+  :root.dark #healthForm textarea::placeholder {
+    color: rgba(255,247,237,.56) !important;
+    -webkit-text-fill-color: rgba(255,247,237,.56) !important;
+  }
+  :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
+  :root.dark input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.4);
+  }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface px-5 h-14 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary active:scale-95 transition-transform" id="backButton" type="button" aria-label="Back">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1 class="font-bold text-[22px] leading-7 text-primary">Health Records</h1>
+  </div>
+  <button class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
+    <span class="material-symbols-outlined text-primary">account_circle</span>
+  </button>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+  <section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow">
+    <p class="text-[12px] font-bold uppercase tracking-wide text-primary">For records only</p>
+    <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container" id="babyTitle">Baby health notes</h2>
+    <p class="text-[15px] leading-6 text-on-primary-container/80">Record medicine taken, fever, cough, clinic notes, or sickness history. This does not diagnose or replace a doctor.</p>
+  </section>
+
+  <p class="hidden rounded-2xl bg-tertiary-container text-on-tertiary-container p-3 text-[14px] font-bold" id="feedback" aria-live="polite"></p>
+
+  <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4" id="entrySection">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-[20px] leading-7 font-bold text-on-surface">Add record</h2>
+      <span class="text-[12px] font-bold text-on-surface-variant">Rough notes are okay</span>
+    </div>
+    <form class="space-y-3" id="healthForm">
+      <label class="block space-y-1">
+        <span class="text-[13px] font-bold text-on-surface">Record type</span>
+        <select class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface" id="recordType">
+          <option value="medicine">Medicine taken</option>
+          <option value="illness">Sickness / illness</option>
+          <option value="temperature">Temperature / fever</option>
+          <option value="clinic">Clinic note</option>
+          <option value="note">General health note</option>
+        </select>
+      </label>
+      <label class="block space-y-1">
+        <span class="text-[13px] font-bold text-on-surface" id="titleLabel">Medicine / record title</span>
+        <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="titleInput" placeholder="Example: Paracetamol, Fever, Cough"/>
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block space-y-1">
+          <span class="text-[13px] font-bold text-on-surface">Date</span>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface" id="dateInput" type="date"/>
+        </label>
+        <label class="block space-y-1">
+          <span class="text-[13px] font-bold text-on-surface">Time</span>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface" id="timeInput" type="time"/>
+        </label>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="block space-y-1">
+          <span class="text-[13px] font-bold text-on-surface">Temp C</span>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="tempInput" inputmode="decimal" type="number" min="30" max="45" step="0.1" placeholder="Optional"/>
+        </label>
+        <label class="block space-y-1">
+          <span class="text-[13px] font-bold text-on-surface">Dose / amount</span>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="doseInput" placeholder="Example: 2.5 ml"/>
+        </label>
+      </div>
+      <textarea class="w-full min-h-24 rounded-2xl border-0 bg-surface-container px-3 py-3 text-on-surface placeholder:text-on-surface-variant" id="notesInput" placeholder="Example: Baby pernah ada fever on 11 Feb. Ate less but still drinking milk."></textarea>
+      <p class="hidden text-[14px] font-bold text-error" id="formError"></p>
+      <button class="w-full h-12 rounded-full bg-primary text-on-primary font-bold active:scale-95 transition-transform" type="submit">Save Record</button>
+    </form>
+  </section>
+
+  <section class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[20px] leading-7 font-bold text-on-surface">History</h2>
+      <span class="text-[13px] font-bold text-primary" id="recordCount">0 records</span>
+    </div>
+    <div class="space-y-3" id="historyList"></div>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+  <button><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button><span class="material-symbols-outlined">add_circle</span><span>Log</span></button>
+  <button><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { deleteHealthNoteRemote, loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+const { goToScreen, bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
+
+const babyState = await loadBabyProfilesRemote(babyProfile);
+const selectedBabyId = babyState.selectedBabyId;
+const selectedBaby = babyState.selectedBaby;
+if (!selectedBabyId || !selectedBaby) {
+  window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
+  await new Promise(() => {});
+}
+const permissions = await getBabyPermissions(selectedBabyId);
+let healthRecords = [];
+
+const feedback = document.getElementById("feedback");
+const form = document.getElementById("healthForm");
+const formError = document.getElementById("formError");
+
+document.getElementById("babyTitle").textContent = `${selectedBaby.name}'s health records`;
+document.getElementById("backButton").addEventListener("click", () => goToScreen("quick_log"));
+setDefaultDateTime();
+bindPrototypeActions();
+if (!permissions.canAddLogs) {
+  document.getElementById("entrySection").classList.add("hidden");
+  showFeedback(viewOnlyMessage);
+}
+
+document.getElementById("recordType").addEventListener("change", updateLabels);
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!permissions.canAddLogs) return showFeedback(viewOnlyMessage);
+  const type = document.getElementById("recordType").value;
+  const title = document.getElementById("titleInput").value.trim();
+  const dose = document.getElementById("doseInput").value.trim();
+  const details = document.getElementById("notesInput").value.trim();
+  const temperatureC = parseNumber("tempInput");
+  const recordedAt = buildRecordedAt();
+  if (!title && !details && !temperatureC) return showError("Add a title, temperature, or note to save.");
+
+  const medicineName = type === "medicine" ? title : "";
+  const body = [
+    dose ? `Dose: ${dose}` : "",
+    details
+  ].filter(Boolean).join("\n");
+
+  try {
+    await saveHealthNoteRemote({
+      id: crypto.randomUUID ? crypto.randomUUID() : `health-local-${Date.now()}`,
+      babyId: selectedBabyId,
+      type,
+      title: title || defaultTitle(type),
+      temperatureC: temperatureC || undefined,
+      medicineName: medicineName || undefined,
+      details: body || undefined,
+      recordedAt
+    });
+    form.reset();
+    setDefaultDateTime();
+    updateLabels();
+    showFeedback("Health record saved.");
+    await refreshRecords();
+  } catch (error) {
+    showFeedback(`${error.message || "Could not sync record."} Saved locally for now.`);
+    await refreshRecords();
+  }
+});
+
+await refreshRecords();
+
+async function refreshRecords() {
+  const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+  healthRecords = result.healthNotes.sort((a, b) => new Date(b.recordedAt) - new Date(a.recordedAt));
+  document.getElementById("recordCount").textContent = `${healthRecords.length} record${healthRecords.length === 1 ? "" : "s"}`;
+  renderHistory();
+}
+
+function renderHistory() {
+  document.getElementById("historyList").innerHTML = healthRecords.length
+    ? healthRecords.map(renderRecord).join("")
+    : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-bold text-on-surface">No health records yet</p><p class="text-[15px] text-on-surface-variant">Medicine, fever, sakit notes, and clinic records will appear here.</p></div>`;
+  document.querySelectorAll("[data-delete-health]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Delete this health record?")) return;
+      button.disabled = true;
+      await deleteHealthNoteRemote(button.dataset.deleteHealth);
+      await refreshRecords();
+    });
+  });
+}
+
+function renderRecord(record) {
+  const date = new Date(record.recordedAt).toLocaleString("en-MY", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+  const type = labelType(record.type);
+  const details = [record.temperatureC ? `${record.temperatureC} C` : "", record.medicineName ? `Medicine: ${record.medicineName}` : "", record.details || ""].filter(Boolean);
+  return `
+    <article class="rounded-[22px] bg-surface-container-lowest p-4 soft-shadow border border-white/60 space-y-3">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-[12px] font-bold uppercase tracking-wide text-primary">${type}</p>
+          <h3 class="text-[18px] leading-6 font-bold text-on-surface truncate">${escapeHtml(record.title || "Health record")}</h3>
+          <p class="text-[13px] font-bold text-on-surface-variant">${date}</p>
+        </div>
+        <span class="material-symbols-outlined text-primary">${iconForType(record.type)}</span>
+      </div>
+      ${details.length ? `<p class="text-[15px] leading-6 text-on-surface-variant whitespace-pre-wrap">${escapeHtml(details.join("\n"))}</p>` : ""}
+      ${permissions.canManageBaby ? `<button class="text-error text-[13px] font-bold" data-delete-health="${escapeHtml(record.id)}" type="button">Delete</button>` : ""}
+    </article>
+  `;
+}
+
+function updateLabels() {
+  const type = document.getElementById("recordType").value;
+  document.getElementById("titleLabel").textContent = type === "medicine" ? "Medicine name" : type === "illness" ? "Sickness / illness" : "Record title";
+  document.getElementById("titleInput").placeholder = type === "medicine" ? "Example: Paracetamol" : type === "illness" ? "Example: Fever, cough, flu" : "Example: Clinic note";
+}
+
+function setDefaultDateTime() {
+  const now = new Date();
+  document.getElementById("dateInput").value = now.toISOString().slice(0, 10);
+  document.getElementById("timeInput").value = now.toTimeString().slice(0, 5);
+}
+
+function buildRecordedAt() {
+  const date = document.getElementById("dateInput").value || new Date().toISOString().slice(0, 10);
+  const time = document.getElementById("timeInput").value || "09:00";
+  return new Date(`${date}T${time}:00`).toISOString();
+}
+
+function defaultTitle(type) {
+  return {
+    medicine: "Medicine taken",
+    illness: "Sickness note",
+    temperature: "Temperature note",
+    clinic: "Clinic note",
+    note: "Health note"
+  }[type] || "Health record";
+}
+
+function labelType(type) {
+  return {
+    medicine: "Medicine",
+    illness: "Sickness",
+    temperature: "Temperature",
+    clinic: "Clinic",
+    note: "Health note"
+  }[type] || "Health";
+}
+
+function iconForType(type) {
+  return {
+    medicine: "medication",
+    illness: "sick",
+    temperature: "thermometer",
+    clinic: "local_hospital",
+    note: "edit_note"
+  }[type] || "medical_information";
+}
+
+function parseNumber(id) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function showError(message) {
+  formError.textContent = message;
+  formError.classList.remove("hidden");
+}
+
+function showFeedback(message) {
+  feedback.textContent = message;
+  feedback.classList.remove("hidden");
+  setTimeout(() => feedback.classList.add("hidden"), 2800);
+}
+
+function escapeHtml(value) {
+  return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+}
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

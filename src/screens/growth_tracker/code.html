@@ -17,6 +17,32 @@
 <script>
 tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","primary-container":"#ffdcc8","on-primary-container":"#321304",surface:"#fff8f5","surface-container":"#f4ebe6","surface-container-low":"#fff1ea","surface-container-lowest":"#fff","on-surface":"#211a17","on-surface-variant":"#53433d",tertiary:"#5f6335","tertiary-container":"#e5e9ad",error:"#ba1a1a"},fontFamily:{body:["Nunito Sans","sans-serif"]}}}};
 </script>
+<style>
+  :root.dark #addMeasurementSection input,
+  :root.dark #addMeasurementSection textarea {
+    background: #121214 !important;
+    color: #FFF7ED !important;
+    -webkit-text-fill-color: #FFF7ED !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  }
+  :root.dark #addMeasurementSection input::placeholder,
+  :root.dark #addMeasurementSection textarea::placeholder {
+    color: rgba(255, 247, 237, 0.56) !important;
+    -webkit-text-fill-color: rgba(255, 247, 237, 0.56) !important;
+  }
+  :root.dark #addMeasurementSection label,
+  :root.dark #addMeasurementSection label span,
+  :root.dark #addMeasurementSection h2,
+  :root.dark #lengthLabel {
+    color: #FFF7ED !important;
+  }
+  :root.dark #formError {
+    color: #ff8e9b !important;
+  }
+  :root.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.4);
+  }
+</style>
 </head>
 <body class="bg-surface text-on-surface font-body min-h-screen pb-28">
 <header class="sticky top-0 z-40 bg-surface px-5 h-14 flex items-center gap-3">
@@ -32,18 +58,18 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <p class="font-body-md text-body-md text-on-primary-container/80" id="growthStatus">Add a first measurement to start a gentle trend.</p>
 </section>
 <section class="grid grid-cols-3 gap-3" id="latestCards"></section>
-<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4">
+<section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4" id="addMeasurementSection">
 <div class="flex items-center justify-between">
 <h2 class="font-headline-md text-headline-md text-on-surface">Add measurement</h2>
 <span class="font-label-sm text-label-sm text-on-surface-variant" id="lengthLabel">Length</span>
 </div>
 <div class="grid grid-cols-2 gap-3">
-<label><span class="font-label-sm text-label-sm">Weight kg</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="weightInput" type="number" min="0" step="0.01" inputmode="decimal"/></label>
-<label><span class="font-label-sm text-label-sm" id="heightInputLabel">Length cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="heightInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
-<label><span class="font-label-sm text-label-sm">Head cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="headInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
-<label><span class="font-label-sm text-label-sm">Date</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3" id="dateInput" type="date"/></label>
+<label><span class="font-label-sm text-label-sm text-on-surface">Weight kg</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="weightInput" type="number" min="0" step="0.01" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm text-on-surface" id="heightInputLabel">Length cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="heightInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm text-on-surface">Head cm</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="headInput" type="number" min="0" step="0.1" inputmode="decimal"/></label>
+<label><span class="font-label-sm text-label-sm text-on-surface">Date</span><input class="mt-1 h-11 w-full rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="dateInput" type="date"/></label>
 </div>
-<textarea class="w-full min-h-20 rounded-2xl border-0 bg-surface-container px-3 py-3" id="notesInput" placeholder="Optional note"></textarea>
+<textarea class="w-full min-h-20 rounded-2xl border-0 bg-surface-container px-3 py-3 text-on-surface placeholder:text-on-surface-variant" id="notesInput" placeholder="Optional note"></textarea>
 <p class="hidden font-label-md text-label-md text-error" id="formError"></p>
 <button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="saveButton" type="button">Save Measurement</button>
 </section>
@@ -66,11 +92,15 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
-const { getLogsForBaby, getPersistedGrowthRecords, getSelectedBabyId, getSelectedBabyProfile, saveLocalGrowthRecord, deleteLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
+const { getLogsForBaby, getPersistedGrowthRecords, saveLocalGrowthRecord, deleteLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
 const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-const selectedBabyId = getSelectedBabyId(babyProfile);
-const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+const babyState = await loadBabyProfilesRemote(babyProfile);
+const selectedBabyId = babyState.selectedBabyId;
+const selectedBaby = babyState.selectedBaby || babyProfile;
+const permissions = await getBabyPermissions(selectedBabyId);
 const tabs = [
   ["weight", "Weight-for-age", "weightKg", "kg"],
   ["height", `${getMeasurementLabel(selectedBaby.dateOfBirth)}-for-age`, "heightCm", "cm"],
@@ -84,7 +114,12 @@ document.getElementById("dateInput").value = new Date().toISOString().slice(0, 1
 document.getElementById("babyName").textContent = selectedBaby.name;
 document.getElementById("lengthLabel").textContent = getMeasurementLabel(selectedBaby.dateOfBirth);
 document.getElementById("heightInputLabel").textContent = `${getMeasurementLabel(selectedBaby.dateOfBirth)} cm`;
-document.getElementById("saveButton").addEventListener("click", saveMeasurement);
+if (permissions.canAddLogs) {
+  document.getElementById("saveButton").addEventListener("click", saveMeasurement);
+} else {
+  document.getElementById("addMeasurementSection").classList.add("hidden");
+  document.getElementById("growthStatus").textContent = viewOnlyMessage;
+}
 renderTabs(); render();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
 function saveMeasurement(){
@@ -117,7 +152,7 @@ function renderGraph(items){
   const path=points.map((p,i)=>`${i?'L':'M'} ${30+(p.x/Math.max(1,points.length-1))*280} ${180-((p.y-min)/span)*140}`).join(" ");
   svg.innerHTML=`<line x1="30" y1="180" x2="320" y2="180" stroke="rgba(131,83,60,.25)"/><line x1="30" y1="30" x2="30" y2="180" stroke="rgba(131,83,60,.25)"/><path d="${path}" fill="none" stroke="#83533c" stroke-width="4" stroke-linecap="round"/><text x="32" y="24" class="chart-label" fill="#665650">${max.toFixed(1)} ${unit}</text><text x="32" y="205" class="chart-label" fill="#665650">${min.toFixed(1)} ${unit}</text>${points.map((p,i)=>`<circle cx="${30+(p.x/Math.max(1,points.length-1))*280}" cy="${180-((p.y-min)/span)*140}" r="5" fill="#FFBFA3"/>`).join("")}`;
 }
-function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div><button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button></article>`; }
+function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button>` : ""}</article>`; }
 function number(id){ const value=Number(document.getElementById(id).value); return Number.isFinite(value)&&value>0?value:0; }
 function showError(message){ const el=document.getElementById("formError"); el.textContent=message; el.classList.remove("hidden"); }
 function escapeHtml(v){ return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}

@@ -283,12 +283,20 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, feedingLogs: mockFeedingLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatDuration, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { getLogsForBaby, getPersistedFeedingLogs, getSelectedBabyId } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = { feedingType: "bottle" };
-        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
+        const permissions = await getBabyPermissions(selectedBabyId);
+        if (!permissions.canAddLogs) {
+            redirectViewOnly((screenId) => window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}/`);
+            await new Promise(() => {});
+        }
         const typeButtons = [...document.querySelectorAll("[data-feeding-type]")];
         const amountField = document.getElementById("amountField");
         const amountInput = document.getElementById("amountInput");

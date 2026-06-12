@@ -107,7 +107,7 @@ Remember me
       return;
     }
     try {
-      await sendPasswordReset(email, `${window.location.origin}${screenUrl("login")}`);
+      await sendPasswordReset(email, `${window.location.origin}${screenUrl("set_password")}`);
       error.textContent = "Password reset email sent. Please check your inbox.";
       error.classList.remove("hidden");
     } catch (resetError) {
