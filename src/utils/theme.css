@@ -294,6 +294,27 @@ nav.fixed.bottom-0 .material-symbols-outlined {
   overflow-wrap: normal;
 }
 
+:root.dark .dashboard-stat-card {
+  background-color: #2D2825 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28) !important;
+}
+
+:root.dark .dashboard-stat-label,
+:root.dark .dashboard-stat-label span,
+:root.dark .dashboard-stat-card > span {
+  color: #FFBFA3 !important;
+}
+
+:root.dark .dashboard-stat-value,
+:root.dark #lastFeedTime,
+:root.dark #todaySleepTotal,
+:root.dark #lastDiaperTime,
+:root.dark #nextEventDate {
+  color: #FFF7ED !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
+}
+
 :root.dark .shadow-xl,
 :root.dark .soft-shadow {
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.32) !important;

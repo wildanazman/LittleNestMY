@@ -163,39 +163,39 @@
 <!-- Status Grid -->
 <section class="grid grid-cols-2 gap-gutter">
 <!-- Feed -->
-<div class="bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
-<div class="flex items-center gap-2 text-on-primary-container">
+<div class="dashboard-stat-card bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
+<div class="dashboard-stat-label flex items-center gap-2 text-on-primary-container">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
 <span class="font-label-sm text-label-sm">Last Feed</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface" id="lastFeedTime">No feeds yet</p>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface" id="lastFeedTime">No feeds yet</p>
 <span class="font-label-sm text-label-sm text-primary"></span>
 </div>
 <!-- Sleep -->
-<div class="bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
-<div class="flex items-center gap-2 text-[#1E40AF]">
+<div class="dashboard-stat-card bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
+<div class="dashboard-stat-label flex items-center gap-2 text-[#1E40AF]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
 <span class="font-label-sm text-label-sm">Today Sleep</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="todaySleepTotal">No sleep yet</p>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="todaySleepTotal">No sleep yet</p>
 <span class="font-label-sm text-label-sm text-[#1E40AF]"></span>
 </div>
 <!-- Diaper -->
-<div class="bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
-<div class="flex items-center gap-2 text-[#166534]">
+<div class="dashboard-stat-card bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
+<div class="dashboard-stat-label flex items-center gap-2 text-[#166534]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
 <span class="font-label-sm text-label-sm">Diaper</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
 <span class="font-label-sm text-label-sm text-[#166534]"></span>
 </div>
 <!-- Vaccine -->
-<div class="bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar">
-<div class="flex items-center gap-2 text-[#6B21A8]">
+<div class="dashboard-stat-card bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar">
+<div class="dashboard-stat-label flex items-center gap-2 text-[#6B21A8]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">vaccines</span>
 <span class="font-label-sm text-label-sm" id="nextEventLabel">Next Vaccine</span>
 </div>
-<p class="font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextEventDate">No appts yet</p>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextEventDate">No appts yet</p>
 <span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative"></span>
 </div>
 </section>
