@@ -1,6 +1,7 @@
 import {
   babyProfilesKey,
   cacheSupabaseBabyProfiles,
+  getBabyIdMap,
   getBabyProfiles,
   readSelectedBabyId,
   rememberSupabaseBabyMapping,
@@ -62,7 +63,7 @@ export async function createBabyProfileRemote(profile, fallbackProfile) {
 
   const { data, error } = await supabase
     .from("babies")
-    .insert(toBabyRow(profile))
+    .insert(toBabyRow(profile, session.user.id))
     .select("*")
     .single();
 
@@ -80,17 +81,19 @@ export async function updateBabyProfileRemote(profile, fallbackProfile) {
   const session = await getAuthSession();
   if (!session) throw new Error("Please log in before editing a baby profile.");
   if (!profile?.id) throw new Error("Missing baby profile id.");
+  const babyId = resolveSupabaseBabyId(profile.id);
 
   const { data, error } = await supabase
     .from("babies")
     .update(toBabyRow(profile))
-    .eq("id", profile.id)
+    .eq("id", babyId)
     .select("*")
     .single();
 
   if (error) throw rlsFriendlyError(error, "update baby");
 
   const baby = fromBabyRow(data);
+  rememberSupabaseBabyMapping(profile.id, baby.id);
   setSelectedBabyIdRemote(baby.id);
   cacheSupabaseBabyProfiles(await fetchRemoteBabyProfiles(), baby.id);
   return baby;
@@ -98,16 +101,18 @@ export async function updateBabyProfileRemote(profile, fallbackProfile) {
 
 export async function getBabyProfileByIdRemote(babyId, fallbackProfile) {
   const result = await loadBabyProfilesRemote(fallbackProfile);
-  return result.profiles.find((profile) => profile.id === babyId) || result.selectedBaby || null;
+  const resolvedBabyId = resolveSupabaseBabyId(babyId, { allowMissing: true });
+  return result.profiles.find((profile) => profile.id === resolvedBabyId || profile.id === babyId) || result.selectedBaby || null;
 }
 
 export function setSelectedBabyIdRemote(babyId) {
+  const resolvedBabyId = resolveSupabaseBabyId(babyId, { allowMissing: true });
   try {
-    window.localStorage.setItem(selectedBabyIdKey, JSON.stringify(babyId || ""));
+    window.localStorage.setItem(selectedBabyIdKey, JSON.stringify(resolvedBabyId || ""));
   } catch {
     // Local selected-baby persistence is a UI convenience.
   }
-  return babyId;
+  return resolvedBabyId;
 }
 
 export function fromBabyRow(row) {
@@ -125,8 +130,8 @@ export function fromBabyRow(row) {
   };
 }
 
-export function toBabyRow(profile) {
-  return {
+export function toBabyRow(profile, createdBy = "") {
+  const row = {
     name: String(profile.name || "").trim(),
     date_of_birth: profile.dateOfBirth || profile.date_of_birth,
     gender: profile.gender || null,
@@ -134,6 +139,12 @@ export function toBabyRow(profile) {
     feeding_preference: profile.feedingPreference || profile.feeding_preference || null,
     notes: profile.notes || null
   };
+
+  if (createdBy) {
+    row.created_by = createdBy;
+  }
+
+  return row;
 }
 
 async function fetchRemoteBabyProfiles() {
@@ -147,12 +158,14 @@ async function fetchRemoteBabyProfiles() {
 }
 
 async function migrateLocalBabyProfiles(localProfiles) {
+  const session = await getAuthSession();
+  if (!session) throw new Error("Please log in before migrating baby profiles.");
   const migrated = [];
 
   for (const localProfile of localProfiles) {
     const { data, error } = await supabase
       .from("babies")
-      .insert(toBabyRow(localProfile))
+      .insert(toBabyRow(localProfile, session.user.id))
       .select("*")
       .single();
 
@@ -189,6 +202,8 @@ async function ensureParentMembership(babyId, userId) {
 
 function chooseSelectedBabyId(profiles) {
   const selectedBabyId = readSelectedBabyId();
+  const mappedSelectedBabyId = resolveSupabaseBabyId(selectedBabyId, { allowMissing: true });
+  if (profiles.some((profile) => profile.id === mappedSelectedBabyId)) return mappedSelectedBabyId;
   if (profiles.some((profile) => profile.id === selectedBabyId)) return selectedBabyId;
   return profiles[0]?.id || "";
 }
@@ -213,4 +228,23 @@ function rlsFriendlyError(error, action) {
     );
   }
   return new Error(message || `Could not ${action}.`);
+}
+
+function resolveSupabaseBabyId(babyId, options = {}) {
+  if (!babyId) return "";
+  if (isUuid(babyId)) return babyId;
+
+  const map = getBabyIdMap();
+  const mappedId = map[babyId]
+    || Object.entries(map || {}).find(([, remoteId]) => remoteId === babyId)?.[1]
+    || "";
+
+  if (mappedId && isUuid(mappedId)) return mappedId;
+  if (options.allowMissing) return babyId;
+
+  throw new Error("Baby profile sync is incomplete. Please refresh and try again.");
+}
+
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
 }
