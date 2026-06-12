@@ -132,7 +132,7 @@
 <span class="font-headline-md text-headline-md text-primary" id="homeParentInitials">P</span>
 </button>
 </header>
-<main class="px-container-padding pt-6 space-y-lg">
+<main class="max-w-md mx-auto px-container-padding pt-6 space-y-lg">
 <!-- Greeting & Profile -->
 <section class="space-y-sm">
 <div class="flex items-end justify-between">
@@ -145,13 +145,13 @@
                 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow cursor-pointer" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
 <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
 <img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="/icons/icon-192.png"/>
 </div>
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">Baby</h3>
-<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a profile to begin</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">No baby profile yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create your first baby profile</p>
 </div>
 <div class="ml-auto">
 <button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
@@ -199,6 +199,35 @@
 <span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative"></span>
 </div>
 </section>
+<!-- Mama Care -->
+<section>
+<div class="rounded-[28px] border border-[#ffb3c5] bg-[#fff1f5] p-5 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-[#fb7185] text-white flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="min-w-0">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Mama Care</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">How is Mama doing today?</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-4">
+<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
+<p class="font-label-sm text-label-sm text-on-surface">Mood</p>
+<p class="font-label-md text-label-md text-error">Not checked</p>
+</div>
+<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
+<p class="font-label-sm text-label-sm text-on-surface">Rest</p>
+<p class="font-label-md text-label-md text-error">Not logged</p>
+</div>
+<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
+<p class="font-label-sm text-label-sm text-on-surface">Meds</p>
+<p class="font-label-md text-label-md text-error">0/0</p>
+</div>
+</div>
+<button class="mt-4 h-12 w-full rounded-full border border-[#fb7185] bg-white/70 text-error font-label-md text-label-md active:scale-95 transition-transform dark:bg-white/5" data-screen-target="mama_care" type="button">Check on Mama</button>
+</div>
+</section>
 <!-- Quick Actions -->
 <section>
 <div class="flex justify-between items-center px-2">
@@ -220,44 +249,32 @@
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Diaper</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open medicine records">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
-<span class="material-symbols-outlined">monitor_weight</span>
+<span class="material-symbols-outlined">medication</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Growth</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
-<span class="material-symbols-outlined">medical_information</span>
+<span class="material-symbols-outlined">edit_note</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Health</span>
-</div>
-</div>
-</section>
-<section>
-<div class="bg-surface-container-low p-4 rounded-[24px] soft-shadow border border-white/60 cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
-<div class="flex items-center justify-between gap-3">
-<div class="min-w-0">
-<p class="font-label-sm text-label-sm text-primary uppercase">Growth</p>
-<p class="font-headline-md text-headline-md text-on-surface truncate" id="growthSummaryTitle">No growth yet</p>
-<p class="font-body-md text-body-md text-on-surface-variant truncate" id="growthSummaryDetail">Add a first measurement when ready.</p>
-</div>
-<span class="material-symbols-outlined text-primary">show_chart</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Note</span>
 </div>
 </div>
 </section>
 <!-- Reminder Banner -->
 <section>
-<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar reminders">
+<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
 <div class="absolute right-0 top-0 opacity-10 scale-150 rotate-12">
-<span class="material-symbols-outlined text-[120px]">notifications_active</span>
+<span class="material-symbols-outlined text-[120px]">tips_and_updates</span>
 </div>
 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">alarm_on</span>
+<span class="material-symbols-outlined">task_alt</span>
 </div>
 <div class="z-10">
-<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">No activity yet</p>
-<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Add your first log when you are ready.</p>
+<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">Start logging to see helpful reminders.</p>
+<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Real suggestions will appear after a few care logs.</p>
 </div>
 </div>
 </section>
@@ -371,7 +388,6 @@
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             getPersistedCalendarEvents,
-            getPersistedGrowthRecords,
             getPersistedReminders,
             getLogsForBaby
         } = await import(`${moduleBase}utils/localState.mjs`);
@@ -392,22 +408,18 @@
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
         const profiles = babyProfileState.profiles;
         const selectedBabyId = babyProfileState.selectedBabyId;
-        const selectedBaby = babyProfileState.selectedBaby;
-        if (!profiles.length || !selectedBabyId || !selectedBaby) {
-            window.location.replace(`${screenUrl("add_baby_profile")}?mode=create`);
-            await new Promise(() => {});
-        }
+        const selectedBaby = babyProfileState.selectedBaby || null;
         const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
         const permissions = await getBabyPermissions(selectedBabyId);
         const allFeedingLogs = coreLogs.feedingLogs;
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
         const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId);
-        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId);
         const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);
         const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
+        const todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
         const nextEvent = [...allCalendarEvents]
             .filter(event => ["vaccine", "clinic"].includes(event.type) && new Date(event.startsAt) >= now)
             .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
@@ -426,17 +438,23 @@
             homeParentPhoto.classList.remove("hidden");
             homeParentInitials.classList.add("hidden");
         }
-        setText("babyName", selectedBaby.name);
-        setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
+        if (selectedBaby) {
+            setText("babyName", selectedBaby.name);
+            setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
+        } else {
+            setText("babyName", "No baby profile yet");
+            setText("babyAge", "Create your first baby profile");
+            document.getElementById("babyProfileMenuButton")?.classList.add("hidden");
+        }
         const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
-        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feeds yet");
-        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "No sleep yet");
-        setText("lastDiaperTime", latestDiaper ? formatRelativeTime(latestDiaper.changedAt, now) : "No diapers yet");
-        setText("assistantTitle", latestFeed ? "Recent care logged" : "No activity yet");
-        setText("assistantMessage", latestFeed ? "Your latest logs will appear in the timeline below." : "Add your first log when you are ready.");
-        setText("babyMenuTitle", selectedBaby.name);
+        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feed yet");
+        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
+        setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : "0");
+        setText("assistantTitle", "Start logging to see helpful reminders.");
+        setText("assistantMessage", "Real suggestions will appear after a few care logs.");
+        setText("babyMenuTitle", selectedBaby?.name || "Manage baby profile");
         const babyPhoto = document.getElementById("babyPhoto");
-        if (babyPhoto && selectedBaby.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
+        if (babyPhoto && selectedBaby?.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
         if (nextEvent) {
             const { dateLabel, relativeLabel } = formatEventDate(nextEvent.startsAt, now);
@@ -445,10 +463,9 @@
             setText("nextEventRelative", relativeLabel);
         } else {
             setText("nextEventLabel", "Next Appointment");
-            setText("nextEventDate", "No appts yet");
+            setText("nextEventDate", "No upcoming");
             setText("nextEventRelative", "");
         }
-        renderGrowthSummary();
         renderReminderBanner();
 
         renderTimeline(now);
@@ -456,15 +473,16 @@
         bindBabyProfileMenu();
 
         function applyPermissions() {
-            if (permissions.canAddLogs) return;
-            document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"]').forEach((element) => {
+            if (permissions.canAddLogs && selectedBaby) return;
+            const message = selectedBaby ? viewOnlyMessage : "Create a baby profile before adding logs.";
+            document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"], [data-screen-target="health_records"]').forEach((element) => {
                 element.removeAttribute("data-screen-target");
                 element.setAttribute("aria-disabled", "true");
                 element.classList.add("opacity-60");
                 element.addEventListener("click", (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    showViewOnlyNotice(viewOnlyMessage);
+                    showViewOnlyNotice(message);
                 });
             });
             document.querySelectorAll("[data-coming-soon]").forEach((element) => {
@@ -473,13 +491,13 @@
                     element.addEventListener("click", (event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        showViewOnlyNotice(viewOnlyMessage);
+                        showViewOnlyNotice(message);
                     });
                 }
             });
             const quickActionSection = document.querySelector("section .flex.justify-between.items-center.px-2");
             if (quickActionSection && !document.getElementById("viewOnlyHomeLabel")) {
-                quickActionSection.insertAdjacentHTML("beforebegin", '<p id="viewOnlyHomeLabel" class="px-2 pb-2 font-label-md text-label-md text-primary">View-only access</p>');
+                quickActionSection.insertAdjacentHTML("beforebegin", `<p id="viewOnlyHomeLabel" class="px-2 pb-2 font-label-md text-label-md text-primary">${selectedBaby ? "View-only access" : "Create a baby profile to start logging"}</p>`);
             }
         }
 
@@ -507,6 +525,7 @@
         }
 
         function renderReminderBanner() {
+            if (!selectedBaby) return;
             const nextReminder = [...allReminders]
                 .filter((reminder) => reminder.enabled && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
                 .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))[0];
@@ -521,8 +540,8 @@
             const reminderText = latestFeed
                 ? nextFeedReminderText(latestFeed.startedAt, enabledFeeding?.repeatRule?.intervalHours || guide.suggestedIntervalHours)
                 : "No feeds logged yet. Add what you remember.";
-            setText("assistantTitle", "Gentle feeding reminder");
-            setText("assistantMessage", reminderText);
+            setText("assistantTitle", "Next feed may be soon");
+            setText("assistantMessage", latestFeed ? `Based on ${selectedBaby.name}'s recent feeding pattern. ${reminderText}` : reminderText);
         }
 
         function nextFeedReminderText(startedAt, intervalHours) {
@@ -614,7 +633,8 @@
         function renderEmptyTimeline() {
             return `
                 <div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant">
-                    <p class="font-body-md text-body-md text-on-surface-variant">No activity yet. Add your first log.</p>
+                    <p class="font-headline-md text-headline-md text-on-surface">No logs yet</p>
+                    <p class="font-body-md text-body-md text-on-surface-variant">Add your first feed, sleep, diaper, or note.</p>
                 </div>
             `;
         }

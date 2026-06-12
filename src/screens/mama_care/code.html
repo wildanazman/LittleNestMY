@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
+<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Mama Care - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#b75f67",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdbe1",
+        "on-primary-container": "#3b0710",
+        surface: "#fff8f8",
+        "surface-container": "#f8e9ea",
+        "surface-container-low": "#fff0f2",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#efe1e2",
+        "on-surface": "#23191a",
+        "on-surface-variant": "#6b4b4f",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 20px 50px rgba(183, 95, 103, 0.12); }
+  .mama-card { background: rgba(255,255,255,.84); border: 1px solid rgba(183,95,103,.12); }
+  :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
+  :root.dark body { background: #1f1a1a; color: #fff7ed; }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between">
+  <button class="h-10 rounded-full px-3 bg-surface-container text-primary font-bold flex items-center gap-1 active:scale-95 transition-transform" id="backToBaby" type="button">
+    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+    <span>Back to Baby</span>
+  </button>
+  <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
+    <span class="material-symbols-outlined">account_circle</span>
+  </button>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+  <section class="space-y-2">
+    <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
+    <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Care for baby. Care for mama too.</h1>
+    <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">A calm space for mother-focused notes and support.</p>
+  </section>
+
+  <section class="rounded-[28px] bg-primary-container p-5 soft-shadow">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-[30px]" style="font-variation-settings:'FILL' 1;">favorite</span>
+      </div>
+      <div>
+        <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container">Today's Mama Check-in</h2>
+        <p class="text-[15px] leading-6 text-on-primary-container/80">No check-in yet.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-2 mt-4">
+      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <p class="text-[12px] font-bold text-on-primary-container/70">Mood</p>
+        <p class="text-[14px] font-extrabold text-on-primary-container">Not checked</p>
+      </div>
+      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <p class="text-[12px] font-bold text-on-primary-container/70">Rest</p>
+        <p class="text-[14px] font-extrabold text-on-primary-container">Not logged</p>
+      </div>
+      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+        <p class="text-[12px] font-bold text-on-primary-container/70">Meds</p>
+        <p class="text-[14px] font-extrabold text-on-primary-container">0/0</p>
+      </div>
+    </div>
+    <button class="mama-action mt-4 w-full h-12 rounded-full bg-primary text-on-primary font-bold active:scale-95 transition-transform" data-coming-soon="Mama check-in" data-coming-soon-message="Mama Care storage is not connected yet. This will become a private check-in flow in a later phase." type="button">Add Check-in</button>
+  </section>
+
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-3">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Husband Support Checklist</h2>
+      <span class="text-[12px] font-extrabold text-primary">Empty</span>
+    </div>
+    <p class="text-[15px] leading-6 text-on-surface-variant">No support tasks yet. Add gentle reminders like water, meals, or rest when this feature is connected.</p>
+    <button class="mama-action h-11 rounded-full bg-primary-container px-4 text-primary font-bold active:scale-95 transition-transform" data-coming-soon="Support checklist" data-coming-soon-message="Support tasks will be saved in a later Mama Care data phase." type="button">Add Support Task</button>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4">
+    <article class="mama-card rounded-[26px] p-5 soft-shadow">
+      <div class="flex items-center gap-3">
+        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">medication</span>
+        <div>
+          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Mama Medication</h2>
+          <p class="text-[15px] leading-6 text-on-surface-variant">No medication logged yet.</p>
+        </div>
+      </div>
+    </article>
+    <article class="mama-card rounded-[26px] p-5 soft-shadow">
+      <div class="flex items-center gap-3">
+        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">calendar_add_on</span>
+        <div>
+          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Mama Appointments</h2>
+          <p class="text-[15px] leading-6 text-on-surface-variant">No appointments yet.</p>
+        </div>
+      </div>
+    </article>
+    <article class="mama-card rounded-[26px] p-5 soft-shadow">
+      <div class="flex items-center gap-3">
+        <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center material-symbols-outlined">edit_note</span>
+        <div>
+          <h2 class="text-[20px] leading-7 font-extrabold text-on-surface">Recovery Notes</h2>
+          <p class="text-[15px] leading-6 text-on-surface-variant">No recovery notes yet.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="rounded-[26px] bg-[#ffe5e5] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
+    <div class="flex items-start gap-3">
+      <span class="material-symbols-outlined text-error mt-1">info</span>
+      <p class="text-[16px] leading-7 text-error">Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+  <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button class="bg-primary-container text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">health_and_safety</span><span>Mama Care</span></button>
+  <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
+const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+
+if (!(await isLoggedIn())) {
+  window.location.replace(screenUrl("auth_welcome"));
+  await new Promise(() => {});
+}
+
+const babyState = await loadBabyProfilesRemote(babyProfile);
+const selectedBabyId = babyState.selectedBabyId;
+const permissions = await getBabyPermissions(selectedBabyId);
+
+document.getElementById("backToBaby").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("roleHint").textContent = permissions.role === "viewer"
+  ? "You have view-only access for this baby."
+  : "A calm space for mother-focused notes and support.";
+
+if (permissions.role === "viewer") {
+  document.querySelectorAll(".mama-action").forEach((button) => {
+    button.removeAttribute("data-coming-soon");
+    button.removeAttribute("data-coming-soon-message");
+    button.classList.add("opacity-60");
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      showViewOnlyNotice(viewOnlyMessage);
+    });
+  });
+}
+
+bindPrototypeActions();
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>
