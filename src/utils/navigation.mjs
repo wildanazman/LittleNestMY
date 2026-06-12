@@ -13,6 +13,7 @@ const activeGroups = {
   home_dashboard: "home",
   home_dashboard_dark: "home",
   mama_care: "home",
+  daily_summary: "home",
   quick_log: "log",
   quick_log_dark: "log",
   feeding_log: "log",
