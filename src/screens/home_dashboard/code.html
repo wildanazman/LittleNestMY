@@ -115,6 +115,20 @@
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
         .timeline-line { background: repeating-linear-gradient(to bottom, #d6c2bb, #d6c2bb 2px, transparent 2px, transparent 6px); }
+        .home-skeleton-block {
+          border-radius: 24px;
+          background: linear-gradient(90deg, rgba(239,238,233,.72), rgba(255,255,255,.86), rgba(239,238,233,.72));
+          background-size: 200% 100%;
+          animation: homeSkeletonPulse 1.4s ease-in-out infinite;
+        }
+        :root.dark .home-skeleton-block {
+          background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08));
+          background-size: 200% 100%;
+        }
+        @keyframes homeSkeletonPulse {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
     </style>
 <style>
     body {
@@ -124,6 +138,46 @@
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-background text-on-background min-h-screen pb-32">
+<section class="max-w-md mx-auto px-container-padding pt-4 pb-32 space-y-lg" id="homeLoadingState" aria-label="Loading dashboard">
+<div class="flex items-center justify-between h-14">
+<div class="home-skeleton-block h-8 w-36 rounded-xl"></div>
+<div class="home-skeleton-block h-10 w-10 rounded-full"></div>
+</div>
+<div class="space-y-sm">
+<div class="home-skeleton-block h-5 w-28 rounded-lg"></div>
+<div class="home-skeleton-block h-12 w-44 rounded-xl"></div>
+</div>
+<div class="home-skeleton-block h-28 w-full"></div>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="home-skeleton-block h-28"></div>
+<div class="home-skeleton-block h-28"></div>
+<div class="home-skeleton-block h-28"></div>
+<div class="home-skeleton-block h-28"></div>
+</div>
+<div class="home-skeleton-block h-44 w-full"></div>
+<div class="flex justify-between px-2">
+<div class="home-skeleton-block h-16 w-14 rounded-full"></div>
+<div class="home-skeleton-block h-16 w-14 rounded-full"></div>
+<div class="home-skeleton-block h-16 w-14 rounded-full"></div>
+<div class="home-skeleton-block h-16 w-14 rounded-full"></div>
+<div class="home-skeleton-block h-16 w-14 rounded-full"></div>
+</div>
+<div class="home-skeleton-block h-28 w-full"></div>
+<div class="space-y-sm">
+<div class="home-skeleton-block h-7 w-32 rounded-xl"></div>
+<div class="home-skeleton-block h-20 w-full"></div>
+<div class="home-skeleton-block h-20 w-full"></div>
+</div>
+</section>
+<section class="hidden max-w-md mx-auto px-container-padding pt-10 text-center space-y-4" id="homeErrorState">
+<div class="w-16 h-16 rounded-full bg-error-container text-error mx-auto flex items-center justify-center">
+<span class="material-symbols-outlined text-[34px]">error</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Could not load dashboard</h1>
+<p class="font-body-md text-body-md text-on-surface-variant" id="homeErrorMessage">Please refresh and try again.</p>
+<button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="homeRetryButton" type="button">Retry</button>
+</section>
+<div class="hidden" id="homeContent" aria-live="polite">
 <!-- Top App Bar -->
 <header class="bg-surface sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-14">
 <h1 class="font-headline-lg text-headline-lg text-primary">LittleNest MY</h1>
@@ -391,6 +445,7 @@
 <span class="font-label-sm text-label-sm">Assistant</span>
 </a>
 </nav>
+</div>
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const {
@@ -418,6 +473,10 @@
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 
+        window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
+        window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
+        document.getElementById("homeRetryButton")?.addEventListener("click", () => window.location.reload());
+
         const now = new Date();
         if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
@@ -439,9 +498,7 @@
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
         const todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
-        const nextEvent = [...allCalendarEvents]
-            .filter(event => ["vaccine", "clinic"].includes(event.type) && new Date(event.startsAt) >= now)
-            .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0];
+        const nextEvent = selectNextHomeAppointment(allCalendarEvents, allReminders, now);
 
         const setText = (id, value) => {
             const element = document.getElementById(id);
@@ -476,9 +533,9 @@
         if (babyPhoto && selectedBaby?.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
         if (nextEvent) {
-            const { dateLabel, relativeLabel } = formatEventDate(nextEvent.startsAt, now);
+            const { relativeLabel } = formatEventDate(nextEvent.startsAt, now);
             setText("nextEventLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
-            setText("nextEventDate", dateLabel);
+            setText("nextEventDate", formatHomeEventSummary(nextEvent));
             setText("nextEventRelative", relativeLabel);
         } else {
             setText("nextEventLabel", "Next Appointment");
@@ -489,8 +546,9 @@
 
         renderTimeline(now);
         applyPermissions();
-        renderMamaCarePreview();
+        await renderMamaCarePreview();
         bindBabyProfileMenu();
+        showHomeContent();
 
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;
@@ -578,6 +636,21 @@
             setText("mamaMedsPreview", `${taken}/${todayMeds.length}`);
         }
 
+        function showHomeContent() {
+            document.getElementById("homeLoadingState")?.classList.add("hidden");
+            document.getElementById("homeErrorState")?.classList.add("hidden");
+            document.getElementById("homeContent")?.classList.remove("hidden");
+        }
+
+        function showHomeError(message) {
+            document.getElementById("homeLoadingState")?.classList.add("hidden");
+            document.getElementById("homeContent")?.classList.add("hidden");
+            const errorState = document.getElementById("homeErrorState");
+            const errorMessage = document.getElementById("homeErrorMessage");
+            if (errorMessage) errorMessage.textContent = message || "Please refresh and try again.";
+            errorState?.classList.remove("hidden");
+        }
+
         function localDate(date) {
             const copy = new Date(date);
             copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
@@ -619,7 +692,7 @@
                         type: "diaper",
                         detailTitle: "Diaper detail",
                         title: "Diaper",
-                        detail: `${capitalize(log.type)} changed`
+                        detail: diaperTimelineSummary(log)
                     }))
             ].sort((a, b) => new Date(a.at) - new Date(b.at));
 
@@ -664,6 +737,101 @@
 
         function labelMilk(type) {
             return type === "formula" ? "formula" : "breastmilk";
+        }
+
+        function selectNextHomeAppointment(events, reminders, date) {
+            const todayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const eventIds = new Set((events || []).map((event) => event.id).filter(Boolean));
+            const eventCandidates = (events || [])
+                .map(normalizeCalendarCandidate)
+                .filter(Boolean);
+            const reminderCandidates = (reminders || [])
+                .filter((reminder) => reminder.enabled !== false && !eventIds.has(reminder.sourceId))
+                .map(normalizeReminderCandidate)
+                .filter(Boolean);
+
+            return [...eventCandidates, ...reminderCandidates]
+                .filter((item) => new Date(item.startsAt) >= todayStart)
+                .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))[0] || null;
+        }
+
+        function normalizeCalendarCandidate(event) {
+            const startsAt = event.startsAt || event.startAt || event.scheduledAt || event.date;
+            if (!startsAt) return null;
+            return {
+                id: event.id,
+                type: event.type || "appointment",
+                title: event.title || labelCalendarType(event.type),
+                startsAt
+            };
+        }
+
+        function normalizeReminderCandidate(reminder) {
+            const startsAt = reminder.scheduledAt || reminder.startsAt || reminder.date;
+            if (!startsAt) return null;
+            return {
+                id: reminder.id,
+                type: reminder.type || "appointment",
+                title: reminder.title || labelCalendarType(reminder.type),
+                startsAt
+            };
+        }
+
+        function formatHomeEventSummary(event) {
+            const title = shortEventTitle(event.title || event.type || "Appointment");
+            const date = new Date(event.startsAt).toLocaleDateString("en-MY", {
+                day: "numeric",
+                month: "long"
+            });
+            return `${title} (${date})`;
+        }
+
+        function shortEventTitle(title) {
+            const cleaned = String(title || "Appointment").trim();
+            if (/klinik\s+kesihatan/i.test(cleaned)) return "KK";
+            return cleaned
+                .replace(/\s+(appointment|reminder)$/i, "")
+                .replace(/\s+/g, " ")
+                .trim() || "Appointment";
+        }
+
+        function labelCalendarType(type) {
+            return {
+                health: "Health appointment",
+                vaccine: "Vaccine",
+                clinic: "Clinic appointment",
+                daycare: "Daycare reminder",
+                school: "School reminder",
+                family: "Family reminder",
+                medicine: "Medicine reminder"
+            }[type] || "Appointment";
+        }
+
+        function diaperTimelineSummary(log) {
+            const type = normalizeDiaperType(log.type);
+            if (type === "pee") {
+                const color = displayOther(log.peeColor, log.peeColorOther) || log.color;
+                return [log.peeAmount || log.texture, color].filter(Boolean).join(" · ") || "Pee changed";
+            }
+            if (type === "poop") {
+                const consistency = displayOther(log.poopConsistency, log.poopConsistencyOther) || log.texture;
+                const color = displayOther(log.poopColor, log.poopColorOther) || log.color;
+                return [consistency, color].filter(Boolean).join(" · ") || "Poop changed";
+            }
+            const pee = [log.peeAmount, displayOther(log.peeColor, log.peeColorOther)].filter(Boolean).join(", ");
+            const poop = [displayOther(log.poopConsistency, log.poopConsistencyOther), displayOther(log.poopColor, log.poopColorOther)].filter(Boolean).join(", ");
+            const fallback = [log.texture, log.color].filter(Boolean).join(" · ");
+            return [pee ? `Pee: ${pee}` : "", poop ? `Poop: ${poop}` : "", !pee && !poop ? fallback : ""].filter(Boolean).join(" · ") || "Mixed diaper changed";
+        }
+
+        function normalizeDiaperType(type) {
+            if (type === "wet") return "pee";
+            if (type === "dirty") return "poop";
+            return type || "mixed";
+        }
+
+        function displayOther(value, otherValue) {
+            return value === "Other" ? otherValue || "Other" : value;
         }
 
         function capitalize(value) {

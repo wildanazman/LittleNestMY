@@ -385,7 +385,7 @@
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
-        const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { fileToCroppedAvatarDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
         const languageButtons = document.querySelectorAll("[data-language-option]");
@@ -452,12 +452,21 @@
 
         document.getElementById("parentPhotoInput")?.addEventListener("change", async (event) => {
             parentError.classList.add("hidden");
+            const file = event.target.files[0];
+            if (!file) return;
             try {
-                parentPhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 640, quality: 0.82 });
+                parentPhotoDataUrl = await fileToCroppedAvatarDataUrl(file, {
+                    outputSize: 640,
+                    quality: 0.82,
+                    title: "Adjust parent photo",
+                    helpText: "Crop it so it looks good inside the round profile button."
+                });
+                if (!parentPhotoDataUrl) event.target.value = "";
             } catch (error) {
                 parentPhotoDataUrl = "";
                 parentError.textContent = error.message;
                 parentError.classList.remove("hidden");
+                event.target.value = "";
             }
         });
 

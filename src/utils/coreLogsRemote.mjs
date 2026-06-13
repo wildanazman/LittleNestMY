@@ -31,8 +31,9 @@ export async function loadCoreLogsRemote(selectedBabyId, fallbacks = {}) {
   try {
     await migrateCoreLogsOnce(selectedBabyId, local);
     const remote = await fetchCoreLogs(selectedBabyId);
-    cacheCoreLogs(remote);
-    return { ...remote, source: "supabase", error: "" };
+    const merged = mergePendingLocalLogs(remote, local);
+    cacheCoreLogs(merged);
+    return { ...merged, source: "supabase", error: "" };
   } catch (error) {
     console.warn("Supabase core log sync failed.", error);
     return {
@@ -54,6 +55,7 @@ export async function saveFeedingLogRemote(log) {
       .select("*")
       .single();
     if (error) throw error;
+    if (data?.id && data.id !== log.id) deleteLocalFeedingLog(log.id);
     return saveLocalFeedingLog(fromFeedingRow(data));
   } catch (error) {
     throw friendlyRlsError(error, "save feeding log");
@@ -92,12 +94,8 @@ export async function saveDiaperLogRemote(log) {
   if (!canUseSupabase(log.babyId)) return local;
 
   try {
-    const { data, error } = await supabase
-      .from("diaper_logs")
-      .upsert(toDiaperRow(log), { onConflict: "id" })
-      .select("*")
-      .single();
-    if (error) throw error;
+    const data = await upsertDiaperRow(log);
+    if (data?.id && data.id !== log.id) deleteLocalDiaperLog(log.id);
     return saveLocalDiaperLog(fromDiaperRow(data));
   } catch (error) {
     throw friendlyRlsError(error, "save diaper log");
@@ -209,6 +207,56 @@ function cacheCoreLogs(remote) {
   remote.healthNotes.forEach(saveLocalHealthNote);
 }
 
+function mergePendingLocalLogs(remote, local) {
+  return {
+    feedingLogs: dedupeFeedingLogs(mergeById(remote.feedingLogs, pendingLocalItems(local.feedingLogs))),
+    sleepLogs: mergeById(remote.sleepLogs, pendingLocalItems(local.sleepLogs)),
+    diaperLogs: mergeById(remote.diaperLogs, pendingLocalItems(local.diaperLogs)),
+    healthNotes: mergeById(remote.healthNotes, pendingLocalItems(local.healthNotes))
+  };
+}
+
+function pendingLocalItems(items = []) {
+  return items.filter((item) => item?.id && !isUuid(item.id));
+}
+
+function mergeById(primary = [], secondary = []) {
+  const seen = new Set(primary.map((item) => item.id));
+  return [...primary, ...secondary.filter((item) => !seen.has(item.id))];
+}
+
+function dedupeFeedingLogs(items = []) {
+  const bySignature = new Map();
+  items.forEach((item) => {
+    const signature = feedingLogSignature(item);
+    const existing = bySignature.get(signature);
+    if (!existing || (isUuid(item.id) && !isUuid(existing.id))) {
+      bySignature.set(signature, item);
+    }
+  });
+  return [...bySignature.values()];
+}
+
+function feedingLogSignature(log) {
+  return [
+    log.babyId || "",
+    log.type || "",
+    minuteKey(log.startedAt),
+    log.amountMl || "",
+    log.amountGrams || "",
+    log.durationMinutes || "",
+    log.notes || ""
+  ].join("|");
+}
+
+function minuteKey(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  date.setSeconds(0, 0);
+  return date.toISOString();
+}
+
 function toFeedingRow(log) {
   return {
     id: stableUuid(log.id, "feed"),
@@ -266,11 +314,56 @@ function toDiaperRow(log) {
     id: stableUuid(log.id, "diaper"),
     baby_id: log.babyId,
     diaper_type: toRemoteDiaperType(log.type),
-    color: log.color || null,
-    texture: log.texture || null,
+    color: log.color || log.poopColor || log.peeColor || null,
+    texture: log.texture || log.poopConsistency || log.peeAmount || null,
+    pee_amount: log.peeAmount || null,
+    pee_color: log.peeColor || null,
+    pee_color_other: log.peeColorOther || null,
+    poop_consistency: log.poopConsistency || null,
+    poop_consistency_other: log.poopConsistencyOther || null,
+    poop_color: log.poopColor || null,
+    poop_color_other: log.poopColorOther || null,
     note: log.notes || null,
     logged_at: log.changedAt || log.loggedAt || new Date().toISOString()
   };
+}
+
+async function upsertDiaperRow(log) {
+  const fullRow = toDiaperRow(log);
+  const { data, error } = await supabase
+    .from("diaper_logs")
+    .upsert(fullRow, { onConflict: "id" })
+    .select("*")
+    .single();
+  if (!error) return data;
+  if (!isMissingDiaperDetailColumn(error)) throw error;
+
+  console.warn("Supabase diaper detail columns are missing. Falling back to legacy diaper log columns until migration 005 is applied.", error);
+  const legacyRow = toLegacyDiaperRow(log);
+  const legacyResult = await supabase
+    .from("diaper_logs")
+    .upsert(legacyRow, { onConflict: "id" })
+    .select("*")
+    .single();
+  if (legacyResult.error) throw legacyResult.error;
+  return legacyResult.data;
+}
+
+function toLegacyDiaperRow(log) {
+  const row = toDiaperRow(log);
+  delete row.pee_amount;
+  delete row.pee_color;
+  delete row.pee_color_other;
+  delete row.poop_consistency;
+  delete row.poop_consistency_other;
+  delete row.poop_color;
+  delete row.poop_color_other;
+  return row;
+}
+
+function isMissingDiaperDetailColumn(error) {
+  const message = `${error?.message || ""} ${error?.details || ""} ${error?.hint || ""}`;
+  return /pee_amount|pee_color|poop_consistency|poop_color|schema cache|column/i.test(message);
 }
 
 function fromDiaperRow(row) {
@@ -280,6 +373,13 @@ function fromDiaperRow(row) {
     type: fromRemoteDiaperType(row.diaper_type),
     color: row.color || undefined,
     texture: row.texture || undefined,
+    peeAmount: row.pee_amount || undefined,
+    peeColor: row.pee_color || undefined,
+    peeColorOther: row.pee_color_other || undefined,
+    poopConsistency: row.poop_consistency || undefined,
+    poopConsistencyOther: row.poop_consistency_other || undefined,
+    poopColor: row.poop_color || undefined,
+    poopColorOther: row.poop_color_other || undefined,
     notes: row.note || undefined,
     changedAt: row.logged_at
   };
@@ -356,8 +456,8 @@ function toRemoteDiaperType(type) {
 }
 
 function fromRemoteDiaperType(type) {
-  if (type === "pee") return "wet";
-  if (type === "poop") return "dirty";
+  if (type === "wet") return "pee";
+  if (type === "dirty") return "poop";
   return type || "mixed";
 }
 

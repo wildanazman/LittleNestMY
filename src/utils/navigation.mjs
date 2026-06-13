@@ -1,5 +1,6 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
 import { isLoggedIn } from "./localAuth.mjs";
+import { getParentProfile, initialsForName } from "./profile.mjs";
 
 const routes = {
   home: "/home_dashboard/",
@@ -144,6 +145,7 @@ function ensureNavigationStyles() {
 
 guardAuthenticatedRoutes();
 setupBottomNavigation();
+normalizePageHeaders();
 bindHeaderProfileButtons();
 
 function getNavKey(link) {
@@ -201,16 +203,75 @@ async function guardAuthenticatedRoutes() {
   }
 }
 
+function normalizePageHeaders(root = document) {
+  const screenId = getCurrentScreenId();
+  if (["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId)) return;
+
+  root.querySelectorAll("header").forEach((header) => {
+    header.className = "sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full";
+    header.style.position = "sticky";
+    header.style.top = "0";
+    header.style.height = "56px";
+    header.style.minHeight = "56px";
+
+    const title = header.querySelector("h1");
+    if (title) {
+      title.className = "font-headline-lg-mobile text-headline-lg-mobile text-primary truncate";
+    }
+
+    const backButton = findHeaderBackButton(header);
+    if (backButton && title && backButton.parentElement === header) {
+      const group = document.createElement("div");
+      group.className = "flex items-center gap-2 min-w-0";
+      header.insertBefore(group, backButton);
+      group.appendChild(backButton);
+      group.appendChild(title);
+    } else if (backButton?.parentElement) {
+      backButton.parentElement.className = "flex items-center gap-2 min-w-0";
+    }
+
+    if (backButton) {
+      ensureBackButtonIcon(backButton);
+      backButton.className = "w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0";
+      backButton.querySelector(".material-symbols-outlined")?.classList.add("text-primary");
+      backButton.setAttribute("aria-label", "Back to home");
+      backButton.dataset.headerBackHomeBound = "true";
+      backButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.location.href = window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/";
+      }, true);
+    }
+  });
+}
+
+function ensureBackButtonIcon(backButton) {
+  if (backButton.querySelector(".material-symbols-outlined")) return;
+  if (!/arrow_back/i.test(backButton.textContent || "")) return;
+  backButton.innerHTML = '<span class="material-symbols-outlined text-primary">arrow_back</span>';
+}
+
+function findHeaderBackButton(header) {
+  return [...header.querySelectorAll("button")].find((button) => {
+    const text = button.textContent || "";
+    const label = button.getAttribute("aria-label") || "";
+    return /arrow_back|back/i.test(text) || /back/i.test(label);
+  }) || null;
+}
+
 function bindHeaderProfileButtons(root = document) {
-  root.querySelectorAll("header img[alt*='Avatar'], header img[alt*='Profile'], header img[alt*='Baby']").forEach((image) => {
-    const target = image.closest("button") || image.parentElement;
+  root.querySelectorAll("header").forEach((header) => {
+    const target = findOrCreateHeaderProfileTarget(header);
     if (!target || target.dataset.profileNavBound === "true") return;
     target.dataset.profileNavBound = "true";
     target.setAttribute("role", target.tagName === "BUTTON" ? "button" : "button");
     target.setAttribute("tabindex", target.getAttribute("tabindex") || "0");
     target.setAttribute("aria-label", target.getAttribute("aria-label") || "Open settings");
-    target.className = "w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform cursor-pointer";
+    target.className = "w-8 h-8 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform cursor-pointer border-2 border-primary-container shrink-0";
+    if (target.dataset.createdHeaderProfile === "true") target.classList.add("ml-auto");
+    const image = ensureHeaderProfileImage(target);
     image.className = "w-full h-full object-cover";
+    renderHeaderProfileAvatar(target, image);
     target.addEventListener("click", () => {
       window.location.href = window.location.protocol === "file:" ? "../settings/code.html" : "/settings/";
     });
@@ -221,6 +282,57 @@ function bindHeaderProfileButtons(root = document) {
       }
     });
   });
+}
+
+function findOrCreateHeaderProfileTarget(header) {
+  const explicit = header.querySelector('[data-screen-target="settings"]');
+  if (explicit) return explicit;
+
+  const imageTargets = [...header.querySelectorAll("img")]
+    .map((image) => image.closest("button") || image.parentElement)
+    .filter((target) => target && target.closest("header") === header);
+  const roundedTarget = imageTargets.find((target) => /rounded-full|overflow-hidden/.test(target.className || ""));
+  if (roundedTarget) return roundedTarget;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.createdHeaderProfile = "true";
+  button.setAttribute("aria-label", "Open settings");
+  header.appendChild(button);
+  return button;
+}
+
+function ensureHeaderProfileImage(target) {
+  target.querySelectorAll(".material-symbols-outlined").forEach((icon) => icon.remove());
+  let image = target.querySelector("img");
+  if (!image) {
+    image = document.createElement("img");
+    target.prepend(image);
+  }
+  return image;
+}
+
+function renderHeaderProfileAvatar(target, image) {
+  const profile = getParentProfile();
+  let initials = target.querySelector("[data-header-profile-initials]");
+  if (!initials) {
+    initials = document.createElement("span");
+    initials.dataset.headerProfileInitials = "true";
+    initials.className = "font-headline-md text-headline-md text-primary";
+    target.appendChild(initials);
+  }
+
+  initials.textContent = initialsForName(profile.name);
+  if (profile.photoUrl) {
+    image.src = profile.photoUrl;
+    image.alt = "Parent profile";
+    image.classList.remove("hidden");
+    initials.classList.add("hidden");
+  } else {
+    image.removeAttribute("src");
+    image.classList.add("hidden");
+    initials.classList.remove("hidden");
+  }
 }
 
 function getCurrentScreenId() {

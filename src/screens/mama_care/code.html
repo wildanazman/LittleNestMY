@@ -49,10 +49,13 @@ tailwind.config = {
   .mama-input { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(216,27,96,.12); background: #fffafa; padding: 0 14px; color: #26191c; font-size: 16px; }
   textarea.mama-input { min-height: 96px; padding-top: 12px; }
   .status-chip { border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
+  .mama-skeleton { border-radius: 26px; background: linear-gradient(90deg, rgba(252,228,236,.75), rgba(255,255,255,.92), rgba(252,228,236,.75)); background-size: 200% 100%; animation: mamaSkeletonPulse 1.4s ease-in-out infinite; }
+  @keyframes mamaSkeletonPulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   :root.dark body { background: #1f1a1a; color: #fff7ed; }
   :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
   :root.dark .mama-input { background: #1f1a1a; color: #fff7ed; border-color: rgba(255,255,255,.12); -webkit-text-fill-color: #fff7ed; }
   :root.dark .mama-input::placeholder { color: rgba(255,247,237,.55); -webkit-text-fill-color: rgba(255,247,237,.55); }
+  :root.dark .mama-skeleton { background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08)); background-size: 200% 100%; }
   :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="time"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.35); }
@@ -60,11 +63,28 @@ tailwind.config = {
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32">
+<section class="max-w-md mx-auto px-5 pt-5 pb-32 space-y-5" id="mamaLoadingState" aria-label="Loading Mama Care">
+  <div class="h-14 flex items-center justify-between">
+    <div class="mama-skeleton h-10 w-36 rounded-full"></div>
+    <div class="mama-skeleton h-10 w-10 rounded-full"></div>
+  </div>
+  <div class="space-y-2">
+    <div class="mama-skeleton h-5 w-24 rounded-lg"></div>
+    <div class="mama-skeleton h-16 w-full"></div>
+  </div>
+  <div class="mama-skeleton h-56 w-full"></div>
+  <div class="mama-skeleton h-48 w-full"></div>
+  <div class="mama-skeleton h-48 w-full"></div>
+  <div class="mama-skeleton h-32 w-full"></div>
+</section>
+<div class="hidden" id="mamaContent">
 <header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between shadow-[0_4px_20px_rgba(216,27,96,0.06)]">
-  <button class="h-10 rounded-full px-3 bg-surface-container text-primary font-bold flex items-center gap-1 active:scale-95 transition-transform" id="backToBaby" type="button">
+  <div class="flex items-center gap-2 min-w-0">
+  <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform shrink-0" id="backToBaby" type="button" aria-label="Back to baby dashboard">
     <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-    <span>Back to Baby</span>
   </button>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Mama Care</h1>
+  </div>
   <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
     <span class="material-symbols-outlined">settings</span>
   </button>
@@ -194,6 +214,7 @@ tailwind.config = {
   <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
   <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
 </nav>
+</div>
 
 <script type="module">
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
@@ -247,6 +268,8 @@ async function bootstrap() {
   const babyState = await loadBabyProfilesRemote(babyProfile);
   selectedBabyId = babyState.selectedBabyId;
   if (!selectedBabyId || !babyState.selectedBaby) {
+    document.getElementById("mamaLoadingState").classList.add("hidden");
+    document.getElementById("mamaContent").classList.add("hidden");
     document.getElementById("mamaApp").classList.add("hidden");
     document.getElementById("noBabyState").classList.remove("hidden");
     return;
@@ -262,6 +285,7 @@ async function bootstrap() {
     });
   }
   await refreshMamaCare();
+  showMamaContent();
 }
 
 async function refreshMamaCare() {
@@ -276,6 +300,12 @@ function renderAll() {
   renderMedications();
   renderAppointments();
   renderRecoveryNotes();
+}
+
+function showMamaContent() {
+  document.getElementById("mamaLoadingState")?.classList.add("hidden");
+  document.getElementById("noBabyState")?.classList.add("hidden");
+  document.getElementById("mamaContent")?.classList.remove("hidden");
 }
 
 function renderCheckin() {

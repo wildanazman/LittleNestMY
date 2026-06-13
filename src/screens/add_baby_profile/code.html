@@ -247,7 +247,7 @@
         } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { fileToCroppedAvatarDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getBabyPermissions, redirectViewOnly, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
         if (!(await isLoggedIn())) {
@@ -274,7 +274,16 @@
             const file = e.target.files[0];
             if (file) {
                 try {
-                    avatarDataUrl = await fileToResizedDataUrl(file, { maxSize: 720, quality: 0.82 });
+                    avatarDataUrl = await fileToCroppedAvatarDataUrl(file, {
+                        outputSize: 720,
+                        quality: 0.82,
+                        title: "Adjust baby photo",
+                        helpText: "Crop the photo so your baby fits nicely in the circle."
+                    });
+                    if (!avatarDataUrl) {
+                        avatarInput.value = "";
+                        return;
+                    }
                     babyAvatarPreview.src = avatarDataUrl;
                     babyAvatarPreview.classList.remove('hidden');
                     avatarPlaceholder.classList.add('hidden');

@@ -130,6 +130,55 @@
         .custom-shadow {
             box-shadow: 0 8px 30px rgba(255, 191, 163, 0.12);
         }
+        .feeding-type-tile {
+            min-width: 136px;
+            min-height: 132px;
+            border: 2px solid transparent;
+            box-shadow: 0 12px 26px rgba(131, 83, 60, 0.06);
+        }
+        .feeding-type-tile.is-active {
+            background: #ffbfa3;
+            border-color: #83533c;
+            color: #673c27;
+            box-shadow: 0 14px 30px rgba(131, 83, 60, 0.16);
+        }
+        .amount-stepper-button {
+            width: 76px;
+            height: 76px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            line-height: 1;
+            transition: transform 120ms ease, opacity 120ms ease;
+        }
+        .amount-stepper-button:active {
+            transform: scale(0.96);
+        }
+        .amount-display-input::-webkit-outer-spin-button,
+        .amount-display-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .amount-display-input {
+            -moz-appearance: textfield;
+        }
+        .hide-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        :root.dark .feeding-type-tile.is-active {
+            background: #ffbfa3;
+            color: #2a1308;
+        }
+        :root.dark .amount-display-input {
+            color: #fff7ed;
+            -webkit-text-fill-color: #fff7ed;
+        }
     </style>
 <style>
     body {
@@ -151,61 +200,96 @@
 <img alt="Baby Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvkDhD9cnIgp1eMJWyjtiHsFxvNVo-AHqS2i_8DVqEpDVtS4IJjvbaQ8Wg4v1fYl_MLmDYB63P6VYh90NVqCpcF0lFN50KpjwpRr2nD0wCXIh6tUDcFoKJL5qBXtQMDTlErZjVqYuA6nUFYI7jX-8IKNOy-5GoS-xiEUWAgNgpdgww23mSTmyxG7gOq5mZIIeiYQ7p-PPSeYNBUlchyaJ8kYT3-dm8NpIHPD9AdDUdfnjm-ksQEaBobI11m"/>
 </div>
 </header>
-<main class="px-container-padding pt-6 space-y-lg">
-<!-- Feeding Type Segmented Control -->
+<main class="px-container-padding pt-6 space-y-xl max-w-md mx-auto overflow-hidden">
+<!-- Feeding Type Tiles -->
 <section class="space-y-sm">
-<h2 class="font-label-md text-label-md text-on-surface-variant px-1">Feeding Type</h2>
-<div class="relative flex p-1 bg-surface-container rounded-full w-full h-12 items-center">
-<div class="absolute h-10 bg-surface-container-lowest rounded-full shadow-sm transition-all duration-300 z-0" id="active-indicator" style="width: calc(25% - 4px); left: 4px;"></div>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md text-on-surface transition-colors" data-feeding-type="breast" type="button">Breast</button>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md text-on-surface transition-colors" data-feeding-type="bottle" type="button">Bottle</button>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md text-on-surface transition-colors" data-feeding-type="formula" type="button">Formula</button>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md text-on-surface transition-colors" data-feeding-type="solid" type="button">Solid</button>
+<h2 class="font-label-md text-label-md text-on-surface-variant px-1 uppercase tracking-wide">Feeding Type</h2>
+<div class="-mx-container-padding px-container-padding overflow-x-auto pb-2 hide-scrollbar">
+<div class="flex gap-gutter min-w-max">
+<button class="feeding-type-tile rounded-[28px] bg-surface-container-low flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="breast" type="button" aria-label="Breast feeding">
+<span class="material-symbols-outlined text-[36px]">child_care</span>
+<span class="font-body-lg text-body-lg">Breast</span>
+</button>
+<button class="feeding-type-tile rounded-[28px] bg-surface-container-low flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="bottle" type="button" aria-label="Bottle feeding">
+<span class="material-symbols-outlined text-[36px]">local_drink</span>
+<span class="font-body-lg text-body-lg">Bottle</span>
+</button>
+<button class="feeding-type-tile rounded-[28px] bg-surface-container-low flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="formula" type="button" aria-label="Formula feeding">
+<span class="material-symbols-outlined text-[36px]">blender</span>
+<span class="font-body-lg text-body-lg">Formula</span>
+</button>
+<button class="feeding-type-tile rounded-[28px] bg-surface-container-low flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="solid" type="button" aria-label="Solid feeding">
+<span class="material-symbols-outlined text-[36px]">restaurant</span>
+<span class="font-body-lg text-body-lg">Solid</span>
+</button>
 </div>
+</div>
+<div class="hidden" id="active-indicator"></div>
 </section>
-<!-- Log Form Inputs -->
-<div class="grid grid-cols-2 gap-gutter">
-<!-- Amount Input -->
+
+<!-- Calm Logging Card -->
+<section class="rounded-[32px] bg-surface-container-lowest p-5 custom-shadow space-y-lg">
 <div class="space-y-sm" id="amountField">
-<label class="font-label-md text-label-md text-on-surface-variant px-1" id="amountLabel">Amount</label>
-<div class="relative">
-<input class="w-full h-14 bg-surface-container-low border-none rounded-xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" id="amountInput" min="0" placeholder="120" type="number"/>
-<span class="absolute right-4 top-1/2 -translate-y-1/2 font-label-md text-on-surface-variant" id="amountUnit">ml</span>
+<label class="block text-center font-label-md text-label-md text-on-surface uppercase tracking-wide" id="amountLabel">Amount</label>
+<div class="flex items-center justify-between gap-3">
+<button class="amount-stepper-button bg-surface-container-highest text-primary" id="decreaseAmountButton" type="button" aria-label="Decrease amount">-</button>
+<div class="flex items-end justify-center min-w-0 flex-1">
+<input class="amount-display-input w-full max-w-[150px] bg-transparent border-0 p-0 text-center text-[72px] leading-none font-extrabold text-primary focus:ring-0" id="amountInput" min="0" placeholder="120" type="number" inputmode="numeric"/>
+<span class="pb-2 ml-1 font-headline-md text-headline-md text-on-surface-variant" id="amountUnit">ml</span>
+</div>
+<button class="amount-stepper-button bg-primary-container text-primary" id="increaseAmountButton" type="button" aria-label="Increase amount">+</button>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 hide-scrollbar" id="amountPresets">
+<button class="h-12 px-5 rounded-full bg-surface-container text-on-surface-variant font-body-lg text-body-lg shrink-0" data-amount-preset="60" type="button">60ml</button>
+<button class="h-12 px-5 rounded-full bg-surface-container text-on-surface-variant font-body-lg text-body-lg shrink-0" data-amount-preset="90" type="button">90ml</button>
+<button class="h-12 px-5 rounded-full bg-surface-container-highest text-primary font-body-lg text-body-lg shrink-0" data-amount-preset="120" type="button">120ml</button>
+<button class="h-12 px-5 rounded-full bg-surface-container text-on-surface-variant font-body-lg text-body-lg shrink-0" data-amount-preset="150" type="button">150ml</button>
 </div>
 </div>
-<!-- Duration Input -->
+
 <div class="space-y-sm" id="durationField">
 <label class="font-label-md text-label-md text-on-surface-variant px-1">Duration</label>
 <div class="relative">
-<input class="w-full h-14 bg-surface-container-low border-none rounded-xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" id="durationInput" min="0" placeholder="15" type="number"/>
+<input class="w-full h-14 bg-surface-container-low border-none rounded-2xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" id="durationInput" min="0" placeholder="15" type="number" inputmode="numeric"/>
 <span class="absolute right-4 top-1/2 -translate-y-1/2 font-label-md text-on-surface-variant">min</span>
 </div>
 </div>
-<!-- Time Picker -->
-<div class="space-y-sm">
-<label class="font-label-md text-label-md text-on-surface-variant px-1">Time</label>
-<div class="relative">
-<input class="w-full h-14 bg-surface-container-low border-none rounded-xl px-4 font-headline-md text-headline-md text-on-surface appearance-none" id="timeInput" type="time" value="10:30"/>
-<span class="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary pointer-events-none">schedule</span>
+
+<div class="grid grid-cols-2 gap-3">
+<label class="min-w-0 rounded-[22px] bg-surface-container-low px-3 py-3 border border-outline-variant/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">calendar_month</span>
+<span class="min-w-0 flex-1">
+<span class="block font-label-sm text-[11px] leading-4 text-on-surface uppercase">Date</span>
+<input class="w-full min-w-0 bg-transparent border-0 p-0 text-[14px] leading-5 text-on-surface focus:ring-0 dark:text-white" id="dateInput" type="date"/>
+</span>
+</label>
+
+<label class="min-w-0 rounded-[22px] bg-surface-container-low px-3 py-3 border border-outline-variant/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">schedule</span>
+<span class="min-w-0 flex-1">
+<span class="block font-label-sm text-[11px] leading-4 text-on-surface uppercase">Time</span>
+<input class="w-full min-w-0 bg-transparent border-0 p-0 text-[14px] leading-5 text-on-surface focus:ring-0 dark:text-white" id="timeInput" type="time"/>
+</span>
+</label>
 </div>
-</div>
-</div>
-<!-- Notes Text Area -->
+
 <section class="space-y-sm">
 <label class="font-label-md text-label-md text-on-surface-variant px-1">Notes</label>
-<textarea class="w-full min-h-[120px] bg-surface-container-low border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="noteInput" placeholder="Optional note, e.g. finished calmly after burping"></textarea>
+<textarea class="w-full min-h-[96px] bg-surface-container-low border-none rounded-2xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="noteInput" placeholder="Optional note, e.g. finished calmly after burping"></textarea>
 </section>
+</section>
+
 <!-- Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="saveFeedback" aria-live="polite">Saved.</p>
-<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full custom-shadow active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-2" id="saveFeedingButton" type="button">
+<button class="w-full h-20 bg-primary text-on-primary font-headline-md text-[24px] leading-8 font-extrabold rounded-full custom-shadow active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-2" id="saveFeedingButton" type="button">
 <span class="material-symbols-outlined">check_circle</span>
-            Save Entry
+            Save Log
         </button>
 <!-- Recent History Section -->
 <section class="space-y-md pt-base">
 <div class="flex justify-between items-center px-1">
-<h3 class="font-headline-md text-headline-md text-on-surface">Recent History</h3>
-<button class="font-label-md text-label-md text-primary" id="feedingSeeAllButton" type="button">See All</button>
+<h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wide">Recent Feeds</h3>
+<button class="font-label-md text-label-md text-primary" id="feedingSeeAllButton" type="button">View All</button>
 </div>
 <div class="space-y-sm" id="feedingHistoryList">
 <!-- Card 1 -->
@@ -289,7 +373,7 @@
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
-        const state = { feedingType: "bottle" };
+        const state = { feedingType: "bottle", isSaving: false };
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
         const permissions = await getBabyPermissions(selectedBabyId);
@@ -303,6 +387,7 @@
         const amountUnit = document.getElementById("amountUnit");
         const durationField = document.getElementById("durationField");
         const durationInput = document.getElementById("durationInput");
+        const dateInput = document.getElementById("dateInput");
         const timeInput = document.getElementById("timeInput");
         const noteInput = document.getElementById("noteInput");
         const saveButton = document.getElementById("saveFeedingButton");
@@ -323,20 +408,32 @@
         saveButton.addEventListener("click", saveEntry);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
         seeAllButton.addEventListener("click", () => showComingSoon("Feeding history", "A full feeding history view is coming soon."));
+        document.getElementById("decreaseAmountButton")?.addEventListener("click", () => adjustAmount(-10));
+        document.getElementById("increaseAmountButton")?.addEventListener("click", () => adjustAmount(10));
+        document.querySelectorAll("[data-amount-preset]").forEach((button) => {
+            button.addEventListener("click", () => setAmount(Number(button.dataset.amountValue || button.dataset.amountPreset)));
+        });
+        amountInput.addEventListener("input", updatePresetState);
+        dateInput.value = getCurrentDateValue();
         timeInput.value = getCurrentTimeValue();
+        setAmount(120);
         moveIndicator(1);
         updateRelevantFields();
         await refreshLogs();
 
         function moveIndicator(index) {
             const indicator = document.getElementById("active-indicator");
-            const offset = index * 25;
-            indicator.style.left = `calc(${offset}% + 4px)`;
+            if (indicator) {
+                const offset = index * 25;
+                indicator.style.left = `calc(${offset}% + 4px)`;
+            }
 
             typeButtons.forEach((btn, i) => {
-                btn.classList.toggle("text-primary", i === index);
-                btn.classList.toggle("font-bold", i === index);
-                btn.classList.toggle("text-on-surface", i !== index);
+                const isActive = i === index;
+                btn.classList.toggle("is-active", isActive);
+                btn.classList.toggle("text-primary", isActive);
+                btn.classList.toggle("font-bold", isActive);
+                btn.classList.toggle("text-on-surface", !isActive);
             });
         }
 
@@ -349,10 +446,21 @@
             amountUnit.textContent = state.feedingType === "solid" ? "g" : "ml";
             amountInput.placeholder = state.feedingType === "solid" ? "45" : "120";
             durationInput.placeholder = state.feedingType === "breast" ? "15" : "10";
+            document.getElementById("amountPresets")?.classList.toggle("hidden", !usesAmount);
+            document.querySelectorAll("[data-amount-preset]").forEach((button) => {
+                const value = Number(button.dataset.amountPreset);
+                button.textContent = state.feedingType === "solid" ? `${Math.round(value / 2)}g` : `${value}ml`;
+                button.dataset.amountValue = state.feedingType === "solid" ? String(Math.round(value / 2)) : String(value);
+            });
+            updatePresetState();
         }
 
         async function saveEntry() {
-            const startedAt = buildDateTime(timeInput.value);
+            if (state.isSaving) return;
+            state.isSaving = true;
+            saveButton.disabled = true;
+            saveButton.classList.add("opacity-70");
+            const startedAt = buildDateTime(dateInput.value, timeInput.value);
             const amountValue = Number(amountInput.value);
             const durationValue = Number(durationInput.value);
             const usesAmount = ["bottle", "formula", "solid"].includes(state.feedingType);
@@ -363,6 +471,9 @@
             if ((amountInput.value && (!Number.isFinite(amountValue) || amountValue <= 0)) || (durationInput.value && (!Number.isFinite(durationValue) || durationValue <= 0))) {
                 saveFeedback.textContent = "Use a positive number for amount or duration.";
                 saveFeedback.classList.remove("hidden");
+                state.isSaving = false;
+                saveButton.disabled = false;
+                saveButton.classList.remove("opacity-70");
                 return;
             }
 
@@ -388,9 +499,14 @@
             amountInput.value = "";
             durationInput.value = "";
             noteInput.value = "";
+            dateInput.value = getCurrentDateValue();
             timeInput.value = getCurrentTimeValue();
+            updatePresetState();
             await refreshLogs();
             showSavedFeedback();
+            state.isSaving = false;
+            saveButton.disabled = false;
+            saveButton.classList.remove("opacity-70");
         }
 
         async function refreshLogs() {
@@ -404,7 +520,7 @@
         }
 
         function renderHistory() {
-            const logs = feedingLogItems
+            const logs = dedupeFeedingLogs(feedingLogItems)
                 .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
                 .slice(0, 5);
 
@@ -476,11 +592,74 @@
             });
         }
 
-        function buildDateTime(timeValue) {
+        function adjustAmount(change) {
+            const current = Number(amountInput.value || amountInput.placeholder || 0);
+            const next = Math.max(0, current + change);
+            amountInput.value = next ? String(next) : "";
+            updatePresetState();
+        }
+
+        function setAmount(value) {
+            amountInput.value = Number.isFinite(value) ? String(value) : "";
+            updatePresetState();
+        }
+
+        function updatePresetState() {
+            const current = Number(amountInput.value);
+            document.querySelectorAll("[data-amount-preset]").forEach((button) => {
+                const value = Number(button.dataset.amountValue || button.dataset.amountPreset);
+                const active = current === value;
+                button.classList.toggle("bg-surface-container-highest", active);
+                button.classList.toggle("text-primary", active);
+                button.classList.toggle("font-bold", active);
+                button.classList.toggle("bg-surface-container", !active);
+                button.classList.toggle("text-on-surface-variant", !active);
+            });
+        }
+
+        function dedupeFeedingLogs(logs) {
+            const bySignature = new Map();
+            (logs || []).forEach((log) => {
+                const signature = [
+                    log.babyId || "",
+                    log.type || "",
+                    minuteKey(log.startedAt),
+                    log.amountMl || "",
+                    log.amountGrams || "",
+                    log.durationMinutes || "",
+                    log.notes || ""
+                ].join("|");
+                const existing = bySignature.get(signature);
+                if (!existing || (isUuid(log.id) && !isUuid(existing.id))) {
+                    bySignature.set(signature, log);
+                }
+            });
+            return [...bySignature.values()];
+        }
+
+        function isUuid(value) {
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+        }
+
+        function minuteKey(value) {
+            if (!value) return "";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return String(value);
+            date.setSeconds(0, 0);
+            return date.toISOString();
+        }
+
+        function buildDateTime(dateValue, timeValue) {
             const [hours, minutes] = timeValue.split(":").map(Number);
-            const date = new Date();
+            const date = dateValue ? new Date(`${dateValue}T00:00:00`) : new Date();
             date.setHours(hours || 0, minutes || 0, 0, 0);
             return date.toISOString();
+        }
+
+        function getCurrentDateValue() {
+            const date = new Date();
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+            return date.toISOString().slice(0, 10);
         }
 
         function getCurrentTimeValue() {

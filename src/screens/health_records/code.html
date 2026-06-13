@@ -104,7 +104,7 @@ tailwind.config = {
       </label>
       <label class="block space-y-1">
         <span class="text-[13px] font-bold text-on-surface" id="titleLabel">Medicine / record title</span>
-        <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="titleInput" placeholder="Example: Paracetamol, Fever, Cough"/>
+        <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-outline-variant resize-none" id="titleInput" placeholder="Example: Paracetamol, Fever, Cough"/>
       </label>
       <div class="grid grid-cols-2 gap-3">
         <label class="block space-y-1">
@@ -119,14 +119,14 @@ tailwind.config = {
       <div class="grid grid-cols-2 gap-3">
         <label class="block space-y-1">
           <span class="text-[13px] font-bold text-on-surface">Temp C</span>
-          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="tempInput" inputmode="decimal" type="number" min="30" max="45" step="0.1" placeholder="Optional"/>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-outline-variant resize-none" id="tempInput" inputmode="decimal" type="number" min="30" max="45" step="0.1" placeholder="Optional in Celsius"/>
         </label>
         <label class="block space-y-1">
           <span class="text-[13px] font-bold text-on-surface">Dose / amount</span>
-          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-on-surface-variant" id="doseInput" placeholder="Example: 2.5 ml"/>
+          <input class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface placeholder:text-outline-variant resize-none" id="doseInput" placeholder="Example: 2.5 ml"/>
         </label>
       </div>
-      <textarea class="w-full min-h-24 rounded-2xl border-0 bg-surface-container px-3 py-3 text-on-surface placeholder:text-on-surface-variant" id="notesInput" placeholder="Example: Baby pernah ada fever on 11 Feb. Ate less but still drinking milk."></textarea>
+      <textarea class="w-full min-h-24 rounded-2xl border-0 bg-surface-container px-3 py-3 text-on-surface placeholder:text-outline-variant resize-none" id="notesInput" placeholder="Describe the situation"></textarea>
       <p class="hidden text-[14px] font-bold text-error" id="formError"></p>
       <button class="w-full h-12 rounded-full bg-primary text-on-primary font-bold active:scale-95 transition-transform" type="submit">Save Record</button>
     </form>

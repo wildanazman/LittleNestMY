@@ -138,6 +138,42 @@
             background: #d6c2bb;
             border-radius: 10px;
         }
+        .diaper-option-active {
+            border-color: #83533c;
+            background: #ffdbcc;
+            color: #673c27;
+        }
+        html.dark .diaper-option-active {
+            border-color: #ffbfa3;
+            background: rgba(255, 191, 163, 0.16);
+            color: #fff7ed;
+        }
+        .diaper-input {
+            color: var(--color-text-primary, #1b1c19);
+        }
+        html.dark .diaper-input {
+            background: #242120;
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #fff7ed;
+        }
+        html.dark .diaper-input::placeholder {
+            color: rgba(255, 247, 237, 0.52);
+        }
+        .color-choice {
+            border-radius: 18px;
+            min-height: 84px;
+        }
+        .color-swatch {
+            width: 38px;
+            height: 38px;
+            border-radius: 9999px;
+            border: 2px solid rgba(131, 83, 60, 0.16);
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.35);
+        }
+        html.dark .color-swatch {
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.14);
+        }
     </style>
 <style>
     body {
@@ -162,8 +198,7 @@
 <div class="max-w-md mx-auto space-y-lg">
 <!-- Hero Illustration / Mood Section -->
 <div class="relative w-full aspect-[16/9] rounded-3xl overflow-hidden soft-shadow bg-surface-container-low group">
-<img alt="Context" class="w-full h-full object-cover opacity-90" data-alt="A minimalist and aesthetically pleasing digital illustration of a clean nursery corner with a stack of soft diapers and a wooden mobile overhead. The lighting is diffused and warm, featuring a palette of soft peach and sage green. The scene evokes a digital sanctuary, prioritizing tranquility and security for parents during a diaper change." src="https://lh3.googleusercontent.com/aida/AP1WRLu9Sfp3CEXKm4yrgn8tkHG0Yu_l6wcWmmzsFd0aqCcz1vkaqP_UJeJK6J0DayTSRWlpmk7i093QH7tJzDK5P1Bg3PE3h-tpS-cE8geETEVQSTRUDab4Y65WE6mKg6SKjGtQbwu6t1rbrKqeWgAr2GHTsPBUV03qlj0-HGUvd0jb7ncSrHN9W-bDRUoUDeW0ZdXzcUrIRUo6SjfNhQSq6SnQoDGkh5KaYy0TaLSsUi35xZiKTROuDm0iRq3U"/>
-<div class="absolute inset-0 bg-gradient-to-t from-surface-bright/40 to-transparent"></div>
+<div class="w-full h-full rounded-[28px] bg-gradient-to-br from-[#FFF4EF] via-[#FFFDF8] to-[#F1F7EC] flex items-center justify-center p-6 dark:from-[#241817] dark:via-[#181514] dark:to-[#18201A]"><div class="flex items-center gap-4"><div class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#FFE1DA] text-[#9A5A43] dark:bg-[#3A2522] dark:text-[#FFD6CC]"><span class="material-symbols-outlined text-[34px]">child_care</span></div><div><h2 class="text-lg font-bold text-[#3A241C] dark:text-white">Track every change</h2><p class="mt-1 text-sm text-[#7A5A50] dark:text-white/70">Log pee, poop, color, and time to help spot patterns.</p></div></div></div><div class="absolute inset-0 bg-gradient-to-t from-surface-bright/40 to-transparent"></div>
 </div>
 <!-- Segmented Control: Type -->
 <section class="space-y-sm">
@@ -171,40 +206,121 @@
 <div class="relative bg-surface-container-high p-1 rounded-full flex items-center h-12 shadow-inner">
 <!-- Sliding Active Indicator -->
 <div class="absolute h-10 w-[32%] bg-surface-container-lowest rounded-full soft-shadow transition-all duration-300 ease-out left-1" id="segment-indicator"></div>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface" data-diaper-type="wet" type="button">Pee</button>
-<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="dirty" type="button">Poop</button>
+<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface" data-diaper-type="pee" type="button">Pee</button>
+<button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="poop" type="button">Poop</button>
 <button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="mixed" type="button">Mixed</button>
 </div>
 </section>
-<!-- Color/Texture Selector -->
+<!-- Date and Time -->
 <section class="space-y-sm">
-<h3 class="font-label-md text-label-md text-on-surface-variant px-1">Texture &amp; Color</h3>
-<div class="grid grid-cols-5 gap-sm">
-<button class="flex flex-col items-center space-y-xs group" data-texture="Normal" type="button">
-<div class="w-12 h-12 rounded-full border-2 border-primary bg-[#F4E4D4] flex items-center justify-center transition-transform group-active:scale-90">
-<span class="material-symbols-outlined text-primary text-body-md" style="font-variation-settings: 'FILL' 1;">water_drop</span>
+<h3 class="font-label-md text-label-md text-on-surface-variant px-1">Time of change</h3>
+<div class="grid grid-cols-2 gap-sm">
+<label class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-xs">
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-[18px]">calendar_today</span>Date</span>
+<input class="diaper-input w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="diaperDateInput" type="date"/>
+</label>
+<label class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-xs">
+<span class="flex items-center gap-xs font-label-sm text-label-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-[18px]">schedule</span>Time</span>
+<input class="diaper-input w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="diaperTimeInput" type="time"/>
+</label>
 </div>
-<span class="font-label-sm text-label-sm text-primary">Normal</span>
-</button>
-<button class="flex flex-col items-center space-y-xs group" data-texture="Loose" type="button">
-<div class="w-12 h-12 rounded-full bg-[#E8D9B4] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Loose</span>
-</button>
-<button class="flex flex-col items-center space-y-xs group" data-texture="Hard" type="button">
-<div class="w-12 h-12 rounded-full bg-[#83533c] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Hard</span>
-</button>
-<button class="flex flex-col items-center space-y-xs group" data-color="Green" type="button">
-<div class="w-12 h-12 rounded-full bg-[#D4E8D4] flex items-center justify-center hover:opacity-80 transition-all group-active:scale-90"></div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Green</span>
-</button>
-<button class="flex flex-col items-center justify-center space-y-xs group" data-color="Other" type="button">
-<div class="w-12 h-12 rounded-full border border-dashed border-outline flex items-center justify-center hover:bg-secondary-container transition-all group-active:scale-90">
-<span class="material-symbols-outlined text-outline">add</span>
+</section>
+<!-- Type-specific Details -->
+<section class="space-y-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant px-1">Details</h3>
+<div class="space-y-sm" id="peeDetailsSection">
+<div class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-sm">
+<p class="font-label-md text-label-md text-on-surface">Pee details</p>
+<div class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Amount</p>
+<div class="grid grid-cols-3 gap-xs">
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeAmount" data-option-value="Light" type="button">Light</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeAmount" data-option-value="Normal" type="button">Normal</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeAmount" data-option-value="Heavy" type="button">Heavy</button>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Other</span>
+</div>
+<div class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Color</p>
+<div class="grid grid-cols-5 gap-xs">
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeColor" data-option-value="Pale yellow" type="button" aria-label="Pale yellow pee color">
+<span class="color-swatch bg-[#FFF7B8]"></span>
+<span>Pale</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeColor" data-option-value="Yellow" type="button" aria-label="Yellow pee color">
+<span class="color-swatch bg-[#FACC15]"></span>
+<span>Yellow</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeColor" data-option-value="Dark yellow" type="button" aria-label="Dark yellow pee color">
+<span class="color-swatch bg-[#D97706]"></span>
+<span>Dark</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeColor" data-option-value="Pink/orange stain" type="button" aria-label="Pink or orange pee stain">
+<span class="color-swatch bg-gradient-to-br from-[#FB7185] to-[#FDBA74]"></span>
+<span>Stain</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-dashed border-outline p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="peeColor" data-option-value="Other" type="button" aria-label="Other pee color">
+<span class="color-swatch bg-surface-container-lowest flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[20px]">add</span></span>
+<span>Other</span>
 </button>
 </div>
+<input class="diaper-input hidden w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="peeColorOtherInput" placeholder="Describe pee color" type="text"/>
+</div>
+</div>
+</div>
+<div class="space-y-sm hidden" id="poopDetailsSection">
+<div class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-sm">
+<p class="font-label-md text-label-md text-on-surface">Poop details</p>
+<div class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Consistency</p>
+<div class="grid grid-cols-2 gap-xs">
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopConsistency" data-option-value="Soft" type="button">Soft</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopConsistency" data-option-value="Watery / Diarrhea" type="button">Watery / Diarrhea</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopConsistency" data-option-value="Hard" type="button">Hard</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopConsistency" data-option-value="Mucus-like" type="button">Mucus-like</button>
+<button class="diaper-choice border border-outline-variant rounded-full py-2 px-3 font-label-sm text-label-sm text-on-surface-variant col-span-2" data-option-group="poopConsistency" data-option-value="Other" type="button">Other</button>
+</div>
+<input class="diaper-input hidden w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="poopConsistencyOtherInput" placeholder="Describe poop consistency" type="text"/>
+</div>
+<div class="space-y-xs">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Color</p>
+<div class="grid grid-cols-4 gap-xs">
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="Yellow" type="button" aria-label="Yellow poop color">
+<span class="color-swatch bg-[#FACC15]"></span>
+<span>Yellow</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="Brown" type="button" aria-label="Brown poop color">
+<span class="color-swatch bg-[#8B5A2B]"></span>
+<span>Brown</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="Green" type="button" aria-label="Green poop color">
+<span class="color-swatch bg-[#65A30D]"></span>
+<span>Green</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="Black" type="button" aria-label="Black poop color">
+<span class="color-swatch bg-[#171717]"></span>
+<span>Black</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="Red" type="button" aria-label="Red poop color">
+<span class="color-swatch bg-[#DC2626]"></span>
+<span>Red</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-outline-variant p-2 font-label-sm text-label-sm text-on-surface-variant" data-option-group="poopColor" data-option-value="White / Pale" type="button" aria-label="White or pale poop color">
+<span class="color-swatch bg-[#F8FAFC]"></span>
+<span>Pale</span>
+</button>
+<button class="diaper-choice color-choice flex flex-col items-center justify-center gap-xs border border-dashed border-outline p-2 font-label-sm text-label-sm text-on-surface-variant col-span-2" data-option-group="poopColor" data-option-value="Other" type="button" aria-label="Other poop color">
+<span class="color-swatch bg-surface-container-lowest flex items-center justify-center"><span class="material-symbols-outlined text-outline text-[20px]">add</span></span>
+<span>Other</span>
+</button>
+</div>
+<input class="diaper-input hidden w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="poopColorOtherInput" placeholder="Describe poop color" type="text"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Safety Note -->
+<section class="bg-primary-container/20 border border-primary-container rounded-2xl p-sm">
+<p class="font-label-sm text-label-sm text-on-primary-container">Track diaper changes for patterns. Contact Klinik Kesihatan or doctor if you see red, black, or white/pale stool, signs of dehydration, or if baby seems unwell.</p>
 </section>
 <!-- Notes Field -->
 <section class="space-y-sm">
@@ -212,16 +328,8 @@
 <h3 class="font-label-md text-label-md text-on-surface-variant">Notes</h3>
 <span class="font-label-sm text-label-sm text-outline">Optional</span>
 </div>
-<textarea class="w-full h-32 bg-surface-container-low border-none rounded-[16px] p-md font-body-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container focus:ring-opacity-50 transition-all resize-none" id="diaperNotesInput" placeholder="Any observations? (e.g. rash, amount...)"></textarea>
+<textarea class="diaper-input w-full h-32 bg-surface-container-low border border-transparent rounded-[16px] p-md font-body-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container focus:ring-opacity-50 transition-all resize-none" id="diaperNotesInput" placeholder="Any observations? (e.g. rash, amount...)"></textarea>
 </section>
-<!-- Time Selector (Quick Component) -->
-<div class="bg-surface-container-low rounded-2xl p-sm flex items-center justify-between border border-surface-container-high">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-primary">schedule</span>
-<span class="font-label-md text-label-md">Time of change</span>
-</div>
-<span class="font-headline-md text-headline-md text-primary" id="diaperTimeLabel">Now</span>
-</div>
 <!-- Large Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="diaperSaveFeedback" aria-live="polite">Saved.</p>
 <button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full inner-glow-primary soft-shadow active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
@@ -272,9 +380,14 @@
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = {
-            diaperType: "wet",
-            color: "",
-            texture: "Normal"
+            diaperType: "pee",
+            peeAmount: "Normal",
+            peeColor: "Yellow",
+            peeColorOther: "",
+            poopConsistency: "Soft",
+            poopConsistencyOther: "",
+            poopColor: "Brown",
+            poopColorOther: ""
         };
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
@@ -284,12 +397,18 @@
             await new Promise(() => {});
         }
         const segmentButtons = [...document.querySelectorAll("[data-diaper-type]")];
-        const detailButtons = [...document.querySelectorAll("[data-color], [data-texture]")];
+        const choiceButtons = [...document.querySelectorAll("[data-option-group]")];
         const notesInput = document.getElementById("diaperNotesInput");
+        const dateInput = document.getElementById("diaperDateInput");
+        const timeInput = document.getElementById("diaperTimeInput");
+        const peeDetailsSection = document.getElementById("peeDetailsSection");
+        const poopDetailsSection = document.getElementById("poopDetailsSection");
+        const peeColorOtherInput = document.getElementById("peeColorOtherInput");
+        const poopConsistencyOtherInput = document.getElementById("poopConsistencyOtherInput");
+        const poopColorOtherInput = document.getElementById("poopColorOtherInput");
         const saveButton = document.getElementById("saveDiaperButton");
         const saveFeedback = document.getElementById("diaperSaveFeedback");
         const historyList = document.getElementById("diaperHistoryList");
-        const timeLabel = document.getElementById("diaperTimeLabel");
         const backButton = document.getElementById("diaperBackButton");
         let diaperLogItems = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId);
 
@@ -300,19 +419,23 @@
             });
         });
 
-        detailButtons.forEach((button) => {
+        choiceButtons.forEach((button) => {
             button.addEventListener("click", () => {
-                state.color = button.dataset.color || state.color;
-                state.texture = button.dataset.texture || state.texture;
-                updateDetailSelection(button);
+                state[button.dataset.optionGroup] = button.dataset.optionValue;
+                updateChoiceSelection();
+                renderDetailSections();
             });
         });
+        peeColorOtherInput.addEventListener("input", () => state.peeColorOther = peeColorOtherInput.value.trim());
+        poopConsistencyOtherInput.addEventListener("input", () => state.poopConsistencyOther = poopConsistencyOtherInput.value.trim());
+        poopColorOtherInput.addEventListener("input", () => state.poopColorOther = poopColorOtherInput.value.trim());
 
         saveButton.addEventListener("click", saveDiaperLog);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
+        setDefaultDateTime();
         updateSegment(0);
-        updateNowLabel();
-        setInterval(updateNowLabel, 30000);
+        updateChoiceSelection();
+        renderDetailSections();
         await refreshLogs();
 
         function updateSegment(index) {
@@ -333,29 +456,37 @@
                     btn.classList.add('text-on-surface-variant');
                 }
             });
+            renderDetailSections();
         }
 
-        function updateDetailSelection(activeButton) {
-            detailButtons.forEach((button) => {
-                button.querySelector("div")?.classList.remove("border-2", "border-primary");
-                button.querySelector("span")?.classList.remove("text-primary");
-                button.querySelector("span")?.classList.add("text-on-surface-variant");
+        function updateChoiceSelection() {
+            choiceButtons.forEach((button) => {
+                const isActive = state[button.dataset.optionGroup] === button.dataset.optionValue;
+                button.classList.toggle("diaper-option-active", isActive);
+                button.classList.toggle("text-on-surface-variant", !isActive);
             });
-            activeButton.querySelector("div")?.classList.add("border-2", "border-primary");
-            activeButton.querySelector("span")?.classList.add("text-primary");
-            activeButton.querySelector("span")?.classList.remove("text-on-surface-variant");
+        }
+
+        function renderDetailSections() {
+            const showPee = state.diaperType === "pee" || state.diaperType === "mixed";
+            const showPoop = state.diaperType === "poop" || state.diaperType === "mixed";
+            peeDetailsSection.classList.toggle("hidden", !showPee);
+            poopDetailsSection.classList.toggle("hidden", !showPoop);
+            peeColorOtherInput.classList.toggle("hidden", state.peeColor !== "Other");
+            poopConsistencyOtherInput.classList.toggle("hidden", state.poopConsistency !== "Other");
+            poopColorOtherInput.classList.toggle("hidden", state.poopColor !== "Other");
+        }
+
+        function setDefaultDateTime() {
+            const now = new Date();
+            dateInput.value = localDateValue(now);
+            timeInput.value = localTimeValue(now);
         }
 
         async function saveDiaperLog() {
-            const log = {
-                id: `diaper-local-${Date.now()}`,
-                babyId: selectedBabyId,
-                type: state.diaperType,
-                changedAt: new Date().toISOString(),
-                color: state.color || undefined,
-                texture: state.texture || undefined,
-                notes: notesInput.value.trim() || undefined
-            };
+            const changedAt = buildChangedAt();
+            const log = buildDiaperLog(changedAt);
+            if (!log) return;
 
             try {
                 await saveDiaperLogRemote(log);
@@ -363,9 +494,49 @@
                 saveFeedback.textContent = `${error.message || "Could not sync diaper log."} Saved locally for now.`;
                 saveFeedback.classList.remove("hidden");
             }
-            notesInput.value = "";
+            resetFormAfterSave();
             await refreshLogs();
             showSavedFeedback();
+        }
+
+        function buildDiaperLog(changedAt) {
+            if (!changedAt) {
+                saveFeedback.textContent = "Please choose a date and time for this change.";
+                saveFeedback.classList.remove("hidden");
+                return null;
+            }
+            const includesPee = state.diaperType === "pee" || state.diaperType === "mixed";
+            const includesPoop = state.diaperType === "poop" || state.diaperType === "mixed";
+            const peeColor = includesPee ? state.peeColor : "";
+            const poopColor = includesPoop ? state.poopColor : "";
+            const poopConsistency = includesPoop ? state.poopConsistency : "";
+            return {
+                id: `diaper-local-${Date.now()}`,
+                babyId: selectedBabyId,
+                type: state.diaperType,
+                changedAt,
+                peeAmount: includesPee ? state.peeAmount : undefined,
+                peeColor: peeColor || undefined,
+                peeColorOther: peeColor === "Other" ? state.peeColorOther || undefined : undefined,
+                poopConsistency: poopConsistency || undefined,
+                poopConsistencyOther: poopConsistency === "Other" ? state.poopConsistencyOther || undefined : undefined,
+                poopColor: poopColor || undefined,
+                poopColorOther: poopColor === "Other" ? state.poopColorOther || undefined : undefined,
+                color: poopColor || peeColor || undefined,
+                texture: poopConsistency || state.peeAmount || undefined,
+                notes: notesInput.value.trim() || undefined
+            };
+        }
+
+        function resetFormAfterSave() {
+            notesInput.value = "";
+            peeColorOtherInput.value = "";
+            poopConsistencyOtherInput.value = "";
+            poopColorOtherInput.value = "";
+            state.peeColorOther = "";
+            state.poopConsistencyOther = "";
+            state.poopColorOther = "";
+            setDefaultDateTime();
         }
 
         async function refreshLogs() {
@@ -404,7 +575,7 @@
         }
 
         function renderHistoryCard(log) {
-            const detail = [labelForType(log.type), log.texture, log.color].filter(Boolean).join(" · ");
+            const detail = diaperSummary(log);
             return `
                 <div class="bg-surface-container-lowest rounded-2xl p-4 soft-shadow flex items-center justify-between cursor-pointer" data-diaper-detail="${detail}" role="button" tabindex="0">
                     <div class="flex items-center gap-3 min-w-0">
@@ -446,8 +617,9 @@
             });
         }
 
-        function updateNowLabel() {
-            timeLabel.textContent = formatTime(new Date().toISOString());
+        function buildChangedAt() {
+            if (!dateInput.value || !timeInput.value) return "";
+            return new Date(`${dateInput.value}T${timeInput.value}:00`).toISOString();
         }
 
         function showSavedFeedback() {
@@ -458,16 +630,46 @@
 
         function labelForType(type) {
             return {
+                pee: "Pee",
+                poop: "Poop",
                 wet: "Pee",
                 dirty: "Poop",
                 mixed: "Mixed"
             }[type] || "Diaper";
         }
 
+        function diaperSummary(log) {
+            const type = normalizeDiaperType(log.type);
+            if (type === "pee") {
+                const color = displayOther(log.peeColor, log.peeColorOther) || log.color;
+                return [labelForType(type), log.peeAmount || log.texture, color].filter(Boolean).join(" · ");
+            }
+            if (type === "poop") {
+                const consistency = displayOther(log.poopConsistency, log.poopConsistencyOther) || log.texture;
+                const color = displayOther(log.poopColor, log.poopColorOther) || log.color;
+                return [labelForType(type), consistency, color].filter(Boolean).join(" · ");
+            }
+            const pee = [log.peeAmount, displayOther(log.peeColor, log.peeColorOther)].filter(Boolean).join(", ");
+            const poop = [displayOther(log.poopConsistency, log.poopConsistencyOther), displayOther(log.poopColor, log.poopColorOther)].filter(Boolean).join(", ");
+            const fallback = [log.texture, log.color].filter(Boolean).join(" · ");
+            return [labelForType(type), pee ? `Pee: ${pee}` : "", poop ? `Poop: ${poop}` : "", !pee && !poop ? fallback : ""].filter(Boolean).join(" · ");
+        }
+
+        function displayOther(value, otherValue) {
+            return value === "Other" ? otherValue || "Other" : value;
+        }
+
+        function normalizeDiaperType(type) {
+            if (type === "wet") return "pee";
+            if (type === "dirty") return "poop";
+            return type || "mixed";
+        }
+
         function toneForType(type) {
-            return type === "wet"
+            const normalized = normalizeDiaperType(type);
+            return normalized === "pee"
                 ? "bg-[#E0F2FE] text-[#0369A1]"
-                : type === "dirty"
+                : normalized === "poop"
                     ? "bg-primary-container/30 text-primary"
                     : "bg-tertiary-container/40 text-tertiary";
         }
@@ -480,6 +682,16 @@
             if (date.toDateString() === today.toDateString()) return "Today";
             if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
             return date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+        }
+
+        function localDateValue(date) {
+            const copy = new Date(date);
+            copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+            return copy.toISOString().slice(0, 10);
+        }
+
+        function localTimeValue(date) {
+            return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
         }
 
         function escapeHtml(value) {

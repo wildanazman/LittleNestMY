@@ -45,11 +45,27 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 </style>
 </head>
 <body class="bg-surface text-on-surface font-body min-h-screen pb-28">
-<header class="sticky top-0 z-40 bg-surface px-5 h-14 flex items-center gap-3">
-<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary" id="backButton" type="button" aria-label="Back">
-<span class="material-symbols-outlined">arrow_back</span>
+<section class="max-w-md mx-auto px-5 pt-5 space-y-5" id="growthLoadingState" aria-label="Loading growth tracker">
+<div class="h-14 flex items-center justify-between">
+<div class="h-8 w-44 rounded-xl bg-surface-container animate-pulse"></div>
+<div class="h-9 w-9 rounded-full bg-surface-container animate-pulse"></div>
+</div>
+<div class="h-28 rounded-[24px] bg-primary-container/40 animate-pulse"></div>
+<div class="grid grid-cols-3 gap-3">
+<div class="h-20 rounded-2xl bg-surface-container animate-pulse"></div>
+<div class="h-20 rounded-2xl bg-surface-container animate-pulse"></div>
+<div class="h-20 rounded-2xl bg-surface-container animate-pulse"></div>
+</div>
+<div class="h-64 rounded-[24px] bg-surface-container-lowest animate-pulse"></div>
+</section>
+<div class="hidden" id="growthContent">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+<div class="flex items-center gap-2 min-w-0">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button" aria-label="Back to home">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Growth Tracker</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Growth Tracker</h1>
+</div>
 </header>
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5">
 <section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow">
@@ -78,7 +94,7 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <div class="rounded-2xl bg-surface-container-low p-3 border border-white/60">
 <svg class="w-full h-56" id="growthGraph" viewBox="0 0 340 220" role="img" aria-label="Growth trend graph"></svg>
 </div>
-<p class="font-label-md text-label-md text-on-surface-variant">WHO/MOH reference curves can be added after official reference tables are imported. This graph shows actual saved measurements only.</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Saved measurements only. WHO reference curves can be added after official data is imported.</p>
 </section>
 <section class="space-y-3">
 <h2 class="font-headline-md text-headline-md">Measurement history</h2>
@@ -88,6 +104,7 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <p class="font-body-md text-body-md text-on-surface-variant">Growth charts are guides to monitor trends. If you are concerned about your baby's growth, please check with Klinik Kesihatan or your doctor.</p>
 </section>
 </main>
+</div>
 <script type="module">
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
@@ -101,19 +118,20 @@ const babyState = await loadBabyProfilesRemote(babyProfile);
 const selectedBabyId = babyState.selectedBabyId;
 const selectedBaby = babyState.selectedBaby || babyProfile;
 const permissions = await getBabyPermissions(selectedBabyId);
+const currentLengthLabel = getMeasurementLabel(selectedBaby.dateOfBirth);
 const tabs = [
-  ["weight", "Weight-for-age", "weightKg", "kg"],
-  ["height", `${getMeasurementLabel(selectedBaby.dateOfBirth)}-for-age`, "heightCm", "cm"],
-  ["head", "Head circumference", "headCircumferenceCm", "cm"],
-  ["wfl", "Weight-for-length", "weightKg", "kg"],
-  ["bmi", "BMI-for-age", "bmi", ""]
+  ["weight", "Weight-for-age"],
+  ["height", `${currentLengthLabel}-for-age`],
+  ["head", "Head circumference-for-age"],
+  ["wfl", `Weight-for-${currentLengthLabel.toLowerCase()}`],
+  ["bmi", "BMI-for-age"]
 ];
 let activeTab = "weight";
 document.getElementById("backButton").addEventListener("click", () => goToScreen("home_dashboard"));
 document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
 document.getElementById("babyName").textContent = selectedBaby.name;
-document.getElementById("lengthLabel").textContent = getMeasurementLabel(selectedBaby.dateOfBirth);
-document.getElementById("heightInputLabel").textContent = `${getMeasurementLabel(selectedBaby.dateOfBirth)} cm`;
+document.getElementById("lengthLabel").textContent = currentLengthLabel;
+document.getElementById("heightInputLabel").textContent = `${currentLengthLabel} cm`;
 if (permissions.canAddLogs) {
   document.getElementById("saveButton").addEventListener("click", saveMeasurement);
 } else {
@@ -121,6 +139,7 @@ if (permissions.canAddLogs) {
   document.getElementById("growthStatus").textContent = viewOnlyMessage;
 }
 renderTabs(); render();
+showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
 function saveMeasurement(){
   const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
@@ -143,19 +162,58 @@ function render(){
   document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",()=>{ if(confirm("Delete this growth record?")){ deleteLocalGrowthRecord(btn.dataset.deleteGrowth); render(); }}));
 }
 function renderTabs(){ document.getElementById("graphTabs").innerHTML = tabs.map(([id,label])=>`<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap ${id===activeTab?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant'}" data-tab="${id}" type="button">${label}</button>`).join(""); document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{activeTab=btn.dataset.tab; renderTabs(); render();})); }
-function renderGraph(items){
-  const tab = tabs.find(t=>t[0]===activeTab), key = tab[2], unit = tab[3];
-  const points = items.map((r,i)=>({x:i, y:key==="bmi" && r.weightKg && (r.heightCm||r.lengthCm) ? r.weightKg / Math.pow((r.heightCm||r.lengthCm)/100,2) : r[key] || (key==="heightCm" ? r.lengthCm : undefined)})).filter(p=>Number.isFinite(p.y));
-  const svg=document.getElementById("growthGraph");
-  if(points.length<1){ svg.innerHTML='<text x="170" y="110" text-anchor="middle" class="chart-label" fill="#8a746b">Add measurements to see trend</text>'; return; }
-  const ys=points.map(p=>p.y), min=Math.min(...ys), max=Math.max(...ys), span=Math.max(1,max-min);
-  const path=points.map((p,i)=>`${i?'L':'M'} ${30+(p.x/Math.max(1,points.length-1))*280} ${180-((p.y-min)/span)*140}`).join(" ");
-  svg.innerHTML=`<line x1="30" y1="180" x2="320" y2="180" stroke="rgba(131,83,60,.25)"/><line x1="30" y1="30" x2="30" y2="180" stroke="rgba(131,83,60,.25)"/><path d="${path}" fill="none" stroke="#83533c" stroke-width="4" stroke-linecap="round"/><text x="32" y="24" class="chart-label" fill="#665650">${max.toFixed(1)} ${unit}</text><text x="32" y="205" class="chart-label" fill="#665650">${min.toFixed(1)} ${unit}</text>${points.map((p,i)=>`<circle cx="${30+(p.x/Math.max(1,points.length-1))*280}" cy="${180-((p.y-min)/span)*140}" r="5" fill="#FFBFA3"/>`).join("")}`;
+function monthsBetween(dateOfBirth, measuredAt){
+  const birth=new Date(`${dateOfBirth}T00:00:00`);
+  const measured=new Date(measuredAt);
+  return Math.max(0, (measured-birth)/(1000*60*60*24*30.4375));
+}
+function formatAxis(value, unit){
+  const rounded = Math.abs(value) >= 10 ? value.toFixed(1).replace(/\.0$/,"") : value.toFixed(1);
+  return unit ? `${rounded} ${unit}` : rounded;
 }
 function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button>` : ""}</article>`; }
+function renderGraph(items){
+  const tab = graphConfig(activeTab);
+  const points = items.map(tab.point).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).sort((a,b)=>a.x-b.x);
+  const svg = document.getElementById("growthGraph");
+  if (!points.length) {
+    svg.innerHTML = `<text x="170" y="88" text-anchor="middle" class="chart-label" fill="#8a746b">Add ${tab.emptyLabel} to see this chart</text><text x="170" y="114" text-anchor="middle" class="chart-label" fill="#8a746b">X-axis: ${tab.xAxisTitle} · Y-axis: ${tab.yAxisTitle}</text><text x="170" y="142" text-anchor="middle" class="chart-label" fill="#8a746b">Saved measurements only.</text>`;
+    return;
+  }
+  const xs = points.map(p=>p.x), ys = points.map(p=>p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), rawSpanX = maxX - minX, spanX = Math.max(1, rawSpanX);
+  const minY = Math.min(...ys), maxY = Math.max(...ys), rawSpanY = maxY - minY, spanY = Math.max(1, rawSpanY);
+  const chart = { left: 48, top: 40, width: 252, height: 126, bottom: 166 };
+  const xFor = (x) => rawSpanX === 0 ? chart.left + chart.width / 2 : chart.left + ((x - minX) / spanX) * chart.width;
+  const yFor = (y) => rawSpanY === 0 ? chart.top + chart.height / 2 : chart.bottom - ((y - minY) / spanY) * chart.height;
+  const path = points.map((p,i)=>`${i ? "L" : "M"} ${xFor(p.x)} ${yFor(p.y)}`).join(" ");
+  const xTicks = rawSpanX === 0 ? [minX] : [minX, maxX];
+  const yTicks = rawSpanY === 0 ? [minY] : [maxY, minY];
+  svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${points.length > 1 ? `<path d="${path}" fill="none" stroke="#83533c" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#FFBFA3" stroke="#83533c" stroke-width="2"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
+}
+function graphConfig(id){
+  const ageMonths = (record) => monthsBetween(selectedBaby.dateOfBirth, record.measuredAt);
+  const length = (record) => record.lengthCm || record.heightCm;
+  const bmi = (record) => record.weightKg && length(record) ? record.weightKg / Math.pow(length(record) / 100, 2) : undefined;
+  const configs = {
+    weight: { title:"Weight-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Weight (kg)", xLabel:"Age", yLabel:"Weight", xUnit:"mo", yUnit:"kg", emptyLabel:"weight records", point:(r)=>growthPoint(r, ageMonths(r), r.weightKg) },
+    height: { title:`${currentLengthLabel}-for-age`, xAxisTitle:"Age (months)", yAxisTitle:`${currentLengthLabel} (cm)`, xLabel:"Age", yLabel:currentLengthLabel, xUnit:"mo", yUnit:"cm", emptyLabel:"length/height records", point:(r)=>growthPoint(r, ageMonths(r), length(r)) },
+    head: { title:"Head circumference-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Head circumference (cm)", xLabel:"Age", yLabel:"Head circumference", xUnit:"mo", yUnit:"cm", emptyLabel:"head circumference records", point:(r)=>growthPoint(r, ageMonths(r), r.headCircumferenceCm) },
+    wfl: { title:`Weight-for-${currentLengthLabel.toLowerCase()}`, xAxisTitle:`${currentLengthLabel} (cm)`, yAxisTitle:"Weight (kg)", xLabel:currentLengthLabel, yLabel:"Weight", xUnit:"cm", yUnit:"kg", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, length(r), r.weightKg) },
+    bmi: { title:"BMI-for-age", xAxisTitle:"Age (months)", yAxisTitle:"BMI", xLabel:"Age", yLabel:"BMI", xUnit:"mo", yUnit:"", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, ageMonths(r), bmi(r)) }
+  };
+  return configs[id] || configs.weight;
+}
+function growthPoint(record, x, y){ return { record, x, y }; }
+function formatRange(min, max, unit){ return `${formatAxis(min, unit)}-${formatAxis(max, unit)}`; }
+function pointTooltip(tab, point){
+  const date = new Date(point.record.measuredAt).toLocaleDateString("en-MY", { day:"numeric", month:"short", year:"numeric" });
+  return `${date} · ${tab.xLabel}: ${formatAxis(point.x, tab.xUnit)} · ${tab.yLabel}: ${formatAxis(point.y, tab.yUnit)}`;
+}
 function number(id){ const value=Number(document.getElementById(id).value); return Number.isFinite(value)&&value>0?value:0; }
 function showError(message){ const el=document.getElementById("formError"); el.textContent=message; el.classList.remove("hidden"); }
 function escapeHtml(v){ return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function showGrowthContent(){ document.getElementById("growthLoadingState")?.classList.add("hidden"); document.getElementById("growthContent")?.classList.remove("hidden"); }
 </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 </body></html>
