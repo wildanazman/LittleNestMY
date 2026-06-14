@@ -97,31 +97,39 @@ function ensureNavigationStyles() {
   style.textContent = `
     nav.fixed.bottom-0 {
       position: fixed !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100% !important;
-      min-height: calc(4.75rem + env(safe-area-inset-bottom)) !important;
-      padding: 0.5rem 0.5rem max(1rem, env(safe-area-inset-bottom)) !important;
+      left: max(14px, env(safe-area-inset-left)) !important;
+      right: max(14px, env(safe-area-inset-right)) !important;
+      bottom: max(14px, env(safe-area-inset-bottom)) !important;
+      width: auto !important;
+      max-width: 520px !important;
+      min-height: 76px !important;
+      margin: 0 auto !important;
+      padding: 0.55rem !important;
       display: flex !important;
       align-items: center !important;
       justify-content: space-around !important;
-      gap: 0.125rem !important;
-      border-top-left-radius: 0.75rem !important;
-      border-top-right-radius: 0.75rem !important;
-      z-index: 80 !important;
+      gap: 0.2rem !important;
+      border-radius: 9999px !important;
+      border: 1px solid rgba(131, 83, 60, 0.14) !important;
+      background: rgba(255, 250, 246, 0.72) !important;
+      box-shadow: 0 18px 46px rgba(131, 83, 60, 0.20), inset 0 1px 0 rgba(255,255,255,.76) !important;
+      backdrop-filter: blur(22px) saturate(1.35) !important;
+      -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
+      z-index: 110 !important;
       transform: translateZ(0);
       -webkit-transform: translateZ(0);
       backface-visibility: hidden;
+      overflow: hidden !important;
+      isolation: isolate;
     }
     nav.fixed.bottom-0 > a,
     nav.fixed.bottom-0 > button {
-      width: 68px !important;
-      height: 52px !important;
-      min-width: 68px !important;
-      max-width: 68px !important;
-      flex: 0 0 68px !important;
-      padding: 0.25rem 0.5rem !important;
+      width: clamp(58px, 18vw, 78px) !important;
+      height: 58px !important;
+      min-width: 0 !important;
+      max-width: 78px !important;
+      flex: 1 1 0 !important;
+      padding: 0.32rem 0.35rem !important;
       border-radius: 9999px !important;
       display: flex !important;
       flex-direction: column !important;
@@ -129,6 +137,8 @@ function ensureNavigationStyles() {
       justify-content: center !important;
       gap: 0 !important;
       line-height: 1 !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
     }
     nav.fixed.bottom-0 > a span:last-child,
     nav.fixed.bottom-0 > button span:last-child {
@@ -141,8 +151,10 @@ function ensureNavigationStyles() {
       line-height: 1 !important;
     }
     nav.fixed .nav-tab-active {
-      outline: 2px solid rgba(131, 83, 60, 0.24);
-      outline-offset: 2px;
+      outline: 0;
+      background: rgba(255, 191, 163, 0.42) !important;
+      border-color: rgba(131, 83, 60, 0.12) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 8px 20px rgba(131,83,60,.12) !important;
     }
   `;
   document.head.appendChild(style);
@@ -168,27 +180,30 @@ function getNavKey(link) {
 function normalizeNavItem(item, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
-    nav.className = "fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center";
+    nav.className = "fixed bottom-0 z-50 flex justify-around items-center";
     nav.style.position = "fixed";
-    nav.style.left = "0";
-    nav.style.right = "0";
-    nav.style.bottom = "0";
-    nav.style.width = "100%";
-    nav.style.minHeight = "calc(4.75rem + env(safe-area-inset-bottom))";
+    nav.style.left = "max(14px, env(safe-area-inset-left))";
+    nav.style.right = "max(14px, env(safe-area-inset-right))";
+    nav.style.bottom = "max(14px, env(safe-area-inset-bottom))";
+    nav.style.width = "auto";
+    nav.style.maxWidth = "520px";
+    nav.style.minHeight = "76px";
+    nav.style.margin = "0 auto";
+    nav.style.zIndex = "110";
   }
 
   item.className = [
-    "flex flex-col items-center justify-center rounded-full transition-colors active:scale-90 duration-150",
-    "w-[68px] h-[52px] px-2 py-1 shrink-0",
+    "flex flex-col items-center justify-center rounded-full transition-all active:scale-90 duration-150",
+    "h-[58px] px-2 py-1 min-w-0",
     isActive
       ? "bg-primary-container text-on-primary-container"
       : "text-on-secondary-fixed-variant hover:bg-secondary-container"
   ].join(" ");
-  item.style.width = "68px";
-  item.style.height = "52px";
-  item.style.minWidth = "68px";
-  item.style.maxWidth = "68px";
-  item.style.flex = "0 0 68px";
+  item.style.width = "clamp(58px, 18vw, 78px)";
+  item.style.height = "58px";
+  item.style.minWidth = "0";
+  item.style.maxWidth = "78px";
+  item.style.flex = "1 1 0";
   item.style.borderRadius = "9999px";
 
   const icon = item.querySelector(".material-symbols-outlined");

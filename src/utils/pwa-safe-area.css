@@ -21,14 +21,15 @@ header.fixed.top-0 {
 }
 
 nav.fixed.bottom-0 {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  padding-bottom: 0.55rem !important;
 }
 
 button.fixed.bottom-24,
 .fixed.bottom-24 {
-  bottom: calc(6rem + env(safe-area-inset-bottom));
+  bottom: calc(6rem + max(14px, env(safe-area-inset-bottom)));
 }
 
 .pb-32 {
-  padding-bottom: calc(8rem + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(9.25rem + env(safe-area-inset-bottom)) !important;
 }
