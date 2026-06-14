@@ -60,10 +60,15 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
 
     if (link.tagName === "A") {
       link.href = route;
+      link.addEventListener("click", (event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        navigateWithTransition(route);
+      });
     } else {
       link.type = "button";
       link.addEventListener("click", () => {
-        window.location.href = route;
+        navigateWithTransition(route);
       });
     }
     link.setAttribute("data-nav-item", key);
@@ -147,6 +152,8 @@ guardAuthenticatedRoutes();
 setupBottomNavigation();
 normalizePageHeaders();
 bindHeaderProfileButtons();
+setupPullToRefresh();
+setupMotionReady();
 
 function getNavKey(link) {
   if (link.dataset.navKey) return link.dataset.navKey;
@@ -239,7 +246,7 @@ function normalizePageHeaders(root = document) {
       backButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
-        window.location.href = window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/";
+        navigateWithTransition(window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/");
       }, true);
     }
   });
@@ -273,15 +280,43 @@ function bindHeaderProfileButtons(root = document) {
     image.className = "w-full h-full object-cover";
     renderHeaderProfileAvatar(target, image);
     target.addEventListener("click", () => {
-      window.location.href = window.location.protocol === "file:" ? "../settings/code.html" : "/settings/";
+      navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
     });
     target.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        window.location.href = window.location.protocol === "file:" ? "../settings/code.html" : "/settings/";
+        navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
       }
     });
   });
+}
+
+function setupMotionReady() {
+  if (document.documentElement.classList.contains("ln-motion-ready")) return;
+  requestAnimationFrame(() => {
+    document.documentElement.classList.add("ln-motion-ready");
+  });
+}
+
+function navigateWithTransition(url) {
+  if (!url || isSameLocation(url)) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    window.location.href = url;
+    return;
+  }
+  document.documentElement.classList.add("ln-page-exit");
+  window.setTimeout(() => {
+    window.location.href = url;
+  }, 120);
+}
+
+function isSameLocation(url) {
+  try {
+    const next = new URL(url, window.location.href);
+    return next.href === window.location.href;
+  } catch {
+    return false;
+  }
 }
 
 function findOrCreateHeaderProfileTarget(header) {
@@ -333,6 +368,104 @@ function renderHeaderProfileAvatar(target, image) {
     image.classList.add("hidden");
     initials.classList.remove("hidden");
   }
+}
+
+function setupPullToRefresh() {
+  if (window.__littleNestPullToRefreshBound) return;
+  if (!("ontouchstart" in window)) return;
+
+  window.__littleNestPullToRefreshBound = true;
+
+  let startY = 0;
+  let startX = 0;
+  let pullDistance = 0;
+  let isPulling = false;
+  let isRefreshing = false;
+  const threshold = 92;
+  const indicator = createPullRefreshIndicator();
+
+  window.addEventListener("touchstart", (event) => {
+    if (isRefreshing || window.scrollY > 0 || isInteractiveTarget(event.target)) return;
+    const touch = event.touches[0];
+    startY = touch.clientY;
+    startX = touch.clientX;
+    pullDistance = 0;
+    isPulling = true;
+  }, { passive: true });
+
+  window.addEventListener("touchmove", (event) => {
+    if (!isPulling || isRefreshing) return;
+    const touch = event.touches[0];
+    const deltaY = touch.clientY - startY;
+    const deltaX = Math.abs(touch.clientX - startX);
+    if (deltaX > 40 || deltaY <= 0 || window.scrollY > 0) {
+      resetPullIndicator(indicator);
+      isPulling = false;
+      return;
+    }
+
+    pullDistance = Math.min(120, deltaY * 0.55);
+    updatePullIndicator(indicator, pullDistance, pullDistance >= threshold);
+  }, { passive: true });
+
+  window.addEventListener("touchend", () => {
+    if (!isPulling || isRefreshing) return;
+    isPulling = false;
+    if (pullDistance >= threshold) {
+      isRefreshing = true;
+      indicator.textContent = "Refreshing...";
+      indicator.style.transform = "translate(-50%, 72px)";
+      setTimeout(() => window.location.reload(), 180);
+      return;
+    }
+    resetPullIndicator(indicator);
+  }, { passive: true });
+}
+
+function createPullRefreshIndicator() {
+  const existing = document.getElementById("littleNestPullRefresh");
+  if (existing) return existing;
+  const indicator = document.createElement("div");
+  indicator.id = "littleNestPullRefresh";
+  indicator.textContent = "Pull to refresh";
+  indicator.setAttribute("aria-hidden", "true");
+  indicator.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "top:0",
+    "z-index:120",
+    "transform:translate(-50%,-56px)",
+    "height:40px",
+    "padding:0 16px",
+    "border-radius:9999px",
+    "display:flex",
+    "align-items:center",
+    "justify-content:center",
+    "background:var(--color-surface-container-lowest,#fff)",
+    "color:var(--color-primary,#83533c)",
+    "box-shadow:0 10px 30px rgba(131,83,60,.16)",
+    "font:700 13px/1 'Nunito Sans',sans-serif",
+    "pointer-events:none",
+    "transition:transform 160ms ease,opacity 160ms ease",
+    "opacity:0"
+  ].join(";");
+  document.body.appendChild(indicator);
+  return indicator;
+}
+
+function updatePullIndicator(indicator, distance, ready) {
+  indicator.textContent = ready ? "Release to refresh" : "Pull to refresh";
+  indicator.style.opacity = String(Math.min(1, distance / 60));
+  indicator.style.transform = `translate(-50%, ${Math.max(-48, distance - 56)}px)`;
+}
+
+function resetPullIndicator(indicator) {
+  indicator.style.opacity = "0";
+  indicator.style.transform = "translate(-50%,-56px)";
+}
+
+function isInteractiveTarget(target) {
+  return Boolean(target?.closest?.("input, textarea, select, button, a, [role='button'], [contenteditable='true']"));
 }
 
 function getCurrentScreenId() {

@@ -5,7 +5,20 @@ export function screenUrl(screenId) {
 }
 
 export function goToScreen(screenId) {
-  window.location.href = screenUrl(screenId);
+  navigateWithTransition(screenUrl(screenId));
+}
+
+export function navigateWithTransition(url) {
+  if (!url) return;
+  if (isSameLocation(url)) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    window.location.href = url;
+    return;
+  }
+  document.documentElement.classList.add("ln-page-exit");
+  window.setTimeout(() => {
+    window.location.href = url;
+  }, 120);
 }
 
 export function showComingSoon(title, message = "This prototype flow is coming soon.") {
@@ -154,4 +167,13 @@ function getCurrentScreenId() {
   const fileMatch = path.match(/\/src\/screens\/([^/]+)\/code\.html$/);
   if (fileMatch) return fileMatch[1];
   return path.split("/").filter(Boolean)[0] || "home_dashboard";
+}
+
+function isSameLocation(url) {
+  try {
+    const next = new URL(url, window.location.href);
+    return next.href === window.location.href;
+  } catch {
+    return false;
+  }
 }
