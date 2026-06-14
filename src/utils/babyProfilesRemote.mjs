@@ -1,12 +1,14 @@
 import {
   cacheSupabaseBabyProfiles,
+  createBabyProfile,
   getBabyIdMap,
   getBabyProfiles,
   readSelectedBabyId,
   rememberSupabaseBabyMapping,
+  saveBabyProfile,
   selectedBabyIdKey
 } from "./localState.mjs";
-import { getAuthSession } from "./localAuth.mjs";
+import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isSupabaseConfigured, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
 
 const babyProfileMigrationKey = "littlenest:babyProfilesSupabaseMigratedAt";
@@ -22,7 +24,7 @@ export async function loadBabyProfilesRemote(fallbackProfile) {
   const session = await getAuthSession();
   if (!session) {
     const fallbackProfiles = getBabyProfiles(fallbackProfile);
-    return fallbackResult(fallbackProfiles, "Please log in to load synced baby profiles.");
+    return fallbackResult(fallbackProfiles, isGuestMode() ? "" : "Please log in to load synced baby profiles.");
   }
 
   try {
@@ -57,6 +59,7 @@ export async function hasAnyBabyProfileRemote(fallbackProfile) {
 }
 
 export async function createBabyProfileRemote(profile, fallbackProfile) {
+  if (isGuestMode()) return createBabyProfile(profile, fallbackProfile);
   if (!isSupabaseConfigured) throw new Error(supabaseConfigMessage);
   const session = await getAuthSession();
   if (!session) throw new Error("Please log in before creating a baby profile.");
@@ -81,6 +84,11 @@ export async function createBabyProfileRemote(profile, fallbackProfile) {
 }
 
 export async function updateBabyProfileRemote(profile, fallbackProfile) {
+  if (isGuestMode()) {
+    const saved = saveBabyProfile(profile, fallbackProfile);
+    setSelectedBabyIdRemote(saved.id);
+    return saved;
+  }
   if (!isSupabaseConfigured) throw new Error(supabaseConfigMessage);
   const session = await getAuthSession();
   if (!session) throw new Error("Please log in before editing a baby profile.");

@@ -3,6 +3,7 @@ import { isSupabaseConfigured, requireSupabaseClient, supabase, supabaseConfigMe
 let cachedSession = null;
 export const pendingInviteTokenKey = "littlenest:pendingInviteToken";
 export const needsPasswordSetupKey = "littlenest:needsPasswordSetup";
+export const guestModeKey = "littlenest:isGuest";
 const lastAuthUserIdKey = "littlenest:lastAuthUserId";
 
 export function hasSupabaseConfig() {
@@ -14,10 +15,12 @@ export function getAuthConfigMessage() {
 }
 
 export async function isLoggedIn() {
+  if (isGuestMode()) return true;
   return Boolean(await getAuthSession());
 }
 
 export async function getAuthSession() {
+  if (isGuestMode()) return null;
   if (!isSupabaseConfigured) return null;
 
   const { data, error } = await supabase.auth.getSession();
@@ -37,6 +40,7 @@ export async function getCurrentUser() {
 }
 
 export async function loginLocalUser({ email, password }) {
+  clearGuestMode();
   const client = requireSupabaseClient();
   const cleanEmail = normalizeEmail(email);
   const { data, error } = await client.auth.signInWithPassword({ email: cleanEmail, password });
@@ -48,6 +52,7 @@ export async function loginLocalUser({ email, password }) {
 }
 
 export async function signupLocalUser({ name, email, password }) {
+  clearGuestMode();
   const client = requireSupabaseClient();
   const cleanEmail = normalizeEmail(email);
   const { data, error } = await client.auth.signUp({
@@ -90,10 +95,34 @@ export async function updateCurrentUserPassword(password) {
 }
 
 export async function loginAsGuest() {
-  throw new Error("Guest mode is not available while Supabase Auth is enabled. Please log in or create an account.");
+  try {
+    window.localStorage.setItem(guestModeKey, "true");
+    window.localStorage.removeItem("currentUser");
+  } catch {
+    // Guest mode is local-only.
+  }
+  cachedSession = null;
+  return { guest: true };
+}
+
+export function isGuestMode() {
+  try {
+    return window.localStorage.getItem(guestModeKey) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function clearGuestMode() {
+  try {
+    window.localStorage.removeItem(guestModeKey);
+  } catch {
+    // Guest flag is local-only.
+  }
 }
 
 export async function logoutLocalUser() {
+  clearGuestMode();
   if (!isSupabaseConfigured) return;
   const { error } = await supabase.auth.signOut();
   if (error) throw error;

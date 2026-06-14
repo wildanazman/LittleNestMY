@@ -24,8 +24,9 @@ export default async function handler(req, res) {
   try {
     if (req.method === "GET") return await listCareCircle(req, res, service, auth.user);
     if (req.method === "POST") return await createInvitation(req, res, service, auth.user);
+    if (req.method === "PATCH") return await updateInvitation(req, res, service, auth.user);
     if (req.method === "DELETE") return await removeCareCircleItem(req, res, service, auth.user);
-    res.setHeader("allow", "GET, POST, DELETE");
+    res.setHeader("allow", "GET, POST, PATCH, DELETE");
     return sendJson(res, 405, { error: "Method not allowed." });
   } catch (error) {
     return sendJson(res, 500, { error: error.message || "Invitation request failed." });
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
 
 async function listCareCircle(req, res, service, user) {
   const babyId = new URL(req.url, "http://localhost").searchParams.get("babyId");
-  if (!babyId) return sendJson(res, 400, { error: "Missing babyId." });
+  if (!babyId) return await listMyPendingInvites(req, res, service, user);
 
   const { data: memberRows, error: memberError } = await service
     .from("baby_members")
@@ -75,6 +76,40 @@ async function listCareCircle(req, res, service, user) {
       isCurrentUser: member.user_id === user.id
     })),
     invitations
+  });
+}
+
+async function listMyPendingInvites(req, res, service, user) {
+  const email = String(user.email || "").trim().toLowerCase();
+  if (!email) return sendJson(res, 200, { invitations: [] });
+
+  const { data, error } = await service
+    .from("family_invitations")
+    .select("id,baby_id,email,role,status,token,expires_at,created_at")
+    .eq("email", email)
+    .eq("status", "pending")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const babyIds = [...new Set((data || []).map((item) => item.baby_id).filter(Boolean))];
+  const { data: babies } = babyIds.length
+    ? await service.from("babies").select("id,name").in("id", babyIds)
+    : { data: [] };
+  const babyById = new Map((babies || []).map((baby) => [baby.id, baby]));
+
+  return sendJson(res, 200, {
+    invitations: (data || []).map((item) => ({
+      id: item.id,
+      babyId: item.baby_id,
+      babyName: babyById.get(item.baby_id)?.name || "baby",
+      email: item.email,
+      role: item.role,
+      status: item.status,
+      token: item.token,
+      expiresAt: item.expires_at,
+      createdAt: item.created_at
+    }))
   });
 }
 
@@ -258,4 +293,35 @@ async function removeCareCircleItem(req, res, service, user) {
   }
 
   return sendJson(res, 400, { error: "Choose an invitation or member to remove." });
+}
+
+async function updateInvitation(req, res, service, user) {
+  const body = await readJsonBody(req);
+  const invitationId = String(body.invitationId || "").trim();
+  const action = String(body.action || "").trim().toLowerCase();
+  if (!invitationId) return sendJson(res, 400, { error: "Missing invitation." });
+  if (action !== "decline") return sendJson(res, 400, { error: "Unsupported invitation action." });
+
+  const email = String(user.email || "").trim().toLowerCase();
+  const { data: invitation, error: invitationError } = await service
+    .from("family_invitations")
+    .select("id,email,status")
+    .eq("id", invitationId)
+    .maybeSingle();
+  if (invitationError) throw invitationError;
+  if (!invitation) return sendJson(res, 404, { error: "Invite not found." });
+  if (String(invitation.email || "").toLowerCase() !== email) {
+    return sendJson(res, 403, { error: "This invitation was sent to another email address." });
+  }
+  if (invitation.status !== "pending") {
+    return sendJson(res, 400, { error: `Invite is ${invitation.status}.` });
+  }
+
+  const { error } = await service
+    .from("family_invitations")
+    .update({ status: "declined", updated_at: new Date().toISOString() })
+    .eq("id", invitationId);
+  if (error) throw error;
+
+  return sendJson(res, 200, { message: "Invite declined." });
 }

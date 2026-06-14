@@ -36,6 +36,29 @@ export async function removeFamilyInviteRemote({ babyId, invitationId, userId })
   return readApiResponse(response);
 }
 
+export async function loadPendingFamilyInvitesRemote() {
+  const token = await getAccessToken();
+  const response = await fetch("/api/family-invitations", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return readApiResponse(response);
+}
+
+export async function declineFamilyInviteRemote(invitationId) {
+  const token = await getAccessToken();
+  const response = await fetch("/api/family-invitations", {
+    method: "PATCH",
+    headers: {
+      "content-type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ invitationId, action: "decline" })
+  });
+  return readApiResponse(response);
+}
+
 export async function acceptFamilyInviteRemote(token) {
   const accessToken = await getAccessToken();
   const response = await fetch("/api/accept-family-invite", {

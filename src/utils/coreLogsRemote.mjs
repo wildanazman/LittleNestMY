@@ -14,7 +14,7 @@ import {
   saveLocalHealthNote,
   saveLocalSleepLog
 } from "./localState.mjs";
-import { getAuthSession } from "./localAuth.mjs";
+import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isSupabaseConfigured, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
 
 const coreLogsMigrationKey = "littlenest:coreLogsSupabaseMigratedAt";
@@ -418,7 +418,7 @@ async function deleteRemoteById(table, logId, action) {
 }
 
 function canUseSupabase(babyId) {
-  return Boolean(isSupabaseConfigured && babyId);
+  return Boolean(isSupabaseConfigured && babyId && !isGuestMode());
 }
 
 function stableUuid(id, prefix) {

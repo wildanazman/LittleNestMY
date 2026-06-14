@@ -19,16 +19,17 @@
 
 :root.dark {
   color-scheme: dark;
-  --ln-bg: #050506;
-  --ln-card: #121214;
-  --ln-card-soft: #1b1b1f;
-  --ln-text: #f8f7ff;
-  --ln-muted: #a8a7b3;
-  --ln-border: rgba(255, 255, 255, 0.10);
-  --ln-primary: #9b7cf6;
-  --ln-peach: #9b7cf6;
-  --ln-purple: #9b7cf6;
-  --ln-purple-soft: #171020;
+  --ln-bg: #0b1222;
+  --ln-card: #121b2d;
+  --ln-card-soft: #202a3d;
+  --ln-text: #eef6ff;
+  --ln-muted: #a8b5ca;
+  --ln-border: rgba(132, 204, 255, 0.14);
+  --ln-primary: #22d3ee;
+  --ln-peach: #22d3ee;
+  --ln-purple: #22d3ee;
+  --ln-purple-soft: #0f2236;
+  --ln-dark-gradient: linear-gradient(180deg, #101a2e 0%, #0d1628 46%, #08101f 100%);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -227,21 +228,33 @@ select:focus {
 }
 
 :root.dark body {
-  background: #050506 !important;
-  color: #f8f7ff !important;
+  background: var(--ln-dark-gradient) fixed !important;
+  color: #f7fbff !important;
 }
 
 :root.dark .bg-surface,
 :root.dark .bg-background,
 :root.dark .bg-\[\#FFF8F5\],
 :root.dark .bg-\[\#fff8f5\] {
-  background-color: #050506 !important;
+  background-color: transparent !important;
+}
+
+:root.dark header,
+:root.dark header.bg-surface,
+:root.dark header.sticky,
+:root.dark header[class*="bg-surface"] {
+  background: linear-gradient(180deg, rgba(16, 26, 46, 0.96), rgba(13, 22, 40, 0.76)) !important;
+  color: #eef6ff !important;
+  border-color: rgba(34, 211, 238, 0.10) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24) !important;
+  backdrop-filter: blur(18px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
 }
 
 :root.dark .bg-surface-container,
 :root.dark .bg-surface-container-highest,
 :root.dark .bg-surface-container-high {
-  background-color: #121214 !important;
+  background-color: #202a3d !important;
 }
 
 :root.dark .bg-surface-container-low,
@@ -251,7 +264,7 @@ select:focus {
 :root.dark .bg-\[\#EFF6FF\],
 :root.dark .bg-\[\#F0FDF4\],
 :root.dark .bg-\[\#FAF5FF\] {
-  background-color: #1b1b1f !important;
+  background-color: #121b2d !important;
 }
 
 :root.dark .text-on-surface,
@@ -261,7 +274,7 @@ select:focus {
 :root.dark .text-on-tertiary-fixed,
 :root.dark .text-\[\#211A17\],
 :root.dark .text-\[\#211a17\] {
-  color: #f8f7ff !important;
+  color: #eef6ff !important;
 }
 
 :root.dark .text-on-surface-variant,
@@ -282,26 +295,26 @@ select:focus {
 :root.dark .text-\[\#15803D\],
 :root.dark .text-\[\#581C87\],
 :root.dark .text-\[\#854D0E\] {
-  color: #a8a7b3 !important;
+  color: #a8b5ca !important;
 }
 
 :root.dark .text-primary {
-  color: #9b7cf6 !important;
+  color: #22d3ee !important;
 }
 
 :root.dark .dark\:text-primary-fixed-dim,
 :root.dark .text-primary-fixed-dim {
-  color: #9b7cf6 !important;
+  color: #22d3ee !important;
 }
 
 :root.dark .bg-primary,
 :root.dark .bg-primary-container {
-  background-color: #9b7cf6 !important;
+  background-color: #22d3ee !important;
 }
 
 :root.dark .text-on-primary,
 :root.dark .text-on-primary-container {
-  color: #050506 !important;
+  color: #07111f !important;
 }
 
 :root.dark .bg-secondary-container,
@@ -316,7 +329,7 @@ select:focus {
 :root.dark .bg-\[\#F3E8FF\],
 :root.dark .bg-\[\#FEF9C3\],
 :root.dark .bg-\[\#FFDAD6\] {
-  background-color: rgba(155, 124, 246, 0.14) !important;
+  background-color: rgba(34, 211, 238, 0.12) !important;
 }
 
 :root.dark [class*="bg-primary-container/"],
@@ -325,7 +338,7 @@ select:focus {
 :root.dark [class*="bg-secondary-fixed/"],
 :root.dark [class*="bg-tertiary-container/"],
 :root.dark [class*="bg-tertiary-fixed/"] {
-  background-color: rgba(155, 124, 246, 0.14) !important;
+  background-color: rgba(34, 211, 238, 0.12) !important;
 }
 
 :root.dark .border,
@@ -334,7 +347,7 @@ select:focus {
 :root.dark .border-white\/50,
 :root.dark .border-white\/60,
 :root.dark .border-white\/70 {
-  border-color: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(132, 204, 255, 0.14) !important;
 }
 
 :root.dark input,
@@ -342,7 +355,7 @@ select:focus {
 :root.dark select {
   background-color: #f8f7ff !important;
   color: #111114 !important;
-  border-color: rgba(155, 124, 246, 0.35) !important;
+  border-color: rgba(34, 211, 238, 0.35) !important;
 }
 
 :root.dark input::placeholder,
@@ -351,8 +364,8 @@ select:focus {
 }
 
 :root.dark nav.fixed {
-  background-color: rgba(18, 18, 20, 0.72) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(32, 42, 61, 0.78) !important;
+  border-color: rgba(132, 204, 255, 0.16) !important;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255,255,255,.08) !important;
 }
 
@@ -446,9 +459,9 @@ button.fixed.bottom-24,
 
 :root.dark nav.fixed.bottom-0 .nav-tab-active,
 :root.dark nav.fixed.bottom-0 [aria-current="page"] {
-  background-color: rgba(155, 124, 246, 0.26) !important;
-  color: #f8f7ff !important;
-  border-color: rgba(155, 124, 246, 0.22) !important;
+  background-color: rgba(34, 211, 238, 0.18) !important;
+  color: #22d3ee !important;
+  border-color: rgba(34, 211, 238, 0.26) !important;
 }
 
 :root.dark .opacity-30,
@@ -463,8 +476,8 @@ button.fixed.bottom-24,
 :root.dark .bg-secondary-fixed,
 :root.dark .bg-tertiary-fixed,
 :root.dark .bg-primary-fixed-dim {
-  background-color: #1b1b1f !important;
-  color: #f8f7ff !important;
+  background-color: #121b2d !important;
+  color: #eef6ff !important;
 }
 
 :root.dark .text-error {
@@ -473,8 +486,8 @@ button.fixed.bottom-24,
 
 :root.dark svg text,
 :root.dark .chart-label {
-  fill: #a8a7b3 !important;
-  color: #a8a7b3 !important;
+  fill: #a8b5ca !important;
+  color: #a8b5ca !important;
 }
 
 .stat-compact,
@@ -488,15 +501,15 @@ button.fixed.bottom-24,
 }
 
 :root.dark .dashboard-stat-card {
-  background-color: #121214 !important;
-  border: 1px solid rgba(155, 124, 246, 0.20) !important;
+  background-color: #121b2d !important;
+  border: 1px solid rgba(132, 204, 255, 0.12) !important;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28) !important;
 }
 
 :root.dark .dashboard-stat-label,
 :root.dark .dashboard-stat-label span,
 :root.dark .dashboard-stat-card > span {
-  color: #9b7cf6 !important;
+  color: #22d3ee !important;
 }
 
 :root.dark .dashboard-stat-value,
@@ -504,7 +517,7 @@ button.fixed.bottom-24,
 :root.dark #todaySleepTotal,
 :root.dark #lastDiaperTime,
 :root.dark #nextEventDate {
-  color: #f8f7ff !important;
+  color: #eef6ff !important;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.28);
 }
 
@@ -525,15 +538,15 @@ button.fixed.bottom-24,
 
 :root.dark .category-card,
 :root.dark .prompt-card {
-  background-color: #121214 !important;
+  background-color: #121b2d !important;
 }
 
 :root.dark button.bg-primary,
 :root.dark button.bg-primary-container,
 :root.dark .pill-button-inner-glow {
-  background-color: #9b7cf6 !important;
-  color: #050506 !important;
-  box-shadow: 0 0 24px rgba(155, 124, 246, 0.22) !important;
+  background-color: #22d3ee !important;
+  color: #07111f !important;
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.22) !important;
 }
 
 :root.dark .bg-tertiary-fixed,
@@ -543,7 +556,7 @@ button.fixed.bottom-24,
 :root.dark .bg-primary-container\/20,
 :root.dark .bg-secondary-container\/50,
 :root.dark .bg-tertiary-container\/30 {
-  background-color: rgba(155, 124, 246, 0.14) !important;
+  background-color: rgba(34, 211, 238, 0.12) !important;
 }
 
 :root.dark .shadow-xl,

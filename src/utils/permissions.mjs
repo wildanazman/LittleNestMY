@@ -1,4 +1,4 @@
-import { getAuthSession } from "./localAuth.mjs";
+import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isSupabaseConfigured, supabase } from "./supabaseClient.mjs";
 
 export const viewOnlyMessage = "You have view-only access for this baby.";
@@ -17,6 +17,7 @@ export function permissionsForRole(role) {
 
 export async function getBabyPermissions(babyId) {
   if (!babyId) return permissionsForRole("viewer");
+  if (isGuestMode()) return permissionsForRole("parent");
   if (!isSupabaseConfigured) return permissionsForRole("parent");
 
   const session = await getAuthSession();

@@ -1,6 +1,7 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
-import { isLoggedIn } from "./localAuth.mjs";
+import { isGuestMode, isLoggedIn } from "./localAuth.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
+import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
 const routes = {
   home: "/home_dashboard/",
@@ -163,6 +164,7 @@ guardAuthenticatedRoutes();
 setupBottomNavigation();
 normalizePageHeaders();
 bindHeaderProfileButtons();
+setupPendingInviteBar();
 setupPullToRefresh();
 setupMotionReady();
 
@@ -223,6 +225,78 @@ async function guardAuthenticatedRoutes() {
   if (!["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId) && !(await isLoggedIn())) {
     window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
   }
+}
+
+async function setupPendingInviteBar() {
+  const screenId = getCurrentScreenId();
+  if (["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId)) return;
+  if (isGuestMode() || !(await isLoggedIn())) return;
+
+  try {
+    const { invitations = [] } = await loadPendingFamilyInvitesRemote();
+    const invite = invitations[0];
+    if (!invite) return;
+    renderPendingInviteBar(invite);
+  } catch (error) {
+    console.warn("Could not load pending family invites.", error);
+  }
+}
+
+function renderPendingInviteBar(invite) {
+  if (document.getElementById("pendingFamilyInviteBar")) return;
+  const bar = document.createElement("div");
+  bar.id = "pendingFamilyInviteBar";
+  bar.className = "fixed left-4 right-4 top-[64px] z-[9998] mx-auto max-w-md rounded-2xl border p-3 soft-shadow";
+  bar.style.background = "rgba(18, 27, 45, 0.94)";
+  bar.style.borderColor = "rgba(34, 211, 238, 0.26)";
+  bar.style.color = "#eef6ff";
+  bar.innerHTML = `
+    <div class="flex items-start gap-3">
+      <span class="material-symbols-outlined text-primary mt-0.5">mail</span>
+      <div class="min-w-0 flex-1">
+        <p class="font-label-md text-label-md">Baby invitation</p>
+        <p class="font-body-md text-body-md text-on-surface-variant">Join ${escapeHtml(invite.babyName)} as ${escapeHtml(invite.role)}.</p>
+        <p class="hidden mt-1 font-label-sm text-label-sm" data-invite-status></p>
+      </div>
+      <div class="flex gap-2">
+        <button class="h-9 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm" type="button" data-accept-invite>Accept</button>
+        <button class="h-9 px-3 rounded-full border border-white/20 font-label-sm text-label-sm" type="button" data-decline-invite>Decline</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(bar);
+
+  const status = bar.querySelector("[data-invite-status]");
+  bar.querySelector("[data-accept-invite]")?.addEventListener("click", async () => {
+    status.textContent = "Accepting invite...";
+    status.classList.remove("hidden");
+    try {
+      await acceptFamilyInviteRemote(invite.token);
+      status.textContent = "Invite accepted.";
+      setTimeout(() => window.location.replace("/baby_profiles/"), 450);
+    } catch (error) {
+      status.textContent = error.message || "Could not accept invite.";
+    }
+  });
+  bar.querySelector("[data-decline-invite]")?.addEventListener("click", async () => {
+    status.textContent = "Declining invite...";
+    status.classList.remove("hidden");
+    try {
+      await declineFamilyInviteRemote(invite.id);
+      bar.remove();
+    } catch (error) {
+      status.textContent = error.message || "Could not decline invite.";
+    }
+  });
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function normalizePageHeaders(root = document) {

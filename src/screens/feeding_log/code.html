@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <link rel="manifest" href="/manifest.json"/>
-<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=nav-fixed-20260614"/>
-<link rel="stylesheet" href="/src/utils/theme.css?v=nav-fixed-20260614"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=cyan-dark-20260614"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=cyan-dark-20260614"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -157,12 +157,16 @@
             transform: scale(0.96);
         }
         .amount-display-input::-webkit-outer-spin-button,
-        .amount-display-input::-webkit-inner-spin-button {
+        .amount-display-input::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        .amount-display-input {
+        .amount-display-input,
+        input[type="number"] {
             -moz-appearance: textfield;
+            appearance: textfield;
         }
         .hide-scrollbar {
             scrollbar-width: none;
@@ -172,12 +176,70 @@
             display: none;
         }
         :root.dark .feeding-type-tile.is-active {
-            background: #ffbfa3;
-            color: #2a1308;
+            background: linear-gradient(180deg, #22d3ee 0%, #0ea5b8 100%);
+            border-color: rgba(103, 232, 249, 0.8);
+            color: #07111f;
+            box-shadow: 0 16px 36px rgba(34, 211, 238, 0.24);
+        }
+        :root.dark .feeding-type-tile:not(.is-active) {
+            background: #121b2d !important;
+            border-color: rgba(132, 204, 255, 0.14);
+            color: #a8b5ca !important;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+        }
+        :root.dark .feeding-type-tile:not(.is-active) .material-symbols-outlined {
+            color: #7e8ca6;
         }
         :root.dark .amount-display-input {
-            color: #fff7ed;
-            -webkit-text-fill-color: #fff7ed;
+            color: #eef6ff;
+            -webkit-text-fill-color: #eef6ff;
+            background: transparent !important;
+        }
+        :root.dark #amountField,
+        :root.dark #durationField {
+            color: #eef6ff;
+        }
+        :root.dark .amount-stepper-button {
+            background: #202a3d !important;
+            color: #22d3ee !important;
+        }
+        :root.dark #increaseAmountButton {
+            background: #22d3ee !important;
+            color: #07111f !important;
+        }
+        :root.dark [data-amount-preset] {
+            background: #202a3d !important;
+            color: #a8b5ca !important;
+        }
+        :root.dark [data-amount-preset].bg-surface-container-highest,
+        :root.dark [data-amount-preset].text-primary {
+            background: rgba(34, 211, 238, 0.18) !important;
+            color: #22d3ee !important;
+        }
+        :root.dark input[type="date"],
+        :root.dark input[type="time"],
+        :root.dark #durationInput,
+        :root.dark #noteInput {
+            background: transparent !important;
+            color: #eef6ff !important;
+            -webkit-text-fill-color: #eef6ff;
+        }
+        :root.dark #durationInput,
+        :root.dark #noteInput,
+        :root.dark label:has(#dateInput),
+        :root.dark label:has(#timeInput) {
+            background: #121b2d !important;
+            border: 1px solid rgba(132, 204, 255, 0.24) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 24px rgba(0, 0, 0, 0.16);
+        }
+        :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
+        :root.dark input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(86%) sepia(32%) saturate(2028%) hue-rotate(142deg) brightness(99%);
+            opacity: 0.9;
+        }
+        :root.dark textarea::placeholder,
+        :root.dark input::placeholder {
+            color: #7e8ca6 !important;
         }
     </style>
 <style>
