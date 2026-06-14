@@ -13,7 +13,7 @@
   --ln-motion-slow: 360ms;
   --ln-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ln-ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --ln-nav-bottom-gap: max(14px, env(safe-area-inset-bottom));
+  --ln-nav-bottom-gap: calc(12px + env(safe-area-inset-bottom));
   --ln-nav-height: 76px;
 }
 
@@ -75,13 +75,13 @@
 }
 
 @keyframes littlenest-page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes littlenest-page-out {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(4px); }
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @keyframes littlenest-rise-in {
@@ -376,9 +376,7 @@ nav.fixed.bottom-0 {
   box-shadow: 0 18px 46px rgba(131, 83, 60, 0.20), inset 0 1px 0 rgba(255,255,255,.76) !important;
   backdrop-filter: blur(22px) saturate(1.35) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
-  z-index: 110 !important;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  z-index: 9999 !important;
   backface-visibility: hidden;
   overflow: hidden !important;
   isolation: isolate;
@@ -425,15 +423,15 @@ nav.fixed.bottom-0 [aria-current="page"] {
 }
 
 body {
-  padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 2.25rem) !important;
+  padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 2.75rem) !important;
 }
 
 main {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
 }
 
 .pb-32 {
-  padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 2.75rem) !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
 }
 
 button.fixed.bottom-24,

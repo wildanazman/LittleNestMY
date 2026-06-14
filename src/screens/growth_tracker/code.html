@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
 <link rel="manifest" href="/manifest.json"/>
-<link rel="stylesheet" href="/src/utils/pwa-safe-area.css"/>
-<link rel="stylesheet" href="/src/utils/theme.css"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=nav-fixed-20260614"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=nav-fixed-20260614"/>
 <title>Growth Tracker - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -215,5 +215,27 @@ function showError(message){ const el=document.getElementById("formError"); el.t
 function escapeHtml(v){ return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
 function showGrowthContent(){ document.getElementById("growthLoadingState")?.classList.add("hidden"); document.getElementById("growthContent")?.classList.remove("hidden"); }
 </script>
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="font-label-sm text-label-sm">Log</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-sm text-label-sm">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm">Assistant</span>
+</a>
+</nav>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 </body></html>

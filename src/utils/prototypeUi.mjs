@@ -83,6 +83,7 @@ export function bindPrototypeActions(root = document) {
 }
 
 export function bindBottomNavigationFallback(root = document) {
+  hoistBottomNavigation(root);
   const navTargets = {
     home: "home_dashboard",
     log: "quick_log",
@@ -126,28 +127,32 @@ function getNavLabel(item) {
 function normalizeNavItem(item, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
-    nav.className = "fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center";
+    if (nav.parentElement !== document.body) document.body.appendChild(nav);
+    nav.className = "fixed bottom-0 z-50 flex justify-around items-center";
     nav.style.position = "fixed";
-    nav.style.left = "0";
-    nav.style.right = "0";
-    nav.style.bottom = "0";
-    nav.style.width = "100%";
-    nav.style.minHeight = "calc(4.75rem + env(safe-area-inset-bottom))";
+    nav.style.left = "max(14px, env(safe-area-inset-left))";
+    nav.style.right = "max(14px, env(safe-area-inset-right))";
+    nav.style.bottom = "calc(12px + env(safe-area-inset-bottom))";
+    nav.style.width = "auto";
+    nav.style.maxWidth = "520px";
+    nav.style.minHeight = "76px";
+    nav.style.margin = "0 auto";
+    nav.style.zIndex = "9999";
   }
 
   item.className = [
     "flex flex-col items-center justify-center rounded-full transition-colors active:scale-90 duration-150",
-    "w-[68px] h-[52px] px-2 py-1 shrink-0",
+    "h-[58px] px-2 py-1 min-w-0",
     isActive
       ? "bg-primary-container text-on-primary-container"
       : "text-on-secondary-fixed-variant hover:bg-secondary-container"
   ].join(" ");
   item.setAttribute("aria-current", isActive ? "page" : "false");
-  item.style.width = "68px";
-  item.style.height = "52px";
-  item.style.minWidth = "68px";
-  item.style.maxWidth = "68px";
-  item.style.flex = "0 0 68px";
+  item.style.width = "clamp(58px, 18vw, 78px)";
+  item.style.height = "58px";
+  item.style.minWidth = "0";
+  item.style.maxWidth = "78px";
+  item.style.flex = "1 1 0";
   item.style.borderRadius = "9999px";
 
   const icon = item.querySelector(".material-symbols-outlined");
@@ -176,4 +181,18 @@ function isSameLocation(url) {
   } catch {
     return false;
   }
+}
+
+function hoistBottomNavigation(root = document) {
+  root.querySelectorAll("nav.fixed.bottom-0").forEach((nav) => {
+    if (nav.parentElement !== document.body) document.body.appendChild(nav);
+    nav.style.position = "fixed";
+    nav.style.left = "max(14px, env(safe-area-inset-left))";
+    nav.style.right = "max(14px, env(safe-area-inset-right))";
+    nav.style.bottom = "calc(12px + env(safe-area-inset-bottom))";
+    nav.style.width = "auto";
+    nav.style.maxWidth = "520px";
+    nav.style.margin = "0 auto";
+    nav.style.zIndex = "9999";
+  });
 }

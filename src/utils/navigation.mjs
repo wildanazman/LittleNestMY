@@ -41,6 +41,7 @@ const activeGroups = {
 export function setupBottomNavigation(currentPath = window.location.pathname) {
   ensureNavigationStyles();
   applyTranslations();
+  hoistBottomNavigation();
 
   const screenId = currentPath.split("/").filter(Boolean)[0] || "home_dashboard";
   const activeKey = activeGroups[screenId] || "home";
@@ -99,7 +100,7 @@ function ensureNavigationStyles() {
       position: fixed !important;
       left: max(14px, env(safe-area-inset-left)) !important;
       right: max(14px, env(safe-area-inset-right)) !important;
-      bottom: max(14px, env(safe-area-inset-bottom)) !important;
+      bottom: calc(12px + env(safe-area-inset-bottom)) !important;
       width: auto !important;
       max-width: 520px !important;
       min-height: 76px !important;
@@ -115,9 +116,7 @@ function ensureNavigationStyles() {
       box-shadow: 0 18px 46px rgba(131, 83, 60, 0.20), inset 0 1px 0 rgba(255,255,255,.76) !important;
       backdrop-filter: blur(22px) saturate(1.35) !important;
       -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
-      z-index: 110 !important;
-      transform: translateZ(0);
-      -webkit-transform: translateZ(0);
+      z-index: 9999 !important;
       backface-visibility: hidden;
       overflow: hidden !important;
       isolation: isolate;
@@ -180,16 +179,17 @@ function getNavKey(link) {
 function normalizeNavItem(item, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
+    if (nav.parentElement !== document.body) document.body.appendChild(nav);
     nav.className = "fixed bottom-0 z-50 flex justify-around items-center";
     nav.style.position = "fixed";
     nav.style.left = "max(14px, env(safe-area-inset-left))";
     nav.style.right = "max(14px, env(safe-area-inset-right))";
-    nav.style.bottom = "max(14px, env(safe-area-inset-bottom))";
+    nav.style.bottom = "calc(12px + env(safe-area-inset-bottom))";
     nav.style.width = "auto";
     nav.style.maxWidth = "520px";
     nav.style.minHeight = "76px";
     nav.style.margin = "0 auto";
-    nav.style.zIndex = "110";
+    nav.style.zIndex = "9999";
   }
 
   item.className = [
@@ -303,6 +303,22 @@ function bindHeaderProfileButtons(root = document) {
         navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
       }
     });
+  });
+}
+
+function hoistBottomNavigation() {
+  document.querySelectorAll("nav.fixed.bottom-0").forEach((nav) => {
+    if (nav.parentElement !== document.body) {
+      document.body.appendChild(nav);
+    }
+    nav.style.position = "fixed";
+    nav.style.left = "max(14px, env(safe-area-inset-left))";
+    nav.style.right = "max(14px, env(safe-area-inset-right))";
+    nav.style.bottom = "calc(12px + env(safe-area-inset-bottom))";
+    nav.style.width = "auto";
+    nav.style.maxWidth = "520px";
+    nav.style.margin = "0 auto";
+    nav.style.zIndex = "9999";
   });
 }
 
