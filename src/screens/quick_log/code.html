@@ -226,42 +226,48 @@
 <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-on-primary-container" style="font-variation-settings: 'FILL' 1;">restaurant</span>
 </div>
-<span class="font-headline-md text-headline-md text-on-primary-container">Feeding</span>
+<span class="font-headline-md text-headline-md text-on-primary-container" data-log-label>Feed</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Breast / Bottle</span>
 </button>
 <!-- Sleep Card -->
 <button class="category-card aspect-square min-h-[150px] bg-secondary-container rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-target="/sleep_log/" type="button">
 <div class="w-16 h-16 rounded-full bg-[#D1E1FF] flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-[#2B478B]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
 </div>
-<span class="font-headline-md text-headline-md text-on-secondary-container">Sleep</span>
+<span class="font-headline-md text-headline-md text-on-secondary-container" data-log-label>Sleep</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Nap / Night</span>
 </button>
 <!-- Diaper Card -->
 <button class="category-card aspect-square min-h-[150px] bg-tertiary-container/30 rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-target="/diaper_log/" type="button">
 <div class="w-16 h-16 rounded-full bg-tertiary-container flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
 </div>
-<span class="font-headline-md text-headline-md text-on-tertiary-container">Diaper</span>
+<span class="font-headline-md text-headline-md text-on-tertiary-container" data-log-label>Diaper</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Wet / Dirty</span>
 </button>
 <!-- Health Card -->
 <button class="category-card aspect-square min-h-[150px] bg-[#FFDAD6] rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-target="/health_records/" type="button">
 <div class="w-16 h-16 rounded-full bg-[#FFB4AB] flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-[#690005]" style="font-variation-settings: 'FILL' 1;">medical_services</span>
 </div>
-<span class="font-headline-md text-headline-md text-[#93000a]">Health</span>
+<span class="font-headline-md text-headline-md text-[#93000a]" data-log-label>Medicine</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Vaccine / Medicine</span>
 </button>
 <!-- Growth Card -->
 <button class="category-card aspect-square min-h-[150px] bg-surface-container-high rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-target="/growth_tracker/" type="button">
 <div class="w-16 h-16 rounded-full bg-outline-variant flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">straighten</span>
 </div>
-<span class="font-headline-md text-headline-md text-on-surface-variant">Growth</span>
+<span class="font-headline-md text-headline-md text-on-surface-variant" data-log-label>Growth</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Weight / Height</span>
 </button>
 <!-- Note Card -->
 <button class="category-card aspect-square min-h-[150px] bg-surface-container-highest rounded-[32px] flex flex-col items-center justify-center gap-base soft-shadow" data-log-type="Note" type="button">
 <div class="w-16 h-16 rounded-full bg-secondary-fixed flex items-center justify-center">
 <span class="material-symbols-outlined text-[32px] text-on-secondary-fixed" style="font-variation-settings: 'FILL' 1;">edit_note</span>
 </div>
-<span class="font-headline-md text-headline-md text-on-secondary-fixed">Note</span>
+<span class="font-headline-md text-headline-md text-on-secondary-fixed" data-log-label>Note</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Note / Milestone</span>
 </button>
 </div>
 <section class="mt-xl space-y-sm">
@@ -374,6 +380,10 @@
         bindPrototypeActions();
         await renderRecentLogs();
         applyPermissions();
+        const quickTypeParam = new URLSearchParams(window.location.search).get("type");
+        if (quickTypeParam && quickTypeParam.toLowerCase() === "note") {
+            openQuickForm("Note");
+        }
 
         document.querySelectorAll('.category-card').forEach(button => {
             button.addEventListener('touchstart', () => {
@@ -381,7 +391,7 @@
             });
             
             button.addEventListener('click', (e) => {
-                const label = button.querySelector('span:last-child').innerText;
+                const label = button.querySelector('[data-log-label]')?.innerText || button.querySelector('span:last-child')?.innerText || "Log";
                 const target = button.dataset.logTarget;
                 const logType = button.dataset.logType;
                 const feedback = document.getElementById('quickLogFeedback');

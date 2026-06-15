@@ -1,17 +1,24 @@
 :root {
   color-scheme: light;
   --ln-bg:
-    radial-gradient(circle at 12% 8%, rgba(255, 182, 193, 0.34), transparent 34%),
-    radial-gradient(circle at 88% 12%, rgba(191, 226, 255, 0.42), transparent 36%),
-    radial-gradient(circle at 50% 82%, rgba(255, 221, 226, 0.28), transparent 42%),
-    linear-gradient(180deg, #fff3f7 0%, #f5fbff 50%, #fff7f2 100%);
+    radial-gradient(circle at 12% 8%, rgba(226, 211, 255, 0.48), transparent 32%),
+    radial-gradient(circle at 88% 10%, rgba(207, 237, 255, 0.58), transparent 34%),
+    radial-gradient(circle at 18% 48%, rgba(255, 219, 228, 0.44), transparent 38%),
+    radial-gradient(circle at 88% 78%, rgba(221, 255, 238, 0.34), transparent 35%),
+    linear-gradient(180deg, #fffaff 0%, #f7fbff 52%, #fff8f1 100%);
   --ln-card: #ffffff;
   --ln-card-soft: #fff1ea;
   --ln-text: #211a17;
   --ln-muted: #665650;
   --ln-border: rgba(83, 67, 61, 0.14);
-  --ln-primary: #83533c;
-  --ln-peach: #ffbfa3;
+  --ln-primary: #7c5cff;
+  --ln-peach: #ffb6c8;
+  --ln-purple: #7c5cff;
+  --ln-lavender: #eee8ff;
+  --ln-pink: #ffe8ef;
+  --ln-mint: #e5fbf2;
+  --ln-sky: #e8f5ff;
+  --ln-cream: #fff5df;
   --ln-motion-fast: 140ms;
   --ln-motion-medium: 220ms;
   --ln-motion-slow: 360ms;
@@ -379,7 +386,7 @@ nav.fixed.bottom-0 {
   right: max(14px, env(safe-area-inset-right)) !important;
   bottom: var(--ln-nav-bottom-gap) !important;
   width: auto !important;
-  max-width: 520px !important;
+  max-width: 390px !important;
   min-height: var(--ln-nav-height) !important;
   margin: 0 auto !important;
   padding: 0.55rem !important;
@@ -388,14 +395,14 @@ nav.fixed.bottom-0 {
   justify-content: space-around !important;
   gap: 0.2rem !important;
   border-radius: 9999px !important;
-  border: 1px solid rgba(131, 83, 60, 0.14) !important;
-  background: rgba(255, 250, 246, 0.72) !important;
-  box-shadow: 0 18px 46px rgba(131, 83, 60, 0.20), inset 0 1px 0 rgba(255,255,255,.76) !important;
+  border: 1px solid rgba(124, 92, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.74) !important;
+  box-shadow: 0 18px 46px rgba(124, 92, 255, 0.16), inset 0 1px 0 rgba(255,255,255,.82) !important;
   backdrop-filter: blur(22px) saturate(1.35) !important;
   -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
   z-index: 9999 !important;
   backface-visibility: hidden;
-  overflow: hidden !important;
+  overflow: visible !important;
   isolation: isolate;
 }
 
@@ -433,22 +440,49 @@ nav.fixed.bottom-0 .material-symbols-outlined {
 
 nav.fixed.bottom-0 .nav-tab-active,
 nav.fixed.bottom-0 [aria-current="page"] {
-  background: rgba(255, 191, 163, 0.42) !important;
-  color: #7a4b36 !important;
-  border-color: rgba(131, 83, 60, 0.12) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 8px 20px rgba(131,83,60,.12) !important;
+  background: rgba(124, 92, 255, 0.14) !important;
+  color: #6f4df2 !important;
+  border-color: rgba(124, 92, 255, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 20px rgba(124,92,255,.12) !important;
 }
+
+nav.fixed.bottom-0 [data-nav-item="log"] {
+  order: 3 !important;
+  flex: 0 0 64px !important;
+  width: 64px !important;
+  height: 64px !important;
+  max-width: 64px !important;
+  margin-top: -28px !important;
+  border-radius: 9999px !important;
+  background: linear-gradient(145deg, #9b7cff, #7056f4) !important;
+  color: #fff !important;
+  box-shadow: 0 16px 32px rgba(124, 92, 255, 0.34) !important;
+}
+
+nav.fixed.bottom-0 [data-nav-item="log"] .material-symbols-outlined {
+  font-size: 34px !important;
+  font-variation-settings: 'FILL' 1 !important;
+}
+
+nav.fixed.bottom-0 [data-nav-item="log"] span:last-child {
+  display: none !important;
+}
+
+nav.fixed.bottom-0 [data-nav-item="home"] { order: 1 !important; }
+nav.fixed.bottom-0 [data-nav-item="calendar"] { order: 2 !important; }
+nav.fixed.bottom-0 [data-nav-item="milestones"] { order: 4 !important; }
+nav.fixed.bottom-0 [data-nav-item="assistant"] { order: 5 !important; }
 
 body {
   padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 2.75rem) !important;
 }
 
 main {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 3.25rem) !important;
 }
 
 .pb-32 {
-  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(var(--ln-nav-height) + var(--ln-nav-bottom-gap) + 3.25rem) !important;
 }
 
 button.fixed.bottom-24,
@@ -466,6 +500,53 @@ button.fixed.bottom-24,
   background-color: rgba(34, 211, 238, 0.18) !important;
   color: #22d3ee !important;
   border-color: rgba(34, 211, 238, 0.26) !important;
+}
+
+:root.dark nav.fixed.bottom-0 [data-nav-item="log"] {
+  background: linear-gradient(145deg, #9b7cff, #22d3ee) !important;
+  color: #07111f !important;
+}
+
+.ln-premium-card,
+main > section,
+main > article,
+.summary-card,
+.quick-log-card,
+.category-card,
+.prompt-card,
+#babyProfileCard,
+.dashboard-stat-card {
+  border-radius: 26px !important;
+}
+
+#homeContent main > section:not(:first-child),
+.ln-premium-card,
+.summary-card,
+.quick-log-card,
+.prompt-card {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border: 1px solid rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 18px 46px rgba(124, 92, 255, 0.10), 0 8px 22px rgba(255, 182, 200, 0.10) !important;
+  backdrop-filter: blur(18px) saturate(1.18);
+  -webkit-backdrop-filter: blur(18px) saturate(1.18);
+}
+
+:root.dark #homeContent main > section:not(:first-child),
+:root.dark .ln-premium-card,
+:root.dark .summary-card,
+:root.dark .quick-log-card,
+:root.dark .prompt-card {
+  background: rgba(18, 27, 45, 0.74) !important;
+  border-color: rgba(132, 204, 255, 0.12) !important;
+}
+
+.dashboard-stat-card:nth-of-type(1), .ln-card-feed { background: linear-gradient(145deg, #ffe7ef, #fff7f7) !important; }
+.dashboard-stat-card:nth-of-type(2), .ln-card-sleep { background: linear-gradient(145deg, #eee8ff, #f8f5ff) !important; }
+.dashboard-stat-card:nth-of-type(3), .ln-card-diaper { background: linear-gradient(145deg, #e5fbf2, #f4fff9) !important; }
+.dashboard-stat-card:nth-of-type(4), .ln-card-growth { background: linear-gradient(145deg, #e8f5ff, #f8fcff) !important; }
+
+:root.dark .dashboard-stat-card:nth-of-type(n) {
+  background: rgba(18, 27, 45, 0.78) !important;
 }
 
 :root.dark .opacity-30,
@@ -566,4 +647,165 @@ button.fixed.bottom-24,
 :root.dark .shadow-xl,
 :root.dark .soft-shadow {
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.44) !important;
+}
+
+/* =====================================================================
+   Light-mode pastel remap — replace the legacy brown Material palette
+   (primary #83533c / primary-container #ffbfa3) with the LittleNest
+   lavender + soft-pink accents from the reference design.
+   Scoped to :root:not(.dark) so dark mode (cyan) is untouched.
+   Pure visual override — no markup or class changes.
+   ===================================================================== */
+:root:not(.dark) .bg-primary,
+:root:not(.dark) button.bg-primary,
+:root:not(.dark) a.bg-primary,
+:root:not(.dark) .bg-primary-fixed-dim,
+:root:not(.dark) .bg-surface-tint {
+  background-image: linear-gradient(145deg, #9b7cff, #7056f4) !important;
+  background-color: #7c5cff !important;
+  color: #ffffff !important;
+}
+
+:root:not(.dark) .text-on-primary,
+:root:not(.dark) .bg-primary .text-on-primary {
+  color: #ffffff !important;
+}
+
+:root:not(.dark) .text-primary,
+:root:not(.dark) .text-primary-fixed-dim,
+:root:not(.dark) .text-surface-tint,
+:root:not(.dark) .text-on-primary-container,
+:root:not(.dark) .text-on-primary-fixed,
+:root:not(.dark) .text-on-primary-fixed-variant {
+  color: #6f4df2 !important;
+}
+
+:root:not(.dark) .border-primary,
+:root:not(.dark) .border-primary-fixed-dim,
+:root:not(.dark) .ring-primary {
+  border-color: rgba(124, 92, 255, 0.55) !important;
+}
+
+/* Soft lavender fills for containers / secondary buttons / nav pills */
+:root:not(.dark) .bg-primary-container,
+:root:not(.dark) [class*="bg-primary-container/"],
+:root:not(.dark) .bg-primary-fixed,
+:root:not(.dark) [class*="bg-primary-fixed/"] {
+  background-color: #eee8ff !important;
+  color: #6f4df2 !important;
+}
+
+:root:not(.dark) .bg-primary-container .text-on-primary-container,
+:root:not(.dark) .bg-primary-container .material-symbols-outlined {
+  color: #6f4df2 !important;
+}
+
+/* Accent icons that used the brown tint */
+:root:not(.dark) .text-inverse-primary {
+  color: #ff9ec0 !important;
+}
+
+/* Quick Log category tiles — give the grey Material tiles distinct pastels */
+:root:not(.dark) .category-card.bg-secondary-container {
+  background-color: #e8f1ff !important;
+}
+:root:not(.dark) .category-card.bg-surface-container-high {
+  background-color: #fff3da !important;
+}
+:root:not(.dark) .category-card.bg-surface-container-highest {
+  background-color: #ffe8ef !important;
+}
+
+/* Dashboard stat cards — premium icon chips + stronger value hierarchy */
+.dashboard-stat-card {
+  padding: 1rem 1.05rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.55rem !important;
+  min-height: 116px !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 12px 30px rgba(124, 92, 255, 0.08) !important;
+}
+.dashboard-stat-label {
+  gap: 0.5rem !important;
+  font-weight: 700 !important;
+}
+.dashboard-stat-card .dashboard-stat-label .material-symbols-outlined {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  font-size: 18px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.dashboard-stat-value {
+  font-weight: 800 !important;
+  letter-spacing: -0.01em;
+  margin-top: auto !important;
+}
+:root.dark .dashboard-stat-card .dashboard-stat-label .material-symbols-outlined {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Quick-action circles — promote the grey Note chip to soft pink */
+:root:not(.dark) .group .bg-surface-container {
+  background-color: #ffe8ef !important;
+}
+:root:not(.dark) .group .bg-surface-container .material-symbols-outlined,
+:root:not(.dark) .group .text-secondary {
+  color: #d6336c !important;
+}
+
+/* Focus ring → lavender to match accent */
+:root:not(.dark) input:focus,
+:root:not(.dark) textarea:focus,
+:root:not(.dark) select:focus {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ln-primary) 26%, transparent) !important;
+}
+
+/* =====================================================================
+   Dark-mode home polish — the home cards hardcode light pastel bg via
+   utility classes; some dark: variants don't resolve, leaving light
+   cards with unreadable text. Force readable dark surfaces here.
+   ===================================================================== */
+:root.dark #mamaCareCard {
+  background: #1d2536 !important;
+  border-color: rgba(255, 99, 132, 0.28) !important;
+}
+:root.dark #mamaCareCard h3,
+:root.dark #mamaCareCard .text-on-surface {
+  color: #eef6ff !important;
+}
+:root.dark #mamaCareCard .text-on-surface-variant {
+  color: #a8b5ca !important;
+}
+:root.dark #mamaCareCard .text-error,
+:root.dark #mamaMoodPreview,
+:root.dark #mamaRestPreview,
+:root.dark #mamaMedsPreview {
+  color: #ff9fb0 !important;
+}
+:root.dark #mamaCareCard .bg-\[\#ffe0e8\] {
+  background-color: rgba(255, 99, 132, 0.18) !important;
+}
+:root.dark #mamaCareCard button {
+  background: rgba(34, 211, 238, 0.14) !important;
+  color: #22d3ee !important;
+  border-color: rgba(34, 211, 238, 0.30) !important;
+}
+
+/* Stat-card icon chips in dark — subtle cyan tint, not a white block */
+:root.dark .dashboard-stat-card .dashboard-stat-label .material-symbols-outlined {
+  background: rgba(34, 211, 238, 0.16) !important;
+  color: #22d3ee !important;
+  box-shadow: none !important;
+}
+
+/* Empty-state / status icon bubbles that hardcode lavender bg */
+:root.dark #activeStatusCard .bg-\[\#eee8ff\],
+:root.dark #noBabyCta .bg-primary-container {
+  background-color: rgba(34, 211, 238, 0.16) !important;
 }

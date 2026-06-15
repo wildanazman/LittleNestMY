@@ -101,7 +101,7 @@
     getLogsForBaby,
     getPersistedGrowthRecords
   } = await import(`${moduleBase}utils/localState.mjs`);
-  const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { deleteBabyProfileRemote, loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
@@ -153,6 +153,26 @@
         render();
       });
     });
+
+    profilesList.querySelectorAll("[data-delete-baby]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const babyName = button.dataset.babyName || "this baby";
+        if (profiles.length < 2) {
+          showFeedback("Add another baby before deleting this profile.");
+          return;
+        }
+        if (!confirm(`Delete ${babyName}'s profile? This removes the baby profile, but existing local logs are not cleared.`)) return;
+        button.disabled = true;
+        try {
+          await deleteBabyProfileRemote(button.dataset.deleteBaby, mockBabyProfile);
+          showFeedback("Baby profile deleted.");
+          render();
+        } catch (error) {
+          showFeedback(error.message || "Could not delete baby profile.");
+          button.disabled = false;
+        }
+      });
+    });
   }
 
   function renderProfileCard(profile, isSelected, totalProfiles, canManageBaby) {
@@ -188,6 +208,7 @@
           ${canManageBaby ? `<button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>` : `<p class="h-11 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
           ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
         </div>
+        ${canManageBaby && totalProfiles > 1 ? `<button class="w-full h-10 rounded-full bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-200 font-label-md text-[13px] font-bold" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete Baby Profile</button>` : ""}
         ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}
       </article>
     `;
@@ -219,7 +240,7 @@
           <span class="material-symbols-outlined text-[34px]">child_care</span>
         </div>
         <p class="font-headline-md text-[20px] font-bold">No baby profile yet</p>
-        <p class="font-body-md text-[15px] text-on-surface-variant">Create one to get started.</p>
+        <p class="font-body-md text-[15px] text-on-surface-variant">Create one now, or wait here for a baby invitation.</p>
       </div>
     `;
   }

@@ -64,7 +64,7 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button" aria-label="Back to home">
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Growth Tracker</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Growth</h1>
 </div>
 </header>
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5">
@@ -74,6 +74,17 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <p class="font-body-md text-body-md text-on-primary-container/80" id="growthStatus">Add a first measurement to start a gentle trend.</p>
 </section>
 <section class="grid grid-cols-3 gap-3" id="latestCards"></section>
+<section class="rounded-[24px] bg-gradient-to-br from-[#eefbf3] to-[#f9f5ff] p-5 soft-shadow border border-white/70 dark:from-white/10 dark:to-white/5 dark:border-white/10" id="growthInsightCard">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-full bg-[#d7f7df] text-[#22a06b] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">tips_and_updates</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Great job!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" id="growthInsightText">Saved measurements will help you see gentle growth patterns.</p>
+</div>
+</div>
+</section>
 <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4" id="addMeasurementSection">
 <div class="flex items-center justify-between">
 <h2 class="font-headline-md text-headline-md text-on-surface">Add measurement</h2>
@@ -103,6 +114,9 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <section class="rounded-[20px] bg-surface-container-low p-4 border border-white/60">
 <p class="font-body-md text-body-md text-on-surface-variant">Growth charts are guides to monitor trends. If you are concerned about your baby's growth, please check with Klinik Kesihatan or your doctor.</p>
 </section>
+<button class="w-full h-12 rounded-full border border-primary text-primary font-label-md text-label-md bg-white/50 dark:bg-white/5" id="viewGrowthReportButton" type="button">
+View Growth Report
+</button>
 </main>
 </div>
 <script type="module">
@@ -128,6 +142,7 @@ const tabs = [
 ];
 let activeTab = "weight";
 document.getElementById("backButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("viewGrowthReportButton")?.addEventListener("click", () => goToScreen("doctor_report"));
 document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
 document.getElementById("babyName").textContent = selectedBaby.name;
 document.getElementById("lengthLabel").textContent = currentLengthLabel;
@@ -156,6 +171,9 @@ function render(){
   const items = records();
   const latest = [...items].reverse().find(Boolean);
   document.getElementById("growthStatus").textContent = latest ? `Latest saved ${calculateBabyAgeShort(selectedBaby.dateOfBirth, new Date(latest.measuredAt))}. Tracking steadily.` : "Add a first measurement to start a gentle trend.";
+  document.getElementById("growthInsightText").textContent = latest
+    ? `${selectedBaby.name}'s latest growth record is saved. Keep tracking trends and check with Klinik Kesihatan or your doctor if you are concerned.`
+    : "Add weight, length/height, or head circumference to build a simple local trend.";
   document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby.dateOfBirth), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
   renderGraph(items);
   document.getElementById("historyList").innerHTML = items.length ? [...items].reverse().map(renderHistory).join("") : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-headline-md text-headline-md">No growth records yet</p><p class="font-body-md text-body-md text-on-surface-variant">Your first measurement will appear here.</p></div>`;
@@ -189,7 +207,7 @@ function renderGraph(items){
   const path = points.map((p,i)=>`${i ? "L" : "M"} ${xFor(p.x)} ${yFor(p.y)}`).join(" ");
   const xTicks = rawSpanX === 0 ? [minX] : [minX, maxX];
   const yTicks = rawSpanY === 0 ? [minY] : [maxY, minY];
-  svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${points.length > 1 ? `<path d="${path}" fill="none" stroke="#83533c" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#FFBFA3" stroke="#83533c" stroke-width="2"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
+  svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#ffffff" stroke="#7c5cff" stroke-width="3"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
 }
 function graphConfig(id){
   const ageMonths = (record) => monthsBetween(selectedBaby.dateOfBirth, record.measuredAt);

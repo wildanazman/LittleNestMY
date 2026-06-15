@@ -190,7 +190,7 @@
 <button aria-label="Open settings" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" id="assistantBackButton" type="button">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Parenting Assistant</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Insights</h1>
 </div>
 <div class="w-8 h-8 rounded-full overflow-hidden bg-secondary-container">
 <img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A warm, soft-focus close-up portrait of a cheerful infant with sparkling eyes, bathed in gentle morning sunlight. The baby's expression is one of pure curiosity and joy, fitting the nurturing aesthetic of a premium parenting app. The background is a blurred, neutral-toned nursery that emphasizes a safe and loving home environment." src="https://lh3.googleusercontent.com/aida/AP1WRLtcEYbzMjIZIz-DWdiSrznHPVUoh-0DuK0x34CXT8FKtIYAedUG10ueEjE5ObB807B0zr2jYF1jnJQ-qBFfLsLs_uVcSrym5XDwWbsUnoFXOb6WaCZE6SN9sGVwt7LmYCSfsunw-Q_AMClaeMazl2i9WMsJhl5zZ6EIfiWpNi6Fnrdrmhmx1EQceOxLNGzlGM0F7T2mbdlCI-CQetP9tx6GPaYQJeex1WbJYOnOAlkpx84O_RIQLv2-jYQz"/>
@@ -204,6 +204,31 @@
   <p class="font-body-md text-body-md text-on-primary-container/80 dark:text-white/70">
     Ask for gentle summaries, checklists, and routines from saved LittleNest data on this device.
   </p>
+</section>
+<section class="space-y-sm" id="insightCards">
+<div class="grid grid-cols-1 gap-sm">
+<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
+<span class="material-symbols-outlined text-[#7056f4] bg-[#eee8ff] rounded-full p-2">bedtime</span>
+<div class="min-w-0 flex-1">
+<p class="font-headline-md text-body-md text-on-surface">Sleep trend</p>
+<p class="font-label-md text-label-md text-on-surface-variant" id="sleepInsightText">Loading sleep pattern...</p>
+</div>
+</article>
+<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
+<span class="material-symbols-outlined text-[#ff6f91] bg-[#ffe8ef] rounded-full p-2">restaurant</span>
+<div class="min-w-0 flex-1">
+<p class="font-headline-md text-body-md text-on-surface">Feeding trend</p>
+<p class="font-label-md text-label-md text-on-surface-variant" id="feedingInsightText">Loading feeding pattern...</p>
+</div>
+</article>
+<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
+<span class="material-symbols-outlined text-[#35b889] bg-[#e5fbf2] rounded-full p-2">baby_changing_station</span>
+<div class="min-w-0 flex-1">
+<p class="font-headline-md text-body-md text-on-surface">Diaper trend</p>
+<p class="font-label-md text-label-md text-on-surface-variant" id="diaperInsightText">Loading diaper pattern...</p>
+</div>
+</article>
+</div>
 </section>
 <!-- Safety Note -->
 <section class="rounded-xl bg-surface-container-low px-4 py-3 border border-outline-variant/40">
@@ -228,7 +253,7 @@
 <!-- Prompt Cards -->
 <section class="space-y-md">
 <div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Helpful prompts</h2>
+<h2 class="font-headline-md text-headline-md text-on-surface">Assistant prompts</h2>
 <p class="font-label-md text-label-md text-on-surface-variant">Local summaries only. AI is not configured yet.</p>
 </div>
 <div class="grid grid-cols-1 gap-sm">
@@ -358,6 +383,7 @@
         const selectedBabyId = getSelectedBabyId(babyProfile);
         const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
         document.getElementById("assistantBabyContext").textContent = `${selectedBaby.name}'s local care assistant`;
+        renderInsightCards();
         updateSendButtonState();
 
         document.querySelectorAll(".prompt-card").forEach(card => {
@@ -470,6 +496,24 @@
                 return `Weekly local report: ${feeds.length} feeding log(s), ${sleeps.length} sleep log(s), ${diapers.length} diaper log(s), ${memories.length} milestone(s), and ${events.length} upcoming event(s).`;
             }
             return "AI is not configured yet. I can still create a local summary from saved sleep, feeding, diaper, milestone, and calendar data on this device.";
+        }
+
+        function renderInsightCards() {
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - 7);
+            const feeds = getLogsForBaby(getPersistedFeedingLogs(feedingLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
+            const sleeps = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
+            const diapers = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId).filter(log => new Date(log.changedAt) >= weekStart);
+            const sleepMinutes = sleeps.reduce((total, log) => total + (log.endedAt ? Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)) : 0), 0);
+            document.getElementById("sleepInsightText").textContent = sleeps.length
+                ? `${sleeps.length} sleep log(s), ${formatDuration(sleepMinutes)} total this week.`
+                : "No sleep logs this week yet. Rough tracking is okay.";
+            document.getElementById("feedingInsightText").textContent = feeds.length
+                ? `${feeds.length} feeding log(s) saved this week.`
+                : "No feeding logs this week yet.";
+            document.getElementById("diaperInsightText").textContent = diapers.length
+                ? `${diapers.length} diaper change(s) saved this week.`
+                : "No diaper logs this week yet.";
         }
 
         function formatDuration(minutes) {

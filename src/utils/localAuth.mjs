@@ -143,7 +143,7 @@ export function routeAfterAuth(hasBabyProfiles, screenUrl) {
   if (pendingInviteToken) {
     return `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`;
   }
-  return hasBabyProfiles ? screenUrl("home_dashboard") : `${screenUrl("add_baby_profile")}?mode=create`;
+  return screenUrl("home_dashboard");
 }
 
 export function rememberPendingInviteToken(token) {

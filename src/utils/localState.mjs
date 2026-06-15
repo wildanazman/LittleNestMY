@@ -91,6 +91,22 @@ export function createBabyProfile(profile, fallbackProfile) {
   return created;
 }
 
+export function deleteBabyProfile(babyId, fallbackProfile) {
+  const profiles = getBabyProfiles(fallbackProfile);
+  if (profiles.length < 2) {
+    throw new Error("Add another baby before deleting this profile.");
+  }
+  const nextProfiles = profiles.filter((profile) => profile.id !== babyId);
+  if (nextProfiles.length === profiles.length) {
+    throw new Error("Baby profile not found.");
+  }
+  writeJson(babyProfilesKey, nextProfiles);
+  const selectedId = readJson(selectedBabyIdKey, "");
+  const nextSelectedId = selectedId === babyId ? nextProfiles[0]?.id || "" : selectedId;
+  writeJson(selectedBabyIdKey, nextSelectedId);
+  return { profiles: nextProfiles, selectedBabyId: nextSelectedId };
+}
+
 export function setSelectedBabyId(babyId, fallbackProfile) {
   const profiles = getBabyProfiles(fallbackProfile);
   if (!profiles.some((profile) => profile.id === babyId)) return getSelectedBabyId(fallbackProfile);

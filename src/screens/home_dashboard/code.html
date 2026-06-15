@@ -129,7 +129,7 @@
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
-        .timeline-line { background: repeating-linear-gradient(to bottom, #d6c2bb, #d6c2bb 2px, transparent 2px, transparent 6px); }
+        .timeline-line { background: linear-gradient(to bottom, rgba(124,92,255,0.28), rgba(124,92,255,0.12)); }
         .home-skeleton-block {
           border-radius: 24px;
           background: linear-gradient(90deg, rgba(239,238,233,.72), rgba(255,255,255,.86), rgba(239,238,233,.72));
@@ -200,15 +200,12 @@
         [data-screen-target="mama_care"][role="button"] .bg-white\/70 {
           background: rgba(255, 250, 246, 0.54) !important;
         }
-        [data-screen-target="mama_care"][role="button"] button {
-          background: #cf5f66 !important;
-          color: #fff7f0 !important;
-          border-color: rgba(255, 255, 255, 0.54) !important;
-        }
+        [data-screen-target="mama_care"][role="button"] button,
         #mamaCareCard button {
-          background: #cf5f66 !important;
-          color: #fff7f0 !important;
-          border-color: rgba(255, 255, 255, 0.54) !important;
+          background: rgba(255, 255, 255, 0.85) !important;
+          color: #6f4df2 !important;
+          border: 1px solid rgba(124, 92, 255, 0.22) !important;
+          font-weight: 700 !important;
         }
         [data-screen-target="feeding_log"] .w-14 {
           background: rgba(254, 217, 188, 0.66) !important;
@@ -313,13 +310,17 @@
                 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="baby-glass-card bg-surface-container-low p-4 rounded-[24px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
-<div class="w-16 h-16 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
+<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
 <img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="../../../icons/icon-192.png"/>
 </div>
-<div>
+<div class="min-w-0 flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">No baby profile yet</h3>
-<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create your first baby profile</p>
+<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
+<span class="mt-2 inline-flex items-center gap-1 rounded-full bg-white/70 px-3 py-1 text-[12px] font-bold text-[#22a06b] dark:bg-white/10 dark:text-[#8ef0bd]" id="babyHealthyBadge">
+<span class="h-2 w-2 rounded-full bg-[#22c55e]"></span>
+Healthy
+</span>
 </div>
 <div class="ml-auto">
 <button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
@@ -327,9 +328,30 @@
 </button>
 </div>
 </div>
+<!-- Empty state CTAs (no baby profile) -->
+<div class="hidden space-y-3" id="noBabyCta">
+<button class="h-14 w-full rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center gap-2 soft-shadow active:scale-95 transition-transform" data-screen-target="add_baby_profile" type="button">
+<span class="material-symbols-outlined">add</span>
+Create baby profile
+</button>
+<button class="h-14 w-full rounded-full bg-primary-container text-on-primary-container font-headline-md text-headline-md flex items-center justify-center gap-2 active:scale-95 transition-transform" data-screen-target="accept_invite" type="button">
+<span class="material-symbols-outlined">mail</span>
+Accept invitation
+</button>
+</div>
+<div class="rounded-[24px] bg-white/75 p-4 soft-shadow border border-white/70 flex items-center gap-4 dark:bg-white/10 dark:border-white/10" id="activeStatusCard">
+<div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">bedtime</span>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusLabel">Latest status</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="activeStatusTitle">Ready to log care</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusDetail">Recent baby activity will appear here.</p>
+</div>
+</div>
 </section>
 <!-- Status Grid -->
-<section class="grid grid-cols-2 gap-gutter">
+<section class="grid grid-cols-2 gap-gutter" id="statusGridSection">
 <!-- Feed -->
 <div class="dashboard-stat-card bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="dashboard-stat-label flex items-center gap-2 text-on-primary-container">
@@ -357,22 +379,22 @@
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
 <span class="font-label-sm text-label-sm text-[#166534]"></span>
 </div>
-<!-- Vaccine -->
-<div class="dashboard-stat-card bg-[#FAF5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open calendar">
+<!-- Growth -->
+<div class="dashboard-stat-card bg-[#E8F5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#6B21A8]">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">vaccines</span>
-<span class="font-label-sm text-label-sm" id="nextEventLabel">Next Vaccine</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monitor_weight</span>
+<span class="font-label-sm text-label-sm">Weight</span>
 </div>
-<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextEventDate">No appts yet</p>
-<span class="font-label-sm text-label-sm text-[#6B21A8]" id="nextEventRelative"></span>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="latestWeight">No data</p>
+<span class="font-label-sm text-label-sm text-[#6B21A8]" id="latestWeightDetail">Add growth record</span>
 </div>
 </section>
 <!-- Mama Care -->
-<section>
-<div class="rounded-[28px] border border-[#ffb3c5] bg-[#fff1f5] p-5 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
+<section id="mamaCareSection">
+<div class="rounded-[26px] border border-[#ffd9e2] bg-[#fff5f8] p-5 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
 <div class="flex items-center gap-4">
-<div class="w-14 h-14 rounded-full bg-[#fb7185] text-white flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<div class="w-12 h-12 rounded-full bg-[#ffe0e8] text-[#fb7185] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
 </div>
 <div class="min-w-0">
 <h3 class="font-headline-lg text-headline-lg text-on-surface">Mama Care</h3>
@@ -380,24 +402,24 @@
 </div>
 </div>
 <div class="grid grid-cols-3 gap-2 mt-4">
-<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
-<p class="font-label-sm text-label-sm text-on-surface">Mood</p>
+<div class="text-center">
+<p class="font-label-sm text-label-sm text-on-surface font-bold">Mood</p>
 <p class="font-label-md text-label-md text-error" id="mamaMoodPreview">Not checked</p>
 </div>
-<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
-<p class="font-label-sm text-label-sm text-on-surface">Rest</p>
+<div class="text-center">
+<p class="font-label-sm text-label-sm text-on-surface font-bold">Rest</p>
 <p class="font-label-md text-label-md text-error" id="mamaRestPreview">Not logged</p>
 </div>
-<div class="rounded-2xl bg-white/70 px-2 py-3 text-center dark:bg-white/10">
-<p class="font-label-sm text-label-sm text-on-surface">Meds</p>
+<div class="text-center">
+<p class="font-label-sm text-label-sm text-on-surface font-bold">Meds</p>
 <p class="font-label-md text-label-md text-error" id="mamaMedsPreview">0/0</p>
 </div>
 </div>
-<button class="mt-4 h-12 w-full rounded-full border border-[#fb7185] bg-white/70 text-error font-label-md text-label-md active:scale-95 transition-transform dark:bg-white/5" data-screen-target="mama_care" type="button">Check on Mama</button>
+<button class="mt-4 h-12 w-full rounded-full bg-white/80 text-primary font-label-md text-label-md active:scale-95 transition-transform dark:bg-white/5" data-screen-target="mama_care" type="button">Check on Mama</button>
 </div>
 </section>
 <!-- Quick Actions -->
-<section>
+<section id="quickActionsSection">
 <div class="flex justify-between items-center px-2">
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
@@ -423,7 +445,7 @@
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-open-note-log="true" role="button" tabindex="0" aria-label="Open note log">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">edit_note</span>
 </div>
@@ -432,7 +454,7 @@
 </div>
 </section>
 <!-- Reminder Banner -->
-<section>
+<section id="reminderSection">
 <div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
 <div class="absolute right-0 top-0 opacity-10 scale-150 rotate-12">
 <span class="material-symbols-outlined text-[120px]">tips_and_updates</span>
@@ -447,7 +469,7 @@
 </div>
 </section>
 <!-- Daily Summary -->
-<section>
+<section id="dailySummarySection">
 <div class="bg-surface-container-low p-4 rounded-[24px] soft-shadow border border-white/60 cursor-pointer dark:border-white/10" data-screen-target="daily_summary" role="button" tabindex="0" aria-label="Open today's care summary">
 <div class="flex items-center justify-between gap-3">
 <div class="flex items-center gap-3 min-w-0">
@@ -465,10 +487,10 @@
 </div>
 </section>
 <!-- Timeline Section -->
-<section class="space-y-sm">
+<section class="space-y-sm" id="timelineSection">
 <h3 class="font-headline-md text-headline-md text-on-surface px-1">Today's Log</h3>
-<div class="relative pl-8 space-y-lg" id="timelineList">
-<div class="absolute left-3 top-2 bottom-2 w-[2px] timeline-line rounded-full"></div>
+<div class="relative pl-12 space-y-3" id="timelineList">
+<div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>
 <!-- Timeline Items -->
 <div class="relative">
 <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-primary-container flex items-center justify-center border-2 border-white">
@@ -506,10 +528,6 @@
 </div>
 </section>
 </main>
-<!-- FAB -->
-<button aria-label="Open quick log" class="fixed bottom-24 right-container-padding w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40" data-screen-target="quick_log" type="button">
-<span class="material-symbols-outlined text-[32px]">add</span>
-</button>
 <div class="fixed inset-0 z-[90] hidden items-end justify-center bg-black/25 px-5 pb-6" id="babyProfileMenu">
 <div class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-3">
 <div class="flex items-start justify-between gap-3">
@@ -575,6 +593,7 @@
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             getPersistedCalendarEvents,
+            getPersistedGrowthRecords,
             getPersistedReminders,
             getLogsForBaby
         } = await import(`${moduleBase}utils/localState.mjs`);
@@ -607,10 +626,13 @@
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
         const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId);
+        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId);
         const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);
         const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
+        const latestGrowth = [...allGrowthRecords].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+        const activeSleep = [...allSleepLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).find((log) => !log.endedAt);
         const todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
         const nextEvent = selectNextHomeAppointment(allCalendarEvents, allReminders, now);
 
@@ -633,13 +655,19 @@
             setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
         } else {
             setText("babyName", "No baby profile yet");
-            setText("babyAge", "Create your first baby profile");
+            setText("babyAge", "Create a baby profile or accept an invitation to begin.");
             document.getElementById("babyProfileMenuButton")?.classList.add("hidden");
+            document.getElementById("babyHealthyBadge")?.classList.add("hidden");
+            document.getElementById("noBabyCta")?.classList.remove("hidden");
+            ["activeStatusCard", "statusGridSection", "mamaCareSection", "quickActionsSection", "reminderSection", "dailySummarySection", "timelineSection"]
+                .forEach((id) => document.getElementById(id)?.classList.add("hidden"));
         }
         const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
         setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feed yet");
         setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
         setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : "No diaper yet");
+        setText("latestWeight", latestGrowth?.weightKg ? `${latestGrowth.weightKg} kg` : "No data");
+        setText("latestWeightDetail", latestGrowth?.measuredAt ? formatRelativeTime(latestGrowth.measuredAt, now) : "Add growth record");
         setText("assistantTitle", "Start logging to see helpful reminders.");
         setText("assistantMessage", "Real suggestions will appear after a few care logs.");
         setText("babyMenuTitle", selectedBaby?.name || "Manage baby profile");
@@ -657,6 +685,7 @@
             setText("nextEventRelative", "");
         }
         renderReminderBanner();
+        renderActiveStatus();
 
         renderTimeline(now);
         applyPermissions();
@@ -667,7 +696,7 @@
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;
             const message = selectedBaby ? viewOnlyMessage : "Create a baby profile before adding logs.";
-            document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"], [data-screen-target="health_records"]').forEach((element) => {
+            document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"], [data-screen-target="health_records"], [data-open-note-log]').forEach((element) => {
                 element.removeAttribute("data-screen-target");
                 element.setAttribute("aria-disabled", "true");
                 element.classList.add("opacity-60");
@@ -813,28 +842,29 @@
             const timeline = document.getElementById("timelineList");
             if (!timeline) return;
 
-            timeline.innerHTML = '<div class="absolute left-3 top-2 bottom-2 w-[2px] timeline-line rounded-full"></div>' +
+            timeline.innerHTML = (events.length ? '<div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>' : '') +
         (events.length ? events.map(renderTimelineItem).join("") : renderEmptyTimeline());
         }
 
         function renderTimelineItem(event) {
-            const colors = {
-                feed: { outer: "bg-primary-container", inner: "bg-primary" },
-                sleep: { outer: "bg-[#E0F2FE]", inner: "bg-[#0369A1]" },
-                diaper: { outer: "bg-[#DCFCE7]", inner: "bg-[#15803D]" }
+            const styles = {
+                feed: { chip: "bg-[#ffe3ec] text-[#d6336c]", icon: "restaurant" },
+                sleep: { chip: "bg-[#e8f1ff] text-[#1E40AF]", icon: "bedtime" },
+                diaper: { chip: "bg-[#e5fbf2] text-[#15803D]", icon: "baby_changing_station" }
             };
-            const color = colors[event.type];
+            const style = styles[event.type] || styles.feed;
 
             return `
                 <div class="relative">
-                    <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full ${color.outer} flex items-center justify-center border-2 border-white">
-                        <div class="w-2 h-2 rounded-full ${color.inner}"></div>
+                    <div class="absolute -left-[44px] top-1 w-9 h-9 rounded-full ${style.chip} flex items-center justify-center border-[3px] border-white shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
                     </div>
-                    <div>
-                        <p class="font-label-md text-label-md text-on-surface">${formatTime(event.at)}</p>
-                        <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant cursor-pointer" data-coming-soon="${event.detailTitle}" data-coming-soon-message="Detail views will open here in the next prototype pass." role="button" tabindex="0">
-                            <p class="font-body-md text-body-md text-on-surface"><span class="font-bold">${event.title}</span> &middot; ${event.detail}</p>
+                    <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center justify-between gap-3 cursor-pointer dark:bg-white/10 dark:border-white/10" data-coming-soon="${event.detailTitle}" data-coming-soon-message="Detail views will open here in the next prototype pass." role="button" tabindex="0">
+                        <div class="min-w-0">
+                            <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
+                            <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
                         </div>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
                     </div>
                 </div>
             `;
@@ -954,9 +984,12 @@
 
         function renderEmptyTimeline() {
             return `
-                <div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant">
-                    <p class="font-headline-md text-headline-md text-on-surface">No logs yet</p>
-                    <p class="font-body-md text-body-md text-on-surface-variant">Add your first feed, sleep, diaper, or note.</p>
+                <div class="-ml-12 rounded-2xl bg-white/70 p-6 border border-white/70 soft-shadow flex flex-col items-center text-center gap-2 dark:bg-white/10 dark:border-white/10">
+                    <div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center">
+                        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">pediatrics</span>
+                    </div>
+                    <p class="font-headline-md text-headline-md text-on-surface">No logs yet today</p>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant">Tap the + button to log a feed, sleep, diaper, or note.</p>
                 </div>
             `;
         }
@@ -1007,6 +1040,34 @@
                 window.location.href = screenUrl("baby_profiles");
             });
         }
+
+        function renderActiveStatus() {
+            if (activeSleep) {
+                setText("activeStatusLabel", "Sleeping now");
+                setText("activeStatusTitle", formatDuration(Math.max(0, Math.round((now - new Date(activeSleep.startedAt)) / 60000))));
+                setText("activeStatusDetail", `Started ${formatTime(activeSleep.startedAt)}`);
+                return;
+            }
+            if (latestFeed) {
+                setText("activeStatusLabel", "Last feed");
+                setText("activeStatusTitle", formatRelativeTime(latestFeed.startedAt, now));
+                setText("activeStatusDetail", latestFeed.amountMl ? `${latestFeed.amountMl} ml logged` : "Feeding logged");
+                return;
+            }
+            setText("activeStatusLabel", "Latest status");
+            setText("activeStatusTitle", selectedBaby ? "Ready to log care" : "No baby profile yet");
+            setText("activeStatusDetail", selectedBaby ? "Recent baby activity will appear here." : "Create baby or accept invitation later.");
+        }
+
+        document.querySelector("[data-open-note-log]")?.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!permissions.canAddLogs || !selectedBaby) {
+                showViewOnlyNotice(selectedBaby ? viewOnlyMessage : "Create a baby profile before adding notes.");
+                return;
+            }
+            window.location.href = `${screenUrl("quick_log")}?type=note`;
+        });
 
         bindPrototypeActions();
     </script>

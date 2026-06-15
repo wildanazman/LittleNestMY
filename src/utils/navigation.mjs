@@ -75,7 +75,7 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
     }
     link.setAttribute("data-nav-item", key);
 
-    normalizeNavItem(link, key === activeKey);
+    normalizeNavItem(link, key, key === activeKey);
 
     if (key === activeKey) {
       link.setAttribute("aria-current", "page");
@@ -103,7 +103,7 @@ function ensureNavigationStyles() {
       right: max(14px, env(safe-area-inset-right)) !important;
       bottom: calc(12px + env(safe-area-inset-bottom)) !important;
       width: auto !important;
-      max-width: 520px !important;
+      max-width: 390px !important;
       min-height: 76px !important;
       margin: 0 auto !important;
       padding: 0.55rem !important;
@@ -112,14 +112,14 @@ function ensureNavigationStyles() {
       justify-content: space-around !important;
       gap: 0.2rem !important;
       border-radius: 9999px !important;
-      border: 1px solid rgba(131, 83, 60, 0.14) !important;
-      background: rgba(255, 250, 246, 0.72) !important;
-      box-shadow: 0 18px 46px rgba(131, 83, 60, 0.20), inset 0 1px 0 rgba(255,255,255,.76) !important;
+      border: 1px solid rgba(124, 92, 255, 0.12) !important;
+      background: rgba(255, 255, 255, 0.74) !important;
+      box-shadow: 0 18px 46px rgba(124, 92, 255, 0.16), inset 0 1px 0 rgba(255,255,255,.82) !important;
       backdrop-filter: blur(22px) saturate(1.35) !important;
       -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
       z-index: 9999 !important;
       backface-visibility: hidden;
-      overflow: hidden !important;
+      overflow: visible !important;
       isolation: isolate;
     }
     nav.fixed.bottom-0 > a,
@@ -152,9 +152,9 @@ function ensureNavigationStyles() {
     }
     nav.fixed .nav-tab-active {
       outline: 0;
-      background: rgba(255, 191, 163, 0.42) !important;
-      border-color: rgba(131, 83, 60, 0.12) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 8px 20px rgba(131,83,60,.12) !important;
+      background: rgba(124, 92, 255, 0.14) !important;
+      border-color: rgba(124, 92, 255, 0.12) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 20px rgba(124,92,255,.12) !important;
     }
   `;
   document.head.appendChild(style);
@@ -178,7 +178,7 @@ function getNavKey(link) {
     || "";
 }
 
-function normalizeNavItem(item, isActive) {
+function normalizeNavItem(item, key, isActive) {
   const nav = item.closest("nav.fixed");
   if (nav) {
     if (nav.parentElement !== document.body) document.body.appendChild(nav);
@@ -188,7 +188,7 @@ function normalizeNavItem(item, isActive) {
     nav.style.right = "max(14px, env(safe-area-inset-right))";
     nav.style.bottom = "calc(12px + env(safe-area-inset-bottom))";
     nav.style.width = "auto";
-    nav.style.maxWidth = "520px";
+    nav.style.maxWidth = "390px";
     nav.style.minHeight = "76px";
     nav.style.margin = "0 auto";
     nav.style.zIndex = "9999";
@@ -207,16 +207,34 @@ function normalizeNavItem(item, isActive) {
   item.style.maxWidth = "78px";
   item.style.flex = "1 1 0";
   item.style.borderRadius = "9999px";
+  item.style.order = ({ home: 1, calendar: 2, log: 3, milestones: 4, assistant: 5 }[key] || 9);
+
+  if (key === "log") {
+    item.className = "flex flex-col items-center justify-center rounded-full transition-all active:scale-90 duration-150 text-white";
+    item.style.flex = "0 0 64px";
+    item.style.width = "64px";
+    item.style.maxWidth = "64px";
+    item.style.height = "64px";
+    item.style.marginTop = "-28px";
+    item.style.background = "linear-gradient(145deg, #9b7cff, #7056f4)";
+    item.style.boxShadow = "0 16px 32px rgba(124, 92, 255, 0.34)";
+  }
 
   const icon = item.querySelector(".material-symbols-outlined");
   if (icon) {
     icon.classList.add("text-[24px]");
     icon.style.fontVariationSettings = isActive ? "'FILL' 1" : "'FILL' 0";
+    if (key === "log") {
+      icon.textContent = "add";
+      icon.style.fontSize = "32px";
+      icon.style.fontVariationSettings = "'FILL' 1";
+    }
   }
 
   const label = item.querySelector("span:last-child");
   if (label) {
     label.className = "font-label-sm text-[10px] leading-4 whitespace-nowrap";
+    if (key === "log") label.classList.add("hidden");
   }
 }
 

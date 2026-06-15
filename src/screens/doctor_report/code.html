@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Doctor Report - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fbf9f4",
+        "surface-container": "#f4ebe6",
+        "surface-container-low": "#fff6f0",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#e9e1d8",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        "tertiary-container": "#dcefd8",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  body { font-family: "Nunito Sans", sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
+  .report-card { border-radius: 26px; }
+  :root.dark .report-card { background: #242120; border-color: rgba(255,255,255,.10); }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- Loading -->
+<section class="max-w-md mx-auto px-5 pt-6 space-y-5" id="reportLoading" aria-label="Loading report">
+<div class="h-10 w-44 rounded-xl bg-surface-container animate-pulse"></div>
+<div class="h-24 rounded-[26px] bg-surface-container animate-pulse"></div>
+<div class="h-40 rounded-[26px] bg-surface-container animate-pulse"></div>
+<div class="h-56 rounded-[26px] bg-surface-container animate-pulse"></div>
+</section>
+
+<div class="hidden" id="reportContent">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between">
+  <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button" aria-label="Back">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="text-[20px] leading-7 font-extrabold text-primary">Doctor Report</h1>
+  <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="shareButton" type="button" aria-label="Print or export report">
+    <span class="material-symbols-outlined">ios_share</span>
+  </button>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
+  <p class="hidden rounded-2xl bg-tertiary-container p-3 text-[14px] font-extrabold text-tertiary" id="feedback" aria-live="polite"></p>
+
+  <!-- Baby profile -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-4 soft-shadow flex items-center gap-4" id="babyCard">
+    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container shrink-0 bg-surface-container flex items-center justify-center">
+      <img class="w-full h-full object-cover hidden" id="babyPhoto" alt="Baby profile"/>
+      <span class="material-symbols-outlined text-primary" id="babyPhotoFallback">child_care</span>
+    </div>
+    <div class="min-w-0">
+      <h2 class="text-[19px] leading-7 font-extrabold text-on-surface truncate" id="babyName">Baby</h2>
+      <p class="text-[14px] text-on-surface-variant" id="babyMeta">Age</p>
+      <p class="text-[14px] text-on-surface-variant" id="babyGender"></p>
+    </div>
+  </section>
+
+  <!-- Summary totals -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <h2 class="text-[18px] leading-6 font-extrabold text-on-surface" id="summaryTitle">Summary (last 7 days)</h2>
+    <div class="mt-4 divide-y divide-surface-container" id="summaryList"></div>
+  </section>
+
+  <!-- Daily breakdown -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Daily breakdown</h2>
+    <div class="mt-3 overflow-x-auto">
+      <table class="w-full text-left text-[13px]" id="dailyTable">
+        <thead>
+          <tr class="text-on-surface-variant">
+            <th class="py-2 pr-2 font-extrabold">Day</th>
+            <th class="py-2 px-2 font-extrabold text-center">Feeds</th>
+            <th class="py-2 px-2 font-extrabold text-center">Sleep</th>
+            <th class="py-2 pl-2 font-extrabold text-center">Diapers</th>
+          </tr>
+        </thead>
+        <tbody id="dailyTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Growth chart -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Growth chart</h2>
+      <span class="text-[12px] font-extrabold text-primary uppercase tracking-wide">Weight (kg)</span>
+    </div>
+    <div class="mt-3 rounded-2xl bg-surface-container-low p-3 border border-white/60">
+      <svg class="w-full h-52" id="growthChart" viewBox="0 0 340 200" role="img" aria-label="Weight trend chart"></svg>
+    </div>
+    <p class="mt-2 text-[13px] text-on-surface-variant" id="growthNote">Saved measurements only.</p>
+  </section>
+
+  <!-- Notes / milestones -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Notes &amp; milestones</h2>
+    <div class="mt-3 space-y-3" id="notesList"></div>
+  </section>
+
+  <section class="rounded-[22px] bg-surface-container-low p-4 border border-primary-container">
+    <p class="text-[13px] leading-6 text-on-surface-variant">This report is a caregiver-logged summary for sharing with family or your clinic. It is based on recent logs only and is not a medical diagnosis. For any health concern, please consult a doctor or Klinik Kesihatan.</p>
+  </section>
+
+  <button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-2" id="printButton" type="button">
+    <span class="material-symbols-outlined">print</span>
+    Print / Export Report
+  </button>
+</main>
+</div>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+  <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button data-screen-target="quick_log"><span class="material-symbols-outlined">add_circle</span><span>Log</span></button>
+  <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+const { getPersistedGrowthRecords, getPersistedMilestones, getLogsForBaby } = await import(`${moduleBase}utils/localState.mjs`);
+const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+
+const now = new Date();
+const DAYS = 7;
+let printPayload = null;
+
+if (!(await isLoggedIn())) {
+  window.location.replace(screenUrl("auth_welcome"));
+  await new Promise(() => {});
+}
+
+document.getElementById("backButton").addEventListener("click", () => goToScreen("growth_tracker"));
+document.getElementById("printButton").addEventListener("click", printReport);
+document.getElementById("shareButton").addEventListener("click", printReport);
+
+await renderReport();
+bindPrototypeActions();
+showContent();
+
+function rangeStart() {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  d.setDate(d.getDate() - (DAYS - 1));
+  return d;
+}
+
+async function renderReport() {
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  const baby = babyState.selectedBaby;
+  const babyId = babyState.selectedBabyId;
+
+  if (!baby || !babyId) {
+    renderNoBaby();
+    return;
+  }
+
+  const core = await loadCoreLogsRemote(babyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+  const feeds = core.feedingLogs || [];
+  const sleeps = core.sleepLogs || [];
+  const diapers = core.diaperLogs || [];
+  const healthNotes = core.healthNotes || [];
+  const growth = getLogsForBaby(getPersistedGrowthRecords([]), babyId)
+    .sort((a, b) => new Date(a.measuredAt) - new Date(b.measuredAt));
+  const milestones = getLogsForBaby(getPersistedMilestones([]), babyId);
+
+  const start = rangeStart();
+  const inRange = (value) => { const d = new Date(value); return d >= start && d <= now; };
+
+  const feeds7 = feeds.filter((l) => inRange(l.startedAt));
+  const diapers7 = diapers.filter((l) => inRange(l.changedAt));
+  const sleepMinutes7 = sumSleepMinutes(sleeps, start, now);
+  const latestGrowth = [...growth].reverse()[0];
+  const length = latestGrowth ? (latestGrowth.heightCm || latestGrowth.lengthCm) : null;
+
+  // Baby card
+  setText("babyName", baby.name);
+  setText("babyMeta", `${calculateBabyAge(baby.dateOfBirth, now)} (${formatDate(baby.dateOfBirth)})`);
+  setText("babyGender", baby.gender ? capitalize(baby.gender) : "");
+  if (baby.photoUrl) {
+    const img = document.getElementById("babyPhoto");
+    img.src = baby.photoUrl;
+    img.classList.remove("hidden");
+    document.getElementById("babyPhotoFallback").classList.add("hidden");
+  }
+
+  // Summary
+  setText("summaryTitle", `Summary (${formatDate(start)} – ${formatDate(now)})`);
+  const summaryRows = [
+    ["Total feedings", `${feeds7.length} times`],
+    ["Total sleep", sleepMinutes7 ? formatDuration(sleepMinutes7) : "0h"],
+    ["Diaper changes", `${diapers7.length} times`],
+    ["Latest weight", latestGrowth?.weightKg ? `${latestGrowth.weightKg} kg` : "No data"],
+    ["Latest height/length", length ? `${length} cm` : "No data"],
+    ["Latest head circ.", latestGrowth?.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm` : "No data"]
+  ];
+  document.getElementById("summaryList").innerHTML = summaryRows.map(([label, value]) => `
+    <div class="flex items-center justify-between py-2.5">
+      <span class="text-[14px] text-on-surface-variant">${escapeHtml(label)}</span>
+      <span class="text-[14px] font-extrabold text-on-surface">${escapeHtml(value)}</span>
+    </div>`).join("");
+
+  // Daily breakdown (newest first)
+  const days = [];
+  for (let i = 0; i < DAYS; i++) {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    day.setDate(day.getDate() - i);
+    const feedCount = feeds.filter((l) => isSameLocalDay(l.startedAt, day)).length;
+    const diaperCount = diapers.filter((l) => isSameLocalDay(l.changedAt, day)).length;
+    const sleepMin = sumSleepMinutes(sleeps, new Date(day.getFullYear(), day.getMonth(), day.getDate()), new Date(day.getFullYear(), day.getMonth(), day.getDate(), 23, 59, 59, 999));
+    days.push({ day, feedCount, diaperCount, sleepMin });
+  }
+  document.getElementById("dailyTableBody").innerHTML = days.map((d) => `
+    <tr class="border-t border-surface-container">
+      <td class="py-2 pr-2 font-bold text-on-surface">${formatDayLabel(d.day)}</td>
+      <td class="py-2 px-2 text-center text-on-surface-variant">${d.feedCount}</td>
+      <td class="py-2 px-2 text-center text-on-surface-variant">${d.sleepMin ? formatDuration(d.sleepMin) : "–"}</td>
+      <td class="py-2 pl-2 text-center text-on-surface-variant">${d.diaperCount}</td>
+    </tr>`).join("");
+
+  // Growth chart
+  renderGrowthChart(growth);
+
+  // Notes & milestones
+  const recentNotes = [
+    ...healthNotes.filter((n) => inRange(n.recordedAt || n.loggedAt)).map((n) => ({
+      at: n.recordedAt || n.loggedAt,
+      icon: "medical_information",
+      title: n.title || n.type || "Health note",
+      detail: n.notes || n.detail || ""
+    })),
+    ...milestones.filter((m) => inRange(m.achievedAt || m.date || m.createdAt)).map((m) => ({
+      at: m.achievedAt || m.date || m.createdAt,
+      icon: "auto_awesome",
+      title: m.title || "Milestone",
+      detail: m.notes || m.description || ""
+    }))
+  ].sort((a, b) => new Date(b.at) - new Date(a.at));
+
+  document.getElementById("notesList").innerHTML = recentNotes.length
+    ? recentNotes.map((n) => `
+      <div class="flex items-start gap-3">
+        <div class="w-9 h-9 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">${n.icon}</span>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[14px] font-bold text-on-surface">${escapeHtml(n.title)}</p>
+          ${n.detail ? `<p class="text-[13px] text-on-surface-variant">${escapeHtml(n.detail)}</p>` : ""}
+          <p class="text-[12px] text-on-surface-variant">${formatDate(n.at)}</p>
+        </div>
+      </div>`).join("")
+    : `<p class="text-[14px] text-on-surface-variant">No notes or milestones logged in this period.</p>`;
+
+  // Print payload
+  printPayload = {
+    babyName: baby.name,
+    meta: `${calculateBabyAge(baby.dateOfBirth, now)} · ${formatDate(baby.dateOfBirth)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`,
+    range: `${formatDate(start)} – ${formatDate(now)}`,
+    summaryRows,
+    days,
+    growth,
+    notes: recentNotes
+  };
+}
+
+function renderNoBaby() {
+  setText("babyName", "No baby profile yet");
+  setText("babyMeta", "Create a baby profile to generate a report.");
+  document.getElementById("summaryTitle").textContent = "Summary";
+  document.getElementById("summaryList").innerHTML = `<p class="py-2 text-[14px] text-on-surface-variant">No data yet.</p>`;
+  document.getElementById("dailyTableBody").innerHTML = `<tr><td colspan="4" class="py-3 text-[14px] text-on-surface-variant">No logs yet.</td></tr>`;
+  document.getElementById("growthChart").innerHTML = `<text x="170" y="100" text-anchor="middle" class="chart-label" fill="#8a746b">No growth records yet</text>`;
+  document.getElementById("notesList").innerHTML = `<p class="text-[14px] text-on-surface-variant">Nothing logged yet.</p>`;
+  const cta = document.getElementById("printButton");
+  cta.innerHTML = `<span class="material-symbols-outlined">add</span> Create baby profile`;
+  cta.addEventListener("click", (e) => { e.stopImmediatePropagation(); goToScreen("add_baby_profile"); }, true);
+}
+
+function sumSleepMinutes(logs, start, end) {
+  return logs.reduce((total, log) => {
+    if (!log.endedAt) return total;
+    const s = new Date(log.startedAt);
+    const e = new Date(log.endedAt);
+    const oStart = new Date(Math.max(s, start));
+    const oEnd = new Date(Math.min(e, end));
+    return total + Math.max(0, Math.round((oEnd - oStart) / 60000));
+  }, 0);
+}
+
+function renderGrowthChart(growth) {
+  const svg = document.getElementById("growthChart");
+  const points = growth.filter((r) => Number.isFinite(Number(r.weightKg)) && Number(r.weightKg) > 0)
+    .map((r) => ({ at: new Date(r.measuredAt).getTime(), y: Number(r.weightKg) }))
+    .sort((a, b) => a.at - b.at);
+
+  if (!points.length) {
+    svg.innerHTML = `<text x="170" y="96" text-anchor="middle" class="chart-label" fill="#8a746b">No weight records yet</text><text x="170" y="120" text-anchor="middle" class="chart-label" fill="#8a746b">Add a growth record to see the trend.</text>`;
+    setText("growthNote", "Add a growth record to build the weight trend.");
+    return;
+  }
+
+  const xs = points.map((p) => p.at), ys = points.map((p) => p.y);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), spanX = Math.max(1, maxX - minX);
+  const minY = Math.min(...ys), maxY = Math.max(...ys), spanY = Math.max(0.5, maxY - minY);
+  const chart = { left: 44, top: 28, width: 264, height: 120, bottom: 148 };
+  const xFor = (x) => (maxX === minX) ? chart.left + chart.width / 2 : chart.left + ((x - minX) / spanX) * chart.width;
+  const yFor = (y) => (maxY === minY) ? chart.top + chart.height / 2 : chart.bottom - ((y - minY) / spanY) * chart.height;
+  const path = points.map((p, i) => `${i ? "L" : "M"} ${xFor(p.at)} ${yFor(p.y)}`).join(" ");
+
+  svg.innerHTML = `
+    <line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(124,92,255,.25)"/>
+    <line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(124,92,255,.25)"/>
+    <text x="40" y="${yFor(maxY) + 4}" text-anchor="end" class="chart-label" fill="#665650">${maxY.toFixed(1)}</text>
+    <text x="40" y="${yFor(minY) + 4}" text-anchor="end" class="chart-label" fill="#665650">${minY.toFixed(1)}</text>
+    ${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>` : ""}
+    ${points.map((p) => `<circle cx="${xFor(p.at)}" cy="${yFor(p.y)}" r="5" fill="#fff" stroke="#7c5cff" stroke-width="3"/>`).join("")}
+    <text x="${chart.left}" y="168" text-anchor="middle" class="chart-label" fill="#665650">${formatDate(new Date(minX))}</text>
+    <text x="${chart.left + chart.width}" y="168" text-anchor="middle" class="chart-label" fill="#665650">${formatDate(new Date(maxX))}</text>`;
+  setText("growthNote", `${points.length} weight measurement${points.length === 1 ? "" : "s"} saved.`);
+}
+
+function printReport() {
+  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
+  const win = window.open("", "_blank", "noopener,noreferrer");
+  if (!win) { showFeedback("Popup blocked. Please allow popups to print the report.", true); return; }
+  const p = printPayload;
+  const summaryHtml = p.summaryRows.map(([l, v]) => `<tr><td>${escapeHtml(l)}</td><td style="text-align:right;font-weight:700">${escapeHtml(v)}</td></tr>`).join("");
+  const dailyHtml = p.days.map((d) => `<tr><td>${escapeHtml(formatDayLabel(d.day))}</td><td style="text-align:center">${d.feedCount}</td><td style="text-align:center">${d.sleepMin ? formatDuration(d.sleepMin) : "–"}</td><td style="text-align:center">${d.diaperCount}</td></tr>`).join("");
+  const growthHtml = p.growth.length
+    ? p.growth.slice().reverse().map((r) => `<tr><td>${escapeHtml(formatDate(r.measuredAt))}</td><td>${r.weightKg ? `${r.weightKg} kg` : "–"}</td><td>${(r.heightCm || r.lengthCm) ? `${r.heightCm || r.lengthCm} cm` : "–"}</td><td>${r.headCircumferenceCm ? `${r.headCircumferenceCm} cm` : "–"}</td></tr>`).join("")
+    : `<tr><td colspan="4">No growth records.</td></tr>`;
+  const notesHtml = p.notes.length
+    ? p.notes.map((n) => `<li><strong>${escapeHtml(n.title)}</strong>${n.detail ? ` — ${escapeHtml(n.detail)}` : ""} <em>(${escapeHtml(formatDate(n.at))})</em></li>`).join("")
+    : "<li>No notes or milestones in this period.</li>";
+
+  win.document.write(`<html><head><title>LittleNest – Doctor Report</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;color:#2b211d;padding:32px;line-height:1.5;max-width:720px;margin:auto}
+      h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:24px 0 8px;border-bottom:2px solid #eee;padding-bottom:4px}
+      .meta{color:#666;font-size:13px;margin-bottom:4px}
+      table{width:100%;border-collapse:collapse;font-size:13px} td,th{padding:6px 8px;border-bottom:1px solid #eee;text-align:left}
+      ul{padding-left:18px;font-size:13px} .note{margin-top:24px;font-size:12px;color:#777}
+    </style></head><body>
+    <h1>LittleNest – Doctor / Family Report</h1>
+    <div class="meta"><strong>${escapeHtml(p.babyName)}</strong> · ${escapeHtml(p.meta)}</div>
+    <div class="meta">Reporting period: ${escapeHtml(p.range)}</div>
+    <h2>Summary</h2><table>${summaryHtml}</table>
+    <h2>Daily breakdown</h2><table><tr><th>Day</th><th style="text-align:center">Feeds</th><th style="text-align:center">Sleep</th><th style="text-align:center">Diapers</th></tr>${dailyHtml}</table>
+    <h2>Growth records</h2><table><tr><th>Date</th><th>Weight</th><th>Height/Length</th><th>Head</th></tr>${growthHtml}</table>
+    <h2>Notes &amp; milestones</h2><ul>${notesHtml}</ul>
+    <p class="note">This report is a caregiver-logged summary based on recent logs only. It is not a medical diagnosis. For health concerns, consult a doctor or Klinik Kesihatan.</p>
+    <script>window.onload=function(){window.print();}<\/script>
+    </body></html>`);
+  win.document.close();
+}
+
+function setText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
+function formatDate(value) { return new Date(typeof value === "string" && value.length === 10 ? `${value}T00:00:00` : value).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
+function formatDayLabel(date) { return date.toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "short" }); }
+function capitalize(value) { return `${String(value).charAt(0).toUpperCase()}${String(value).slice(1)}`; }
+function showFeedback(message, persistent = false) {
+  const f = document.getElementById("feedback");
+  f.textContent = message; f.classList.remove("hidden");
+  if (!persistent) setTimeout(() => f.classList.add("hidden"), 2600);
+}
+function escapeHtml(value) { return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
+function showContent() { document.getElementById("reportLoading")?.classList.add("hidden"); document.getElementById("reportContent")?.classList.remove("hidden"); }
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

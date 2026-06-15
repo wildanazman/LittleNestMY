@@ -1,6 +1,7 @@
 import {
   cacheSupabaseBabyProfiles,
   createBabyProfile,
+  deleteBabyProfile,
   getBabyIdMap,
   getBabyProfiles,
   readSelectedBabyId,
@@ -111,6 +112,43 @@ export async function updateBabyProfileRemote(profile, fallbackProfile) {
   cacheSupabaseBabyProfiles(profiles, baby.id);
   cacheUserBabyProfiles(session.user.id, profiles, baby.id);
   return baby;
+}
+
+export async function deleteBabyProfileRemote(babyId, fallbackProfile) {
+  if (isGuestMode()) return deleteBabyProfile(babyId, fallbackProfile);
+  if (!isSupabaseConfigured) return deleteBabyProfile(babyId, fallbackProfile);
+  const session = await getAuthSession();
+  if (!session) throw new Error("Please log in before deleting a baby profile.");
+
+  const currentProfiles = await fetchRemoteBabyProfiles();
+  if (currentProfiles.length < 2) {
+    throw new Error("Add another baby before deleting this profile.");
+  }
+
+  const resolvedBabyId = resolveSupabaseBabyId(babyId);
+  const { data: membership, error: membershipError } = await supabase
+    .from("baby_members")
+    .select("role")
+    .eq("baby_id", resolvedBabyId)
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+
+  if (membershipError) throw rlsFriendlyError(membershipError, "check baby permission");
+  if (membership?.role !== "parent") throw new Error("Only a parent can delete a baby profile.");
+
+  const { error } = await supabase
+    .from("babies")
+    .delete()
+    .eq("id", resolvedBabyId);
+
+  if (error) throw rlsFriendlyError(error, "delete baby");
+
+  const profiles = (await fetchRemoteBabyProfiles()).filter((profile) => profile.id !== resolvedBabyId);
+  const selectedBabyId = profiles[0]?.id || "";
+  setSelectedBabyIdRemote(selectedBabyId);
+  cacheSupabaseBabyProfiles(profiles, selectedBabyId);
+  cacheUserBabyProfiles(session.user.id, profiles, selectedBabyId);
+  return { profiles, selectedBabyId };
 }
 
 export async function getBabyProfileByIdRemote(babyId, fallbackProfile) {
