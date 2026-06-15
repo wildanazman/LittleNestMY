@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
 <link rel="manifest" href="/manifest.json"/>
-<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=cyan-dark-20260614"/>
-<link rel="stylesheet" href="/src/utils/theme.css?v=cyan-dark-20260614"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Privacy &amp; Safety | LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -145,7 +145,8 @@
 </div>
 <div>
 <h3 class="font-headline-md text-body-md text-on-surface">Export data</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">A future MVP step can turn local logs into a simple report for parents, caregivers, or clinic visits.</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Download a local JSON backup of LittleNest data saved in this browser.</p>
+<button class="mt-3 h-10 px-4 rounded-full bg-tertiary-container text-on-tertiary-fixed font-label-md text-label-md active:scale-95 transition-transform" id="exportDataButton" type="button">Export local data</button>
 </div>
 </div>
 </article>
@@ -183,6 +184,17 @@ Clear local app data
 </button>
 <p class="min-h-6 font-label-md text-label-md text-tertiary" id="clearDataFeedback"></p>
 </section>
+<section class="rounded-xl bg-error-container/40 p-5 soft-shadow border border-error/20 space-y-sm">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Delete account</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">This deletes your Supabase account for LittleNest MY. Shared baby access for this account will be removed. Local browser data is also cleared.</p>
+</div>
+<button class="w-full h-14 rounded-full border border-error text-error font-headline-md text-body-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="deleteAccountButton" type="button">
+<span class="material-symbols-outlined">person_remove</span>
+Delete account
+</button>
+<p class="min-h-6 font-label-md text-label-md text-error" id="deleteAccountFeedback"></p>
+</section>
 </main>
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
@@ -212,16 +224,42 @@ Clear local app data
       const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
       const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
       const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
+      const { getAuthSession, isGuestMode, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
 
       const clearDataButton = document.getElementById("clearDataButton");
       const clearDataFeedback = document.getElementById("clearDataFeedback");
+      const exportDataButton = document.getElementById("exportDataButton");
+      const deleteAccountButton = document.getElementById("deleteAccountButton");
+      const deleteAccountFeedback = document.getElementById("deleteAccountFeedback");
       const backButton = document.getElementById("backButton");
       let clearArmed = false;
+      let deleteArmed = false;
       const babyState = await loadBabyProfilesRemote(babyProfile);
       const permissions = await getBabyPermissions(babyState.selectedBabyId);
 
       backButton.addEventListener("click", () => {
         goToScreen("settings");
+      });
+
+      exportDataButton.addEventListener("click", () => {
+        const data = {
+          exportedAt: new Date().toISOString(),
+          app: "LittleNest MY",
+          localStorage: Object.keys(window.localStorage)
+            .filter((key) => key.startsWith("littlenest:"))
+            .sort()
+            .reduce((items, key) => {
+              items[key] = safeJson(window.localStorage.getItem(key));
+              return items;
+            }, {})
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `littlenest-my-export-${new Date().toISOString().slice(0, 10)}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
       });
 
       clearDataButton.addEventListener("click", () => {
@@ -251,6 +289,61 @@ Clear local app data
         clearDataFeedback.textContent = "Local LittleNest data has been cleared on this browser.";
         setTimeout(() => goToScreen("auth_welcome"), 700);
       });
+
+      deleteAccountButton.addEventListener("click", async () => {
+        if (isGuestMode()) {
+          deleteAccountFeedback.textContent = "Guest mode has no online account. Use Clear local app data instead.";
+          return;
+        }
+        const session = await getAuthSession();
+        if (!session?.access_token) {
+          deleteAccountFeedback.textContent = "Log in first to delete your account.";
+          return;
+        }
+        if (!deleteArmed) {
+          deleteArmed = true;
+          deleteAccountFeedback.textContent = "Tap once more to permanently delete this account.";
+          deleteAccountButton.innerHTML = '<span class="material-symbols-outlined">person_remove</span>Confirm delete account';
+          setTimeout(() => {
+            deleteArmed = false;
+            deleteAccountButton.innerHTML = '<span class="material-symbols-outlined">person_remove</span>Delete account';
+          }, 5000);
+          return;
+        }
+        deleteAccountButton.disabled = true;
+        deleteAccountFeedback.textContent = "Deleting account...";
+        try {
+          const response = await fetch("/api/delete-account", {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${session.access_token}` }
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(payload.error || "Could not delete account.");
+          clearLittleNestLocalData();
+          await logoutLocalUser().catch(() => {});
+          deleteAccountFeedback.textContent = "Account deleted.";
+          setTimeout(() => goToScreen("auth_welcome"), 700);
+        } catch (error) {
+          deleteAccountButton.disabled = false;
+          deleteAccountFeedback.textContent = error.message || "Could not delete account.";
+        }
+      });
+
+      function clearLittleNestLocalData() {
+        Object.keys(window.localStorage)
+          .filter((key) => key.startsWith("littlenest:"))
+          .forEach((key) => window.localStorage.removeItem(key));
+        window.localStorage.removeItem("isLoggedIn");
+        window.localStorage.removeItem("currentUser");
+      }
+
+      function safeJson(value) {
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value;
+        }
+      }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
