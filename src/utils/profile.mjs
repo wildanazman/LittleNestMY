@@ -6,7 +6,7 @@ export { parentProfileKey };
 
 export function getParentProfile() {
   const user = getCachedAuthUser() || {};
-  const saved = user.id ? readScopedProfile(user) : null;
+  const saved = user.id ? readScopedProfile(user) : readJson(parentProfileKey, null);
   return {
     name: saved?.name || user.user_metadata?.display_name || user.user_metadata?.name || "Parent",
     email: saved?.email || user.email || "",

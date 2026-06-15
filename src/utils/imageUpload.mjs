@@ -94,7 +94,7 @@ function loadImage(file) {
 function openCropDialog(image, options) {
   return new Promise((resolve) => {
     const modal = document.createElement("div");
-    modal.className = "fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/45 px-5 pb-6 pt-10";
+    modal.className = "fixed inset-0 z-[10000] flex items-end sm:items-center justify-center bg-black/45 px-5 pb-6 pt-10 overflow-y-auto";
     modal.innerHTML = `
       <div class="w-full max-w-md rounded-[28px] bg-surface-container-lowest text-on-surface shadow-2xl border border-white/40 p-5 space-y-4">
         <div class="flex items-start justify-between gap-3">
@@ -119,7 +119,9 @@ function openCropDialog(image, options) {
       </div>
     `;
 
+    const hadModalOpen = document.body.classList.contains("ln-modal-open");
     document.body.appendChild(modal);
+    document.body.classList.add("ln-modal-open");
     const preview = modal.querySelector("[data-crop-preview]");
     const context = preview.getContext("2d");
     const zoomInput = modal.querySelector("[data-crop-control='zoom']");
@@ -149,6 +151,7 @@ function openCropDialog(image, options) {
 
     function close(result) {
       modal.remove();
+      if (!hadModalOpen) document.body.classList.remove("ln-modal-open");
       resolve(result);
     }
   });

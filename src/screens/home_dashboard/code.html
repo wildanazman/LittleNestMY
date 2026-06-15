@@ -172,25 +172,28 @@
           border: 1px solid rgba(255, 255, 255, 0.72);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 10px 28px rgba(131, 83, 60, 0.10);
         }
-        .dashboard-stat-card:nth-child(1) {
-          background: rgba(254, 217, 188, 0.58) !important;
-          color: #8a3b17 !important;
+        :root:not(.dark) .dashboard-stat-card:nth-child(1) {
+          background: linear-gradient(160deg, #ffe9d8, #fff4ec) !important;
+          color: #9a4a22 !important;
         }
-        .dashboard-stat-card:nth-child(2) {
-          background: rgba(190, 228, 246, 0.62) !important;
-          color: #075985 !important;
+        :root:not(.dark) .dashboard-stat-card:nth-child(2) {
+          background: linear-gradient(160deg, #e3f1ff, #f3f9ff) !important;
+          color: #0b5e95 !important;
         }
-        .dashboard-stat-card:nth-child(3) {
-          background: rgba(201, 241, 214, 0.58) !important;
-          color: #166534 !important;
+        :root:not(.dark) .dashboard-stat-card:nth-child(3) {
+          background: linear-gradient(160deg, #dcf7e6, #f1fdf5) !important;
+          color: #1d7a45 !important;
         }
-        .dashboard-stat-card:nth-child(4) {
-          background: rgba(226, 211, 251, 0.60) !important;
-          color: #5b21b6 !important;
+        :root:not(.dark) .dashboard-stat-card:nth-child(4) {
+          background: linear-gradient(160deg, #ece2ff, #f7f2ff) !important;
+          color: #6b3fc4 !important;
         }
         #homeContent .dashboard-stat-card {
-          border: 1px solid rgba(255, 255, 255, 0.68);
-          box-shadow: 0 14px 34px rgba(92, 72, 88, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.70);
+          border: 0 !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          border-radius: 30px !important;
+          box-shadow: 0 10px 26px rgba(96, 84, 140, 0.10), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
         }
         [data-screen-target="mama_care"][role="button"] {
           background: rgba(255, 231, 235, 0.62) !important;
@@ -359,7 +362,7 @@ Accept invitation
 <span class="font-label-sm text-label-sm">Last Feed</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface" id="lastFeedTime">No feeds yet</p>
-<span class="font-label-sm text-label-sm text-primary"></span>
+<span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastFeedDetail"></span>
 </div>
 <!-- Sleep -->
 <div class="dashboard-stat-card bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
@@ -368,7 +371,7 @@ Accept invitation
 <span class="font-label-sm text-label-sm">Today Sleep</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="todaySleepTotal">No sleep yet</p>
-<span class="font-label-sm text-label-sm text-[#1E40AF]"></span>
+<span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="todaySleepDetail"></span>
 </div>
 <!-- Diaper -->
 <div class="dashboard-stat-card bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
@@ -377,7 +380,7 @@ Accept invitation
 <span class="font-label-sm text-label-sm">Diaper</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
-<span class="font-label-sm text-label-sm text-[#166534]"></span>
+<span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastDiaperDetail"></span>
 </div>
 <!-- Growth -->
 <div class="dashboard-stat-card bg-[#E8F5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
@@ -641,6 +644,15 @@ Accept invitation
             if (element) element.textContent = value;
         };
 
+        const feedAmountLabel = (log) => {
+            if (!log) return "";
+            if (log.amountMl) return `${log.amountMl} ml`;
+            if (log.amountGrams) return `${log.amountGrams} g`;
+            if (log.durationMinutes) return formatDuration(log.durationMinutes);
+            return "";
+        };
+        const formatStatDate = (value) => new Date(value).toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+
         setText("parentName", primaryParent?.name || "Parent");
         const homeParentPhoto = document.getElementById("homeParentPhoto");
         const homeParentInitials = document.getElementById("homeParentInitials");
@@ -664,10 +676,13 @@ Accept invitation
         }
         const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
         setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feed yet");
+        setText("lastFeedDetail", latestFeed ? [formatTime(latestFeed.startedAt), feedAmountLabel(latestFeed)].filter(Boolean).join(" · ") : "Tap to log");
         setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
+        setText("todaySleepDetail", todaySleepMinutes ? "Total today" : "Tap to log");
         setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : "No diaper yet");
+        setText("lastDiaperDetail", todayDiaperCount ? `change${todayDiaperCount === 1 ? "" : "s"} today` : "Tap to log");
         setText("latestWeight", latestGrowth?.weightKg ? `${latestGrowth.weightKg} kg` : "No data");
-        setText("latestWeightDetail", latestGrowth?.measuredAt ? formatRelativeTime(latestGrowth.measuredAt, now) : "Add growth record");
+        setText("latestWeightDetail", latestGrowth?.measuredAt ? formatStatDate(latestGrowth.measuredAt) : "Add growth record");
         setText("assistantTitle", "Start logging to see helpful reminders.");
         setText("assistantMessage", "Real suggestions will appear after a few care logs.");
         setText("babyMenuTitle", selectedBaby?.name || "Manage baby profile");

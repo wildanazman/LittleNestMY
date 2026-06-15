@@ -443,6 +443,7 @@
             parentError.classList.add("hidden");
             parentModal.classList.remove("hidden");
             parentModal.classList.add("flex");
+            document.body.classList.add("ln-modal-open");
         });
 
         document.getElementById("closeParentProfileButton")?.addEventListener("click", closeParentProfileModal);
@@ -555,6 +556,7 @@
         function closeParentProfileModal() {
             parentModal.classList.add("hidden");
             parentModal.classList.remove("flex");
+            document.body.classList.remove("ln-modal-open");
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

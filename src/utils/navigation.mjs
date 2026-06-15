@@ -1,5 +1,5 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
-import { isGuestMode, isLoggedIn } from "./localAuth.mjs";
+import { getAuthSession, isGuestMode, isLoggedIn } from "./localAuth.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
@@ -167,6 +167,17 @@ bindHeaderProfileButtons();
 setupPendingInviteBar();
 setupPullToRefresh();
 setupMotionReady();
+
+// Auth session caches asynchronously; once ready, re-render header avatars so
+// the uploaded profile photo (stored under the user-scoped key) is shown.
+getAuthSession()
+  .catch(() => null)
+  .then(() => {
+    document.querySelectorAll("header").forEach((header) => {
+      const target = header.querySelector("[data-profile-nav-bound='true']");
+      if (target) refreshHeaderProfileAvatar(target);
+    });
+  });
 
 function getNavKey(link) {
   if (link.dataset.navKey) return link.dataset.navKey;
@@ -470,15 +481,24 @@ function ensureHeaderProfileImage(target) {
   return image;
 }
 
+function refreshHeaderProfileAvatar(target) {
+  if (!target) return;
+  const image = ensureHeaderProfileImage(target);
+  image.className = "w-full h-full object-cover";
+  renderHeaderProfileAvatar(target, image);
+}
+
 function renderHeaderProfileAvatar(target, image) {
   const profile = getParentProfile();
-  let initials = target.querySelector("[data-header-profile-initials]");
+  // Reuse any existing initials span (e.g. #homeParentInitials) so we don't
+  // render a duplicate letter next to the photo.
+  let initials = target.querySelector("[data-header-profile-initials]") || target.querySelector("span");
   if (!initials) {
     initials = document.createElement("span");
-    initials.dataset.headerProfileInitials = "true";
     initials.className = "font-headline-md text-headline-md text-primary";
     target.appendChild(initials);
   }
+  initials.dataset.headerProfileInitials = "true";
 
   initials.textContent = initialsForName(profile.name);
   if (profile.photoUrl) {

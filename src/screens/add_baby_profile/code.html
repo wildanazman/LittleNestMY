@@ -153,9 +153,10 @@
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">LittleNest MY</h1>
 </div>
-<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border-2 border-primary-container">
-<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLsXkS-DzsW2IxuGaNlrZ1u-pGUCtB6uXCPPu2_-H5HuAyzUZRBVLpdD9WXQeVZjqh-oFL7oVR8BFArBbXy2dttyHilBNYDHX4mwEr68CqS9H7Ek-CbM0XNo6jjq-xDjUWUAtjeDO77D1pzgvMGAjw3niAWQ7E-DNKiqjuRMs9YGTHvigUfOT8fSjJsbelzCB0PmOX_zwEQIQnewpT1UOHJjoLdapKCLSHCtpvh7ca4YNiOshoFuI54HpaHN"/>
-</div>
+<button class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border-2 border-primary-container flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
+<img alt="Parent profile" class="w-full h-full object-cover hidden" id="topParentPhoto"/>
+<span class="font-headline-md text-headline-md text-primary" id="topParentInitials">P</span>
+</button>
 </header>
 <main class="max-w-md mx-auto px-container-padding pt-8 pb-32">
 <!-- Content Canvas -->
@@ -412,6 +413,7 @@
             setTimeout(() => saveFeedback.classList.add("hidden"), 2600);
         }
     </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
     navigator.serviceWorker.register("/service-worker.js").catch(() => {});
