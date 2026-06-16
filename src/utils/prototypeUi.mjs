@@ -1,4 +1,7 @@
 export function screenUrl(screenId) {
+  if (window.LittleNestCompat?.screenUrl) {
+    return window.LittleNestCompat.screenUrl(screenId);
+  }
   return window.location.protocol === "file:"
     ? `../${screenId}/code.html`
     : `/${screenId}/`;

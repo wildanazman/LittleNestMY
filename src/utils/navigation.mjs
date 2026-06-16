@@ -4,12 +4,17 @@ import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
 const routes = {
-  home: "/home_dashboard/",
-  log: "/quick_log/",
-  calendar: "/calendar/",
-  milestones: "/milestones/",
-  assistant: "/assistant/"
+  home: "home_dashboard",
+  log: "quick_log",
+  calendar: "calendar",
+  milestones: "milestones",
+  assistant: "assistant"
 };
+
+function screenUrl(screenId) {
+  if (window.LittleNestCompat?.screenUrl) return window.LittleNestCompat.screenUrl(screenId);
+  return window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}/`;
+}
 
 const activeGroups = {
   home_dashboard: "home",
@@ -49,7 +54,7 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
 
   document.querySelectorAll("nav.fixed a, nav.fixed button").forEach((link) => {
     const key = getNavKey(link);
-    const route = routes[key];
+    const route = routes[key] ? screenUrl(routes[key]) : "";
 
     if (!route) return;
 
@@ -274,9 +279,7 @@ async function guardAuthenticatedRoutes() {
   // Guests stay local-only and are always allowed into the app shell.
   if (isGuestMode()) return;
 
-  const redirect = (screen) => window.location.replace(
-    window.location.protocol === "file:" ? `../${screen}/code.html` : `/${screen}/`
-  );
+  const redirect = (screen) => window.location.replace(screenUrl(screen));
 
   const session = await getAuthSession();
   if (!session) { redirect("auth_welcome"); return; }
@@ -330,7 +333,7 @@ function renderPendingInviteBar(invite) {
     try {
       await acceptFamilyInviteRemote(invite.token);
       status.textContent = "Invite accepted.";
-      setTimeout(() => window.location.replace("/baby_profiles/"), 450);
+      setTimeout(() => window.location.replace(screenUrl("baby_profiles")), 450);
     } catch (error) {
       status.textContent = error.message || "Could not accept invite.";
     }
