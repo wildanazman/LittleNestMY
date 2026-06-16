@@ -31,6 +31,10 @@
     go
   };
 
+  if (isNativeCapacitor()) {
+    document.documentElement.classList.add("ln-capacitor-native");
+  }
+
   if (isNativeCapacitor() && navigator.serviceWorker?.register) {
     try {
       navigator.serviceWorker.register = function () {

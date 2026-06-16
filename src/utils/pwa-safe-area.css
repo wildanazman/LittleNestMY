@@ -14,6 +14,24 @@ body {
   background: #fbf9f4;
 }
 
+html.ln-capacitor-native body {
+  padding-top: max(18px, env(safe-area-inset-top));
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.ln-capacitor-native header.sticky.top-0 {
+  padding-top: 0;
+  height: 3.5rem;
+}
+
+html.ln-capacitor-native nav.fixed.bottom-0 {
+  bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  transform: translate3d(0, 0, 0) !important;
+  transition: none !important;
+  will-change: auto !important;
+}
+
 header.sticky.top-0,
 header.fixed.top-0 {
   padding-top: env(safe-area-inset-top);

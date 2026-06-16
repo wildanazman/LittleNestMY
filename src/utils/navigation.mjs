@@ -622,6 +622,7 @@ function renderHeaderProfileAvatar(target, image) {
 
 function setupPullToRefresh() {
   if (window.__littleNestPullToRefreshBound) return;
+  if (window.LittleNestCompat?.isNativeCapacitor?.()) return;
   if (!("ontouchstart" in window)) return;
 
   window.__littleNestPullToRefreshBound = true;
