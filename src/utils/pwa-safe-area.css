@@ -7,6 +7,23 @@ html {
   min-height: 100%;
 }
 
+html.ln-capacitor-native {
+  --ln-native-top-inset: max(44px, env(safe-area-inset-top));
+  background: var(--ln-bg, #fbf9f4);
+}
+
+html.ln-capacitor-native::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--ln-native-top-inset);
+  background: var(--ln-bg, #fbf9f4);
+  z-index: 9998;
+  pointer-events: none;
+}
+
 body {
   min-height: 100dvh;
   padding-left: env(safe-area-inset-left);
@@ -15,7 +32,8 @@ body {
 }
 
 html.ln-capacitor-native body {
-  padding-top: max(18px, env(safe-area-inset-top));
+  padding-top: var(--ln-native-top-inset);
+  background: var(--ln-bg, #fbf9f4);
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -23,6 +41,13 @@ html.ln-capacitor-native body {
 html.ln-capacitor-native header.sticky.top-0 {
   padding-top: 0;
   height: 3.5rem;
+  top: 0;
+}
+
+html.ln-capacitor-native header.fixed.top-0 {
+  padding-top: 0;
+  height: 3.5rem;
+  top: var(--ln-native-top-inset) !important;
 }
 
 html.ln-capacitor-native nav.fixed.bottom-0 {
