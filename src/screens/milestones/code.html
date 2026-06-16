@@ -116,26 +116,36 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
-        .scrapbook-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-        }
-        @media (max-width: 768px) {
-            .scrapbook-grid {
-                grid-template-columns: 1fr;
-            }
+        .memory-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            max-width: 520px;
+            margin: 0 auto;
         }
         .milestone-card {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
-        .milestone-card:active {
-            transform: scale(0.98);
-        }
+        .milestone-card:active { transform: scale(0.985); }
         .glass-tag {
-            backdrop-filter: blur(8px);
-            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.66);
         }
+        .recap-strip, .chip-row {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+            padding-bottom: 6px;
+        }
+        .recap-strip::-webkit-scrollbar, .chip-row::-webkit-scrollbar { display: none; }
+        .recap-strip, .chip-row { scrollbar-width: none; }
+        .recap-card { scroll-snap-align: start; }
+        .story-fade { animation: storyFade 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes storyFade { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
+        .story-rise { animation: storyRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        @keyframes storyRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 <style>
     body {
@@ -154,17 +164,32 @@
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Milestones &amp; Memories</h1>
 </div>
 <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
-<img alt="Baby Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuMhrH-R-d-8aScXkbUn47TZnMoFaxHFFiRreG0akRAkk9GwdIg2PiFSehCwG4GPk5lmcvZPRpIwwxsfB9m3OjSR_Az9-MDYJNRaJ6kIREhlHNwhSCbJ7Nr9t3N8BSyapBn1uNHcMedx9cZX2YhHuGZkwhLeZfbDEPTVwWyf97mkg6teSOstE_vRv_x-wOfDXGetFu1QC54_fzS8I_hSjTZonSF2eUUdJPqOEpq9nwUGRZ3cNt2O7RU5uP8"/>
+<img alt="Baby Avatar" class="w-full h-full object-cover" src="/icons/placeholder.svg"/>
 </div>
 </header>
 <main class="px-container-padding pt-6 max-w-5xl mx-auto">
-<!-- Floating Intro Header -->
-<section class="mb-10 text-center md:text-left">
-<h2 class="font-display-lg text-display-lg text-on-surface mb-2">Beautiful beginnings</h2>
-<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Every tiny victory is a giant leap. Capture and cherish the moments that make parenthood magical.</p>
+<!-- Dreamy Intro Header -->
+<section class="mb-7 max-w-[520px] mx-auto">
+<p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-1" id="memoryKicker">Memory book</p>
+<h2 class="font-display-lg text-display-lg text-on-surface leading-[1.05]" id="memoryHeroTitle">Little moments, kept forever</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2" id="memoryHeroSub">Every tiny first, gathered into one warm keepsake.</p>
 </section>
+<!-- Monthly Recap -->
+<section class="mb-6 max-w-[520px] mx-auto hidden" id="recapSection">
+<div class="flex items-end justify-between mb-3">
+<h3 class="font-headline-md text-headline-md text-on-surface">Monthly recap</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Swipe →</span>
+</div>
+<div class="recap-strip" id="recapStrip"></div>
+</section>
+<!-- Category Chips -->
+<section class="mb-5 max-w-[520px] mx-auto">
+<div class="chip-row" id="categoryChips"></div>
+</section>
+<!-- Memory Feed -->
+<div class="memory-feed pb-10" id="milestoneGrid"></div>
 <!-- Add Milestone Panel -->
-<section class="mb-10 bg-surface-container-low rounded-[32px] p-5 shadow-[0_8px_30px_rgba(255,191,163,0.12)]" id="addMilestonePanel">
+<section class="mb-10 max-w-[520px] mx-auto bg-surface-container-low rounded-[32px] p-5 shadow-[0_8px_30px_rgba(255,191,163,0.12)]" id="addMilestonePanel">
 <div class="flex items-center justify-between gap-4 mb-4">
 <div>
 <h3 class="font-headline-md text-headline-md text-on-surface">Add a memory</h3>
@@ -180,6 +205,7 @@
 <select class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="milestoneType">
 <option>First smile</option>
 <option>First laugh</option>
+<option>First bath</option>
 <option>First roll over</option>
 <option>First tooth</option>
 <option>First word</option>
@@ -215,57 +241,6 @@
 Save Milestone
 </button>
 </section>
-<!-- Scrapbook Layout -->
-<div class="scrapbook-grid pb-12" id="milestoneGrid">
-<!-- Milestone Card 1: First Smile -->
-<article class="milestone-card bg-surface-container-low rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(255,191,163,0.12)] p-4 relative flex flex-col gap-4">
-<div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A heart-warming close-up photograph of a newborn baby girl giving a wide, toothless first smile. The lighting is soft and golden, coming from a nearby window, casting a gentle glow on her soft skin. The background is a soft-focus, creamy-white knit blanket, emphasizing a serene, light-mode aesthetic with warm peach and cream undertones." src="https://lh3.googleusercontent.com/aida/AP1WRLsH-jQYC3ZSncoHSRHw9OOuNO-xJZiWlB2BKA2HT1uDff1TP189UX-lRUd-_-iYbt7Wd714WrmmDqE8V_jrqZVsDvaXsrK_-VRTPt6DFk3q6y70cDIIZstwZqq-GJttg7ZdzgZmnO1_8cQl7SBCPesHyAOA86Z4q0u6Z57B-5huIBl9tpyLVHgZqjfNTz_2MTdeLoXnJPeZ1RcdsiZyhLdpKbSYy2-u-zaa8g0eGZSz-pafVLvXgMxq5kM"/>
-<div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full border border-white/50">
-<span class="font-label-sm text-label-sm text-primary uppercase">6 Weeks Old</span>
-</div>
-<div class="absolute bottom-4 right-4 bg-tertiary-container/90 px-4 py-1 rounded-full shadow-sm rotate-2">
-<span class="font-label-sm text-label-sm text-on-tertiary-container">Feb 14, 2024</span>
-</div>
-</div>
-<div class="px-2 pb-2">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">First Smile</h3>
-<p class="font-body-md text-body-md text-on-surface-variant italic">"The room lit up when you finally beamed at Daddy. A moment we'll never forget."</p>
-</div>
-</article>
-<!-- Milestone Card 2: Slept Through Night -->
-<article class="milestone-card bg-surface-container-low rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(255,191,163,0.12)] p-4 relative flex flex-col gap-4 md:mt-12">
-<div class="relative w-full aspect-square rounded-[24px] overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="An atmospheric, serene image of a baby sleeping peacefully in a minimalist wooden crib. The scene is bathed in cool, soft blue morning light filtered through sheer curtains. The room is decorated in muted sage green and warm cream tones, creating a digital sanctuary vibe that is calm and trustworthy. The focus is sharp on the baby's calm face." src="https://lh3.googleusercontent.com/aida/AP1WRLvoafNB7tmwEDrX7w8l0Hz3RHwWfnDjmnl6Ko3DQoSMZqRQM5R5UTS-0tAsjaCmP6A9uCuM-4QM_MR4OoCtM2mrp37sc4UcoAs7UCm5YX6JKF1OahziLDtV59X0OuhFTqhY6Btdy_JiLVmLt3d1Itw1eW4yhVH4WdPURq4E2Rth4gaxOTmeOLuwL5SUA8CXqS84Cc6Usra9ZyGq73xQDbLtes8MBZR-_aEyhqqiix7EqBxGmz2TYTjfLKeT"/>
-<div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full border border-white/50">
-<span class="font-label-sm text-label-sm text-primary uppercase">3 Months</span>
-</div>
-<div class="absolute bottom-4 right-4 bg-primary-container/90 px-4 py-1 rounded-full shadow-sm -rotate-3">
-<span class="font-label-sm text-label-sm text-on-primary-container">Mar 22, 2024</span>
-</div>
-</div>
-<div class="px-2 pb-2">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Full Night's Sleep</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">"8 hours straight! We all feel like new humans today. Such a big milestone for the whole family."</p>
-</div>
-</article>
-<!-- Milestone Card 3: First Solid Food -->
-<article class="milestone-card bg-surface-container-low rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(255,191,163,0.12)] p-4 relative flex flex-col gap-4">
-<div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A bright and playful high-angle shot of a baby sitting in a modern wooden high chair, covered in a little bit of orange sweet potato puree. The color palette is dominated by soft peach, vibrant orange, and clean whites. The style is modern minimalist with tactile softness, using natural materials and plenty of whitespace for a breathable, airy feel." src="https://lh3.googleusercontent.com/aida/AP1WRLvDMbLJtNi4r2WvSW-UHR1cM-K4FV1i1eeKm7ETNAxemz8JKWXXlR3OtOwc29fsUfCuS7YQUiuFKUFJIsa2ebd5RWPJVLEqlMFTovVPvMAWd47HFrZvGkfY0IdYC6EHcKd9rr2wIew5VwXVXDnYrMU3FVgtYviBrit8Fr_oI7KsvyXtZl44Y4iM7XBsmJnbEebLf8BrtzBBH5PALHlwNSHIwZ0ADT2QQzzkEL7rAzNdtw2XyNSjoH2lDxyG"/>
-<div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full border border-white/50">
-<span class="font-label-sm text-label-sm text-primary uppercase">6 Months</span>
-</div>
-<div class="absolute bottom-4 right-4 bg-secondary-container/90 px-4 py-1 rounded-full shadow-sm rotate-1">
-<span class="font-label-sm text-label-sm text-on-secondary-container">May 05, 2024</span>
-</div>
-</div>
-<div class="px-2 pb-2">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-1">First Tastes</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">"Tried sweet potato today. Not a fan of the texture, but loved the color!"</p>
-</div>
-</article>
-</div>
 <!-- Add Milestone Floating Action -->
 <div class="fixed bottom-24 right-6 md:right-12 z-50">
 <button class="flex items-center gap-2 bg-primary text-on-primary h-14 px-6 rounded-full shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all" id="addMilestoneFab" type="button">
@@ -274,6 +249,22 @@ Save Milestone
 </button>
 </div>
 </main>
+<!-- Story View (immersive full-screen memory) -->
+<div class="fixed inset-0 z-[120] hidden" id="storyModal" role="dialog" aria-modal="true" aria-label="Memory story view">
+<div class="absolute inset-0 bg-[#18120f]/95 backdrop-blur-sm"></div>
+<div class="relative h-full w-full max-w-[520px] mx-auto flex flex-col">
+<button aria-label="Close memory" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="storyClose" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+<button aria-label="Previous memory" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/12 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform hidden" id="storyPrev" type="button">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button aria-label="Next memory" class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/12 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform hidden" id="storyNext" type="button">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<div class="h-full w-full overflow-y-auto" id="storyBody"></div>
+</div>
+</div>
 <!-- Bottom Navigation Bar (Mandatory Shell) -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
 <button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-transform active:scale-90 duration-150">
@@ -346,7 +337,63 @@ Save Milestone
         });
         backButton.addEventListener("click", () => goToScreen("home_dashboard"));
 
-        renderMilestones();
+        // New memory-book UI elements
+        const recapSection = document.getElementById("recapSection");
+        const recapStrip = document.getElementById("recapStrip");
+        const chipRow = document.getElementById("categoryChips");
+        const storyModal = document.getElementById("storyModal");
+        const storyBody = document.getElementById("storyBody");
+        const storyCloseBtn = document.getElementById("storyClose");
+        const storyPrevBtn = document.getElementById("storyPrev");
+        const storyNextBtn = document.getElementById("storyNext");
+
+        const CATEGORIES = [
+            { key: "all", label: "All", icon: "auto_awesome" },
+            { key: "smile", label: "First smile", icon: "sentiment_very_satisfied" },
+            { key: "bath", label: "First bath", icon: "bathtub" },
+            { key: "steps", label: "First steps", icon: "directions_walk" },
+            { key: "word", label: "First word", icon: "chat_bubble" },
+            { key: "custom", label: "Memories", icon: "favorite" }
+        ];
+        let activeCategory = "all";
+        let storyOrder = [];
+        let storyIndex = 0;
+
+        storyCloseBtn.addEventListener("click", closeStory);
+        storyModal.addEventListener("click", (event) => { if (event.target === storyModal || event.target === storyModal.firstElementChild) closeStory(); });
+        storyPrevBtn.addEventListener("click", () => stepStory(-1));
+        storyNextBtn.addEventListener("click", () => stepStory(1));
+        document.addEventListener("keydown", (event) => {
+            if (storyModal.classList.contains("hidden")) return;
+            if (event.key === "Escape") closeStory();
+            if (event.key === "ArrowLeft") stepStory(-1);
+            if (event.key === "ArrowRight") stepStory(1);
+        });
+
+        renderAll();
+
+        function allMemories() {
+            return getLogsForBaby(getPersistedMilestones([]), selectedBabyId)
+                .sort((a, b) => new Date(b.achievedAt) - new Date(a.achievedAt));
+        }
+
+        function visibleMemories() {
+            const all = allMemories();
+            return activeCategory === "all" ? all : all.filter((m) => memoryCategory(m) === activeCategory);
+        }
+
+        function memoryCategory(m) {
+            const t = (m.title || "").toLowerCase();
+            if (t.includes("smile") || t.includes("laugh")) return "smile";
+            if (t.includes("bath")) return "bath";
+            if (t.includes("step") || t.includes("walk") || t.includes("roll") || t.includes("crawl")) return "steps";
+            if (t.includes("word") || t.includes("mama") || t.includes("papa") || t.includes("talk")) return "word";
+            return "custom";
+        }
+
+        function memDate(m) { return new Date(`${m.achievedAt}T00:00:00+08:00`); }
+        function dateLabelOf(m) { return memDate(m).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
+        function ageOf(m) { return calculateBabyAgeShort(selectedBaby.dateOfBirth, memDate(m)); }
 
         function saveMilestone() {
             const title = typeInput.value === "Custom milestone" ? customTitleInput.value.trim() : typeInput.value.trim();
@@ -380,7 +427,7 @@ Save Milestone
                 photoUrl: milestonePhotoDataUrl || undefined
             });
 
-      noteInput.value = "";
+            noteInput.value = "";
             customTitleInput.value = "";
             typeInput.value = "First smile";
             customTitleWrapper.classList.add("hidden");
@@ -389,128 +436,256 @@ Save Milestone
             milestonePhotoDataUrl = "";
             editingMilestoneId = "";
             saveButton.textContent = "Save Milestone";
-            renderMilestones();
+            renderAll();
             showFeedback("Saved to memory book.");
         }
 
-        function renderMilestones() {
-            const milestones = getLogsForBaby(getPersistedMilestones(mockMilestones), selectedBabyId)
-                .sort((a, b) => new Date(b.achievedAt) - new Date(a.achievedAt));
+        function renderAll() {
+            renderHero();
+            renderRecap();
+            renderChips();
+            renderFeed();
+        }
 
-            grid.innerHTML = milestones.length
-        ? milestones.map(renderMilestoneCard).join("")
-                : renderEmptyMilestones();
-            bindMilestoneCards();
+        function renderHero() {
+            const all = allMemories();
+            const name = selectedBaby?.name ? selectedBaby.name.split(" ")[0] : "your little one";
+            const sub = document.getElementById("memoryHeroSub");
+            if (sub) {
+                sub.textContent = all.length
+                    ? `${all.length} ${all.length === 1 ? "memory" : "memories"} of ${name}, kept warm and close.`
+                    : `Start ${name}'s keepsake — one tiny first at a time.`;
+            }
+        }
+
+        function renderChips() {
+            chipRow.innerHTML = CATEGORIES.map((c) => {
+                const active = c.key === activeCategory;
+                return `
+                    <button class="shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-full font-label-md text-label-md transition-colors ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}" data-chip="${c.key}" type="button">
+                        <span class="material-symbols-outlined text-[18px]">${c.icon}</span>${c.label}
+                    </button>`;
+            }).join("");
+            chipRow.querySelectorAll("[data-chip]").forEach((btn) => btn.addEventListener("click", () => {
+                activeCategory = btn.dataset.chip;
+                renderChips();
+                renderFeed();
+            }));
+        }
+
+        function renderRecap() {
+            const all = allMemories();
+            if (!all.length) { recapSection.classList.add("hidden"); return; }
+            const groups = new Map();
+            for (const m of all) {
+                const d = memDate(m);
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(m);
+            }
+            const months = [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+            recapStrip.innerHTML = months.map(([key, items]) => {
+                const label = new Date(`${key}-01T00:00:00`).toLocaleDateString("en-MY", { month: "long", year: "numeric" });
+                const photos = items.filter((m) => m.photoUrl).length;
+                const cover = items.find((m) => m.photoUrl)?.photoUrl;
+                return `
+                    <button class="recap-card shrink-0 w-[180px] text-left rounded-[24px] overflow-hidden shadow-[0_12px_34px_rgba(124,92,255,0.12)] relative" data-recap="${items[0].id}" type="button">
+                        <div class="relative h-[120px] bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
+                            ${cover ? `<img class="w-full h-full object-cover" src="${cover}" alt="">` : `<div class="w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
+                            <p class="absolute bottom-2 left-3 right-3 text-white font-headline-md text-headline-md leading-tight">${label}</p>
+                        </div>
+                        <div class="bg-surface-container-lowest px-3 py-2.5">
+                            <p class="font-label-sm text-label-sm text-on-surface-variant">${items.length} ${items.length === 1 ? "memory" : "memories"} · ${photos} photo${photos === 1 ? "" : "s"}</p>
+                        </div>
+                    </button>`;
+            }).join("");
+            recapSection.classList.remove("hidden");
+            recapStrip.querySelectorAll("[data-recap]").forEach((btn) => btn.addEventListener("click", () => {
+                activeCategory = "all";
+                renderChips();
+                renderFeed();
+                openStory(btn.dataset.recap);
+            }));
+        }
+
+        function renderFeed() {
+            const items = visibleMemories();
+            grid.innerHTML = items.length ? items.map(renderMemoryCard).join("") : renderEmptyMemories();
+            grid.querySelectorAll("[data-open-story]").forEach((card) => {
+                card.addEventListener("click", (event) => {
+                    if (event.target.closest("[data-card-edit], [data-card-delete]")) return;
+                    openStory(card.dataset.openStory);
+                });
+                card.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openStory(card.dataset.openStory); }
+                });
+            });
+            grid.querySelectorAll("[data-card-edit]").forEach((btn) => btn.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const m = allMemories().find((x) => x.id === btn.dataset.cardEdit);
+                if (m) startEdit(m);
+            }));
+            grid.querySelectorAll("[data-card-delete]").forEach((btn) => btn.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (!confirm("Delete this memory?")) return;
+                deleteLocalMilestone(btn.dataset.cardDelete);
+                renderAll();
+                showFeedback("Memory deleted.");
+            }));
             animateCards();
         }
 
-        function renderEmptyMilestones() {
+        function renderMemoryCard(m) {
+            const cat = CATEGORIES.find((c) => c.key === memoryCategory(m)) || CATEGORIES[CATEGORIES.length - 1];
+            const notePreview = m.notes ? escapeHtml(m.notes) : "A small moment worth keeping close.";
             return `
-                <article class="milestone-card md:col-span-2 bg-surface-container-low rounded-[32px] p-8 shadow-[0_8px_30px_rgba(255,191,163,0.12)] border border-primary-container/30 text-center space-y-4">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-primary-container/50 to-tertiary-container/40 text-primary mx-auto flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[42px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[30px] overflow-hidden shadow-[0_18px_50px_rgba(124,92,255,0.14)] cursor-pointer">
+                    <div class="relative aspect-[4/5] w-full bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
+                        ${m.photoUrl ? `<img class="w-full h-full object-cover" src="${m.photoUrl}" alt="">` : renderCardArt(cat)}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/10"></div>
+                        <div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full">
+                            <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">${ageOf(m)}</span>
+                        </div>
+                        <div class="absolute top-3 right-3 flex gap-2">
+                            <button class="glass-tag w-9 h-9 rounded-full flex items-center justify-center text-primary active:scale-90 transition-transform" data-card-edit="${m.id}" type="button" aria-label="Edit memory">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                            <button class="glass-tag w-9 h-9 rounded-full flex items-center justify-center text-error active:scale-90 transition-transform" data-card-delete="${m.id}" type="button" aria-label="Delete memory">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 p-5">
+                            <span class="inline-flex items-center gap-1 rounded-full bg-white/85 px-2.5 py-0.5 mb-2 text-primary font-label-sm text-label-sm">
+                                <span class="material-symbols-outlined text-[15px]">${cat.icon}</span>${cat.label}
+                            </span>
+                            <h3 class="font-display-lg text-display-lg text-white leading-[1.08] drop-shadow-sm">${escapeHtml(m.title)}</h3>
+                            <p class="font-body-md text-body-md text-white/85 mt-1 line-clamp-2">${dateLabelOf(m)} · ${notePreview}</p>
+                        </div>
                     </div>
-                    <div class="space-y-2">
-                        <h3 class="font-headline-md text-headline-md text-on-surface">Your first milestone memory will appear here</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant">Tiny moments count too. Add the memory when it feels right.</p>
-                    </div>
-                </article>
+                </div>
             `;
         }
 
-        function renderMilestoneCard(milestone, index) {
-            const date = new Date(`${milestone.achievedAt}T00:00:00+08:00`);
-            const age = calculateBabyAgeShort(selectedBaby.dateOfBirth, date);
-            const dateLabel = date.toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
-            const image = milestone.photoUrl || imageForMilestone(milestone.title);
-            const tilt = index % 2 === 0 ? "rotate-1" : "-rotate-1";
-
-            return `
-                <article class="milestone-card bg-surface-container-low rounded-[32px] overflow-hidden shadow-[0_8px_30px_rgba(255,191,163,0.12)] p-4 relative flex flex-col gap-4 ${index % 2 === 1 ? "md:mt-12" : ""}">
-                    <div class="relative w-full aspect-[4/5] rounded-[24px] overflow-hidden bg-surface-container-lowest">
-                        ${image ? `<img class="w-full h-full object-cover" src="${image}" alt="">` : renderImagePlaceholder()}
-                        <div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full border border-white/50">
-                            <span class="font-label-sm text-label-sm text-primary uppercase">${age}</span>
-                        </div>
-                        <div class="absolute bottom-4 right-4 bg-primary-container/90 px-4 py-1 rounded-full shadow-sm ${tilt}">
-                            <span class="font-label-sm text-label-sm text-on-primary-container">${dateLabel}</span>
-                        </div>
-                    </div>
-                    <div class="px-2 pb-2">
-                        <h3 class="font-headline-md text-headline-md text-on-surface mb-1">${escapeHtml(milestone.title)}</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant italic">${escapeHtml(milestone.notes || "A small moment worth keeping close.")}</p>
-                        <div class="flex gap-2 pt-3">
-                            <button class="h-9 px-4 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm" data-edit-milestone="${milestone.id}" type="button">Edit</button>
-                            <button class="h-9 px-4 rounded-full bg-error-container/40 text-error font-label-sm text-label-sm" data-delete-milestone="${milestone.id}" type="button">Delete</button>
-                        </div>
-                    </div>
-                </article>
-            `;
+        function renderCardArt(cat) {
+            return `<div class="w-full h-full flex items-center justify-center text-primary/55"><span class="material-symbols-outlined text-[72px]" style="font-variation-settings:'FILL' 1;">${cat.icon}</span></div>`;
         }
 
-        function bindMilestoneCards() {
-            const milestones = getLogsForBaby(getPersistedMilestones(mockMilestones), selectedBabyId);
-            grid.querySelectorAll("[data-edit-milestone]").forEach((button) => {
-                button.addEventListener("click", () => {
-                    const milestone = milestones.find((item) => item.id === button.dataset.editMilestone);
-                    if (!milestone) return;
-                    editingMilestoneId = milestone.id;
-                    const preset = [...typeInput.options].some((option) => option.value === milestone.title);
-                    typeInput.value = preset ? milestone.title : "Custom milestone";
-                    customTitleInput.value = preset ? "" : milestone.title;
-                    customTitleWrapper.classList.toggle("hidden", preset);
-                    dateInput.value = milestone.achievedAt;
-                    noteInput.value = milestone.notes || "";
-                    milestonePhotoDataUrl = milestone.photoUrl || "";
-                    photoLabel.textContent = milestonePhotoDataUrl ? "Photo ready" : "Add optional photo";
-                    saveButton.textContent = "Update Milestone";
-                    addPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-                });
-            });
-            grid.querySelectorAll("[data-delete-milestone]").forEach((button) => {
-                button.addEventListener("click", () => {
-                    if (!confirm("Delete this milestone memory?")) return;
-                    deleteLocalMilestone(button.dataset.deleteMilestone);
-                    renderMilestones();
-                    showFeedback("Milestone deleted.");
-                });
-            });
-        }
-
-        function renderImagePlaceholder() {
+        function renderEmptyMemories() {
+            const msg = activeCategory === "all"
+                ? { title: "Your keepsake starts here", body: "Tiny moments count too. Add the first memory when it feels right." }
+                : { title: "No memories here yet", body: "Capture this kind of moment and it will live here forever." };
             return `
-                <div class="w-full h-full flex flex-col items-center justify-center gap-3 text-primary bg-gradient-to-br from-primary-container/30 via-surface-container-lowest to-tertiary-container/30">
-                    <span class="material-symbols-outlined text-[56px]">auto_awesome</span>
-                    <span class="font-label-md text-label-md">Photo placeholder</span>
+                <div class="rounded-[30px] bg-surface-container-low p-8 text-center shadow-[0_12px_34px_rgba(124,92,255,0.1)]">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-primary mx-auto flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-[42px]" style="font-variation-settings:'FILL' 1;">photo_album</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-1">${msg.title}</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant">${msg.body}</p>
                 </div>
             `;
         }
 
         function animateCards() {
-            const cards = document.querySelectorAll(".milestone-card");
+            const cards = grid.querySelectorAll(".milestone-card");
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
                         entry.target.style.opacity = "1";
-                        entry.target.style.transform = "translateY(0) rotate(0deg)";
+                        entry.target.style.transform = "translateY(0)";
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-
+            }, { threshold: 0.08, rootMargin: "0px 0px -40px 0px" });
             cards.forEach((card, index) => {
                 card.style.opacity = "0";
-                card.style.transform = `translateY(30px) rotate(${index % 2 === 0 ? "-1" : "1"}deg)`;
-                card.style.transition = `all 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.08}s`;
+                card.style.transform = "translateY(26px)";
+                card.style.transition = `all 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s`;
                 observer.observe(card);
             });
         }
 
-        function imageForMilestone(title) {
-            const normalized = title.toLowerCase();
-            if (normalized.includes("smile")) return "https://lh3.googleusercontent.com/aida/AP1WRLsH-jQYC3ZSncoHSRHw9OOuNO-xJZiWlB2BKA2HT1uDff1TP189UX-lRUd-_-iYbt7Wd714WrmmDqE8V_jrqZVsDvaXsrK_-VRTPt6DFk3q6y70cDIIZstwZqq-GJttg7ZdzgZmnO1_8cQl7SBCPesHyAOA86Z4q0u6Z57B-5huIBl9tpyLVHgZqjfNTz_2MTdeLoXnJPeZ1RcdsiZyhLdpKbSYy2-u-zaa8g0eGZSz-pafVLvXgMxq5kM";
-            if (normalized.includes("sleep")) return "https://lh3.googleusercontent.com/aida/AP1WRLvoafNB7tmwEDrX7w8l0Hz3RHwWfnDjmnl6Ko3DQoSMZqRQM5R5UTS-0tAsjaCmP6A9uCuM-4QM_MR4OoCtM2mrp37sc4UcoAs7UCm5YX6JKF1OahziLDtV59X0OuhFTqhY6Btdy_JiLVmLt3d1Itw1eW4yhVH4WdPURq4E2Rth4gaxOTmeOLuwL5SUA8CXqS84Cc6Usra9ZyGq73xQDbLtes8MBZR-_aEyhqqiix7EqBxGmz2TYTjfLKeT";
-            if (normalized.includes("food")) return "https://lh3.googleusercontent.com/aida/AP1WRLvDMbLJtNi4r2WvSW-UHR1cM-K4FV1i1eeKm7ETNAxemz8JKWXXlR3OtOwc29fsUfCuS7YQUiuFKUFJIsa2ebd5RWPJVLEqlMFTovVPvMAWd47HFrZvGkfY0IdYC6EHcKd9rr2wIew5VwXVXDnYrMU3FVgtYviBrit8Fr_oI7KsvyXtZl44Y4iM7XBsmJnbEebLf8BrtzBBH5PALHlwNSHIwZ0ADT2QQzzkEL7rAzNdtw2XyNSjoH2lDxyG";
-            return "";
+        function openStory(id) {
+            storyOrder = visibleMemories().map((m) => m.id);
+            storyIndex = Math.max(0, storyOrder.indexOf(id));
+            storyModal.classList.remove("hidden");
+            renderStory();
+        }
+
+        function stepStory(delta) {
+            if (!storyOrder.length) return;
+            storyIndex = (storyIndex + delta + storyOrder.length) % storyOrder.length;
+            renderStory();
+        }
+
+        function closeStory() {
+            storyModal.classList.add("hidden");
+            storyBody.innerHTML = "";
+        }
+
+        function renderStory() {
+            const m = allMemories().find((item) => item.id === storyOrder[storyIndex]);
+            if (!m) { closeStory(); return; }
+            const cat = CATEGORIES.find((c) => c.key === memoryCategory(m)) || CATEGORIES[CATEGORIES.length - 1];
+            const multi = storyOrder.length > 1;
+            storyPrevBtn.classList.toggle("hidden", !multi);
+            storyNextBtn.classList.toggle("hidden", !multi);
+            storyBody.innerHTML = `
+                <div class="story-fade min-h-full flex flex-col">
+                    <div class="relative w-full" style="height:60vh">
+                        ${m.photoUrl
+                            ? `<img class="w-full h-full object-cover" src="${m.photoUrl}" alt="">`
+                            : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#cdbbf5] via-[#f3c9da] to-[#bfe3f5] text-white/80"><span class="material-symbols-outlined text-[96px]" style="font-variation-settings:'FILL' 1;">${cat.icon}</span></div>`}
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#18120f] via-[#18120f]/10 to-[#18120f]/35"></div>
+                        <div class="absolute top-5 left-5 glass-tag px-3 py-1 rounded-full">
+                            <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">${ageOf(m)}</span>
+                        </div>
+                    </div>
+                    <div class="story-rise flex-1 -mt-12 rounded-t-[34px] bg-[#1f1714] px-6 pt-7 pb-12 text-white">
+                        <p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-[#f7b89d]">${cat.label} · ${dateLabelOf(m)}</p>
+                        <h2 class="font-display-lg text-display-lg leading-[1.06] mt-1">${escapeHtml(m.title)}</h2>
+                        <p class="font-body-lg text-body-lg text-white/85 mt-4 leading-relaxed">${m.notes ? escapeHtml(m.notes) : "A quiet little moment, saved so it never fades."}</p>
+                        <div class="flex flex-wrap gap-3 mt-8">
+                            <button class="h-11 px-5 rounded-full bg-white text-[#1f1714] font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" data-story-share="${m.id}" type="button"><span class="material-symbols-outlined text-[18px]">ios_share</span>Share</button>
+                            <button class="h-11 px-5 rounded-full bg-white/12 text-white font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" data-story-edit="${m.id}" type="button"><span class="material-symbols-outlined text-[18px]">edit</span>Edit</button>
+                            <button class="h-11 px-5 rounded-full bg-white/12 text-[#ff9fb0] font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" data-story-delete="${m.id}" type="button"><span class="material-symbols-outlined text-[18px]">delete</span>Delete</button>
+                        </div>
+                        ${multi ? `<p class="text-center text-white/40 font-label-sm text-label-sm mt-8">${storyIndex + 1} of ${storyOrder.length}</p>` : ""}
+                    </div>
+                </div>`;
+            storyBody.scrollTop = 0;
+            storyBody.querySelector("[data-story-share]")?.addEventListener("click", () => shareMemory(m));
+            storyBody.querySelector("[data-story-edit]")?.addEventListener("click", () => { closeStory(); startEdit(m); });
+            storyBody.querySelector("[data-story-delete]")?.addEventListener("click", () => {
+                if (!confirm("Delete this memory?")) return;
+                deleteLocalMilestone(m.id);
+                closeStory();
+                renderAll();
+                showFeedback("Memory deleted.");
+            });
+        }
+
+        function startEdit(m) {
+            editingMilestoneId = m.id;
+            const preset = [...typeInput.options].some((option) => option.value === m.title);
+            typeInput.value = preset ? m.title : "Custom milestone";
+            customTitleInput.value = preset ? "" : m.title;
+            customTitleWrapper.classList.toggle("hidden", preset);
+            dateInput.value = m.achievedAt;
+            noteInput.value = m.notes || "";
+            milestonePhotoDataUrl = m.photoUrl || "";
+            photoLabel.textContent = milestonePhotoDataUrl ? "Photo ready" : "Add optional photo";
+            saveButton.textContent = "Update memory";
+            addPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        async function shareMemory(m) {
+            const text = `${selectedBaby?.name || "Baby"} — ${m.title} (${dateLabelOf(m)})${m.notes ? `\n${m.notes}` : ""}\nvia LittleNest MY`;
+            try {
+                if (navigator.share) { await navigator.share({ title: m.title, text }); return; }
+                await navigator.clipboard.writeText(text);
+                showFeedback("Memory copied to share.");
+            } catch { /* user cancelled share */ }
         }
 
         function categoryForTitle(title) {

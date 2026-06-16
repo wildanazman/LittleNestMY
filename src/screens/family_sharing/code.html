@@ -153,124 +153,106 @@
 </div>
 </div>
 </header>
-<main class="max-w-md mx-auto px-container-padding pt-6 space-y-xl">
-<section class="space-y-sm">
-<div class="rounded-xl bg-primary-fixed p-5 soft-shadow">
+<main class="max-w-md mx-auto px-container-padding pt-6 space-y-6 pb-40">
+<!-- Hero -->
+<section class="rounded-[26px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(155deg,#efe7ff,#ffeef4 60%,#e6f6ff)">
 <div class="flex items-start gap-3">
-<div class="w-11 h-11 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" data-icon="home_health">home_health</span>
+<div class="w-12 h-12 rounded-full bg-white/70 text-[#7056f4] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;" data-icon="diversity_1">diversity_1</span>
 </div>
-<div class="space-y-1">
-<p class="font-label-sm text-label-sm text-on-primary-container uppercase">Shared care</p>
-<h2 class="font-headline-md text-headline-md text-on-primary-fixed" id="careCircleTitle">Care circle</h2>
-<p class="font-body-md text-body-md text-on-primary-fixed-variant">Keep Mama, Papa, and trusted helpers clear on daily care without adding pressure.</p>
-</div>
+<div class="space-y-0.5 min-w-0">
+<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-[#7056f4]/80">Care Circle</p>
+<h2 class="font-headline-lg text-headline-lg text-[#241b3a] truncate" id="careCircleTitle">Care circle</h2>
+<p class="font-body-md text-body-md text-[#5b4f72]" id="careCircleSub">Invite the people who love your little one to help, together.</p>
 </div>
 </div>
 </section>
-<section class="space-y-md">
+
+<!-- Members -->
+<section class="space-y-3">
 <div class="flex items-center justify-between gap-3">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Members</h2>
+<div class="min-w-0">
+<h2 class="font-headline-md text-headline-md text-on-surface">Your circle</h2>
 <p class="font-label-md text-label-md text-on-surface-variant" id="memberSummary">Loading care circle...</p>
 </div>
-<button class="h-11 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 active:scale-95 transition-transform" id="inviteToggleButton" type="button">
+<button class="h-11 px-4 rounded-full bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 active:scale-95 transition-transform shrink-0" id="inviteFamilyButton" type="button">
 <span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
-<span>Invite</span>
+<span>Invite family</span>
 </button>
 </div>
-<div class="prototype-panel" id="invitePanel">
-<div class="rounded-xl bg-surface-container-low p-4 border border-outline-variant/40 soft-shadow space-y-sm">
-<div class="flex items-start justify-between gap-3">
-<div>
-<h3 class="font-headline-md text-body-lg text-on-surface">Send Invite</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Send an invite to join this baby's care circle.</p>
-</div>
-<button aria-label="Close invite form" class="w-9 h-9 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center" id="inviteCloseButton" type="button">
-<span class="material-symbols-outlined text-[20px]" data-icon="close">close</span>
-</button>
-</div>
-<label class="block space-y-xs">
-<span class="font-label-md text-label-md text-on-surface">Name</span>
-<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteNameInput" placeholder="Example: Atuk"/>
-</label>
-<label class="block space-y-xs">
-<span class="font-label-md text-label-md text-on-surface">Email</span>
-<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteContactInput" inputmode="email" placeholder="name@example.my"/>
-</label>
-<label class="block space-y-xs">
-<span class="font-label-md text-label-md text-on-surface">Role</span>
-<select class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="inviteRoleInput">
-<option value="parent">Parent</option>
-<option value="caregiver">Caregiver</option>
-<option value="viewer">Viewer</option>
-</select>
-</label>
-<p class="font-label-md text-label-md text-on-surface-variant" id="permissionPreview">Parent: full access.</p>
-<button class="w-full h-12 rounded-full bg-primary-container text-on-primary-container font-headline-md text-body-md flex items-center justify-center gap-2 pill-button-inner-glow active:scale-95 transition-transform" id="prepareInviteButton" type="button">
-<span class="material-symbols-outlined" data-icon="send">send</span>
-Send Invite
-</button>
-<button class="hidden w-full h-11 rounded-full bg-surface-container-lowest text-primary border border-primary-container font-label-md text-label-md active:scale-95 transition-transform" id="copyInviteLinkButton" type="button">
-<span class="material-symbols-outlined text-[18px] align-middle">content_copy</span>
-Copy Invite Link
-</button>
-<p class="min-h-5 font-label-md text-label-md text-tertiary" id="inviteFeedback"></p>
-</div>
-</div>
-<div class="space-y-sm" id="familyMembersList"></div>
+<div class="space-y-3" id="familyMembersList"></div>
 </section>
-<section class="space-y-md">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Permissions</h2>
-<p class="font-label-md text-label-md text-on-surface-variant">Simple access levels for shared baby care.</p>
-</div>
-<div class="grid gap-sm">
-<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
-<div class="flex items-start gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" data-icon="family_restroom">family_restroom</span>
-</div>
-<div>
-<h3 class="font-label-md text-label-md text-on-surface">Parent</h3>
-<p class="font-body-md text-label-md text-on-surface-variant">Can add logs, update calendar items, and help manage the care circle.</p>
-</div>
-</div>
-</article>
-<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
-<div class="flex items-start gap-3">
-<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
-</div>
-<div>
-<h3 class="font-label-md text-label-md text-on-surface">Caregiver</h3>
-<p class="font-body-md text-label-md text-on-surface-variant">Can record practical care updates like feeding, sleep, diapers, and daycare notes.</p>
-</div>
-</div>
-</article>
-<article class="rounded-xl bg-surface-container-low p-4 soft-shadow border border-white/60">
-<div class="flex items-start gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
-</div>
-<div>
-<h3 class="font-label-md text-label-md text-on-surface">Viewer</h3>
-<p class="font-body-md text-label-md text-on-surface-variant">Can read shared updates and reminders, but cannot edit baby records.</p>
-</div>
-</div>
-</article>
-</div>
+
+<!-- Pending invites -->
+<section class="space-y-3 hidden" id="pendingSection">
+<h2 class="font-headline-md text-headline-md text-on-surface">Pending invites</h2>
+<div class="space-y-3" id="pendingInvitesList"></div>
 </section>
-<section class="rounded-xl bg-surface-container-high p-5 soft-shadow space-y-sm">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center">
-<span class="material-symbols-outlined" data-icon="privacy_tip">privacy_tip</span>
+
+<!-- Role guide -->
+<section class="space-y-3">
+<h2 class="font-headline-md text-headline-md text-on-surface">What each role can do</h2>
+<div class="grid gap-3">
+<article class="rounded-[22px] bg-surface-container-low p-4 soft-shadow flex items-start gap-3">
+<div class="w-11 h-11 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">family_restroom</span></div>
+<div><h3 class="font-headline-md text-body-lg text-on-surface">Parent</h3><p class="font-body-md text-label-md text-on-surface-variant">Full access — manage baby, logs, memories, and the care circle.</p></div>
+</article>
+<article class="rounded-[22px] bg-surface-container-low p-4 soft-shadow flex items-start gap-3">
+<div class="w-11 h-11 rounded-full bg-[#e5fbf2] text-[#15803D] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">volunteer_activism</span></div>
+<div><h3 class="font-headline-md text-body-lg text-on-surface">Caregiver</h3><p class="font-body-md text-label-md text-on-surface-variant">Can add care logs and memories, and view baby information.</p></div>
+</article>
+<article class="rounded-[22px] bg-surface-container-low p-4 soft-shadow flex items-start gap-3">
+<div class="w-11 h-11 rounded-full bg-[#e8f1ff] text-[#1E40AF] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">visibility</span></div>
+<div><h3 class="font-headline-md text-body-lg text-on-surface">Viewer</h3><p class="font-body-md text-label-md text-on-surface-variant">Can view baby updates only — no adding, editing, or deleting.</p></div>
+</article>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Invite note</h2>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant">Invite emails are sent through Supabase Auth. The invited person must log in with the invited email to join this baby's care circle.</p>
 </section>
 </main>
+
+<!-- Invite Family sheet -->
+<div class="fixed inset-0 z-[120] hidden" id="inviteSheet" role="dialog" aria-modal="true" aria-label="Invite family">
+<div class="absolute inset-0 bg-black/40 backdrop-blur-sm" data-sheet-overlay></div>
+<div class="absolute inset-x-0 bottom-0 max-w-md mx-auto bg-surface-container-lowest rounded-t-[32px] p-5 pb-8 shadow-2xl max-h-[92vh] overflow-y-auto dark:bg-[#181514]">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-lg text-headline-lg text-on-surface" id="sheetTitle">Invite to Care Circle</h3>
+<button aria-label="Close" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center active:scale-95" id="sheetClose" type="button"><span class="material-symbols-outlined">close</span></button>
+</div>
+
+<!-- Step 1: details + role -->
+<div id="sheetStep1" class="space-y-4">
+<label class="block space-y-1"><span class="font-label-md text-label-md text-on-surface-variant">Their name</span>
+<input class="w-full h-12 bg-surface-container border-none rounded-2xl px-4 font-body-md text-body-md text-on-surface" id="sheetName" placeholder="Example: Atuk"/></label>
+<label class="block space-y-1"><span class="font-label-md text-label-md text-on-surface-variant">Their email</span>
+<input class="w-full h-12 bg-surface-container border-none rounded-2xl px-4 font-body-md text-body-md text-on-surface" id="sheetEmail" inputmode="email" placeholder="name@example.my"/></label>
+<div class="space-y-2">
+<span class="font-label-md text-label-md text-on-surface-variant">Choose a role</span>
+<div class="grid gap-2" id="sheetRoleCards"></div>
+</div>
+<button class="w-full h-13 min-h-[52px] rounded-full bg-primary text-on-primary font-headline-md text-body-lg flex items-center justify-center gap-2 active:scale-95 transition-transform" id="sheetCreateButton" type="button">
+<span class="material-symbols-outlined">auto_awesome</span>Create invite
+</button>
+<p class="min-h-5 font-label-md text-label-md text-error text-center" id="sheetError"></p>
+</div>
+
+<!-- Step 2: preview + share -->
+<div id="sheetStep2" class="space-y-4 hidden">
+<div class="rounded-[24px] p-5 text-center soft-shadow" style="background:linear-gradient(160deg,#efe7ff,#ffeef4)">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-white/70 border-2 border-white mx-auto flex items-center justify-center mb-3">
+<img class="w-full h-full object-cover hidden" id="previewAvatar" alt=""/>
+<span class="material-symbols-outlined text-[#7056f4]" id="previewAvatarFallback" style="font-variation-settings:'FILL' 1;">child_care</span>
+</div>
+<p class="font-headline-md text-body-lg text-[#241b3a] leading-snug" id="previewTitle">You're invited 💜</p>
+<p class="font-label-md text-label-md text-[#5b4f72] mt-1"><span id="previewRole">Caregiver</span> · Valid for 7 days</p>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant text-center" id="sheetDelivery"></p>
+<div class="grid gap-2">
+<button class="w-full h-12 rounded-full bg-[#25D366] text-white font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="whatsappButton" type="button"><span class="material-symbols-outlined">chat</span>Share on WhatsApp</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="copyLinkButton" type="button"><span class="material-symbols-outlined text-[18px]">content_copy</span>Copy invite link</button>
+<button class="w-full h-11 rounded-full text-on-surface-variant font-label-md text-label-md active:scale-95 transition-transform" id="sheetDoneButton" type="button">Done</button>
+</div>
+</div>
+</div>
+</div>
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
 <span class="material-symbols-outlined" data-icon="home">home</span>
@@ -302,345 +284,304 @@ Copy Invite Link
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
 
         const familyMembersList = document.getElementById("familyMembersList");
+        const pendingSection = document.getElementById("pendingSection");
+        const pendingInvitesList = document.getElementById("pendingInvitesList");
         const memberSummary = document.getElementById("memberSummary");
-        const invitePanel = document.getElementById("invitePanel");
-        const inviteToggleButton = document.getElementById("inviteToggleButton");
-        const inviteCloseButton = document.getElementById("inviteCloseButton");
-        const inviteNameInput = document.getElementById("inviteNameInput");
-        const inviteContactInput = document.getElementById("inviteContactInput");
-        const inviteRoleInput = document.getElementById("inviteRoleInput");
-        const permissionPreview = document.getElementById("permissionPreview");
-        const prepareInviteButton = document.getElementById("prepareInviteButton");
-        const inviteFeedback = document.getElementById("inviteFeedback");
-        const copyInviteLinkButton = document.getElementById("copyInviteLinkButton");
+        const inviteFamilyButton = document.getElementById("inviteFamilyButton");
         const backButton = document.getElementById("backButton");
+        const inviteSheet = document.getElementById("inviteSheet");
+        const sheetStep1 = document.getElementById("sheetStep1");
+        const sheetStep2 = document.getElementById("sheetStep2");
+        const sheetClose = document.getElementById("sheetClose");
+        const sheetName = document.getElementById("sheetName");
+        const sheetEmail = document.getElementById("sheetEmail");
+        const sheetRoleCards = document.getElementById("sheetRoleCards");
+        const sheetCreateButton = document.getElementById("sheetCreateButton");
+        const sheetError = document.getElementById("sheetError");
+        const previewTitle = document.getElementById("previewTitle");
+        const previewRole = document.getElementById("previewRole");
+        const previewAvatar = document.getElementById("previewAvatar");
+        const previewAvatarFallback = document.getElementById("previewAvatarFallback");
+        const sheetDelivery = document.getElementById("sheetDelivery");
+        const whatsappButton = document.getElementById("whatsappButton");
+        const copyLinkButton = document.getElementById("copyLinkButton");
+        const sheetDoneButton = document.getElementById("sheetDoneButton");
+
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
         const selectedBaby = babyState.selectedBaby;
+        const babyName = selectedBaby?.name || "this baby";
         let careCircle = { currentRole: "viewer", members: [], invitations: [] };
+        let selectedRole = "caregiver";
+        let lastInvite = null;
 
-        document.getElementById("careCircleTitle").textContent = `${selectedBaby?.name || "Baby"}'s care circle`;
+        const ROLES = [
+          { key: "parent", label: "Parent", icon: "family_restroom", desc: "Full access — manage everything." },
+          { key: "caregiver", label: "Caregiver", icon: "volunteer_activism", desc: "Add logs & memories, view info." },
+          { key: "viewer", label: "Viewer", icon: "visibility", desc: "View baby updates only." }
+        ];
 
-        inviteToggleButton.addEventListener("click", () => {
-            invitePanel.classList.toggle("is-open");
-            inviteNameInput.focus();
-        });
+        document.getElementById("careCircleTitle").textContent = `${babyName}'s Care Circle`;
+        if (selectedBaby?.photoUrl) { previewAvatar.src = selectedBaby.photoUrl; previewAvatar.classList.remove("hidden"); previewAvatarFallback.classList.add("hidden"); }
 
-        inviteCloseButton.addEventListener("click", () => {
-            invitePanel.classList.remove("is-open");
-        });
+        backButton.addEventListener("click", () => goToScreen("settings"));
+        inviteFamilyButton.addEventListener("click", openSheet);
+        sheetClose.addEventListener("click", closeSheet);
+        inviteSheet.querySelector("[data-sheet-overlay]").addEventListener("click", closeSheet);
+        sheetDoneButton.addEventListener("click", closeSheet);
+        sheetCreateButton.addEventListener("click", createInvite);
+        whatsappButton.addEventListener("click", () => shareInvite("whatsapp"));
+        copyLinkButton.addEventListener("click", () => shareInvite("copy"));
 
-        inviteRoleInput.addEventListener("change", updatePermissionPreview);
+        renderRoleCards();
+        await renderMembers();
 
-        prepareInviteButton.addEventListener("click", async () => {
-            const name = inviteNameInput.value.trim();
-            const contact = inviteContactInput.value.trim().toLowerCase();
-            const selectedRole = inviteRoleInput.value;
+        function openSheet() {
+          if (careCircle.currentRole !== "parent") return;
+          sheetName.value = ""; sheetEmail.value = ""; sheetError.textContent = "";
+          selectedRole = "caregiver"; renderRoleCards();
+          sheetStep2.classList.add("hidden"); sheetStep1.classList.remove("hidden");
+          document.getElementById("sheetTitle").textContent = "Invite to Care Circle";
+          inviteSheet.classList.remove("hidden");
+        }
+        function closeSheet() { inviteSheet.classList.add("hidden"); }
 
-            if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) {
-                inviteFeedback.textContent = "Add a name and valid email address.";
-                return;
-            }
-
-            prepareInviteButton.disabled = true;
-            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Sending...';
-            try {
-                const inviteResult = await sendFamilyInviteRemote({
-                    babyId: selectedBabyId,
-                    name,
-                    email: contact,
-                    role: selectedRole
-                });
-                rememberInviteLink(inviteResult.inviteUrl || "");
-                if (inviteResult.emailDelivery === "existing_user") {
-                    inviteFeedback.textContent = "This user already has an account. Share this invite link with them.";
-                    copyInviteLinkButton.classList.remove("hidden");
-                } else if (inviteResult.emailDelivery === "pending") {
-                    inviteFeedback.textContent = "Invitation is already pending. You can copy the invite link.";
-                    copyInviteLinkButton.classList.remove("hidden");
-                } else {
-                    inviteFeedback.textContent = "Invitation sent.";
-                    copyInviteLinkButton.classList.toggle("hidden", !inviteResult.inviteUrl);
-                }
-                inviteNameInput.value = "";
-                inviteContactInput.value = "";
-                await renderMembers();
-            } catch (error) {
-                inviteFeedback.textContent = error.message || "Invite failed. Please try again.";
-            }
-            inviteRoleInput.value = "parent";
-            updatePermissionPreview();
-            prepareInviteButton.disabled = false;
-            prepareInviteButton.innerHTML = '<span class="material-symbols-outlined" data-icon="send">send</span>Send Invite';
-        });
-
-        copyInviteLinkButton.addEventListener("click", async () => {
-            const link = copyInviteLinkButton.dataset.inviteUrl || "";
-            if (!link) return;
-            try {
-                await navigator.clipboard.writeText(link);
-                inviteFeedback.textContent = "Invite link copied.";
-            } catch {
-                inviteFeedback.textContent = link;
-            }
-        });
-
-        backButton.addEventListener("click", () => {
-            goToScreen("settings");
-        });
-
-        async function renderMembers() {
-            try {
-                careCircle = await loadCareCircleRemote(selectedBabyId);
-                inviteFeedback.textContent = "";
-            } catch (error) {
-                inviteFeedback.textContent = error.message || "Could not load care circle.";
-                careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] };
-            }
-            const invitedMembers = dedupeMembers(careCircle.members.filter((member) => !member.isCurrentUser));
-            const memberEmails = new Set(invitedMembers.map((member) => String(member.email || "").toLowerCase()).filter(Boolean));
-            const invitations = dedupePendingInvitations(careCircle.invitations || [], memberEmails);
-            const parent = getCurrentParentMember();
-            const members = [parent, ...invitedMembers.filter((member) => member.userId !== parent.userId)];
-            memberSummary.textContent = invitedMembers.length || invitations.length
-                ? `${invitedMembers.length} member${invitedMembers.length === 1 ? "" : "s"} and ${invitations.length} invite${invitations.length === 1 ? "" : "s"}`
-                : "Current parent only";
-            familyMembersList.innerHTML = members.map(renderMemberCard).join("")
-                + invitations.map(renderInvitationCard).join("")
-                + (invitedMembers.length || invitations.length ? "" : renderNoHelpersCard());
-            bindMemberActions();
-            const canInvite = careCircle.currentRole === "parent";
-            inviteToggleButton.disabled = !canInvite;
-            inviteToggleButton.classList.toggle("opacity-50", !canInvite);
-            if (!canInvite) inviteFeedback.textContent = "Only a parent can invite caregivers.";
+        function renderRoleCards() {
+          sheetRoleCards.innerHTML = ROLES.map((r) => {
+            const active = r.key === selectedRole;
+            return `<button type="button" data-role="${r.key}" class="flex items-center gap-3 w-full text-left rounded-2xl p-3 border-2 transition-colors ${active ? "border-primary bg-primary-container/40" : "border-transparent bg-surface-container"}">
+              <span class="w-10 h-10 rounded-full ${active ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-primary"} flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px]">${r.icon}</span></span>
+              <span class="min-w-0"><span class="block font-headline-md text-body-md text-on-surface">${r.label}</span><span class="block font-label-sm text-label-sm text-on-surface-variant">${r.desc}</span></span>
+              ${active ? `<span class="material-symbols-outlined text-primary ml-auto">check_circle</span>` : ``}
+            </button>`;
+          }).join("");
+          sheetRoleCards.querySelectorAll("[data-role]").forEach((b) => b.addEventListener("click", () => { selectedRole = b.dataset.role; renderRoleCards(); }));
         }
 
-        function renderNoHelpersCard() {
-            return `
-                <article class="bg-surface-container-low rounded-xl p-6 soft-shadow border border-tertiary-container/40 text-center space-y-3">
-                    <div class="w-16 h-16 rounded-full bg-tertiary-fixed text-on-tertiary-fixed mx-auto flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[34px]">diversity_1</span>
-                    </div>
-                    <div>
-                        <h3 class="font-headline-md text-headline-md text-on-surface">No caregivers or viewers yet</h3>
-                        <p class="font-body-md text-body-md text-on-surface-variant">No caregivers added yet. Invite someone you trust to help track baby care.</p>
-                    </div>
-                </article>
-            `;
+        async function createInvite() {
+          const name = sheetName.value.trim();
+          const email = sheetEmail.value.trim().toLowerCase();
+          sheetError.textContent = "";
+          if (!name) { sheetError.textContent = "Add their name."; return; }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { sheetError.textContent = "Enter a valid email."; return; }
+          sheetCreateButton.disabled = true;
+          sheetCreateButton.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span>Creating...`;
+          try {
+            const result = await sendFamilyInviteRemote({ babyId: selectedBabyId, name, email, role: selectedRole });
+            lastInvite = { url: result.inviteUrl || "", role: selectedRole, email, name };
+            showPreview(result);
+            await renderMembers();
+          } catch (error) {
+            sheetError.textContent = error.message || "Could not create invite.";
+          }
+          sheetCreateButton.disabled = false;
+          sheetCreateButton.innerHTML = `<span class="material-symbols-outlined">auto_awesome</span>Create invite`;
+        }
+
+        function showPreview(result) {
+          previewTitle.textContent = `You're invited to join ${babyName}'s Care Circle 💜`;
+          previewRole.textContent = capitalize(lastInvite.role);
+          const delivery = result.emailDelivery;
+          sheetDelivery.textContent = delivery === "sent"
+            ? "Email invite sent. Share the link too so they get it faster."
+            : delivery === "existing_user"
+              ? "They already have an account — share this link so they can accept."
+              : "Invite ready — share the link below.";
+          document.getElementById("sheetTitle").textContent = "Invite ready";
+          sheetStep1.classList.add("hidden");
+          sheetStep2.classList.remove("hidden");
+        }
+
+        function inviteMessage(url) {
+          return `You're invited to help care for ${babyName} on LittleNest MY 💜\n${url}`;
+        }
+
+        async function shareInvite(method) {
+          const url = lastInvite?.url || "";
+          if (!url) { sheetDelivery.textContent = "No invite link available."; return; }
+          const text = inviteMessage(url);
+          if (method === "whatsapp") {
+            try { if (navigator.share) { await navigator.share({ title: "LittleNest Care Circle", text, url }); return; } } catch { return; }
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+            return;
+          }
+          try { await navigator.clipboard.writeText(url); sheetDelivery.textContent = "Invite link copied 💜"; }
+          catch { sheetDelivery.textContent = url; }
+        }
+
+        async function renderMembers() {
+          try { careCircle = await loadCareCircleRemote(selectedBabyId); }
+          catch (error) { careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] }; }
+          const invitedMembers = dedupeMembers(careCircle.members.filter((m) => !m.isCurrentUser));
+          const memberEmails = new Set(invitedMembers.map((m) => String(m.email || "").toLowerCase()).filter(Boolean));
+          const invitations = dedupePendingInvitations(careCircle.invitations || [], memberEmails);
+          const parent = getCurrentParentMember();
+          const members = [parent, ...invitedMembers.filter((m) => m.userId !== parent.userId)];
+
+          memberSummary.textContent = invitedMembers.length
+            ? `${members.length} ${members.length === 1 ? "person" : "people"} in the circle`
+            : "Just you for now";
+
+          familyMembersList.innerHTML = invitedMembers.length
+            ? members.map(renderMemberCard).join("")
+            : renderMemberCard(parent) + renderEmptyCircle();
+
+          const isParent = careCircle.currentRole === "parent";
+          pendingSection.classList.toggle("hidden", !invitations.length && !isParent);
+          pendingInvitesList.innerHTML = invitations.length
+            ? invitations.map(renderInvitationCard).join("")
+            : (isParent ? renderNoPending() : "");
+
+          bindMemberActions();
+          inviteFamilyButton.classList.toggle("hidden", !isParent);
+        }
+
+        function renderEmptyCircle() {
+          if (careCircle.currentRole !== "parent") return "";
+          return `<div class="rounded-[24px] bg-surface-container-low p-6 text-center soft-shadow">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-[#7056f4] mx-auto flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1;">diversity_1</span></div>
+            <h3 class="font-headline-md text-headline-md text-on-surface">Start your baby's Care Circle</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-1">Invite Mama, Papa, grandparents, or caregivers to stay connected.</p>
+            <button class="mt-4 h-11 px-5 rounded-full bg-primary text-on-primary font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" data-open-invite type="button"><span class="material-symbols-outlined text-[18px]">person_add</span>Invite family</button>
+          </div>`;
+        }
+
+        function renderNoPending() {
+          return `<p class="text-center font-label-md text-label-md text-on-surface-variant py-2">No pending invites right now.</p>`;
         }
 
         function renderMemberCard(member) {
-            const role = getDisplayRole(member);
-            const style = getRoleStyle(role);
-            const contact = member.email || "Email not shared";
-            const status = member.isCurrentUser ? "Current user" : "Accepted";
-            const actions = member.isCurrentUser
-                ? `<span class="font-label-sm text-label-sm text-on-surface-variant">Managed in Profile</span>`
-                : careCircle.currentRole === "parent"
-                  ? `<button class="font-label-sm text-label-sm text-error" data-delete-member="${member.userId}" type="button">Remove</button>`
-                  : `<span class="font-label-sm text-label-sm text-on-surface-variant">Shared access</span>`;
-
-            return `
-                <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center font-headline-md text-body-lg shrink-0">
-                            ${getInitials(member.name)}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(member.name)}</h3>
-                                    <p class="font-label-md text-label-md text-on-surface-variant truncate">${escapeHtml(contact)}</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full ${style.chip} font-label-sm text-label-sm whitespace-nowrap">${role}</span>
-                            </div>
-                            <div class="mt-3 flex items-center justify-between gap-3">
-                                <p class="font-label-sm text-label-sm text-on-surface-variant">${getPermissionText(member)}</p>
-                                <div class="flex items-center gap-2">
-                                    ${actions}
-                                </div>
-                            </div>
-                            <p class="mt-1 font-label-sm text-label-sm ${status === "Active" ? "text-tertiary" : "text-primary"}">${status}</p>
-                        </div>
-                    </div>
-                </article>
-            `;
+          const role = getDisplayRole(member);
+          const style = getRoleStyle(role);
+          const contact = member.email || "Email not shared";
+          const joined = member.acceptedAt ? `Joined ${formatDate(member.acceptedAt)}` : "";
+          const status = member.isCurrentUser ? "That's you" : joined;
+          const action = (!member.isCurrentUser && careCircle.currentRole === "parent")
+            ? `<button class="w-8 h-8 rounded-full text-on-surface-variant hover:text-error hover:bg-error/10 flex items-center justify-center shrink-0" data-delete-member="${member.userId}" aria-label="Remove member" type="button"><span class="material-symbols-outlined text-[18px]">person_remove</span></button>`
+            : "";
+          return `<article class="bg-surface-container-low rounded-[24px] p-4 soft-shadow flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center font-headline-md text-body-lg shrink-0">${getInitials(member.name)}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2"><h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(member.name)}</h3><span class="px-2.5 py-0.5 rounded-full ${style.chip} font-label-sm text-label-sm shrink-0">${role}</span></div>
+              <p class="font-label-md text-label-md text-on-surface-variant truncate">${escapeHtml(contact)}</p>
+              ${status ? `<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${escapeHtml(status)}</p>` : ""}
+            </div>
+            ${action}
+          </article>`;
         }
 
         function renderInvitationCard(invitation) {
-            const role = capitalize(invitation.role);
-            const style = getRoleStyle(role);
-            const status = capitalize(invitation.status || "pending");
-            return `
-                <article class="bg-surface-container-low rounded-xl p-4 soft-shadow border border-white/60">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined">mail</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="min-w-0">
-                                    <h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(invitation.email)}</h3>
-                                    <p class="font-label-md text-label-md text-on-surface-variant truncate">Email invitation</p>
-                                </div>
-                                <span class="px-3 py-1 rounded-full ${style.chip} font-label-sm text-label-sm whitespace-nowrap">${role}</span>
-                            </div>
-                            <div class="mt-3 flex items-center justify-between gap-3">
-                                <p class="font-label-sm text-label-sm ${status === "Failed" ? "text-error" : "text-primary"}">${status}</p>
-                                ${careCircle.currentRole === "parent" && ["Pending", "Failed", "Expired"].includes(status)
-                                    ? `<button class="font-label-sm text-label-sm text-error" data-delete-invite="${invitation.id}" type="button">Remove</button>`
-                                    : ""}
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            `;
+          const role = capitalize(invitation.role);
+          const style = getRoleStyle(role);
+          const statusInfo = inviteStatus(invitation);
+          const url = inviteUrlFor(invitation);
+          const parentControls = careCircle.currentRole === "parent";
+          return `<article class="bg-surface-container-low rounded-[24px] p-4 soft-shadow space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full ${style.avatar} flex items-center justify-center shrink-0"><span class="material-symbols-outlined">mail</span></div>
+              <div class="flex-1 min-w-0"><div class="flex items-center justify-between gap-2"><h3 class="font-headline-md text-body-md text-on-surface truncate">${escapeHtml(invitation.email || "Invited")}</h3><span class="px-2.5 py-0.5 rounded-full ${style.chip} font-label-sm text-label-sm shrink-0">${role}</span></div>
+              <p class="font-label-sm text-label-sm text-on-surface-variant">Sent ${formatDate(invitation.createdAt || invitation.created_at)} · ${statusInfo}</p></div>
+            </div>
+            ${parentControls ? `<div class="flex gap-2">
+              ${url ? `<button class="flex-1 h-9 rounded-full bg-[#25D366] text-white font-label-sm text-label-sm inline-flex items-center justify-center gap-1" data-share-invite="${url}" type="button"><span class="material-symbols-outlined text-[16px]">chat</span>WhatsApp</button>
+              <button class="flex-1 h-9 rounded-full bg-surface-container text-primary font-label-sm text-label-sm inline-flex items-center justify-center gap-1" data-copy-invite="${url}" type="button"><span class="material-symbols-outlined text-[16px]">content_copy</span>Copy</button>` : ""}
+              <button class="h-9 px-3 rounded-full bg-error-container/40 text-error font-label-sm text-label-sm" data-delete-invite="${invitation.id}" type="button">Cancel</button>
+            </div>` : ""}
+          </article>`;
+        }
+
+        function inviteUrlFor(invitation) {
+          const token = invitation.token || "";
+          if (!token) return "";
+          return `${window.location.origin}/accept_invite/?token=${encodeURIComponent(token)}`;
+        }
+
+        function inviteStatus(invitation) {
+          const exp = invitation.expiresAt || invitation.expires_at;
+          if (exp && new Date(exp) < new Date()) return "Expired";
+          if (exp) {
+            const days = Math.max(0, Math.ceil((new Date(exp) - new Date()) / 86400000));
+            return `Expires in ${days} day${days === 1 ? "" : "s"}`;
+          }
+          return capitalize(invitation.status || "pending");
         }
 
         function bindMemberActions() {
-            familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
-                button.addEventListener("click", async () => {
-                    if (!confirm("Remove this family member from the care circle?")) return;
-                    button.disabled = true;
-                    button.textContent = "Removing...";
-                    try {
-                        await removeFamilyInviteRemote({ babyId: selectedBabyId, userId: button.dataset.deleteMember });
-                        inviteFeedback.textContent = "Family member removed.";
-                        await renderMembers();
-                    } catch (error) {
-                        inviteFeedback.textContent = error.message || "Could not remove member.";
-                        button.disabled = false;
-                        button.textContent = "Remove";
-                    }
-                });
+          document.querySelectorAll("[data-open-invite]").forEach((b) => b.addEventListener("click", openSheet));
+          familyMembersList.querySelectorAll("[data-delete-member]").forEach((button) => {
+            button.addEventListener("click", async () => {
+              if (!confirm("Remove this person from the Care Circle?")) return;
+              button.disabled = true;
+              try { await removeFamilyInviteRemote({ babyId: selectedBabyId, userId: button.dataset.deleteMember }); await renderMembers(); }
+              catch (error) { alert(error.message || "Could not remove member."); button.disabled = false; }
             });
-            familyMembersList.querySelectorAll("[data-delete-invite]").forEach((button) => {
-                button.addEventListener("click", async () => {
-                    if (!confirm("Remove this invitation?")) return;
-                    button.disabled = true;
-                    button.textContent = "Removing...";
-                    try {
-                        await removeFamilyInviteRemote({ babyId: selectedBabyId, invitationId: button.dataset.deleteInvite });
-                        inviteFeedback.textContent = "Invitation removed.";
-                        await renderMembers();
-                    } catch (error) {
-                        inviteFeedback.textContent = error.message || "Could not remove invitation.";
-                        button.disabled = false;
-                        button.textContent = "Remove";
-                    }
-                });
+          });
+          pendingInvitesList.querySelectorAll("[data-delete-invite]").forEach((button) => {
+            button.addEventListener("click", async () => {
+              if (!confirm("Cancel this invite?")) return;
+              button.disabled = true;
+              try { await removeFamilyInviteRemote({ babyId: selectedBabyId, invitationId: button.dataset.deleteInvite }); await renderMembers(); }
+              catch (error) { alert(error.message || "Could not cancel invite."); button.disabled = false; }
             });
+          });
+          pendingInvitesList.querySelectorAll("[data-copy-invite]").forEach((button) => button.addEventListener("click", async () => {
+            const url = button.dataset.copyInvite; if (!url) return;
+            try { await navigator.clipboard.writeText(url); button.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span>Copied`; } catch {}
+          }));
+          pendingInvitesList.querySelectorAll("[data-share-invite]").forEach((button) => button.addEventListener("click", async () => {
+            const url = button.dataset.shareInvite; if (!url) return;
+            const text = inviteMessage(url);
+            try { if (navigator.share) { await navigator.share({ title: "LittleNest Care Circle", text, url }); return; } } catch { return; }
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+          }));
         }
 
         function dedupeMembers(members) {
-            const seen = new Set();
-            return members.filter((member) => {
-                const key = member.userId || String(member.email || "").toLowerCase();
-                if (!key || seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
+          const seen = new Set();
+          return members.filter((member) => {
+            const key = member.userId || String(member.email || "").toLowerCase();
+            if (!key || seen.has(key)) return false;
+            seen.add(key); return true;
+          });
         }
 
         function dedupePendingInvitations(invitations, memberEmails) {
-            const seen = new Set();
-            return invitations.filter((invitation) => {
-                const email = String(invitation.email || "").toLowerCase();
-                if ((invitation.status || "").toLowerCase() !== "pending") return false;
-                if (email && memberEmails.has(email)) return false;
-                const key = invitation.id || email;
-                if (!key || seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
+          const seen = new Set();
+          return invitations.filter((invitation) => {
+            const email = String(invitation.email || "").toLowerCase();
+            if ((invitation.status || "").toLowerCase() !== "pending") return false;
+            if (email && memberEmails.has(email)) return false;
+            const key = invitation.id || email;
+            if (!key || seen.has(key)) return false;
+            seen.add(key); return true;
+          });
         }
 
         function getDisplayRole(member) {
-            if (member.permission === "viewer") return "Viewer";
-            if (member.role === "viewer") return "Viewer";
-            if (member.role === "caregiver") return "Caregiver";
-            return "Parent";
+          if (member.role === "viewer") return "Viewer";
+          if (member.role === "caregiver") return "Caregiver";
+          return "Parent";
         }
 
         function getRoleStyle(role) {
-            const styles = {
-                Parent: {
-                    avatar: "bg-primary-container text-on-primary-container",
-                    chip: "bg-primary-container text-on-primary-container"
-                },
-                Caregiver: {
-                    avatar: "bg-tertiary-fixed text-on-tertiary-fixed",
-                    chip: "bg-tertiary-fixed text-on-tertiary-fixed"
-                },
-                Viewer: {
-                    avatar: "bg-secondary-container text-secondary",
-                    chip: "bg-secondary-container text-secondary"
-                }
-            };
-            return styles[role] || styles.Viewer;
+          const styles = {
+            Parent: { avatar: "bg-[#eee8ff] text-[#7056f4]", chip: "bg-[#eee8ff] text-[#7056f4]" },
+            Caregiver: { avatar: "bg-[#e5fbf2] text-[#15803D]", chip: "bg-[#e5fbf2] text-[#15803D]" },
+            Viewer: { avatar: "bg-[#e8f1ff] text-[#1E40AF]", chip: "bg-[#e8f1ff] text-[#1E40AF]" }
+          };
+          return styles[role] || styles.Viewer;
         }
 
-        function getPermissionText(member) {
-            if (member.permission === "owner") return "Full access";
-            if (member.permission === "viewer") return "View only";
-            return "Can add logs";
-        }
-
-        function getPermissionForRole(role) {
-            if (role === "viewer") return "viewer";
-            if (role === "caregiver") return "editor";
-            return "owner";
-        }
-
-        function capitalize(value) {
-            const text = String(value || "");
-            return text.charAt(0).toUpperCase() + text.slice(1);
-        }
-
-        function updatePermissionPreview() {
-            const role = inviteRoleInput.value;
-            const descriptions = {
-                parent: "Parent: full access.",
-                caregiver: "Caregiver: can add feeding, sleep, diaper, and notes.",
-                viewer: "Viewer: view only."
-            };
-            permissionPreview.textContent = descriptions[role] || descriptions.parent;
-        }
-
-        function rememberInviteLink(link) {
-            copyInviteLinkButton.dataset.inviteUrl = link;
-            copyInviteLinkButton.classList.toggle("hidden", !link);
-        }
+        function capitalize(value) { const t = String(value || ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+        function formatDate(value) { if (!value) return ""; return new Date(value).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
 
         function getCurrentParentMember() {
-            const parent = getParentProfile();
-            return {
-                id: "current-parent",
-                babyId: selectedBabyId,
-                name: parent.name || "Parent",
-                email: parent.email || "",
-                role: "parent",
-                permission: "owner",
-                acceptedAt: new Date().toISOString(),
-                isCurrentUser: true
-            };
+          const parent = getParentProfile();
+          return { id: "current-parent", babyId: selectedBabyId, name: parent.name || "Parent", email: parent.email || "", role: "parent", acceptedAt: "", isCurrentUser: true };
         }
 
-        function getInitials(name) {
-            return initialsForName(name);
-        }
-
-        function escapeHtml(value) {
-            return String(value)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
-        }
-
-        updatePermissionPreview();
-        await renderMembers();
+        function getInitials(name) { return initialsForName(name); }
+        function escapeHtml(value) { return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">

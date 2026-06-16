@@ -21,6 +21,63 @@ export function navigateWithTransition(url) {
   }, 120);
 }
 
+export function showUndoToast(message, onUndo, { duration = 5000 } = {}) {
+  let toast = document.getElementById("prototypeUndoToast");
+  if (toast) {
+    clearTimeout(toast.__timer);
+    toast.remove();
+  }
+  toast = document.createElement("div");
+  toast.id = "prototypeUndoToast";
+  toast.setAttribute("role", "status");
+  toast.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "bottom:calc(104px + env(safe-area-inset-bottom))",
+    "transform:translate(-50%,120%)",
+    "z-index:10001",
+    "display:flex",
+    "align-items:center",
+    "gap:14px",
+    "max-width:calc(100% - 28px)",
+    "padding:12px 14px 12px 18px",
+    "border-radius:9999px",
+    "background:rgba(40,30,28,.94)",
+    "color:#fff",
+    "font:600 13px/1.2 'Nunito Sans',sans-serif",
+    "box-shadow:0 14px 38px rgba(0,0,0,.32)",
+    "backdrop-filter:blur(8px)",
+    "transition:transform 240ms cubic-bezier(0.16,1,0.3,1)"
+  ].join(";");
+  toast.innerHTML = `<span style="min-width:0">${escapeToastHtml(message)}</span>`;
+  const undoBtn = document.createElement("button");
+  undoBtn.type = "button";
+  undoBtn.textContent = "Undo";
+  undoBtn.style.cssText = "flex:0 0 auto;padding:6px 14px;border-radius:9999px;background:#fff;color:#7056f4;font:700 13px/1 'Nunito Sans',sans-serif;border:0;cursor:pointer";
+  toast.appendChild(undoBtn);
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => { toast.style.transform = "translate(-50%,0)"; });
+
+  const dismiss = () => {
+    clearTimeout(toast.__timer);
+    toast.style.transform = "translate(-50%,120%)";
+    setTimeout(() => toast.remove(), 240);
+  };
+  undoBtn.addEventListener("click", () => {
+    dismiss();
+    try { onUndo?.(); } catch { /* undo handler errors shouldn't crash UI */ }
+  });
+  toast.__timer = setTimeout(dismiss, duration);
+  return dismiss;
+}
+
+function escapeToastHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
 export function showComingSoon(title, message = "This prototype flow is coming soon.") {
   let modal = document.getElementById("prototypeComingSoonModal");
 

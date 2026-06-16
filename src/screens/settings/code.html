@@ -267,7 +267,7 @@
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Export data" data-coming-soon-message="Export will generate a local report in a later MVP step.">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="doctor_report">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">ios_share</span>
@@ -292,7 +292,7 @@
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
 </a>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Help & Support" data-coming-soon-message="Help content will be added before release.">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="mommy_guide">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant">help</span>
@@ -385,7 +385,7 @@
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
-        const { fileToCroppedAvatarDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
         const languageButtons = document.querySelectorAll("[data-language-option]");
@@ -443,7 +443,6 @@
             parentError.classList.add("hidden");
             parentModal.classList.remove("hidden");
             parentModal.classList.add("flex");
-            document.body.classList.add("ln-modal-open");
         });
 
         document.getElementById("closeParentProfileButton")?.addEventListener("click", closeParentProfileModal);
@@ -462,7 +461,11 @@
                     title: "Adjust parent photo",
                     helpText: "Crop it so it looks good inside the round profile button."
                 });
-                if (!parentPhotoDataUrl) event.target.value = "";
+                if (!parentPhotoDataUrl) {
+                    event.target.value = "";
+                } else {
+                    parentPhotoDataUrl = await persistAvatar(parentPhotoDataUrl, { folder: "parent" });
+                }
             } catch (error) {
                 parentPhotoDataUrl = "";
                 parentError.textContent = error.message;
@@ -556,7 +559,6 @@
         function closeParentProfileModal() {
             parentModal.classList.add("hidden");
             parentModal.classList.remove("flex");
-            document.body.classList.remove("ln-modal-open");
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

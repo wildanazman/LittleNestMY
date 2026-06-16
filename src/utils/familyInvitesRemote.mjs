@@ -59,6 +59,11 @@ export async function declineFamilyInviteRemote(invitationId) {
   return readApiResponse(response);
 }
 
+export async function loadInvitePreviewRemote(token) {
+  const response = await fetch(`/api/invite-preview?token=${encodeURIComponent(token)}`);
+  return readApiResponse(response);
+}
+
 export async function acceptFamilyInviteRemote(token) {
   const accessToken = await getAccessToken();
   const response = await fetch("/api/accept-family-invite", {

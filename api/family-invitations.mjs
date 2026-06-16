@@ -56,7 +56,7 @@ async function listCareCircle(req, res, service, user) {
   if (currentMember.role === "parent") {
     const { data: invitationRows, error: invitationError } = await service
       .from("family_invitations")
-      .select("id,baby_id,email,role,status,invited_by,accepted_by,expires_at,created_at,updated_at")
+      .select("id,baby_id,email,role,status,token,invited_by,accepted_by,expires_at,created_at,updated_at")
       .eq("baby_id", babyId)
       .eq("status", "pending")
       .order("created_at", { ascending: false });
@@ -172,7 +172,7 @@ async function createInvitation(req, res, service, user) {
       status: "pending",
       invited_by: user.id,
       accepted_by: null,
-      expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     })
     .select("id,email,role,status,token,expires_at,created_at")
     .single();

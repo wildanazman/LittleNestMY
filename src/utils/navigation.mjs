@@ -167,6 +167,8 @@ bindHeaderProfileButtons();
 setupPendingInviteBar();
 setupPullToRefresh();
 setupMotionReady();
+setupOfflineIndicator();
+setupModalNavGuard();
 
 // Auth session caches asynchronously; once ready, re-render header avatars so
 // the uploaded profile photo (stored under the user-scoped key) is shown.
@@ -423,6 +425,79 @@ function hoistBottomNavigation() {
     nav.style.margin = "0 auto";
     nav.style.zIndex = "9999";
   });
+}
+
+// Any full-screen overlay (modals, sheets, photo crop, coming-soon popups)
+// should hide the bottom nav so its action buttons are never blocked. Instead
+// of wiring every modal by hand, watch the DOM for visible `.fixed.inset-0`
+// overlays and toggle `ln-modal-open` accordingly. Handles nesting for free.
+function setupModalNavGuard() {
+  if (window.__littleNestModalGuard) return;
+  window.__littleNestModalGuard = true;
+
+  const isVisibleOverlay = (el) => {
+    if (el.id === "littleNestOfflineBar" || el.id === "prototypeUndoToast") return false;
+    if (el.classList.contains("hidden")) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) return false;
+    return true;
+  };
+  const anyOverlay = () => [...document.querySelectorAll(".fixed.inset-0")].some(isVisibleOverlay);
+
+  let scheduled = 0;
+  const update = () => {
+    scheduled = 0;
+    document.body.classList.toggle("ln-modal-open", anyOverlay());
+  };
+  const schedule = () => { if (!scheduled) scheduled = requestAnimationFrame(update); };
+
+  new MutationObserver(schedule).observe(document.body, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ["class", "style", "hidden"]
+  });
+  schedule();
+}
+
+function setupOfflineIndicator() {
+  if (window.__littleNestOfflineBound) return;
+  window.__littleNestOfflineBound = true;
+
+  const bar = document.createElement("div");
+  bar.id = "littleNestOfflineBar";
+  bar.setAttribute("role", "status");
+  bar.style.cssText = [
+    "position:fixed",
+    "left:50%",
+    "top:max(10px, env(safe-area-inset-top))",
+    "transform:translate(-50%,-160%)",
+    "z-index:10001",
+    "display:flex",
+    "align-items:center",
+    "gap:8px",
+    "max-width:calc(100% - 28px)",
+    "padding:8px 14px",
+    "border-radius:9999px",
+    "background:rgba(40,30,28,.92)",
+    "color:#fff",
+    "font:700 12px/1 'Nunito Sans',sans-serif",
+    "box-shadow:0 10px 30px rgba(0,0,0,.28)",
+    "backdrop-filter:blur(8px)",
+    "transition:transform 240ms cubic-bezier(0.16,1,0.3,1)",
+    "pointer-events:none"
+  ].join(";");
+  bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px">cloud_off</span><span>Offline — changes saved on this device</span>`;
+  document.body.appendChild(bar);
+
+  const apply = () => {
+    bar.style.transform = navigator.onLine
+      ? "translate(-50%,-160%)"
+      : "translate(-50%,0)";
+  };
+  window.addEventListener("online", apply);
+  window.addEventListener("offline", apply);
+  apply();
 }
 
 function setupMotionReady() {

@@ -9,12 +9,13 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>Accept Family Invite - LittleNest MY</title>
+<title>Care Circle Invite - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -36,30 +37,38 @@ tailwind.config = {
   }
 };
 </script>
-<style>.soft-shadow{box-shadow:0 18px 45px rgba(131,83,60,.12)}</style>
+<style>.soft-shadow{box-shadow:0 18px 45px rgba(124,92,255,.14)}</style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface font-body min-h-screen">
 <main class="min-h-screen px-6 py-8 max-w-md mx-auto flex flex-col justify-center">
-<section class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5 text-center">
-<div class="w-20 h-20 rounded-3xl bg-primary-container text-on-primary-container mx-auto flex items-center justify-center">
-<span class="material-symbols-outlined text-[44px]">diversity_1</span>
+<section class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5 dark:bg-[#181514] dark:border-white/10">
+<!-- Warm hero -->
+<div class="rounded-[26px] p-5 text-center" style="background:linear-gradient(160deg,#efe7ff,#ffeef4 60%,#e6f6ff)">
+<div class="w-20 h-20 rounded-full overflow-hidden bg-white/70 border-2 border-white mx-auto flex items-center justify-center mb-3">
+<img class="w-full h-full object-cover hidden" id="babyAvatar" alt=""/>
+<span class="material-symbols-outlined text-[44px] text-[#7056f4]" id="babyAvatarFallback" style="font-variation-settings:'FILL' 1;">diversity_1</span>
 </div>
-<div class="space-y-2">
-<p class="text-sm font-extrabold uppercase tracking-wide text-primary">LittleNest MY</p>
-<h1 class="text-3xl font-extrabold text-primary leading-tight">Join this care circle</h1>
-<p class="text-base leading-6 text-on-surface-variant" id="inviteMessage">Checking your invitation...</p>
+<p class="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[#7056f4]/80">Care Circle invite</p>
+<h1 class="text-[22px] leading-tight font-extrabold text-[#241b3a] mt-1" id="inviteHeadline">You're invited 💜</h1>
+<p class="text-sm text-[#5b4f72] mt-1" id="inviteSubline">Checking your invitation...</p>
+<div class="mt-3 flex items-center justify-center gap-2">
+<span class="hidden px-3 py-1 rounded-full bg-white/85 text-[#7056f4] text-[13px] font-extrabold" id="inviteRoleBadge"></span>
+<span class="hidden px-3 py-1 rounded-full bg-white/70 text-on-surface-variant text-[13px] font-bold" id="inviteExpiryBadge"></span>
 </div>
-<button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform" id="acceptButton" type="button">Accept Invite</button>
-<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform" id="loginButton" type="button">Log In / Create Account</button>
-<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="signupButton" type="button">Create Account</button>
-<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="resetButton" type="button">Set / Reset Password</button>
-<p class="text-sm text-error hidden" id="inviteError" aria-live="polite"></p>
+</div>
+
+<button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform flex items-center justify-center gap-2" id="acceptButton" type="button"><span class="material-symbols-outlined">favorite</span>Accept invite</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="loginButton" type="button">Log in to accept</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="signupButton" type="button">Create account</button>
+<button class="w-full h-11 rounded-full text-on-surface-variant font-bold active:scale-[0.98] transition-transform" id="declineButton" type="button">Decline / Back</button>
+<button class="w-full h-11 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="resetButton" type="button">Set / Reset password</button>
+<p class="text-sm text-error hidden text-center" id="inviteError" aria-live="polite"></p>
 </section>
 </main>
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-  const { acceptFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
+  const { acceptFamilyInviteRemote, loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { clearPendingInviteToken, getAuthSession, isLoggedIn, markNeedsPasswordSetup, rememberPendingInviteToken } = await import(`${moduleBase}utils/localAuth.mjs`);
@@ -70,70 +79,116 @@ tailwind.config = {
   const token = rememberPendingInviteToken(params.get("token") || params.get("invite_token") || "");
   const cameFromSupabaseInvite = ["invite", "recovery"].includes(String(params.get("type") || hashParams.get("type") || "").toLowerCase())
     || Boolean(hashParams.get("access_token") && token);
-  const message = document.getElementById("inviteMessage");
+
+  const headline = document.getElementById("inviteHeadline");
+  const subline = document.getElementById("inviteSubline");
+  const roleBadge = document.getElementById("inviteRoleBadge");
+  const expiryBadge = document.getElementById("inviteExpiryBadge");
   const error = document.getElementById("inviteError");
   const acceptButton = document.getElementById("acceptButton");
   const loginButton = document.getElementById("loginButton");
   const signupButton = document.getElementById("signupButton");
   const resetButton = document.getElementById("resetButton");
+  const declineButton = document.getElementById("declineButton");
 
-  if (!token) {
-    showError("This invite link is missing a token.");
-    acceptButton.disabled = true;
-  } else if (!(await isLoggedIn())) {
-    message.textContent = "Log in or create an account with the invited email. We'll bring you back here after sign in.";
-    acceptButton.classList.add("hidden");
-    loginButton.textContent = "Log In";
-    signupButton.classList.remove("hidden");
-    resetButton.classList.remove("hidden");
-  } else {
+  const roleLabels = { parent: "Parent", caregiver: "Caregiver", viewer: "Viewer" };
+  let preview = null;
+
+  loginButton.addEventListener("click", () => { window.location.href = screenUrl("login"); });
+  signupButton.addEventListener("click", () => { window.location.href = screenUrl("signup"); });
+  resetButton.addEventListener("click", () => { window.location.href = screenUrl("login"); });
+  declineButton.addEventListener("click", () => { window.location.href = screenUrl(isLoggedInCached ? "home_dashboard" : "auth_welcome"); });
+  acceptButton.addEventListener("click", acceptInvite);
+
+  let isLoggedInCached = false;
+
+  await init();
+
+  async function init() {
+    if (!token) {
+      showError("This invite link is missing its code.");
+      acceptButton.disabled = true;
+      return;
+    }
+
+    // Public preview (works before login). Degrades gracefully if API is offline.
+    try {
+      preview = await loadInvitePreviewRemote(token);
+      renderPreview(preview);
+    } catch {
+      headline.textContent = "You're invited to a Care Circle 💜";
+      subline.textContent = "Join this baby's Care Circle on LittleNest MY.";
+    }
+
+    isLoggedInCached = Boolean(await getAuthSession());
+
+    if (preview && ["expired", "revoked", "declined", "accepted"].includes(String(preview.status))) {
+      acceptButton.classList.add("hidden");
+      const map = { expired: "This invite has expired.", revoked: "This invite was cancelled.", declined: "This invite was declined.", accepted: "This invite was already accepted." };
+      showError(map[preview.status] || "This invite is no longer active.");
+      return;
+    }
+
+    if (!isLoggedInCached) {
+      subline.textContent = preview
+        ? `Sign in with ${preview.invitedEmail || "the invited email"} to join the circle.`
+        : "Log in or create an account with the invited email to join.";
+      acceptButton.classList.add("hidden");
+      loginButton.classList.remove("hidden");
+      signupButton.classList.remove("hidden");
+      resetButton.classList.remove("hidden");
+      return;
+    }
+
+    // Logged in + valid → accept immediately.
     acceptInvite();
   }
 
-  loginButton.addEventListener("click", () => {
-    window.location.href = screenUrl("login");
-  });
-  signupButton.addEventListener("click", () => {
-    window.location.href = screenUrl("signup");
-  });
-  resetButton.addEventListener("click", () => {
-    window.location.href = screenUrl("login");
-  });
-
-  acceptButton.addEventListener("click", acceptInvite);
+  function renderPreview(p) {
+    const baby = p.babyName || "this baby";
+    headline.textContent = `You're invited to join ${baby}'s Care Circle 💜`;
+    subline.textContent = p.inviterName ? `${p.inviterName} would love your help.` : "Someone would love your help caring for the little one.";
+    if (p.role) {
+      roleBadge.textContent = roleLabels[p.role] || "Member";
+      roleBadge.classList.remove("hidden");
+    }
+    if (p.expiresAt) {
+      const days = Math.max(0, Math.ceil((new Date(p.expiresAt) - new Date()) / 86400000));
+      expiryBadge.textContent = days > 0 ? `Valid for ${days} more day${days === 1 ? "" : "s"}` : "Expires today";
+      expiryBadge.classList.remove("hidden");
+    }
+  }
 
   async function acceptInvite() {
     if (!token) return;
     acceptButton.disabled = true;
-    acceptButton.textContent = "Accepting...";
-    message.textContent = "Accepting your invitation...";
+    acceptButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Accepting...';
     error.classList.add("hidden");
     try {
       const result = await acceptFamilyInviteRemote(token);
       setSelectedBabyIdRemote(result.babyId);
       clearPendingInviteToken();
       await loadBabyProfilesRemote(babyProfile).catch(() => null);
-      message.textContent = "Invite accepted. Welcome to the care circle.";
+      subline.textContent = "Welcome to the Care Circle 💜";
       if (cameFromSupabaseInvite || result.passwordSetupRecommended) {
         const session = await getAuthSession();
         markNeedsPasswordSetup(session?.user?.email || "");
-        acceptButton.textContent = "Set Password...";
+        acceptButton.innerHTML = "Set password...";
         setTimeout(() => window.location.href = screenUrl("set_password"), 700);
         return;
       }
-      acceptButton.textContent = "Opening Home...";
+      acceptButton.innerHTML = "Opening home...";
       setTimeout(() => window.location.href = screenUrl("home_dashboard"), 700);
     } catch (inviteError) {
       showError(inviteError.message || "Could not accept invite.");
       acceptButton.disabled = false;
-      acceptButton.textContent = "Accept Invite";
+      acceptButton.innerHTML = '<span class="material-symbols-outlined">favorite</span>Accept invite';
     }
   }
 
   function showError(text) {
     error.textContent = text;
     error.classList.remove("hidden");
-    message.textContent = "We could not complete this invite yet.";
   }
 </script>
 </body></html>

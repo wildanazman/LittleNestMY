@@ -1,3 +1,36 @@
+import { supabase, isSupabaseConfigured } from "./supabaseClient.mjs";
+import { getAuthSession } from "./localAuth.mjs";
+
+const AVATAR_BUCKET = "avatars";
+
+/**
+ * Persist an avatar data-URL. When the user is logged in and Supabase Storage
+ * is reachable, uploads the image to the `avatars` bucket and returns a public
+ * URL (small, syncs across devices). On any failure — no Supabase, guest mode,
+ * missing bucket, RLS — it returns the original data-URL unchanged, so the
+ * existing local-only behavior always still works.
+ */
+export async function persistAvatar(dataUrl, options = {}) {
+  const folder = options.folder || "avatar";
+  if (!dataUrl || !String(dataUrl).startsWith("data:")) return dataUrl || "";
+  if (!isSupabaseConfigured) return dataUrl;
+  try {
+    const session = await getAuthSession();
+    if (!session?.user) return dataUrl; // guest → keep local data-URL
+    const blob = await (await fetch(dataUrl)).blob();
+    const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+    const path = `${session.user.id}/${folder}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage
+      .from(AVATAR_BUCKET)
+      .upload(path, blob, { upsert: true, contentType: blob.type });
+    if (error) return dataUrl;
+    const { data } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    return data?.publicUrl || dataUrl;
+  } catch {
+    return dataUrl;
+  }
+}
+
 export async function fileToResizedDataUrl(file, options = {}) {
   const {
     maxSize = 720,
@@ -119,9 +152,7 @@ function openCropDialog(image, options) {
       </div>
     `;
 
-    const hadModalOpen = document.body.classList.contains("ln-modal-open");
     document.body.appendChild(modal);
-    document.body.classList.add("ln-modal-open");
     const preview = modal.querySelector("[data-crop-preview]");
     const context = preview.getContext("2d");
     const zoomInput = modal.querySelector("[data-crop-control='zoom']");
@@ -151,7 +182,6 @@ function openCropDialog(image, options) {
 
     function close(result) {
       modal.remove();
-      if (!hadModalOpen) document.body.classList.remove("ln-modal-open");
       resolve(result);
     }
   });

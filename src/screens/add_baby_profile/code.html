@@ -172,7 +172,7 @@
 <div class="flex flex-col items-center gap-4">
 <div class="relative group">
 <div class="w-32 h-32 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border-4 border-surface shadow-soft transition-transform group-active:scale-95">
-<img class="w-full h-full object-cover hidden" data-alt="A soft, heartwarming portrait of a newborn baby wrapped in a light cream-colored organic cotton blanket. The lighting is diffused and golden, creating a serene and angelic mood. The background is a blurred, warm wooden nursery setting, maintaining a professional and clean aesthetic typical of a high-end parenting application." id="babyAvatarPreview" src="https://lh3.googleusercontent.com/aida/AP1WRLs8THNt6xPiwBS3Z5K7wRrxj-0fzAirwZA1W47nZW0F-9xu36yvx5BH2w0PYcAi04ry_BvcXrNeptq5AAsaIKuXgV1VI2cZwufZA03v_8yzt9gSsJSIlrKpdR8Fk9I-OAGc8KKDBHxM7UCTvM_UYjG9HQLvSa82Glc2N0pIxF7yfJTXtjpTNPC7bpfYDlciLrLwPNOUxqaRBY4D_t-UFVttDwngV_L9e1yUN2HzlZatM5sLCUBkZbf8dE8"/>
+<img class="w-full h-full object-cover hidden" data-alt="A soft, heartwarming portrait of a newborn baby wrapped in a light cream-colored organic cotton blanket. The lighting is diffused and golden, creating a serene and angelic mood. The background is a blurred, warm wooden nursery setting, maintaining a professional and clean aesthetic typical of a high-end parenting application." id="babyAvatarPreview" src="/icons/placeholder.svg"/>
 <span class="material-symbols-outlined text-4xl text-on-secondary-container" id="avatarPlaceholder">add_a_photo</span>
 </div>
 <label class="absolute bottom-1 right-1 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-on-primary shadow-lg cursor-pointer hover:scale-105 transition-transform" for="avatarInput">
@@ -248,7 +248,7 @@
         } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { fileToCroppedAvatarDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getBabyPermissions, redirectViewOnly, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
         if (!(await isLoggedIn())) {
@@ -285,6 +285,7 @@
                         avatarInput.value = "";
                         return;
                     }
+                    avatarDataUrl = await persistAvatar(avatarDataUrl, { folder: "baby" });
                     babyAvatarPreview.src = avatarDataUrl;
                     babyAvatarPreview.classList.remove('hidden');
                     avatarPlaceholder.classList.add('hidden');

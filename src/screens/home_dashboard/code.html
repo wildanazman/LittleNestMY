@@ -598,11 +598,17 @@ Accept invitation
             getPersistedCalendarEvents,
             getPersistedGrowthRecords,
             getPersistedReminders,
-            getLogsForBaby
+            getLogsForBaby,
+            deleteLocalFeedingLog,
+            deleteLocalSleepLog,
+            deleteLocalDiaperLog,
+            saveLocalFeedingLog,
+            saveLocalSleepLog,
+            saveLocalDiaperLog
         } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, screenUrl, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
@@ -828,27 +834,27 @@ Accept invitation
                 ...allFeedingLogs
                     .filter(log => isSameLocalDay(log.startedAt, date))
                     .map(log => ({
+                        id: log.id,
                         at: log.startedAt,
                         type: "feed",
-                        detailTitle: "Feeding detail",
                         title: labelFeedingType(log.type),
                         detail: log.amountGrams ? `${log.amountGrams}g solid food` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} feeding` : log.notes || "Feeding logged"
                     })),
                 ...allSleepLogs
                     .filter(log => isSameLocalDay(log.startedAt, date))
                     .map(log => ({
+                        id: log.id,
                         at: log.startedAt,
                         type: "sleep",
-                        detailTitle: "Sleep detail",
                         title: log.status === "nap" ? "Nap" : "Sleep",
                         detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
                     })),
                 ...allDiaperLogs
                     .filter(log => isSameLocalDay(log.changedAt, date))
                     .map(log => ({
+                        id: log.id,
                         at: log.changedAt,
                         type: "diaper",
-                        detailTitle: "Diaper detail",
                         title: "Diaper",
                         detail: diaperTimelineSummary(log)
                     }))
@@ -859,6 +865,34 @@ Accept invitation
 
             timeline.innerHTML = (events.length ? '<div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>' : '') +
         (events.length ? events.map(renderTimelineItem).join("") : renderEmptyTimeline());
+
+            if (permissions.canAddLogs) bindTimelineDelete(date);
+        }
+
+        function bindTimelineDelete(date) {
+            document.querySelectorAll("#timelineList [data-del-id]").forEach((btn) => {
+                btn.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const id = btn.dataset.delId;
+                    const type = btn.dataset.delType;
+                    const deleteMap = { feed: deleteLocalFeedingLog, sleep: deleteLocalSleepLog, diaper: deleteLocalDiaperLog };
+                    const saveMap = { feed: saveLocalFeedingLog, sleep: saveLocalSleepLog, diaper: saveLocalDiaperLog };
+                    const arrayMap = { feed: allFeedingLogs, sleep: allSleepLogs, diaper: allDiaperLogs };
+                    const arr = arrayMap[type];
+                    const index = arr.findIndex((log) => log.id === id);
+                    const removed = index >= 0 ? arr[index] : null;
+                    deleteMap[type]?.(id);
+                    if (index >= 0) arr.splice(index, 1);
+                    renderTimeline(date);
+                    showUndoToast("Log deleted", () => {
+                        if (!removed) return;
+                        saveMap[type]?.(removed);
+                        arr.push(removed);
+                        renderTimeline(date);
+                    });
+                });
+            });
         }
 
         function renderTimelineItem(event) {
@@ -868,18 +902,23 @@ Accept invitation
                 diaper: { chip: "bg-[#e5fbf2] text-[#15803D]", icon: "baby_changing_station" }
             };
             const style = styles[event.type] || styles.feed;
+            const canDelete = permissions.canAddLogs && event.id;
+            const deleteButton = canDelete
+                ? `<button class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete ${event.title} log"><span class="material-symbols-outlined text-[18px]">delete</span></button>`
+                : "";
 
             return `
                 <div class="relative">
                     <div class="absolute -left-[44px] top-1 w-9 h-9 rounded-full ${style.chip} flex items-center justify-center border-[3px] border-white shadow-sm">
                         <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
                     </div>
-                    <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center justify-between gap-3 cursor-pointer dark:bg-white/10 dark:border-white/10" data-coming-soon="${event.detailTitle}" data-coming-soon-message="Detail views will open here in the next prototype pass." role="button" tabindex="0">
-                        <div class="min-w-0">
+                    <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center justify-between gap-2 dark:bg-white/10 dark:border-white/10">
+                        <div class="min-w-0 flex-1">
                             <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
                             <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
                         </div>
                         <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
+                        ${deleteButton}
                     </div>
                 </div>
             `;
