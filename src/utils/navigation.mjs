@@ -492,6 +492,8 @@ function setupModalNavGuard() {
 function setupOfflineIndicator() {
   if (window.__littleNestOfflineBound) return;
   window.__littleNestOfflineBound = true;
+  const isNativeCapacitor = Boolean(window.LittleNestCompat?.isNativeCapacitor?.());
+  let nativeOfflineEventSeen = false;
 
   const bar = document.createElement("div");
   bar.id = "littleNestOfflineBar";
@@ -519,10 +521,11 @@ function setupOfflineIndicator() {
   bar.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px">cloud_off</span><span>Offline — changes saved on this device</span>`;
   document.body.appendChild(bar);
 
-  const apply = () => {
-    bar.style.transform = navigator.onLine
-      ? "translate(-50%,-160%)"
-      : "translate(-50%,0)";
+  const apply = (event) => {
+    if (isNativeCapacitor && event?.type === "offline") nativeOfflineEventSeen = true;
+    if (isNativeCapacitor && event?.type === "online") nativeOfflineEventSeen = false;
+    const shouldShow = isNativeCapacitor ? nativeOfflineEventSeen : !navigator.onLine;
+    bar.style.transform = shouldShow ? "translate(-50%,0)" : "translate(-50%,-160%)";
   };
   window.addEventListener("online", apply);
   window.addEventListener("offline", apply);
