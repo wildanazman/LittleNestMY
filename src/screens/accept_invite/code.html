@@ -97,7 +97,10 @@ tailwind.config = {
   loginButton.addEventListener("click", () => { window.location.href = screenUrl("login"); });
   signupButton.addEventListener("click", () => { window.location.href = screenUrl("signup"); });
   resetButton.addEventListener("click", () => { window.location.href = screenUrl("login"); });
-  declineButton.addEventListener("click", () => { window.location.href = screenUrl(isLoggedInCached ? "home_dashboard" : "auth_welcome"); });
+  declineButton.addEventListener("click", () => {
+    clearPendingInviteToken();
+    window.location.href = screenUrl(isLoggedInCached ? "home_dashboard" : "auth_welcome");
+  });
   acceptButton.addEventListener("click", acceptInvite);
 
   let isLoggedInCached = false;
@@ -111,18 +114,26 @@ tailwind.config = {
       return;
     }
 
-    // Public preview (works before login). Degrades gracefully if API is offline.
+    isLoggedInCached = Boolean(await getAuthSession());
+
+    // Public preview (works before login). Invalid/stale tokens must not trap logged-in users.
     try {
       preview = await loadInvitePreviewRemote(token);
       renderPreview(preview);
     } catch {
+      if (isLoggedInCached) {
+        clearPendingInviteToken();
+        acceptButton.classList.add("hidden");
+        showError("This invite link is not valid anymore. Opening your dashboard...");
+        setTimeout(() => window.location.href = screenUrl("home_dashboard"), 900);
+        return;
+      }
       headline.textContent = "You're invited to a Care Circle 💜";
       subline.textContent = "Join this baby's Care Circle on LittleNest MY.";
     }
 
-    isLoggedInCached = Boolean(await getAuthSession());
-
     if (preview && ["expired", "revoked", "declined", "accepted"].includes(String(preview.status))) {
+      clearPendingInviteToken();
       acceptButton.classList.add("hidden");
       const map = { expired: "This invite has expired.", revoked: "This invite was cancelled.", declined: "This invite was declined.", accepted: "This invite was already accepted." };
       showError(map[preview.status] || "This invite is no longer active.");
@@ -180,6 +191,7 @@ tailwind.config = {
       acceptButton.innerHTML = "Opening home...";
       setTimeout(() => window.location.href = screenUrl("home_dashboard"), 700);
     } catch (inviteError) {
+      clearPendingInviteToken();
       showError(inviteError.message || "Could not accept invite.");
       acceptButton.disabled = false;
       acceptButton.innerHTML = '<span class="material-symbols-outlined">favorite</span>Accept invite';

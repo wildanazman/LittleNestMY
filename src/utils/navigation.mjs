@@ -1,5 +1,5 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
-import { getAuthSession, isGuestMode, isLoggedIn } from "./localAuth.mjs";
+import { getAuthSession, isEmailVerified, isGuestMode, isLoggedIn } from "./localAuth.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
@@ -183,6 +183,21 @@ getAuthSession()
 
 function getNavKey(link) {
   if (link.dataset.navKey) return link.dataset.navKey;
+  const iconText = (link.querySelector(".material-symbols-outlined")?.dataset.icon
+    || link.querySelector(".material-symbols-outlined")?.textContent
+    || "").trim();
+  const iconMap = {
+    home: "home",
+    add: "log",
+    add_circle: "log",
+    calendar_month: "calendar",
+    event: "calendar",
+    auto_awesome: "milestones",
+    stars: "milestones",
+    smart_toy: "assistant",
+    psychology: "assistant"
+  };
+  if (iconMap[iconText]) return iconMap[iconText];
   const labelElement = link.querySelector("span:last-child");
   const label = (labelElement?.textContent || link.textContent).trim().toLowerCase();
   const language = getLanguage();
@@ -253,9 +268,20 @@ function normalizeNavItem(item, key, isActive) {
 
 async function guardAuthenticatedRoutes() {
   const screenId = getCurrentScreenId();
-  if (!["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId) && !(await isLoggedIn())) {
-    window.location.replace(window.location.protocol === "file:" ? "../auth_welcome/code.html" : "/auth_welcome/");
-  }
+  const publicScreens = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending"];
+  if (publicScreens.includes(screenId)) return;
+
+  // Guests stay local-only and are always allowed into the app shell.
+  if (isGuestMode()) return;
+
+  const redirect = (screen) => window.location.replace(
+    window.location.protocol === "file:" ? `../${screen}/code.html` : `/${screen}/`
+  );
+
+  const session = await getAuthSession();
+  if (!session) { redirect("auth_welcome"); return; }
+  // Logged-in but unverified email → hold at the verification screen.
+  if (!isEmailVerified(session.user)) redirect("verify_pending");
 }
 
 async function setupPendingInviteBar() {

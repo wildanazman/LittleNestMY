@@ -60,7 +60,7 @@ tailwind.config = {
 <p class="text-sm leading-5 text-on-surface-variant">Pick up where your little care notes left off.</p>
 </div>
 </div>
-<form class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5" id="loginForm">
+<form class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5" id="loginForm" novalidate>
 <div class="space-y-2">
 <label class="font-bold text-sm text-on-surface" for="email">Email</label>
 <input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 text-on-surface placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary" id="email" inputmode="email" placeholder="mama@example.com" type="email"/>
@@ -86,7 +86,8 @@ Remember me
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getAuthConfigMessage, getPendingInviteToken, hasSupabaseConfig, isValidEmail, loginLocalUser, normalizeEmail, routeAfterAuth, sendPasswordReset } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getAuthConfigMessage, getPendingInviteToken, clearPendingInviteToken, hasSupabaseConfig, isEmailVerified, isValidEmail, loginLocalUser, logoutLocalUser, normalizeEmail, rememberPendingVerificationEmail, routeAfterAuth, sendPasswordReset } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
@@ -134,11 +135,19 @@ Remember me
     submitButton.textContent = "Logging in...";
     error.classList.add("hidden");
     try {
-      await loginLocalUser({ email, password });
+      const result = await loginLocalUser({ email, password });
+      if (!isEmailVerified(result.user || result.session?.user)) {
+        rememberPendingVerificationEmail(email);
+        await logoutLocalUser().catch(() => {});
+        window.location.href = screenUrl("verify_pending");
+        return;
+      }
       const pendingInviteToken = getPendingInviteToken();
-      window.location.href = pendingInviteToken
-        ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
-        : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+      if (await hasUsablePendingInvite(pendingInviteToken)) {
+        window.location.href = `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`;
+        return;
+      }
+      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
     } catch (authError) {
       error.textContent = authError.message || "Email or password is incorrect. If this account was created from an invitation, please set or reset your password first.";
       error.classList.remove("hidden");
@@ -146,6 +155,19 @@ Remember me
       submitButton.textContent = "Log In";
     }
   });
+
+  async function hasUsablePendingInvite(token) {
+    if (!token) return false;
+    try {
+      const invite = await loadInvitePreviewRemote(token);
+      const status = String(invite?.status || "pending");
+      if (!["expired", "revoked", "declined", "accepted"].includes(status)) return true;
+    } catch {
+      // Stale/broken invite token should not trap normal login.
+    }
+    clearPendingInviteToken();
+    return false;
+  }
 </script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {

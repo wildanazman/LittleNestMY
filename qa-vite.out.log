@@ -1,0 +1,5 @@
+
+> littlenest-my-stitch-ui@0.1.0 dev
+> node scripts/serve-static.mjs --host 127.0.0.1
+
+LittleNest MY is running at http://localhost:5173

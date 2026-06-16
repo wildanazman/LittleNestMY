@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Verify your email - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fff8f5",
+        "surface-container": "#f4ebe6",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>.soft-shadow{box-shadow:0 18px 45px rgba(124,92,255,.14)}</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen">
+<main class="min-h-screen px-6 py-8 max-w-md mx-auto flex flex-col justify-center">
+<section class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5 dark:bg-[#181514] dark:border-white/10">
+<div class="rounded-[26px] p-6 text-center" style="background:linear-gradient(160deg,#efe7ff,#ffeef4 60%,#e6f6ff)">
+<div class="w-20 h-20 rounded-full bg-white/75 text-[#7056f4] mx-auto flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-[44px]" style="font-variation-settings:'FILL' 1;">mark_email_unread</span>
+</div>
+<p class="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[#7056f4]/80">Almost there</p>
+<h1 class="text-[22px] leading-tight font-extrabold text-[#241b3a] mt-1">Check your email</h1>
+<p class="text-sm text-[#5b4f72] mt-2">We sent a verification link to <span class="font-bold" id="pendingEmail">your email</span>. Please verify your email before continuing.</p>
+</div>
+
+<button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform flex items-center justify-center gap-2" id="continueButton" type="button"><span class="material-symbols-outlined">check_circle</span>I've verified — continue</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform flex items-center justify-center gap-2" id="resendButton" type="button"><span class="material-symbols-outlined text-[18px]">forward_to_inbox</span>Resend verification email</button>
+<button class="w-full h-11 rounded-full text-on-surface-variant font-bold active:scale-[0.98] transition-transform" id="backButton" type="button">Back to login</button>
+
+<p class="min-h-5 text-sm text-center font-bold hidden" id="feedback" aria-live="polite"></p>
+</section>
+</main>
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { clearPendingVerificationEmail, completeEmailRedirectSession, getPendingVerificationEmail, isEmailVerified, logoutLocalUser, resendVerificationEmail } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+
+  const pendingEmail = getPendingVerificationEmail();
+  const emailLabel = document.getElementById("pendingEmail");
+  if (pendingEmail) emailLabel.textContent = pendingEmail;
+
+  const feedback = document.getElementById("feedback");
+  const continueButton = document.getElementById("continueButton");
+  const resendButton = document.getElementById("resendButton");
+  const backButton = document.getElementById("backButton");
+
+  checkForVerifiedRedirect();
+
+  function showFeedback(message, kind = "info") {
+    feedback.textContent = message;
+    feedback.classList.remove("hidden", "text-tertiary", "text-error", "text-on-surface-variant");
+    feedback.classList.add(kind === "error" ? "text-error" : kind === "success" ? "text-tertiary" : "text-on-surface-variant");
+  }
+
+  backButton.addEventListener("click", async () => {
+    await logoutLocalUser().catch(() => {});
+    window.location.href = screenUrl("login");
+  });
+
+  continueButton.addEventListener("click", async () => {
+    continueButton.disabled = true;
+    continueButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Checking...';
+    const session = await completeEmailRedirectSession();
+    if (session && isEmailVerified(session.user)) {
+      clearPendingVerificationEmail();
+      window.location.href = screenUrl("home_dashboard");
+      return;
+    }
+    showFeedback("Not verified yet. Open the link in your email, then try again.", "info");
+    continueButton.disabled = false;
+    continueButton.innerHTML = '<span class="material-symbols-outlined">check_circle</span>I\'ve verified — continue';
+  });
+
+  async function checkForVerifiedRedirect() {
+    const hasReturnParams = window.location.search.includes("code=") || window.location.hash.includes("access_token");
+    if (!hasReturnParams) return;
+    continueButton.disabled = true;
+    continueButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Signing you in...';
+    try {
+      const session = await completeEmailRedirectSession();
+      if (session && isEmailVerified(session.user)) {
+        clearPendingVerificationEmail();
+        window.location.href = screenUrl("home_dashboard");
+        return;
+      }
+      showFeedback("Email verified. Please log in to continue.", "success");
+      setTimeout(() => window.location.href = screenUrl("login"), 900);
+    } catch {
+      showFeedback("Could not finish email verification. Please open the latest email link or log in again.", "error");
+    } finally {
+      continueButton.disabled = false;
+      continueButton.innerHTML = '<span class="material-symbols-outlined">check_circle</span>I\'ve verified — continue';
+    }
+  }
+
+  resendButton.addEventListener("click", async () => {
+    if (!pendingEmail) { showFeedback("Go back to login and sign up again to resend.", "error"); return; }
+    resendButton.disabled = true;
+    const original = resendButton.innerHTML;
+    resendButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Sending...';
+    try {
+      await resendVerificationEmail(pendingEmail);
+      showFeedback("Verification email sent.", "success");
+      // brief cooldown to avoid hammering the rate limit
+      let cooldown = 30;
+      resendButton.innerHTML = `Wait ${cooldown}s`;
+      const timer = setInterval(() => {
+        cooldown -= 1;
+        if (cooldown <= 0) { clearInterval(timer); resendButton.disabled = false; resendButton.innerHTML = original; }
+        else resendButton.innerHTML = `Wait ${cooldown}s`;
+      }, 1000);
+    } catch (error) {
+      showFeedback(error.message || "We could not send the email. Try again.", "error");
+      resendButton.disabled = false;
+      resendButton.innerHTML = original;
+    }
+  });
+</script>
+</body></html>

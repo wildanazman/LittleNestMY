@@ -5,6 +5,7 @@ export const screens = [
   { id: "signup", title: "Sign Up", group: "auth", path: "signup/code.html", preview: "signup/screen.png" },
   { id: "accept_invite", title: "Accept Invite", group: "auth", path: "accept_invite/code.html", preview: "auth_welcome/screen.png" },
   { id: "set_password", title: "Set Password", group: "auth", path: "set_password/code.html", preview: "auth_welcome/screen.png" },
+  { id: "verify_pending", title: "Verify Email", group: "auth", path: "verify_pending/code.html", preview: "auth_welcome/screen.png" },
   { id: "onboarding", title: "Onboarding", group: "core", path: "onboarding/code.html", preview: "onboarding/screen.png" },
   { id: "add_baby_profile", title: "Add Baby Profile", group: "core", path: "add_baby_profile/code.html", preview: "add_baby_profile/screen.png" },
   { id: "baby_profiles", title: "Baby Profiles", group: "core", path: "baby_profiles/code.html", preview: "add_baby_profile/screen.png" },

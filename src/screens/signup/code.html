@@ -52,7 +52,7 @@ tailwind.config = {
 <h1 class="text-3xl font-extrabold text-primary leading-tight">Create your nest</h1>
 <p class="text-base leading-6 text-on-surface-variant">Start with a parent account, then add your baby's profile.</p>
 </div>
-<form class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-4" id="signupForm">
+<form class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-4" id="signupForm" novalidate>
 <div class="space-y-2">
 <label class="font-bold text-sm" for="name">Name</label>
 <input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 focus:ring-2 focus:ring-primary" id="name" placeholder="Mama" type="text"/>
@@ -79,7 +79,8 @@ tailwind.config = {
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getAuthConfigMessage, getPendingInviteToken, hasSupabaseConfig, isValidEmail, normalizeEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getAuthConfigMessage, getPendingInviteToken, clearPendingInviteToken, hasSupabaseConfig, isEmailVerified, isValidEmail, normalizeEmail, rememberPendingVerificationEmail, routeAfterAuth, signupLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   bindPrototypeActions();
@@ -116,17 +117,19 @@ tailwind.config = {
     error.classList.add("hidden");
     try {
       const result = await signupLocalUser({ name, email, password });
-      if (!result.session) {
-        error.textContent = "Account created. Please check your email to confirm your account before logging in.";
-        error.classList.remove("hidden");
-        submitButton.disabled = false;
-        submitButton.textContent = "Create Account";
+      rememberPendingVerificationEmail(email);
+      const verified = result.session && isEmailVerified(result.user || result.session.user);
+      if (!verified) {
+        // Email confirmation required → hold at the verification screen.
+        window.location.href = screenUrl("verify_pending");
         return;
       }
       const pendingInviteToken = getPendingInviteToken();
-      window.location.href = pendingInviteToken
-        ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
-        : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
+      if (await hasUsablePendingInvite(pendingInviteToken)) {
+        window.location.href = `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`;
+        return;
+      }
+      window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
     } catch (authError) {
       error.textContent = authError.message || "Could not create account. If this email already has an account, please log in or reset your password.";
       error.classList.remove("hidden");
@@ -134,6 +137,19 @@ tailwind.config = {
       submitButton.textContent = "Create Account";
     }
   });
+
+  async function hasUsablePendingInvite(token) {
+    if (!token) return false;
+    try {
+      const invite = await loadInvitePreviewRemote(token);
+      const status = String(invite?.status || "pending");
+      if (!["expired", "revoked", "declined", "accepted"].includes(status)) return true;
+    } catch {
+      // Stale/broken invite token should not trap normal signup.
+    }
+    clearPendingInviteToken();
+    return false;
+  }
 </script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {

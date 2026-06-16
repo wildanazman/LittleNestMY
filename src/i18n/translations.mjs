@@ -12,7 +12,7 @@ export const translations = {
       log: "Log",
       calendar: "Calendar",
       milestones: "Milestones",
-      assistant: "Assistant"
+      assistant: "Insights"
     },
     dashboard: {
       babyName: "Baby name",
@@ -82,7 +82,7 @@ export const translations = {
       log: "Log",
       calendar: "Kalendar",
       milestones: "Milestone",
-      assistant: "Pembantu"
+      assistant: "Insights"
     },
     dashboard: {
       babyName: "Nama bayi",

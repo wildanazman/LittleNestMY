@@ -59,6 +59,7 @@ export async function signupLocalUser({ name, email, password }) {
     email: cleanEmail,
     password,
     options: {
+      emailRedirectTo: getEmailRedirectUrl("verify_pending"),
       data: {
         display_name: name,
         name
@@ -132,6 +133,80 @@ export async function logoutLocalUser() {
 
 export function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+const pendingVerificationKey = "littlenest:pendingVerificationEmail";
+
+// A user counts as verified once Supabase records a confirmation timestamp.
+// Guests are local-only and never need email verification.
+export function isEmailVerified(user) {
+  if (!user) return false;
+  return Boolean(user.email_confirmed_at || user.confirmed_at);
+}
+
+export async function isCurrentUserVerified() {
+  if (isGuestMode()) return true;
+  const user = await getCurrentUser();
+  return isEmailVerified(user);
+}
+
+export async function resendVerificationEmail(email) {
+  const client = requireSupabaseClient();
+  const cleanEmail = normalizeEmail(email);
+  if (!isValidEmail(cleanEmail)) throw new Error("Enter a valid email address.");
+  const { error } = await client.auth.resend({
+    type: "signup",
+    email: cleanEmail,
+    options: { emailRedirectTo: getEmailRedirectUrl("verify_pending") }
+  });
+  if (error) throw friendlyAuthError(error, "resend");
+  return true;
+}
+
+export function getEmailRedirectUrl(screen = "verify_pending") {
+  const origin = window.location.origin;
+  const cleanScreen = String(screen || "verify_pending").replace(/^\/+|\/+$/g, "");
+  return `${origin}/${cleanScreen}/`;
+}
+
+export async function completeEmailRedirectSession() {
+  if (isGuestMode() || !isSupabaseConfigured) return null;
+
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get("code");
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) throw friendlyAuthError(error, "login");
+    cachedSession = data?.session || null;
+    window.history.replaceState({}, document.title, url.pathname);
+    return cachedSession;
+  }
+
+  return getAuthSession();
+}
+
+export function rememberPendingVerificationEmail(email) {
+  try {
+    if (email) window.localStorage.setItem(pendingVerificationKey, normalizeEmail(email));
+  } catch {
+    // Pending verification email is local UI state only.
+  }
+}
+
+export function getPendingVerificationEmail() {
+  try {
+    return String(window.localStorage.getItem(pendingVerificationKey) || "");
+  } catch {
+    return "";
+  }
+}
+
+export function clearPendingVerificationEmail() {
+  try {
+    window.localStorage.removeItem(pendingVerificationKey);
+  } catch {
+    // Pending verification email is local UI state only.
+  }
 }
 
 export function normalizeEmail(email) {
@@ -288,7 +363,13 @@ function friendlyAuthError(error, mode) {
     return new Error("An account already exists for this email. Please log in or reset your password.");
   }
   if (/email not confirmed/i.test(message)) {
-    return new Error("Please confirm your email before logging in.");
+    return new Error("Please verify your email before using LittleNest MY.");
+  }
+  if (/rate limit|too many|for security purposes|seconds/i.test(message)) {
+    return new Error("Please wait before requesting another email.");
+  }
+  if (mode === "resend") {
+    return new Error("We could not send the email. Try again.");
   }
   if (mode === "signup" && /signup/i.test(message)) {
     return new Error(message);

@@ -183,7 +183,7 @@
       month: "short",
       year: "numeric"
     });
-    const photo = profile.photoUrl || "/src/screens/home_dashboard/screen.png";
+    const photo = profile.photoUrl || "/icons/placeholder.svg";
 
     return `
       <article class="bg-surface-container-lowest rounded-[24px] p-4 soft-shadow border ${isSelected ? "border-primary-container" : "border-transparent"} space-y-4">
@@ -208,7 +208,7 @@
           ${canManageBaby ? `<button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>` : `<p class="h-11 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
           ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
         </div>
-        ${canManageBaby && totalProfiles > 1 ? `<button class="w-full h-10 rounded-full bg-red-50 text-red-700 dark:bg-red-500/15 dark:text-red-200 font-label-md text-[13px] font-bold" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete Baby Profile</button>` : ""}
+        ${canManageBaby && totalProfiles > 1 ? `<button class="w-full h-10 rounded-full bg-[#ffe0e1] text-[#b3261e] dark:bg-red-500/20 dark:text-red-200 font-label-md text-[13px] font-extrabold active:scale-95 transition-transform" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete Baby Profile</button>` : ""}
         ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}
       </article>
     `;

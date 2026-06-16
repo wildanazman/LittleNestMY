@@ -85,14 +85,17 @@ body { min-height: 100dvh; }
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getPendingInviteToken, isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getPendingInviteToken, clearPendingInviteToken, isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   if (await isLoggedIn()) {
     const pendingInviteToken = getPendingInviteToken();
-    window.location.replace(pendingInviteToken
-      ? `${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`
-      : routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl));
+    if (await hasUsablePendingInvite(pendingInviteToken)) {
+      window.location.replace(`${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`);
+    } else {
+      window.location.replace(routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl));
+    }
     await new Promise(() => {});
   }
 
@@ -101,6 +104,19 @@ body { min-height: 100dvh; }
     await loginAsGuest();
     window.location.href = routeAfterAuth(await hasAnyBabyProfileRemote(babyProfile), screenUrl);
   });
+
+  async function hasUsablePendingInvite(token) {
+    if (!token) return false;
+    try {
+      const invite = await loadInvitePreviewRemote(token);
+      const status = String(invite?.status || "pending");
+      if (!["expired", "revoked", "declined", "accepted"].includes(status)) return true;
+    } catch {
+      // Stale/broken invite token should not trap normal app entry.
+    }
+    clearPendingInviteToken();
+    return false;
+  }
 </script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
