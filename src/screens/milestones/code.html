@@ -293,9 +293,10 @@ Save Milestone
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, milestones: mockMilestones } = await import(`${moduleBase}data/mockData.mjs`);
         const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { deleteLocalMilestone, getLogsForBaby, getPersistedMilestones, getSelectedBabyId, getSelectedBabyProfile, saveLocalMilestone } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedMilestones, getSelectedBabyId, getSelectedBabyProfile } = await import(`${moduleBase}utils/localState.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
 
         const grid = document.getElementById("milestoneGrid");
         const typeInput = document.getElementById("milestoneType");
@@ -312,6 +313,7 @@ Save Milestone
         const backButton = document.getElementById("milestonesBackButton");
         const selectedBabyId = getSelectedBabyId(babyProfile);
         const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+        let milestonesCache = getLogsForBaby(getPersistedMilestones([]), selectedBabyId);
         let milestonePhotoDataUrl = "";
         let editingMilestoneId = "";
 
@@ -323,7 +325,7 @@ Save Milestone
             try {
                 milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 900, quality: 0.82 });
                 photoLabel.textContent = "Photo ready";
-                showFeedback("Photo added locally.");
+                showFeedback("Photo ready. It will upload to cloud when saved.");
             } catch (error) {
                 milestonePhotoDataUrl = "";
                 photoLabel.textContent = "Add optional photo";
@@ -371,9 +373,10 @@ Save Milestone
         });
 
         renderAll();
+        refreshMilestones();
 
         function allMemories() {
-            return getLogsForBaby(getPersistedMilestones([]), selectedBabyId)
+            return (milestonesCache || [])
                 .sort((a, b) => new Date(b.achievedAt) - new Date(a.achievedAt));
         }
 
@@ -395,7 +398,7 @@ Save Milestone
         function dateLabelOf(m) { return memDate(m).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
         function ageOf(m) { return calculateBabyAgeShort(selectedBaby.dateOfBirth, memDate(m)); }
 
-        function saveMilestone() {
+        async function saveMilestone() {
             const title = typeInput.value === "Custom milestone" ? customTitleInput.value.trim() : typeInput.value.trim();
             const achievedAt = dateInput.value;
             const notes = noteInput.value.trim();
@@ -417,27 +420,47 @@ Save Milestone
                 return;
             }
 
-            saveLocalMilestone({
-                id: editingMilestoneId || `milestone-local-${Date.now()}`,
+            saveButton.disabled = true;
+            saveButton.textContent = editingMilestoneId ? "Updating..." : "Saving...";
+            const milestoneDraft = {
+                id: editingMilestoneId || (crypto.randomUUID ? crypto.randomUUID() : `milestone-local-${Date.now()}`),
                 babyId: selectedBabyId,
                 title,
                 achievedAt,
                 category: categoryForTitle(title),
                 notes: notes || undefined,
                 photoUrl: milestonePhotoDataUrl || undefined
-            });
+            };
+            try {
+                const saved = await saveMilestoneRemote(milestoneDraft);
+                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== editingMilestoneId)];
 
-            noteInput.value = "";
-            customTitleInput.value = "";
-            typeInput.value = "First smile";
-            customTitleWrapper.classList.add("hidden");
-            photoInput.value = "";
-            photoLabel.textContent = "Add optional photo";
-            milestonePhotoDataUrl = "";
-            editingMilestoneId = "";
-            saveButton.textContent = "Save Milestone";
+                noteInput.value = "";
+                customTitleInput.value = "";
+                typeInput.value = "First smile";
+                customTitleWrapper.classList.add("hidden");
+                photoInput.value = "";
+                photoLabel.textContent = "Add optional photo";
+                milestonePhotoDataUrl = "";
+                editingMilestoneId = "";
+                saveButton.textContent = "Save Milestone";
+                renderAll();
+                showFeedback(saved.photoUrl?.startsWith("http") ? "Saved to cloud memory book." : "Saved to memory book.");
+            } catch (error) {
+                milestonesCache = [milestoneDraft, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
+                renderAll();
+                saveButton.textContent = editingMilestoneId ? "Update memory" : "Save Milestone";
+                showFeedback(`${error.message || "Cloud save failed."} Memory kept on this device.`);
+            } finally {
+                saveButton.disabled = false;
+            }
+        }
+
+        async function refreshMilestones() {
+            const result = await loadMilestonesRemote(selectedBabyId, []);
+            milestonesCache = result.milestones || [];
             renderAll();
-            showFeedback("Saved to memory book.");
+            if (result.error) showFeedback(result.error);
         }
 
         function renderAll() {
@@ -529,7 +552,8 @@ Save Milestone
             grid.querySelectorAll("[data-card-delete]").forEach((btn) => btn.addEventListener("click", (event) => {
                 event.stopPropagation();
                 if (!confirm("Delete this memory?")) return;
-                deleteLocalMilestone(btn.dataset.cardDelete);
+                deleteMilestoneRemote(btn.dataset.cardDelete).catch((error) => showFeedback(error.message || "Could not delete memory."));
+                milestonesCache = milestonesCache.filter((item) => item.id !== btn.dataset.cardDelete);
                 renderAll();
                 showFeedback("Memory deleted.");
             }));
@@ -658,7 +682,8 @@ Save Milestone
             storyBody.querySelector("[data-story-edit]")?.addEventListener("click", () => { closeStory(); startEdit(m); });
             storyBody.querySelector("[data-story-delete]")?.addEventListener("click", () => {
                 if (!confirm("Delete this memory?")) return;
-                deleteLocalMilestone(m.id);
+                deleteMilestoneRemote(m.id).catch((error) => showFeedback(error.message || "Could not delete memory."));
+                milestonesCache = milestonesCache.filter((item) => item.id !== m.id);
                 closeStory();
                 renderAll();
                 showFeedback("Memory deleted.");

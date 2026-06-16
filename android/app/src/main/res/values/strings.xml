@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LittleNest</string>
+    <string name="title_activity_main">LittleNest</string>
+    <string name="package_name">com.littlenest.app</string>
+    <string name="custom_url_scheme">com.littlenest.app</string>
+</resources>
