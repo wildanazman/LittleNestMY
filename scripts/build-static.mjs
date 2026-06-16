@@ -7,7 +7,7 @@ import { loadRuntimeEnv } from "./runtime-env.mjs";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const dist = join(root, "dist");
 const screensRoot = join(root, "src", "screens");
-loadRuntimeEnv();
+await loadRuntimeEnv();
 
 const missingScreens = screens
   .filter((screen) => !existsSync(join(screensRoot, screen.path)) || !existsSync(join(screensRoot, screen.preview)))

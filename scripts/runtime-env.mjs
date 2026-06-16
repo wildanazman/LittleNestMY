@@ -1,17 +1,19 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const outputPath = join(root, "src", "config", "runtime-env.mjs");
+const publicEnvPath = join(root, "src", "config", "public-env.mjs");
 
-export function loadRuntimeEnv() {
+export async function loadRuntimeEnv() {
   loadDotEnvFile(join(root, ".env"));
   loadDotEnvFile(join(root, ".env.local"));
+  const publicEnv = await loadPublicEnvFallback();
 
   const safeEnv = {
-    VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || "",
-    VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || ""
+    VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || publicEnv.VITE_SUPABASE_URL || "",
+    VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || publicEnv.VITE_SUPABASE_ANON_KEY || ""
   };
 
   mkdirSync(dirname(outputPath), { recursive: true });
@@ -22,6 +24,16 @@ export function loadRuntimeEnv() {
   );
 
   return safeEnv;
+}
+
+async function loadPublicEnvFallback() {
+  if (!existsSync(publicEnvPath)) return {};
+  try {
+    const module = await import(`${pathToFileURL(publicEnvPath).href}?t=${Date.now()}`);
+    return module.publicEnv || {};
+  } catch {
+    return {};
+  }
 }
 
 function loadDotEnvFile(filePath) {

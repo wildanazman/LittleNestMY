@@ -9,7 +9,7 @@ import { loadRuntimeEnv } from "./runtime-env.mjs";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const screensRoot = join(root, "src", "screens");
 const port = Number(process.env.PORT || 5173);
-loadRuntimeEnv();
+await loadRuntimeEnv();
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
