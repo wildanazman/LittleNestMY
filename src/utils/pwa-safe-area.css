@@ -9,6 +9,7 @@ html {
 
 html.ln-capacitor-native {
   --ln-native-top-inset: max(44px, env(safe-area-inset-top));
+  --ln-native-nav-bottom: 24px;
   background: var(--ln-bg, #fbf9f4);
 }
 
@@ -51,7 +52,7 @@ html.ln-capacitor-native header.fixed.top-0 {
 }
 
 html.ln-capacitor-native nav.fixed.bottom-0 {
-  bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  bottom: var(--ln-native-nav-bottom) !important;
   transform: translate3d(0, 0, 0) !important;
   transition: none !important;
   will-change: auto !important;
