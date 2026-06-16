@@ -417,6 +417,7 @@ function findHeaderBackButton(header) {
 
 function bindHeaderProfileButtons(root = document) {
   root.querySelectorAll("header").forEach((header) => {
+    ensureHeaderRefreshButton(header);
     const target = findOrCreateHeaderProfileTarget(header);
     if (!target || target.dataset.profileNavBound === "true") return;
     target.dataset.profileNavBound = "true";
@@ -438,6 +439,23 @@ function bindHeaderProfileButtons(root = document) {
       }
     });
   });
+}
+
+function ensureHeaderRefreshButton(header) {
+  if (!header || header.querySelector("[data-header-refresh]")) return;
+  const profileTarget = findOrCreateHeaderProfileTarget(header);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.dataset.headerRefresh = "true";
+  button.setAttribute("aria-label", "Refresh page");
+  button.className = "w-8 h-8 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform border border-primary-container/60 shrink-0";
+  button.innerHTML = '<span class="material-symbols-outlined text-[19px]">refresh</span>';
+  button.addEventListener("click", () => window.location.reload());
+  if (profileTarget?.parentElement === header) {
+    header.insertBefore(button, profileTarget);
+  } else {
+    header.appendChild(button);
+  }
 }
 
 function hoistBottomNavigation() {
@@ -493,7 +511,7 @@ function setupOfflineIndicator() {
   if (window.__littleNestOfflineBound) return;
   window.__littleNestOfflineBound = true;
   const isNativeCapacitor = Boolean(window.LittleNestCompat?.isNativeCapacitor?.());
-  let nativeOfflineEventSeen = false;
+  if (isNativeCapacitor) return;
 
   const bar = document.createElement("div");
   bar.id = "littleNestOfflineBar";
@@ -522,9 +540,7 @@ function setupOfflineIndicator() {
   document.body.appendChild(bar);
 
   const apply = (event) => {
-    if (isNativeCapacitor && event?.type === "offline") nativeOfflineEventSeen = true;
-    if (isNativeCapacitor && event?.type === "online") nativeOfflineEventSeen = false;
-    const shouldShow = isNativeCapacitor ? nativeOfflineEventSeen : !navigator.onLine;
+    const shouldShow = !navigator.onLine;
     bar.style.transform = shouldShow ? "translate(-50%,0)" : "translate(-50%,-160%)";
   };
   window.addEventListener("online", apply);
@@ -622,7 +638,6 @@ function renderHeaderProfileAvatar(target, image) {
 
 function setupPullToRefresh() {
   if (window.__littleNestPullToRefreshBound) return;
-  if (window.LittleNestCompat?.isNativeCapacitor?.()) return;
   if (!("ontouchstart" in window)) return;
 
   window.__littleNestPullToRefreshBound = true;

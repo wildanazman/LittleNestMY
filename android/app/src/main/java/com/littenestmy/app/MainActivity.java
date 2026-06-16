@@ -1,4 +1,4 @@
-package com.littlenest.app;
+package com.littenestmy.app;
 
 import com.getcapacitor.BridgeActivity;
 

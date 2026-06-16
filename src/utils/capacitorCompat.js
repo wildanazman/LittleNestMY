@@ -33,6 +33,9 @@
 
   if (isNativeCapacitor()) {
     document.documentElement.classList.add("ln-capacitor-native");
+    window.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("littleNestOfflineBar")?.remove();
+    });
   }
 
   if (isNativeCapacitor() && navigator.serviceWorker?.register) {
