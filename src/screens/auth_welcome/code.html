@@ -47,39 +47,37 @@ tailwind.config = {
 };
 </script>
 <style>
-body { min-height: 100dvh; }
+html, body { height: 100%; overflow: hidden; }
 .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.12); }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-surface text-on-surface font-body min-h-screen">
-<main class="min-h-screen px-6 py-8 flex flex-col justify-between max-w-md mx-auto">
-<section class="pt-8 space-y-8">
-<div class="flex items-center justify-between">
-<div class="w-12 h-12 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center soft-shadow">
+<body class="bg-surface text-on-surface font-body">
+<main class="h-[100dvh] overflow-hidden max-w-md mx-auto flex flex-col px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+<div class="flex items-center justify-between shrink-0 mb-3">
+<div class="w-11 h-11 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center soft-shadow">
 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">crib</span>
 </div>
 <span class="text-sm font-bold text-primary">LittleNest MY</span>
 </div>
-<div class="rounded-[32px] bg-surface-container-lowest soft-shadow p-6 border border-white/70">
-<div class="aspect-[4/3] rounded-[28px] bg-gradient-to-br from-primary-container via-surface-container-low to-tertiary-container flex items-center justify-center mb-7">
-<div class="w-28 h-28 rounded-full bg-white/70 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary text-[64px]" style="font-variation-settings:'FILL' 1;">family_restroom</span>
+<div class="rounded-[32px] bg-surface-container-lowest soft-shadow p-5 border border-white/70 flex-1 min-h-0 flex flex-col">
+<div class="flex-1 min-h-0 rounded-[28px] bg-gradient-to-br from-primary-container via-surface-container-low to-tertiary-container flex items-center justify-center mb-4">
+<div class="w-[clamp(72px,22vw,112px)] aspect-square rounded-full bg-white/70 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[clamp(40px,12vw,64px)]" style="font-variation-settings:'FILL' 1;">family_restroom</span>
 </div>
 </div>
-<div class="space-y-3">
-<h1 class="text-[36px] leading-[40px] font-extrabold text-primary">LittleNest MY</h1>
-<p class="text-xl leading-7 font-bold text-on-surface">Track the little things. Remember the big moments.</p>
-<p class="text-base leading-6 text-on-surface-variant">A calm parenting companion for your baby's routines, milestones, and memories.</p>
+<div class="space-y-2 shrink-0">
+<h1 class="text-[clamp(26px,7vw,34px)] leading-tight font-extrabold text-primary">LittleNest MY</h1>
+<p class="text-[clamp(16px,4.4vw,20px)] leading-snug font-bold text-on-surface">Track the little things. Remember the big moments.</p>
+<p class="text-sm leading-5 text-on-surface-variant">A calm parenting companion for your baby's routines, milestones, and memories.</p>
 </div>
 </div>
-</section>
-<section class="space-y-3 pb-4">
-<button class="w-full h-14 rounded-full bg-primary text-on-primary font-bold text-base active:scale-[0.98] transition-transform soft-shadow" data-screen-target="login" type="button">Log In</button>
-<button class="w-full h-14 rounded-full bg-primary-container text-on-primary-container font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="signup" type="button">Create Account</button>
-<button class="w-full h-14 rounded-full bg-surface-container text-primary font-bold text-base active:scale-[0.98] transition-transform" id="guestButton" type="button">Continue as Guest</button>
-<p class="text-center text-xs leading-5 text-on-surface-variant px-8">Guest data is saved only on this device.</p>
-</section>
+<div class="space-y-2.5 pt-4 shrink-0">
+<button class="w-full h-13 min-h-[52px] rounded-full bg-primary text-on-primary font-bold text-base active:scale-[0.98] transition-transform soft-shadow" data-screen-target="login" type="button">Log In</button>
+<button class="w-full h-13 min-h-[52px] rounded-full bg-primary-container text-on-primary-container font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="signup" type="button">Create Account</button>
+<button class="w-full h-13 min-h-[52px] rounded-full bg-surface-container text-primary font-bold text-base active:scale-[0.98] transition-transform" id="guestButton" type="button">Continue as Guest</button>
+<p class="text-center text-xs leading-4 text-on-surface-variant">Guest data is saved only on this device.</p>
+</div>
 </main>
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";

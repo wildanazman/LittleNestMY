@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -12,525 +11,398 @@
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Insights</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "surface-container": "#efeee9",
-                        "surface-container-low": "#f5f3ee",
-                        "tertiary-fixed": "#caecc4",
-                        "inverse-primary": "#f7b89d",
-                        "surface-bright": "#fbf9f4",
-                        "surface-container-high": "#eae8e3",
-                        "on-primary": "#ffffff",
-                        "error": "#ba1a1a",
-                        "error-container": "#ffdad6",
-                        "secondary-fixed-dim": "#ccc5bc",
-                        "surface-tint": "#83533c",
-                        "inverse-surface": "#30312e",
-                        "on-secondary-container": "#67625a",
-                        "on-tertiary-fixed-variant": "#314d30",
-                        "on-error": "#ffffff",
-                        "surface": "#fbf9f4",
-                        "on-primary-fixed": "#331203",
-                        "surface-container-highest": "#e4e2de",
-                        "on-tertiary-container": "#415e3f",
-                        "on-surface-variant": "#51443e",
-                        "background": "#fbf9f4",
-                        "surface-dim": "#dbdad5",
-                        "primary-fixed-dim": "#f7b89d",
-                        "secondary-fixed": "#e9e1d8",
-                        "on-background": "#1b1c19",
-                        "on-secondary-fixed-variant": "#4a463f",
-                        "surface-container-lowest": "#ffffff",
-                        "tertiary-container": "#b5d6af",
-                        "primary-fixed": "#ffdbcc",
-                        "on-tertiary": "#ffffff",
-                        "on-primary-fixed-variant": "#673c27",
-                        "outline-variant": "#d6c2bb",
-                        "on-secondary": "#ffffff",
-                        "primary": "#83533c",
-                        "inverse-on-surface": "#f2f1ec",
-                        "on-error-container": "#93000a",
-                        "tertiary-fixed-dim": "#aecfa9",
-                        "on-tertiary-fixed": "#052108",
-                        "on-primary-container": "#7a4b36",
-                        "primary-container": "#ffbfa3",
-                        "outline": "#84746d",
-                        "secondary-container": "#e6dfd5",
-                        "surface-variant": "#e4e2de",
-                        "on-secondary-fixed": "#1e1b15",
-                        "secondary": "#625e56",
-                        "on-surface": "#1b1c19",
-                        "tertiary": "#486646"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "md": "24px",
-                        "base": "8px",
-                        "xl": "48px",
-                        "lg": "32px",
-                        "xs": "4px",
-                        "container-padding": "20px",
-                        "gutter": "16px",
-                        "sm": "12px"
-                    },
-                    "fontFamily": {
-                        "headline-lg": ["Nunito Sans"],
-                        "display-lg": ["Nunito Sans"],
-                        "headline-md": ["Nunito Sans"],
-                        "label-sm": ["Nunito Sans"],
-                        "body-lg": ["Nunito Sans"],
-                        "headline-lg-mobile": ["Nunito Sans"],
-                        "label-md": ["Nunito Sans"],
-                        "body-md": ["Nunito Sans"]
-                    },
-                    "fontSize": {
-                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
-                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
-                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
-                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
-                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-                        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
-                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
-                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
-                    }
-                },
-            },
-        }
-    </script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: {
+      colors: {
+        primary: "#83533c", "on-primary": "#ffffff", "primary-container": "#ffdcc8", "on-primary-container": "#321304",
+        surface: "#fbf9f4", "surface-container": "#efeee9", "surface-container-low": "#f5f3ee",
+        "surface-container-lowest": "#ffffff", "surface-container-high": "#eae8e3",
+        "on-surface": "#1b1c19", "on-surface-variant": "#51443e", tertiary: "#486646", error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    } }
+  };
+</script>
 <style>
-        body {
-            background-color: #FFFDF8;
-            color: #1b1c19;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .chat-bubble-shadow {
-            box-shadow: 0 4px 12px rgba(255, 191, 163, 0.1);
-        }
-        .suggestion-chip {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .suggestion-chip:active {
-            transform: scale(0.95);
-        }
-        .input-glow:focus-within {
-            box-shadow: 0 0 0 4px rgba(255, 191, 163, 0.3);
-        }
-        :root.dark .prompt-card .material-symbols-outlined {
-            background: rgba(255, 191, 163, 0.16) !important;
-            color: #FFBFA3 !important;
-            border: 1px solid rgba(255, 191, 163, 0.28);
-        }
-        :root.dark #addContextButton {
-            background: #2D2927;
-            color: #FFBFA3;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 9999px;
-        }
-        :root.dark #sendPreviewButton {
-            background: #FFBFA3 !important;
-            color: #1E1B1A !important;
-            border: 1px solid rgba(255, 255, 255, 0.16);
-        }
-        :root.dark #assistantInput {
-            background: transparent !important;
-            color: #FFF7ED !important;
-            -webkit-text-fill-color: #FFF7ED !important;
-        }
-        :root.dark #assistantInput::placeholder {
-            color: rgba(255, 247, 237, 0.56) !important;
-            -webkit-text-fill-color: rgba(255, 247, 237, 0.56) !important;
-        }
-        :root.dark .assistant-input-shell {
-            background: #121214 !important;
-            border-color: rgba(255, 255, 255, 0.12) !important;
-        }
-        :root.dark .assistant-local-summary {
-            background: #121214 !important;
-            color: #FFF7ED !important;
-            border-color: rgba(255, 255, 255, 0.10) !important;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #e4e2de;
-            border-radius: 10px;
-        }
-    </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
-  <script type="module" src="/src/utils/theme.mjs"></script>
+  body { font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 14px 38px rgba(124,92,255,0.10); }
+  .rise { animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+<style> body { min-height: 100dvh; } </style>
+<script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="font-body-md text-on-surface min-h-screen flex flex-col">
-<!-- TopAppBar -->
-<header class="docked full-width top-0 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14 fixed z-50">
-<div class="flex items-center gap-sm">
-<button aria-label="Open settings" class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" id="assistantBackButton" type="button">
+<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+<div class="flex items-center gap-2 min-w-0">
+<button aria-label="Back to home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="assistantBackButton" type="button">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Insights</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Insights</h1>
 </div>
-<div class="w-8 h-8 rounded-full overflow-hidden bg-secondary-container">
-<img alt="Baby Profile Avatar" class="w-full h-full object-cover" data-alt="A warm, soft-focus close-up portrait of a cheerful infant with sparkling eyes, bathed in gentle morning sunlight. The baby's expression is one of pure curiosity and joy, fitting the nurturing aesthetic of a premium parenting app. The background is a blurred, neutral-toned nursery that emphasizes a safe and loving home environment." src="/icons/placeholder.svg"/>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-secondary-container border-2 border-primary-container">
+<img alt="Baby" class="w-full h-full object-cover" id="insightsBabyPhoto" src="/icons/placeholder.svg"/>
 </div>
 </header>
-<!-- Chat Canvas -->
-<main class="flex-1 mt-14 pb-44 px-container-padding overflow-y-auto pt-lg space-y-lg" id="assistantCanvas">
-<section class="rounded-[24px] bg-primary-container/70 p-5 soft-shadow border border-white/60 dark:bg-[#1E1830] dark:border-white/10">
-  <p class="font-label-sm text-label-sm text-primary uppercase dark:text-[#B99AFF]">Local insights</p>
-  <h2 class="font-headline-md text-headline-md text-on-primary-container dark:!text-white" id="assistantBabyContext">Baby care insights</h2>
-  <p class="font-body-md text-body-md text-on-primary-container/80 dark:text-white/70">
-    Helpful patterns from saved LittleNest logs. No diagnosis, just gentle summaries for parents.
-  </p>
+
+<main class="max-w-md mx-auto px-container-padding pt-5 space-y-5 pb-40" id="insightsContent">
+<!-- Weekly summary (narrative) -->
+<section class="rounded-[26px] p-5 soft-shadow relative overflow-hidden rise" style="background:linear-gradient(155deg,#ece3ff,#ffe9f2 58%,#e3f3ff)">
+<div class="flex items-center gap-2 mb-2">
+<span class="w-8 h-8 rounded-full bg-white/70 text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">auto_awesome</span></span>
+<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-[#7056f4]/85">Weekly summary</p>
+</div>
+<h2 class="text-[clamp(20px,5.4vw,25px)] leading-tight font-extrabold text-[#241b3a]" id="summaryTitle">This week with your baby</h2>
+<p class="text-[15px] leading-relaxed text-[#3f3357] mt-2" id="summaryText">Reading this week's logs...</p>
 </section>
-<section class="space-y-sm" id="insightCards">
-<div class="grid grid-cols-1 gap-sm">
-<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
-<span class="material-symbols-outlined text-[#7056f4] bg-[#eee8ff] rounded-full p-2">bedtime</span>
-<div class="min-w-0 flex-1">
-<p class="font-headline-md text-body-md text-on-surface">Sleep trend</p>
-<p class="font-label-md text-label-md text-on-surface-variant" id="sleepInsightText">Loading sleep pattern...</p>
-</div>
-</article>
-<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
-<span class="material-symbols-outlined text-[#ff6f91] bg-[#ffe8ef] rounded-full p-2">restaurant</span>
-<div class="min-w-0 flex-1">
-<p class="font-headline-md text-body-md text-on-surface">Feeding trend</p>
-<p class="font-label-md text-label-md text-on-surface-variant" id="feedingInsightText">Loading feeding pattern...</p>
-</div>
-</article>
-<article class="rounded-[22px] bg-surface-container-lowest p-4 border border-white/60 chat-bubble-shadow flex items-center gap-3">
-<span class="material-symbols-outlined text-[#35b889] bg-[#e5fbf2] rounded-full p-2">baby_changing_station</span>
-<div class="min-w-0 flex-1">
-<p class="font-headline-md text-body-md text-on-surface">Diaper trend</p>
-<p class="font-label-md text-label-md text-on-surface-variant" id="diaperInsightText">Loading diaper pattern...</p>
-</div>
-</article>
-</div>
+
+<!-- Data confidence -->
+<section class="rise" style="animation-delay:.05s">
+<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-5" id="confidenceCard"></div>
 </section>
-<!-- Safety Note -->
-<section class="rounded-xl bg-surface-container-low px-4 py-3 border border-outline-variant/40">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-[20px] text-primary mt-0.5">health_and_safety</span>
-<p class="font-label-md text-label-md text-on-surface-variant">
-                    For medical concerns, please consult Klinik Kesihatan or your doctor.
-                </p>
+
+<!-- Weekly highlights -->
+<section class="rise" style="animation-delay:.1s">
+<div class="flex items-center justify-between mb-2 px-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Weekly highlights</h3>
+<button class="text-[#7056f4] flex items-center gap-1 font-label-md text-label-md active:scale-95 transition-transform" id="shareHighlights" type="button"><span class="material-symbols-outlined text-[18px]">ios_share</span>Share</button>
 </div>
+<div class="grid grid-cols-1 gap-2.5" id="highlightsCard"></div>
 </section>
-<!-- AI Message -->
-<div class="flex gap-sm">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+
+<!-- Trends -->
+<section class="space-y-4 rise" style="animation-delay:.15s">
+<h3 class="font-headline-md text-headline-md text-on-surface px-1">Trends &amp; patterns</h3>
+<div class="space-y-4" id="trendCards"></div>
+</section>
+
+<!-- Recommendations -->
+<section class="rise" style="animation-delay:.2s">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Recommended next steps</h3>
+<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-2" id="recsCard"></div>
+</section>
+
+<!-- Premium locked -->
+<section class="rise" style="animation-delay:.25s">
+<div class="rounded-[24px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#241b3a,#3a2d63)">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-[#f7b89d]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
+<h3 class="font-headline-md text-headline-md text-white">Coming to LittleNest Premium</h3>
 </div>
-<div class="max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container">
-<p class="font-body-md text-body-md text-on-surface">
-                    Hi Mama and Papa. Choose a prompt below to preview how LittleNest Assistant could help summarize routines, prepare checklists, or turn baby notes into calm, simple wording.
-                </p>
-</div>
-</div>
-<!-- Prompt Cards -->
-<section class="space-y-md">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Assistant prompts</h2>
-<p class="font-label-md text-label-md text-on-surface-variant">Local summaries only. AI is not configured yet.</p>
-</div>
-<div class="grid grid-cols-1 gap-sm">
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="restaurant" data-prompt="Summarize today's feeding">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">restaurant</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Summarize today's feeding</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Review today's feeds gently.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="bedtime" data-prompt="Summarize baby's sleep this week">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">bedtime</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Summarize baby's sleep this week</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">See nap totals, night sleep, and gentle patterns.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="nightlight" data-prompt="Create bedtime routine">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary bg-primary-fixed rounded-full p-2">nightlight</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Create bedtime routine</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Build a soft routine for tired evenings.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="checklist" data-prompt="Generate daycare checklist">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed rounded-full p-2">checklist</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Generate daycare checklist</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Prepare bottles, diapers, baju, and notes.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="clinical_notes" data-prompt="What should I ask the doctor?">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary bg-secondary-container rounded-full p-2">clinical_notes</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">What should I ask the doctor?</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Prepare questions from logs and notes.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="translate" data-prompt="Explain this milestone in simple Malay">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed rounded-full p-2">translate</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Explain this milestone in simple Malay</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Bilingual-friendly wording for family sharing.</p>
-</div>
-</div>
-</button>
-<button class="prompt-card text-left bg-surface-container-lowest rounded-xl p-4 border border-surface-container chat-bubble-shadow active:scale-[0.98] transition-transform" data-icon="article" data-prompt="Create weekly baby report">
-<div class="flex items-start gap-3">
-<span class="material-symbols-outlined text-primary bg-primary-container rounded-full p-2">article</span>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Create weekly baby report</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">A gentle summary to share with caregivers.</p>
-</div>
-</div>
-</button>
+<div class="grid grid-cols-1 gap-2" id="premiumCard"></div>
 </div>
 </section>
-<section class="space-y-sm" id="prototypeConversation" aria-live="polite"></section>
+
+<!-- Disclaimer footer -->
+<section class="rounded-2xl bg-surface-container-low/70 px-4 py-3 flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant/70">health_and_safety</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant/80">Gentle observations from your logs — not medical advice. For concerns, consult your doctor or Klinik Kesihatan.</p>
+</section>
 </main>
-<!-- Bottom Controls (Floating above Nav) -->
-<div class="fixed bottom-[88px] left-0 w-full px-container-padding pointer-events-none z-[70]">
-<div class="assistant-input-shell bg-surface-bright p-3 rounded-3xl shadow-lg border border-surface-container input-glow pointer-events-auto flex items-center gap-base">
-<button aria-label="Add context" class="w-10 h-10 flex items-center justify-center text-outline hover:text-primary transition-colors" id="addContextButton" type="button">
-<span class="material-symbols-outlined">add_circle</span>
-</button>
-<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant" id="assistantInput" placeholder="Choose a prompt or type a question..." type="text"/>
-<button aria-label="Preview assistant response" class="w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md active:scale-90 transition-transform" id="sendPreviewButton" type="button">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
-</button>
-</div>
-</div>
-<!-- BottomNavBar -->
+
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-surface-container-highest rounded-t-xl shadow-lg">
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined" data-icon="home">home</span>
-<span class="font-label-sm text-label-sm-mobile">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
-<span class="font-label-sm text-label-sm-mobile">Log</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
-<span class="font-label-sm text-label-sm-mobile">Calendar</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
-<span class="font-label-sm text-label-sm-mobile">Milestones</span>
-</a>
-<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
-<span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-<span class="font-label-sm text-label-sm-mobile">Insights</span>
-</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" href="#"><span class="material-symbols-outlined" data-icon="home">home</span><span class="font-label-sm text-label-sm-mobile">Home</span></a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" href="#"><span class="material-symbols-outlined" data-icon="add_circle">add_circle</span><span class="font-label-sm text-label-sm-mobile">Log</span></a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" href="#"><span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span><span class="font-label-sm text-label-sm-mobile">Calendar</span></a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" href="#"><span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span><span class="font-label-sm text-label-sm-mobile">Milestones</span></a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" href="#"><span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings:'FILL' 1;">smart_toy</span><span class="font-label-sm text-label-sm-mobile">Insights</span></a>
 </nav>
+
 <script type="module">
-        const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const { babyProfile, feedingLogs, sleepLogs, diaperLogs, calendarEvents, milestones } = await import(`${moduleBase}data/mockData.mjs`);
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const {
-            getLogsForBaby,
-            getPersistedCalendarEvents,
-            getPersistedDiaperLogs,
-            getPersistedFeedingLogs,
-            getPersistedMilestones,
-            getPersistedSleepLogs,
-            getSelectedBabyId,
-            getSelectedBabyProfile
-        } = await import(`${moduleBase}utils/localState.mjs`);
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const {
+    getLogsForBaby, getPersistedDiaperLogs, getPersistedFeedingLogs, getPersistedSleepLogs,
+    getSelectedBabyId, getSelectedBabyProfile
+  } = await import(`${moduleBase}utils/localState.mjs`);
 
-        const assistantInput = document.getElementById("assistantInput");
-        const sendPreviewButton = document.getElementById("sendPreviewButton");
-        const prototypeConversation = document.getElementById("prototypeConversation");
-        const assistantCanvas = document.getElementById("assistantCanvas");
-        const addContextButton = document.getElementById("addContextButton");
-        const assistantBackButton = document.getElementById("assistantBackButton");
-        const selectedBabyId = getSelectedBabyId(babyProfile);
-        const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
-        document.getElementById("assistantBabyContext").textContent = `${selectedBaby.name}'s care insights`;
-        renderInsightCards();
-        updateSendButtonState();
+  document.getElementById("assistantBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
 
-        document.querySelectorAll(".prompt-card").forEach(card => {
-            card.addEventListener("click", () => {
-                assistantInput.value = card.dataset.prompt;
-                updateSendButtonState();
-                assistantInput.focus();
-            });
-        });
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  const selectedBabyId = babyState.selectedBabyId || getSelectedBabyId(babyProfile);
+  const selectedBaby = babyState.selectedBaby || getSelectedBabyProfile(babyProfile) || babyProfile;
+  const firstName = (selectedBaby?.name || "Baby").split(" ")[0];
+  if (selectedBaby?.photoUrl) document.getElementById("insightsBabyPhoto").src = selectedBaby.photoUrl;
 
-        sendPreviewButton.addEventListener("click", () => {
-            const prompt = assistantInput.value.trim();
-            if (!prompt) {
-                assistantInput.focus();
-                return;
-            }
-            renderPrototypeTurn(prompt, localAssistantReply(prompt));
-        });
+  // ---------- data (real, no mock) ----------
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const allFeeds = getLogsForBaby(getPersistedFeedingLogs([]), selectedBabyId);
+  const allSleeps = getLogsForBaby(getPersistedSleepLogs([]), selectedBabyId);
+  const allDiapers = getLogsForBaby(getPersistedDiaperLogs([]), selectedBabyId);
 
-        assistantInput.addEventListener("input", updateSendButtonState);
+  const dayStart = (back) => { const d = new Date(startOfToday); d.setDate(d.getDate() - back); return d; };
+  const between = (v, a, b) => { const t = new Date(v).getTime(); return t >= a.getTime() && t < b.getTime(); };
+  const tomorrow = new Date(startOfToday); tomorrow.setDate(tomorrow.getDate() + 1);
 
-        addContextButton.addEventListener("click", () => {
-            showComingSoon("Attach context", "Adding photos or files to the assistant is coming soon.");
-        });
+  // windows
+  const thisWeekStart = dayStart(6);          // last 7 days incl today
+  const lastWeekStart = dayStart(13), lastWeekEnd = dayStart(6);
+  const yStart = dayStart(1);                  // yesterday
 
-        assistantBackButton.addEventListener("click", () => {
-            goToScreen("settings");
-        });
+  const inThisWeek = (v) => between(v, thisWeekStart, tomorrow);
+  const inLastWeek = (v) => between(v, lastWeekStart, lastWeekEnd);
+  const isToday = (v) => between(v, startOfToday, tomorrow);
+  const isYesterday = (v) => between(v, yStart, startOfToday);
 
-        assistantInput.addEventListener("keydown", event => {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                if (!assistantInput.value.trim()) return;
-                sendPreviewButton.click();
-            }
-        });
+  const sleepMins = (s) => s.endedAt ? Math.max(0, Math.round((new Date(s.endedAt) - new Date(s.startedAt)) / 60000)) : 0;
 
-        function updateSendButtonState() {
-            const hasPrompt = Boolean(assistantInput.value.trim());
-            sendPreviewButton.disabled = !hasPrompt;
-            sendPreviewButton.classList.toggle("opacity-50", !hasPrompt);
-            sendPreviewButton.classList.toggle("cursor-not-allowed", !hasPrompt);
-        }
+  const feedsW = allFeeds.filter((l) => inThisWeek(l.startedAt));
+  const sleepsW = allSleeps.filter((l) => inThisWeek(l.startedAt));
+  const diapersW = allDiapers.filter((l) => inThisWeek(l.changedAt));
+  const feedsL = allFeeds.filter((l) => inLastWeek(l.startedAt));
+  const sleepsL = allSleeps.filter((l) => inLastWeek(l.startedAt));
+  const diapersL = allDiapers.filter((l) => inLastWeek(l.changedAt));
 
-        function renderPrototypeTurn(prompt, reply) {
-            prototypeConversation.innerHTML = `
-                <div class="flex flex-row-reverse gap-sm">
-                    <div class="max-w-[85%] bg-primary text-on-primary p-4 rounded-2xl rounded-tr-none shadow-sm">
-                        <p class="font-body-md text-body-md">${escapeHtml(prompt)}</p>
-                    </div>
-                </div>
-                <div class="flex gap-sm">
-                    <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
-                        <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-                    </div>
-                    <div class="assistant-local-summary max-w-[85%] bg-surface-container-lowest p-4 rounded-2xl rounded-tl-none chat-bubble-shadow border border-surface-container space-y-2">
-                        <p class="font-label-sm text-label-sm text-primary uppercase">Local summary</p>
-                        <p class="font-body-md text-body-md text-on-surface">${escapeHtml(reply)}</p>
-                        <p class="font-label-md text-label-md text-on-surface-variant">AI is not configured yet. This answer is generated from local logs on this device.</p>
-                        <p class="font-label-md text-label-md text-on-surface-variant">For medical concerns, please consult a doctor.</p>
-                    </div>
-                </div>
-            `;
-            requestAnimationFrame(() => {
-                assistantCanvas.scrollTop = assistantCanvas.scrollHeight;
-            });
-        }
+  const sleepMinW = sleepsW.reduce((t, s) => t + sleepMins(s), 0);
+  const sleepMinL = sleepsL.reduce((t, s) => t + sleepMins(s), 0);
+  const totalLogs = feedsW.length + sleepsW.length + diapersW.length;
 
-        function localAssistantReply(prompt) {
-            const lower = prompt.toLowerCase();
-            const weekStart = new Date();
-            weekStart.setDate(weekStart.getDate() - 7);
-            const feeds = getLogsForBaby(getPersistedFeedingLogs(feedingLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
-            const sleeps = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
-            const diapers = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId).filter(log => new Date(log.changedAt) >= weekStart);
-            const events = getLogsForBaby(getPersistedCalendarEvents(calendarEvents), selectedBabyId).filter(event => new Date(event.startsAt) >= new Date());
-            const memories = getLogsForBaby(getPersistedMilestones(milestones), selectedBabyId).filter(milestone => new Date(milestone.achievedAt) >= weekStart);
-            const sleepMinutes = sleeps.reduce((total, log) => total + (log.endedAt ? Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)) : 0), 0);
+  // per-day buckets (oldest -> today)
+  const days = []; for (let i = 6; i >= 0; i -= 1) days.push(dayStart(i));
+  const dKey = (d) => `${new Date(d).getFullYear()}-${new Date(d).getMonth()}-${new Date(d).getDate()}`;
+  const countByDay = (logs, field) => { const m = new Map(days.map((d) => [dKey(d), 0])); logs.forEach((l) => { const k = dKey(l[field]); if (m.has(k)) m.set(k, m.get(k) + 1); }); return days.map((d) => m.get(dKey(d))); };
+  const sleepHoursByDay = () => { const m = new Map(days.map((d) => [dKey(d), 0])); sleepsW.forEach((s) => { const k = dKey(s.startedAt); if (m.has(k)) m.set(k, m.get(k) + sleepMins(s) / 60); }); return days.map((d) => Math.round(m.get(dKey(d)) * 10) / 10); };
 
-            if (lower.includes("sleep")) {
-                return sleeps.length
-                    ? `Sleep was logged ${sleeps.length} time(s) this week, about ${formatDuration(sleepMinutes)} total. If sleep felt more interrupted, you may want to review nap timing gently.`
-                    : "No sleep logs yet this week. Add what you remember; rough tracking is okay.";
-            }
-            if (lower.includes("feeding") || lower.includes("feed")) {
-                return feeds.length
-                    ? `Feeding was logged ${feeds.length} time(s) this week. Recent entries can help you notice rhythm without needing perfect tracking.`
-                    : "No feeding logs yet this week. Start with the next feed; you do not need to backfill everything.";
-            }
-            if (lower.includes("diaper")) {
-                return diapers.length
-                    ? `Diapers were logged ${diapers.length} time(s) this week. Keep noting changes when useful, especially before clinic visits.`
-                    : "No diaper logs yet this week. Add the next change when you can.";
-            }
-            if (lower.includes("daycare")) {
-                return "Daycare checklist: bottles or milk, diapers, wipes, extra baju, bib, comfort item, daycare payment/reminder, and one calm note for Cikgu.";
-            }
-            if (lower.includes("bedtime")) {
-                return "Bedtime routine template: dim lights, clean diaper, quiet feed, short cuddle or doa, same sleep phrase, then settle baby calmly.";
-            }
-            if (lower.includes("doctor")) {
-                return `Doctor checklist: ask about feeding, sleep, growth, vaccines, and any recent health notes. Upcoming reminders: ${events.length || "none yet"}.`;
-            }
-            if (lower.includes("milestone") || lower.includes("malay")) {
-                return memories.length
-                    ? `Ringkasan mudah: Bayi menunjukkan perkembangan baru. Simpan tarikh, nota ringkas, dan gambar jika ada.`
-                    : "Belum ada milestone minggu ini. Memori pertama akan muncul di sini bila anda simpan nanti.";
-            }
-            if (lower.includes("weekly") || lower.includes("report")) {
-                return `Weekly local report: ${feeds.length} feeding log(s), ${sleeps.length} sleep log(s), ${diapers.length} diaper log(s), ${memories.length} milestone(s), and ${events.length} upcoming event(s).`;
-            }
-            return "AI is not configured yet. I can still create a local summary from saved sleep, feeding, diaper, milestone, and calendar data on this device.";
-        }
+  const fmtDur = (mins) => { const h = Math.floor(mins / 60), m = Math.round(mins % 60); return h ? `${h}h ${m}m` : `${m}m`; };
+  const weekday = (d) => new Date(d).toLocaleDateString("en-MY", { weekday: "long" });
+  const pct = (cur, prev) => prev > 0 ? Math.round(((cur - prev) / prev) * 100) : (cur > 0 ? 100 : 0);
 
-        function renderInsightCards() {
-            const weekStart = new Date();
-            weekStart.setDate(weekStart.getDate() - 7);
-            const feeds = getLogsForBaby(getPersistedFeedingLogs(feedingLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
-            const sleeps = getLogsForBaby(getPersistedSleepLogs(sleepLogs), selectedBabyId).filter(log => new Date(log.startedAt) >= weekStart);
-            const diapers = getLogsForBaby(getPersistedDiaperLogs(diaperLogs), selectedBabyId).filter(log => new Date(log.changedAt) >= weekStart);
-            const sleepMinutes = sleeps.reduce((total, log) => total + (log.endedAt ? Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)) : 0), 0);
-            document.getElementById("sleepInsightText").textContent = sleeps.length
-                ? `${sleeps.length} sleep log(s), ${formatDuration(sleepMinutes)} total this week.`
-                : "No sleep logs this week yet. Rough tracking is okay.";
-            document.getElementById("feedingInsightText").textContent = feeds.length
-                ? `${feeds.length} feeding log(s) saved this week.`
-                : "No feeding logs this week yet.";
-            document.getElementById("diaperInsightText").textContent = diapers.length
-                ? `${diapers.length} diaper change(s) saved this week.`
-                : "No diaper logs this week yet.";
-        }
+  function changeChip(curr, prev, { goodUp = true, period = "last week" } = {}) {
+    if (prev === 0 && curr === 0) return `<span class="font-label-sm text-label-sm text-on-surface-variant/70">No data ${period === "yesterday" ? "yesterday" : "last week"}</span>`;
+    const p = pct(curr, prev);
+    if (p === 0) return `<span class="font-label-sm text-label-sm text-on-surface-variant/80">Steady vs ${period}</span>`;
+    const up = p > 0; const good = up === goodUp;
+    const color = good ? "#15803D" : "#b45309";
+    return `<span class="inline-flex items-center gap-0.5 font-label-md text-label-md" style="color:${color}"><span class="material-symbols-outlined text-[16px]">${up ? "trending_up" : "trending_down"}</span>${Math.abs(p)}% ${up ? "more" : "less"} vs ${period}</span>`;
+  }
 
-        function formatDuration(minutes) {
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return hours ? `${hours}h ${mins}m` : `${mins}m`;
-        }
+  // ---------- sparkline ----------
+  let sid = 0;
+  function sparkline(values, stroke) {
+    const w = 300, h = 56, pad = 6, id = `sp${sid++}`;
+    const max = Math.max(1, ...values);
+    const xs = (i) => pad + (values.length === 1 ? (w - 2 * pad) / 2 : i * (w - 2 * pad) / (values.length - 1));
+    const ys = (v) => h - pad - (v / max) * (h - 2 * pad);
+    const pts = values.map((v, i) => [xs(i), ys(v)]);
+    const line = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ");
+    const area = `${line} L${pts[pts.length - 1][0].toFixed(1)} ${h} L${pts[0][0].toFixed(1)} ${h} Z`;
+    return `<svg viewBox="0 0 ${w} ${h}" class="w-full h-[56px]" preserveAspectRatio="none"><defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${stroke}" stop-opacity="0.26"/><stop offset="1" stop-color="${stroke}" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#${id})"/><path d="${line}" fill="none" stroke="${stroke}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${pts.map((p) => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="#fff" stroke="${stroke}" stroke-width="2"/>`).join("")}</svg>`;
+  }
 
-        function escapeHtml(value) {
-            return String(value)
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
-        }
-    </script>
+  // takeaway sentence from values (first half vs second half)
+  function takeaway(values, noun) {
+    const active = values.filter((v) => v > 0).length;
+    if (active < 2) return `Log a couple more days to read ${noun} patterns.`;
+    const half = Math.floor(values.length / 2);
+    const a = values.slice(0, half).reduce((s, v) => s + v, 0) / Math.max(1, half);
+    const b = values.slice(half).reduce((s, v) => s + v, 0) / Math.max(1, values.length - half);
+    const mean = values.reduce((s, v) => s + v, 0) / values.length;
+    const variance = values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length;
+    if (Math.sqrt(variance) < mean * 0.2) return `${cap(noun)} has stayed remarkably consistent all week.`;
+    if (b > a * 1.12) return `${cap(noun)} has gradually increased since the start of the week.`;
+    if (b < a * 0.88) return `${cap(noun)} eased off toward the end of the week.`;
+    return `${cap(noun)} moved up and down day to day, which is normal.`;
+  }
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  // best day per metric
+  function bestDay(logs, field) {
+    if (!logs.length) return null;
+    const m = new Map(); logs.forEach((l) => { const k = dKey(l[field]); m.set(k, (m.get(k) || 0) + 1); });
+    let bk = null, bv = -1; for (const [k, v] of m) if (v > bv) { bv = v; bk = k; }
+    const d = days.find((x) => dKey(x) === bk); return d ? weekday(d) : null;
+  }
+  function bestSleepDay() {
+    if (!sleepsW.length) return null;
+    const m = new Map(); sleepsW.forEach((s) => { const k = dKey(s.startedAt); m.set(k, (m.get(k) || 0) + sleepMins(s)); });
+    let bk = null, bv = -1; for (const [k, v] of m) if (v > bv) { bv = v; bk = k; }
+    const d = days.find((x) => dKey(x) === bk); return d ? { day: weekday(d), mins: bv } : null;
+  }
+
+  // ---------- render: weekly summary narrative ----------
+  function renderSummary() {
+    const parts = [];
+    if (!totalLogs) {
+      document.getElementById("summaryTitle").textContent = `${firstName}'s week is just beginning`;
+      document.getElementById("summaryText").textContent = `Log a few feeds, sleeps, and diapers and LittleNest will start spotting ${firstName}'s gentle routines and patterns for you here.`;
+      return;
+    }
+    document.getElementById("summaryTitle").textContent = `How ${firstName}'s week went`;
+    // feeding
+    if (feedsW.length) {
+      const fp = pct(feedsW.length, feedsL.length);
+      if (feedsL.length && Math.abs(fp) < 12) parts.push(`${firstName}'s feeding stayed consistent with last week`);
+      else if (feedsL.length) parts.push(`feeding was ${fp > 0 ? "more frequent" : "a little lighter"} than last week`);
+      else parts.push(`${firstName} was fed ${feedsW.length} times this week`);
+    }
+    // sleep
+    if (sleepMinW > 0) {
+      const sp = pct(sleepMinW, sleepMinL);
+      if (sleepMinL && Math.abs(sp) >= 8) parts.push(`sleep ${sp > 0 ? "increased" : "dipped"} about ${Math.abs(sp)}% versus last week`);
+      else parts.push(`total sleep held around ${fmtDur(Math.round(sleepMinW / 7))} a day`);
+    }
+    // afternoon-nap correlation (only if supported)
+    const dur = (b) => { const arr = sleepsW.filter((s) => s.endedAt).filter((s) => { const hr = new Date(s.startedAt).getHours(); return b === "pm" ? hr >= 12 && hr < 18 : hr < 12; }).map(sleepMins); return arr.length ? { n: arr.length, avg: arr.reduce((x, y) => x + y, 0) / arr.length } : null; };
+    const pm = dur("pm"), am = dur("am");
+    if (pm && am && pm.n >= 2 && pm.avg >= am.avg * 1.15) parts.push(`afternoon naps tended to run longer than morning ones`);
+
+    const text = parts.length
+      ? `Based on this week's logs, ${parts.join(", and ")}.`
+      : `${firstName}'s logs are building up — a few more days will sharpen these observations.`;
+    document.getElementById("summaryText").textContent = text;
+  }
+
+  // ---------- data confidence ----------
+  function renderConfidence() {
+    const daysLogged = new Set([...feedsW.map((l) => dKey(l.startedAt)), ...sleepsW.map((l) => dKey(l.startedAt)), ...diapersW.map((l) => dKey(l.changedAt))]).size;
+    let confidence = "Building", cColor = "#b45309", level = 1;
+    if (totalLogs >= 14 && daysLogged >= 5) { confidence = "High"; cColor = "#15803D"; level = 3; }
+    else if (totalLogs >= 6 && daysLogged >= 3) { confidence = "Medium"; cColor = "#7056f4"; level = 2; }
+    const consistency = daysLogged >= 6 ? "Excellent" : daysLogged >= 4 ? "Good" : "Getting started";
+    const dots = (n) => Array.from({ length: 3 }, (_, i) => `<span class="w-2.5 h-2.5 rounded-full" style="background:${i < n ? cColor : "#00000014"}"></span>`).join("");
+    document.getElementById("confidenceCard").innerHTML = `
+      <div class="flex items-center justify-between gap-3">
+        <div><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Data confidence</p><p class="font-headline-lg text-[22px] font-extrabold" style="color:${cColor}">${confidence}</p></div>
+        <div class="flex items-center gap-1">${dots(level)}</div>
+      </div>
+      <div class="h-px bg-surface-container my-3"></div>
+      <div class="flex items-center justify-between gap-3">
+        <div><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Tracking consistency</p><p class="font-headline-md text-headline-md text-on-surface">${consistency}</p></div>
+        <p class="font-label-md text-label-md text-on-surface-variant">${daysLogged}/7 days</p>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant mt-3">${confidence === "High" ? `Enough data to trust ${firstName}'s weekly patterns.` : `Log on ${Math.max(0, 5 - daysLogged)} more day${5 - daysLogged === 1 ? "" : "s"} to reach high confidence.`}</p>`;
+  }
+
+  // ---------- highlights ----------
+  function renderHighlights() {
+    const items = [];
+    const bs = bestSleepDay();
+    if (bs) items.push({ emoji: "🌙", bg: "#eee8ff", label: "Best sleep day", val: `${bs.day} · ${fmtDur(bs.mins)}` });
+    const fd = bestDay(feedsW, "startedAt");
+    if (fd) items.push({ emoji: "🍼", bg: "#ffe3ec", label: "Most feeding activity", val: fd });
+    const longest = sleepsW.reduce((mx, s) => Math.max(mx, sleepMins(s)), 0);
+    if (longest > 0) { const ls = sleepsW.filter((s) => s.endedAt).sort((a, b) => sleepMins(b) - sleepMins(a))[0]; items.push({ emoji: "🏆", bg: "#fff3da", label: "Longest single sleep", val: `${fmtDur(longest)} · ${weekday(ls.startedAt)}` }); }
+
+    const card = document.getElementById("highlightsCard");
+    if (!items.length) {
+      document.getElementById("shareHighlights").classList.add("hidden");
+      card.innerHTML = `<div class="rounded-[20px] bg-surface-container-low p-5 text-center"><p class="text-3xl mb-2">✨</p><p class="font-body-md text-body-md text-on-surface-variant">Your weekly highlights — best sleep day, busiest feeding day — appear here once a few days are logged.</p></div>`;
+      return;
+    }
+    card.innerHTML = items.map((it) => `<div class="flex items-center gap-3 rounded-[20px] p-3.5" style="background:${it.bg}">
+      <span class="text-2xl shrink-0">${it.emoji}</span>
+      <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide" style="color:#6b5e72">${it.label}</p><p class="font-headline-md text-body-lg font-extrabold truncate" style="color:#241b3a">${it.val}</p></div>
+    </div>`).join("");
+    window.__highlights = items;
+  }
+
+  document.getElementById("shareHighlights").addEventListener("click", async () => {
+    const lines = (window.__highlights || []).map((it) => `${it.emoji} ${it.label}: ${it.val}`);
+    const text = `${firstName}'s week on LittleNest 💜\n${lines.join("\n")}`;
+    try { if (navigator.share) { await navigator.share({ title: "LittleNest weekly highlights", text }); return; } } catch { return; }
+    try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
+  });
+
+  // ---------- trends ----------
+  const TREND_MIN = 3;
+  function trendCard({ label, icon, chipBg, chipFg, stroke, currW, prevW, currT, prevT, summaryUnit, values, noun, goodUp }) {
+    const unlocked = currW >= TREND_MIN;
+    if (!unlocked) {
+      const remaining = TREND_MIN - currW; const p = Math.round((currW / TREND_MIN) * 100);
+      return `<article class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4">
+        <div class="flex items-center gap-2.5 mb-3"><span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:${chipBg};color:${chipFg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${icon}</span></span><div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">${label}</p><p class="font-label-sm text-label-sm text-on-surface-variant">Pattern detection locked</p></div><span class="material-symbols-outlined text-[18px] text-on-surface-variant/40">lock</span></div>
+        <div class="h-2 rounded-full bg-surface-container overflow-hidden"><div class="h-full rounded-full" style="width:${p}%;background:${stroke}"></div></div>
+        <p class="font-label-md text-label-md text-on-surface-variant mt-2.5">Track <span class="font-bold" style="color:${stroke}">${remaining} more ${noun}${remaining === 1 ? "" : "s"}</span> to unlock ${noun} pattern detection.</p>
+      </article>`;
+    }
+    return `<article class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4">
+      <div class="flex items-center justify-between gap-3 mb-2">
+        <div class="flex items-center gap-2.5 min-w-0"><span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:${chipBg};color:${chipFg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${icon}</span></span><div class="min-w-0"><p class="font-headline-md text-body-md text-on-surface">${label}</p><p class="font-label-sm text-label-sm text-on-surface-variant">${summaryUnit}</p></div></div>
+        <div class="text-right">${changeChip(currW, prevW, { goodUp })}</div>
+      </div>
+      ${sparkline(values, stroke)}
+      <p class="font-body-md text-body-md text-on-surface mt-2 leading-snug">${takeaway(values, noun)}</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">${changeChipText(currT, prevT, "yesterday", goodUp)}</p>
+    </article>`;
+  }
+  function changeChipText(curr, prev, period, goodUp) {
+    if (prev === 0 && curr === 0) return `No ${period} data to compare.`;
+    const p = pct(curr, prev);
+    if (p === 0) return `Same as ${period}.`;
+    return `${p > 0 ? "↑" : "↓"} ${Math.abs(p)}% ${p > 0 ? "more" : "fewer"} than ${period}.`;
+  }
+
+  function renderTrends() {
+    const sleepTodayMin = sleepsW.filter((s) => isToday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0);
+    const sleepYestMin = allSleeps.filter((s) => isYesterday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0);
+    const feedsToday = feedsW.filter((l) => isToday(l.startedAt)).length;
+    const feedsYest = allFeeds.filter((l) => isYesterday(l.startedAt)).length;
+    const diapToday = diapersW.filter((l) => isToday(l.changedAt)).length;
+    const diapYest = allDiapers.filter((l) => isYesterday(l.changedAt)).length;
+
+    document.getElementById("trendCards").innerHTML = [
+      trendCard({ label: "Sleep", icon: "bedtime", chipBg: "#eee8ff", chipFg: "#7056f4", stroke: "#7056f4", noun: "sleep session", goodUp: true,
+        currW: sleepsW.length, prevW: sleepsL.length, currT: sleepTodayMin, prevT: sleepYestMin,
+        summaryUnit: `${fmtDur(sleepMinW)} total this week`, values: sleepHoursByDay() }),
+      trendCard({ label: "Feeding", icon: "restaurant", chipBg: "#ffe3ec", chipFg: "#d6336c", stroke: "#d6336c", noun: "feed", goodUp: true,
+        currW: feedsW.length, prevW: feedsL.length, currT: feedsToday, prevT: feedsYest,
+        summaryUnit: `${feedsW.length} feeds this week`, values: countByDay(feedsW, "startedAt") }),
+      trendCard({ label: "Diapers", icon: "baby_changing_station", chipBg: "#e5fbf2", chipFg: "#15803D", stroke: "#15803D", noun: "diaper change", goodUp: true,
+        currW: diapersW.length, prevW: diapersL.length, currT: diapToday, prevT: diapYest,
+        summaryUnit: `${diapersW.length} changes this week`, values: countByDay(diapersW, "changedAt") })
+    ].join("");
+  }
+
+  // ---------- recommendations ----------
+  function renderRecs() {
+    const recs = [];
+    const diaperDaysMissing = days.filter((d) => !diapersW.some((l) => dKey(l.changedAt) === dKey(d))).length;
+    const sleepDaysMissing = days.filter((d) => !sleepsW.some((l) => dKey(l.startedAt) === dKey(d))).length;
+
+    if (sleepsW.length < TREND_MIN) recs.push({ icon: "bedtime", c: "#7056f4", t: `Track ${TREND_MIN - sleepsW.length} more sleep session${TREND_MIN - sleepsW.length === 1 ? "" : "s"} to unlock bedtime pattern detection.` });
+    if (diaperDaysMissing >= 2) recs.push({ icon: "baby_changing_station", c: "#15803D", t: `Diaper logs are missing for ${diaperDaysMissing} day${diaperDaysMissing === 1 ? "" : "s"} — quick to add next time you change one.` });
+    if (sleepsW.length >= TREND_MIN && sleepDaysMissing <= 1) recs.push({ icon: "schedule", c: "#7056f4", t: `Keep logging naps right after they happen — it keeps ${firstName}'s sleep insights accurate.` });
+    if (feedsW.length && feedsL.length && Math.abs(pct(feedsW.length, feedsL.length)) >= 25) recs.push({ icon: "restaurant", c: "#d6336c", t: `Feeding changed noticeably vs last week — worth a gentle note for your next clinic visit.` });
+    if (!totalLogs) recs.push({ icon: "edit_note", c: "#7056f4", t: `Start with your next feed or nap — you don't need to backfill everything.` });
+    if (recs.length < 2) recs.push({ icon: "favorite", c: "#d6336c", t: `Great consistency this week — small daily logs build the clearest picture.` });
+
+    document.getElementById("recsCard").innerHTML = recs.slice(0, 4).map((r, i) => `<div class="flex items-start gap-3 p-3 ${i ? "border-t border-surface-container" : ""}">
+      <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background:${r.c}1f;color:${r.c}"><span class="material-symbols-outlined text-[18px]">${r.icon}</span></span>
+      <p class="font-body-md text-body-md text-on-surface leading-snug">${r.t}</p>
+    </div>`).join("");
+  }
+
+  // ---------- premium locked ----------
+  function renderPremium() {
+    const feats = [
+      { icon: "nightlight", t: "Sleep predictions", d: "Forecast the next nap window" },
+      { icon: "schedule", t: "Routine analysis", d: "Spot your baby's natural rhythm" },
+      { icon: "summarize", t: "Weekly AI reports", d: "A written recap every Sunday" },
+      { icon: "monitoring", t: "Growth correlations", d: "Link feeding & sleep to growth" }
+    ];
+    document.getElementById("premiumCard").innerHTML = feats.map((f) => `<div class="flex items-center gap-3 rounded-2xl bg-white/[0.06] px-3.5 py-3">
+      <span class="w-9 h-9 rounded-full bg-white/10 text-[#f7b89d] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">${f.icon}</span></span>
+      <div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-white">${f.t}</p><p class="font-label-sm text-label-sm text-white/55">${f.d}</p></div>
+      <span class="material-symbols-outlined text-[18px] text-white/40">lock</span>
+    </div>`).join("");
+  }
+
+  renderSummary();
+  renderConfidence();
+  renderHighlights();
+  renderTrends();
+  renderRecs();
+  renderPremium();
+</script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {

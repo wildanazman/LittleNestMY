@@ -448,11 +448,29 @@ function ensureHeaderRefreshButton(header) {
   button.type = "button";
   button.dataset.headerRefresh = "true";
   button.setAttribute("aria-label", "Refresh page");
-  button.className = "w-8 h-8 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform border border-primary-container/60 shrink-0";
-  button.innerHTML = '<span class="material-symbols-outlined text-[19px]">refresh</span>';
-  button.addEventListener("click", () => window.location.reload());
+  // Soft, ghosted refresh that blends into the airy header — secondary to the
+  // profile button. Spins on tap for feedback, then reloads.
+  button.className = "w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-primary hover:bg-black/[0.04] dark:hover:bg-white/10 active:scale-90 transition-all shrink-0";
+  button.innerHTML = '<span class="material-symbols-outlined text-[20px]">refresh</span>';
+  button.addEventListener("click", () => {
+    if (button.dataset.refreshing === "true") return;
+    button.dataset.refreshing = "true";
+    button.querySelector(".material-symbols-outlined")?.classList.add("animate-spin");
+    button.classList.add("text-primary");
+    setTimeout(() => window.location.reload(), 360);
+  });
+  // Keep refresh snug next to the profile on the right, instead of letting the
+  // header's justify-between fling it into the middle.
   if (profileTarget?.parentElement === header) {
-    header.insertBefore(button, profileTarget);
+    let group = header.querySelector("[data-header-right-group]");
+    if (!group) {
+      group = document.createElement("div");
+      group.dataset.headerRightGroup = "true";
+      group.className = "flex items-center gap-1.5 shrink-0";
+      header.insertBefore(group, profileTarget);
+      group.appendChild(profileTarget);
+    }
+    group.insertBefore(button, group.firstChild);
   } else {
     header.appendChild(button);
   }
