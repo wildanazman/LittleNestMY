@@ -105,7 +105,7 @@ tailwind.config={theme:{extend:{colors:{primary:"#83533c","on-primary":"#fff","p
 <div class="rounded-2xl bg-surface-container-low p-3 border border-white/60">
 <svg class="w-full h-56" id="growthGraph" viewBox="0 0 340 220" role="img" aria-label="Growth trend graph"></svg>
 </div>
-<p class="font-label-md text-label-md text-on-surface-variant">Saved measurements only. WHO reference curves can be added after official data is imported.</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Solid line = your baby's measurements. Dashed line = WHO median (50th percentile) for age &amp; sex. Set the baby's sex in their profile to see it.</p>
 </section>
 <section class="space-y-3">
 <h2 class="font-headline-md text-headline-md">Measurement history</h2>
@@ -128,11 +128,14 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
 const { goToScreen, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { whoMedian } = await import(`${moduleBase}utils/benchmarks.mjs`);
 const babyState = await loadBabyProfilesRemote(babyProfile);
 const selectedBabyId = babyState.selectedBabyId;
 const selectedBaby = babyState.selectedBaby || babyProfile;
 const permissions = await getBabyPermissions(selectedBabyId);
 const currentLengthLabel = getMeasurementLabel(selectedBaby.dateOfBirth);
+const genderRaw = String(selectedBaby.gender || "").toLowerCase();
+const whoGender = /^(m|b)/.test(genderRaw) ? "male" : /^(f|g)/.test(genderRaw) ? "female" : "";
 const tabs = [
   ["weight", "Weight-for-age"],
   ["height", `${currentLengthLabel}-for-age`],
@@ -200,23 +203,30 @@ function renderGraph(items){
   }
   const xs = points.map(p=>p.x), ys = points.map(p=>p.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), rawSpanX = maxX - minX, spanX = Math.max(1, rawSpanX);
-  const minY = Math.min(...ys), maxY = Math.max(...ys), rawSpanY = maxY - minY, spanY = Math.max(1, rawSpanY);
+  const whoPoints = (tab.whoMetric && whoGender)
+    ? (rawSpanX === 0 ? [minX] : Array.from({length:24},(_,i)=>minX + (rawSpanX*i)/23))
+        .map(x=>({x, y: whoMedian(x, whoGender, tab.whoMetric)}))
+        .filter(p=>Number.isFinite(p.y))
+    : [];
+  const allYs = ys.concat(whoPoints.map(p=>p.y));
+  const minY = Math.min(...allYs), maxY = Math.max(...allYs), rawSpanY = maxY - minY, spanY = Math.max(1, rawSpanY);
   const chart = { left: 48, top: 40, width: 252, height: 126, bottom: 166 };
   const xFor = (x) => rawSpanX === 0 ? chart.left + chart.width / 2 : chart.left + ((x - minX) / spanX) * chart.width;
   const yFor = (y) => rawSpanY === 0 ? chart.top + chart.height / 2 : chart.bottom - ((y - minY) / spanY) * chart.height;
   const path = points.map((p,i)=>`${i ? "L" : "M"} ${xFor(p.x)} ${yFor(p.y)}`).join(" ");
+  const whoPath = whoPoints.length > 1 ? whoPoints.map((p,i)=>`${i ? "L" : "M"} ${xFor(p.x)} ${yFor(p.y)}`).join(" ") : "";
   const xTicks = rawSpanX === 0 ? [minX] : [minX, maxX];
   const yTicks = rawSpanY === 0 ? [minY] : [maxY, minY];
-  svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#ffffff" stroke="#7c5cff" stroke-width="3"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
+  svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${whoPath ? `<path d="${whoPath}" fill="none" stroke="#b9a6ff" stroke-width="2.5" stroke-dasharray="5 5" stroke-linecap="round" opacity="0.9"/>` : ""}${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#ffffff" stroke="#7c5cff" stroke-width="3"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
 }
 function graphConfig(id){
   const ageMonths = (record) => monthsBetween(selectedBaby.dateOfBirth, record.measuredAt);
   const length = (record) => record.lengthCm || record.heightCm;
   const bmi = (record) => record.weightKg && length(record) ? record.weightKg / Math.pow(length(record) / 100, 2) : undefined;
   const configs = {
-    weight: { title:"Weight-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Weight (kg)", xLabel:"Age", yLabel:"Weight", xUnit:"mo", yUnit:"kg", emptyLabel:"weight records", point:(r)=>growthPoint(r, ageMonths(r), r.weightKg) },
-    height: { title:`${currentLengthLabel}-for-age`, xAxisTitle:"Age (months)", yAxisTitle:`${currentLengthLabel} (cm)`, xLabel:"Age", yLabel:currentLengthLabel, xUnit:"mo", yUnit:"cm", emptyLabel:"length/height records", point:(r)=>growthPoint(r, ageMonths(r), length(r)) },
-    head: { title:"Head circumference-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Head circumference (cm)", xLabel:"Age", yLabel:"Head circumference", xUnit:"mo", yUnit:"cm", emptyLabel:"head circumference records", point:(r)=>growthPoint(r, ageMonths(r), r.headCircumferenceCm) },
+    weight: { title:"Weight-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Weight (kg)", xLabel:"Age", yLabel:"Weight", xUnit:"mo", yUnit:"kg", emptyLabel:"weight records", whoMetric:"weight", point:(r)=>growthPoint(r, ageMonths(r), r.weightKg) },
+    height: { title:`${currentLengthLabel}-for-age`, xAxisTitle:"Age (months)", yAxisTitle:`${currentLengthLabel} (cm)`, xLabel:"Age", yLabel:currentLengthLabel, xUnit:"mo", yUnit:"cm", emptyLabel:"length/height records", whoMetric:"length", point:(r)=>growthPoint(r, ageMonths(r), length(r)) },
+    head: { title:"Head circumference-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Head circumference (cm)", xLabel:"Age", yLabel:"Head circumference", xUnit:"mo", yUnit:"cm", emptyLabel:"head circumference records", whoMetric:"head", point:(r)=>growthPoint(r, ageMonths(r), r.headCircumferenceCm) },
     wfl: { title:`Weight-for-${currentLengthLabel.toLowerCase()}`, xAxisTitle:`${currentLengthLabel} (cm)`, yAxisTitle:"Weight (kg)", xLabel:currentLengthLabel, yLabel:"Weight", xUnit:"cm", yUnit:"kg", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, length(r), r.weightKg) },
     bmi: { title:"BMI-for-age", xAxisTitle:"Age (months)", yAxisTitle:"BMI", xLabel:"Age", yLabel:"BMI", xUnit:"mo", yUnit:"", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, ageMonths(r), bmi(r)) }
   };
