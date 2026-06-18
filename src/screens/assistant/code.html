@@ -39,7 +39,7 @@
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface font-body min-h-screen pb-32">
-<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-5 h-14 flex justify-between items-center w-full">
 <div class="flex items-center gap-2 min-w-0">
 <button aria-label="Back to home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="assistantBackButton" type="button">
 <span class="material-symbols-outlined">arrow_back</span>
@@ -51,7 +51,7 @@
 </div>
 </header>
 
-<main class="max-w-md mx-auto px-container-padding pt-5 space-y-5 pb-40" id="insightsContent">
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5 pb-40" id="insightsContent">
 <!-- Weekly summary (narrative) -->
 <section class="rounded-[26px] p-5 soft-shadow relative overflow-hidden rise" style="background:linear-gradient(155deg,#ece3ff,#ffe9f2 58%,#e3f3ff)">
 <div class="flex items-center gap-2 mb-2">
@@ -60,6 +60,18 @@
 </div>
 <h2 class="text-[clamp(20px,5.4vw,25px)] leading-tight font-extrabold text-[#241b3a]" id="summaryTitle">This week with your baby</h2>
 <p class="text-[15px] leading-relaxed text-[#3f3357] mt-2" id="summaryText">Reading this week's logs...</p>
+</section>
+
+<!-- Nutrition stage -->
+<section class="rise" style="animation-delay:.03s"><div class="rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3" id="nutritionCard"></div></section>
+
+<!-- Wellness score -->
+<section class="rise" style="animation-delay:.06s"><div class="rounded-[26px] p-5 soft-shadow text-white relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" id="wellnessCard"></div></section>
+
+<!-- Today vs guidelines -->
+<section class="rise" style="animation-delay:.09s">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Today vs guidelines</h3>
+<div class="grid grid-cols-1 gap-2.5" id="benchmarkCards"></div>
 </section>
 
 <!-- Data confidence -->
@@ -81,6 +93,12 @@
 <h3 class="font-headline-md text-headline-md text-on-surface px-1">Trends &amp; patterns</h3>
 <div class="space-y-4" id="trendCards"></div>
 </section>
+
+<!-- Growth vs WHO -->
+<section class="rise"><h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Growth vs WHO median</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="growthCard"></div></section>
+
+<!-- Next milestone -->
+<section class="rise"><h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">What's next</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="milestoneNextCard"></div></section>
 
 <!-- Recommendations -->
 <section class="rise" style="animation-delay:.2s">
@@ -121,8 +139,9 @@
   const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const {
     getLogsForBaby, getPersistedDiaperLogs, getPersistedFeedingLogs, getPersistedSleepLogs,
-    getSelectedBabyId, getSelectedBabyProfile
+    getPersistedGrowthRecords, getSelectedBabyId, getSelectedBabyProfile
   } = await import(`${moduleBase}utils/localState.mjs`);
+  const B = await import(`${moduleBase}utils/benchmarks.mjs`);
 
   document.getElementById("assistantBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
 
@@ -396,10 +415,144 @@
     </div>`).join("");
   }
 
+  // ---------- age-aware benchmark engine (RESEARCH.md) ----------
+  const ageMo = B.ageInMonths(selectedBaby?.dateOfBirth, now);
+  const feedingType = selectedBaby?.feedingPreference || selectedBaby?.feedingType || "mixed";
+  const growthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId)
+    .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt));
+
+  const toneStyle = { good: "#15803D", watch: "#b45309", high: "#b45309", info: "#7056f4" };
+  const toneBg = { good: "#e5fbf2", watch: "#fff3da", high: "#fff3da", info: "#eee8ff" };
+
+  function renderNutrition() {
+    const st = B.nutritionStage(ageMo);
+    document.getElementById("nutritionCard").innerHTML = `
+      <span class="w-11 h-11 rounded-full bg-[#fff3da] text-[#b45309] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant_menu</span></span>
+      <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Nutrition stage · ${Math.floor(ageMo)} mo</p>
+      <p class="font-headline-md text-body-lg font-extrabold text-on-surface">${st.title}</p>
+      <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${st.guidance}</p></div>`;
+  }
+
+  function renderWellness() {
+    const fb = B.feedingBenchmark(ageMo, feedingType);
+    const sb = B.sleepBenchmark(ageMo);
+    const db = B.diaperBenchmark(ageMo, feedingType);
+    const feedsToday = feedsW.filter((l) => isToday(l.startedAt)).length;
+    const sleepTodayH = sleepsW.filter((s) => isToday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0) / 60;
+    const wetToday = diapersW.filter((l) => isToday(l.changedAt)).length;
+    const latest = growthRecords[0];
+    const gMed = latest?.weightKg ? B.whoMedian(ageMo, selectedBaby?.gender, "weight") : null;
+
+    const dF = B.domainScore(feedsToday, fb.freq);
+    const dS = B.domainScore(sleepTodayH, sb.totalHours);
+    const dD = B.domainScore(wetToday, [db.wetMin, null]);
+    const dG = latest?.weightKg && gMed ? (Math.abs((latest.weightKg - gMed) / gMed) <= 0.12 ? { score: 25, label: "On track" } : { score: 18, label: "Monitor" }) : { score: 12, label: "Needs data" };
+    const total = Math.round(dF.score + dS.score + dD.score + dG.score);
+    const name = (selectedBaby?.name || "Baby").split(" ")[0];
+    const row = (icon, label, sub) => `<div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-white/90">${icon}</span><span class="font-label-md text-label-md text-white/90 flex-1">${label}</span><span class="font-label-md text-label-md font-bold text-white">${sub}</span></div>`;
+    document.getElementById("wellnessCard").innerHTML = `
+      <p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/70">${name} wellness score</p>
+      <div class="flex items-end gap-2 mt-1 mb-3"><span class="text-[44px] leading-none font-extrabold">${total}</span><span class="text-white/70 font-headline-md mb-1">/100 · ${B.wellnessLabel(total)}</span></div>
+      <div class="space-y-1.5">
+        ${row("restaurant", "Feeding", dF.label)}
+        ${row("bedtime", "Sleep", dS.label)}
+        ${row("baby_changing_station", "Diaper", dD.label)}
+        ${row("monitoring", "Growth", dG.label)}
+      </div>
+      <p class="font-label-sm text-label-sm text-white/65 mt-3">Based on today's logs against ${Math.floor(ageMo)}-month guidelines.</p>`;
+  }
+
+  function benchRow({ icon, chipBg, chipFg, label, value, rangeText, status }) {
+    const c = toneStyle[status.tone], bg = toneBg[status.tone];
+    return `<div class="rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3">
+      <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:${chipBg};color:${chipFg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${icon}</span></span>
+      <div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">${label}: <span class="font-extrabold">${value}</span></p><p class="font-label-sm text-label-sm text-on-surface-variant">Recommended ${rangeText}</p></div>
+      <span class="px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap" style="background:${bg};color:${c}">${status.short}</span>
+    </div>`;
+  }
+
+  function renderBenchmarks() {
+    const fb = B.feedingBenchmark(ageMo, feedingType);
+    const sb = B.sleepBenchmark(ageMo);
+    const db = B.diaperBenchmark(ageMo, feedingType);
+    const feedsToday = feedsW.filter((l) => isToday(l.startedAt)).length;
+    const sleepTodayH = sleepsW.filter((s) => isToday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0) / 60;
+    const wetToday = diapersW.filter((l) => isToday(l.changedAt)).length;
+    const cards = [];
+
+    cards.push(benchRow({ icon: "restaurant", chipBg: "#ffe3ec", chipFg: "#d6336c", label: "Feeds today", value: `${feedsToday}`,
+      rangeText: fb.freq ? `${fb.freq[0]}–${fb.freq[1]}/day (${fb.type})` : "varies at this age", status: fb.freq ? B.rangeStatus(feedsToday, fb.freq) : { tone: "info", short: "Flexible" } }));
+
+    // formula average volume vs range (only if formula/mixed and volumes logged)
+    if (fb.volume) {
+      const vols = feedsW.filter((l) => l.amountMl).map((l) => l.amountMl);
+      if (vols.length) {
+        const avg = Math.round(vols.reduce((a, b) => a + b, 0) / vols.length);
+        cards.push(benchRow({ icon: "local_drink", chipBg: "#e8f1ff", chipFg: "#1E40AF", label: "Avg feed volume", value: `${avg}ml`,
+          rangeText: `${fb.volume[0]}–${fb.volume[1]}ml/feed`, status: B.rangeStatus(avg, fb.volume) }));
+      }
+    }
+
+    cards.push(benchRow({ icon: "bedtime", chipBg: "#eee8ff", chipFg: "#7056f4", label: "Sleep today", value: fmtDur(Math.round(sleepTodayH * 60)),
+      rangeText: `${sb.totalHours[0]}–${sb.totalHours[1]}h/day`, status: B.rangeStatus(sleepTodayH, sb.totalHours) }));
+
+    cards.push(benchRow({ icon: "baby_changing_station", chipBg: "#e5fbf2", chipFg: "#15803D", label: "Wet diapers today", value: `${wetToday}`,
+      rangeText: `${db.wetMin}+ per day`, status: B.rangeStatus(wetToday, [db.wetMin, null]) }));
+
+    // stool pattern (feeding-type aware)
+    const stools = diapersW.filter((l) => l.dirty || l.type === "dirty" || l.type === "mixed").sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt));
+    const daysSince = stools.length ? Math.floor((startOfToday - new Date(new Date(stools[0].changedAt).getFullYear(), new Date(stools[0].changedAt).getMonth(), new Date(stools[0].changedAt).getDate())) / 86400000) : null;
+    const ss = B.stoolStatus(daysSince, feedingType);
+    cards.push(benchRow({ icon: "category", chipBg: "#fff3da", chipFg: "#b45309", label: "Last stool", value: daysSince == null ? "—" : (daysSince === 0 ? "Today" : `${daysSince}d ago`),
+      rangeText: `${B.normalizeFeedingType(feedingType) === "breast" ? "breastfed" : "formula/mixed"} pattern`, status: { tone: ss.tone, short: ss.tone === "good" ? "Normal" : "Monitor" } }));
+
+    document.getElementById("benchmarkCards").innerHTML = cards.join("");
+  }
+
+  function renderGrowth() {
+    const card = document.getElementById("growthCard");
+    const latest = growthRecords[0];
+    if (!latest || (!latest.weightKg && !latest.heightCm && !latest.lengthCm)) {
+      card.innerHTML = `<div class="flex items-center gap-3"><span class="w-10 h-10 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined">monitoring</span></span><p class="font-body-md text-body-md text-on-surface-variant">Add a growth measurement to compare with WHO medians for ${Math.floor(ageMo)} months.</p></div>`;
+      return;
+    }
+    const rows = [];
+    const add = (label, val, unit, metric) => {
+      if (!val) return;
+      const med = B.whoMedian(ageMo, selectedBaby?.gender, metric);
+      const cmp = B.growthComparison(val, med);
+      if (!cmp) return;
+      const c = toneStyle[cmp.tone];
+      rows.push(`<div class="py-2.5 ${rows.length ? "border-t border-surface-container" : ""}">
+        <div class="flex items-center justify-between"><span class="font-headline-md text-body-md text-on-surface">${label}</span><span class="font-label-md text-label-md text-on-surface-variant">${val}${unit} · WHO ${med}${unit}</span></div>
+        <p class="font-label-sm text-label-sm mt-0.5" style="color:${c}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}% vs median — ${cmp.text}</p></div>`);
+    };
+    add("Weight", latest.weightKg, "kg", "weight");
+    add("Length/Height", latest.heightCm || latest.lengthCm, "cm", "length");
+    add("Head", latest.headCircumferenceCm, "cm", "head");
+    card.innerHTML = rows.join("") || `<p class="font-body-md text-body-md text-on-surface-variant">Add weight, length, or head circumference to compare with WHO medians.</p>`;
+  }
+
+  function renderNextMilestone() {
+    const { current, next } = B.milestonesForAge(ageMo);
+    const card = document.getElementById("milestoneNextCard");
+    const block = (m, heading, tone) => `<p class="font-label-sm text-label-sm uppercase tracking-wide" style="color:${tone}">${heading} · ${m.age} months</p>
+      <ul class="mt-1.5 space-y-1.5">${m.items.slice(0, 4).map((it) => `<li class="flex items-start gap-2 font-body-md text-body-md text-on-surface"><span class="material-symbols-outlined text-[18px] mt-0.5" style="color:${tone}">check_circle</span>${it}</li>`).join("")}</ul>`;
+    const parts = [];
+    if (current) parts.push(`<div>${block(current, "Around now", "#15803D")}</div>`);
+    if (next) parts.push(`<div class="${current ? "mt-4 pt-4 border-t border-surface-container" : ""}">${block(next, "Coming up", "#7056f4")}</div>`);
+    card.innerHTML = parts.join("") || `<p class="font-body-md text-body-md text-on-surface-variant">Milestone guidance appears as your baby grows.</p>`;
+  }
+
   renderSummary();
+  renderNutrition();
+  renderWellness();
+  renderBenchmarks();
   renderConfidence();
   renderHighlights();
   renderTrends();
+  renderGrowth();
+  renderNextMilestone();
   renderRecs();
   renderPremium();
 </script>
