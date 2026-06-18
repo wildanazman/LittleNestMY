@@ -182,6 +182,18 @@
 </div>
 <div class="recap-strip" id="recapStrip"></div>
 </section>
+<!-- Developmental milestones (CDC, age-aware) -->
+<section class="mb-7 max-w-[520px] mx-auto hidden" id="cdcSection">
+<div class="flex items-end justify-between mb-3">
+<div>
+<p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-1">Development</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="cdcTitle">What to look for now</h3>
+</div>
+<span class="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm" id="cdcAgeBadge"></span>
+</div>
+<div id="cdcBody"></div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace. A general CDC guide — not a checklist to worry over. Mark what you've noticed; it joins the memory book.</p>
+</section>
 <!-- Category Chips -->
 <section class="mb-5 max-w-[520px] mx-auto">
 <div class="chip-row" id="categoryChips"></div>
@@ -297,6 +309,7 @@ Save Milestone
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
+        const { ageInMonths, milestonesForAge } = await import(`${moduleBase}utils/benchmarks.mjs`);
 
         const grid = document.getElementById("milestoneGrid");
         const typeInput = document.getElementById("milestoneType");
@@ -316,6 +329,11 @@ Save Milestone
         let milestonesCache = getLogsForBaby(getPersistedMilestones([]), selectedBabyId);
         let milestonePhotoDataUrl = "";
         let editingMilestoneId = "";
+        const cdcSection = document.getElementById("cdcSection");
+        const cdcBody = document.getElementById("cdcBody");
+        const cdcTitle = document.getElementById("cdcTitle");
+        const cdcAgeBadge = document.getElementById("cdcAgeBadge");
+        let cdcBusy = false;
 
         dateInput.value = new Date().toISOString().slice(0, 10);
         typeInput.addEventListener("change", () => {
@@ -466,8 +484,84 @@ Save Milestone
         function renderAll() {
             renderHero();
             renderRecap();
+            renderCdc();
             renderChips();
             renderFeed();
+        }
+
+        function achievedFor(itemText) {
+            const target = itemText.trim().toLowerCase();
+            return allMemories().find((m) => (m.title || "").trim().toLowerCase() === target) || null;
+        }
+
+        function renderCdcGroup(group, { upcoming = false } = {}) {
+            if (!group) return "";
+            const done = group.items.filter((it) => achievedFor(it)).length;
+            const heading = upcoming
+                ? `Coming up · by ${group.age} months`
+                : `Around ${group.age} months · ${done}/${group.items.length} noticed`;
+            const rows = group.items.map((it) => {
+                const hit = achievedFor(it);
+                if (hit) {
+                    return `
+                        <button data-cdc-open="${hit.id}" type="button" class="w-full flex items-center gap-3 text-left py-2.5 active:scale-[0.99] transition-transform">
+                            <span class="shrink-0 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check</span></span>
+                            <span class="flex-1 font-body-md text-body-md text-on-surface">${escapeHtml(it)}</span>
+                            <span class="font-label-sm text-label-sm text-primary">${dateLabelOf(hit)}</span>
+                        </button>`;
+                }
+                return `
+                    <button data-cdc-mark="${escapeHtml(it)}" type="button" class="w-full flex items-center gap-3 text-left py-2.5 group active:scale-[0.99] transition-transform">
+                        <span class="shrink-0 w-7 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary flex items-center justify-center text-transparent group-hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></span>
+                        <span class="flex-1 font-body-md text-body-md ${upcoming ? "text-on-surface-variant" : "text-on-surface"}">${escapeHtml(it)}</span>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">Mark</span>
+                    </button>`;
+            }).join("");
+            return `
+                <div class="rounded-[24px] bg-surface-container-low p-4 mb-3 shadow-[0_10px_30px_rgba(124,92,255,0.08)] ${upcoming ? "opacity-90" : ""}">
+                    <p class="font-label-md text-label-md text-on-surface-variant mb-1">${heading}</p>
+                    <div class="divide-y divide-outline-variant/40">${rows}</div>
+                </div>`;
+        }
+
+        function renderCdc() {
+            if (!cdcSection) return;
+            const dob = selectedBaby?.dateOfBirth;
+            if (!dob) { cdcSection.classList.add("hidden"); return; }
+            const months = ageInMonths(dob);
+            const { current, next } = milestonesForAge(months);
+            if (!current && !next) { cdcSection.classList.add("hidden"); return; }
+            cdcAgeBadge.textContent = months < 1 ? "Newborn" : `${Math.floor(months)} mo`;
+            cdcTitle.textContent = current ? "What to look for now" : "First milestones ahead";
+            cdcBody.innerHTML = renderCdcGroup(current) + renderCdcGroup(next, { upcoming: true });
+            cdcSection.classList.remove("hidden");
+            cdcBody.querySelectorAll("[data-cdc-mark]").forEach((btn) =>
+                btn.addEventListener("click", () => markCdcAchieved(btn.dataset.cdcMark)));
+            cdcBody.querySelectorAll("[data-cdc-open]").forEach((btn) =>
+                btn.addEventListener("click", () => openStory(btn.dataset.cdcOpen)));
+        }
+
+        async function markCdcAchieved(itemText) {
+            if (cdcBusy || achievedFor(itemText)) return;
+            cdcBusy = true;
+            const today = new Date().toISOString().slice(0, 10);
+            const draft = {
+                id: crypto.randomUUID ? crypto.randomUUID() : `milestone-local-${Date.now()}`,
+                babyId: selectedBabyId,
+                title: itemText,
+                achievedAt: today,
+                category: categoryForTitle(itemText)
+            };
+            milestonesCache = [draft, ...milestonesCache.filter((item) => item.id !== draft.id)];
+            try {
+                await saveMilestoneRemote(draft);
+                showFeedback("Noticed! Added to the memory book.");
+            } catch (error) {
+                showFeedback(`${error.message || "Cloud save failed."} Kept on this device.`);
+            } finally {
+                cdcBusy = false;
+                renderAll();
+            }
         }
 
         function renderHero() {
