@@ -450,8 +450,8 @@ Save Milestone
                 photoUrl: milestonePhotoDataUrl || undefined
             };
             try {
-                const saved = await saveMilestoneRemote(milestoneDraft);
-                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== editingMilestoneId)];
+                milestonesCache = [{ ...milestoneDraft }, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
+                await saveMilestoneRemote(milestoneDraft);
 
                 noteInput.value = "";
                 customTitleInput.value = "";
@@ -463,7 +463,7 @@ Save Milestone
                 editingMilestoneId = "";
                 saveButton.textContent = "Save Milestone";
                 renderAll();
-                showFeedback(saved.photoUrl?.startsWith("http") ? "Saved to cloud memory book." : "Saved to memory book.");
+                showFeedback(milestoneDraft.photoUrl?.startsWith("http") ? "Saved to cloud memory book." : "Saved to memory book.");
             } catch (error) {
                 milestonesCache = [milestoneDraft, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
                 renderAll();
