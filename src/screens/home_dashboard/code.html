@@ -284,9 +284,9 @@
 <div class="w-16 h-16 rounded-full bg-error-container text-error mx-auto flex items-center justify-center">
 <span class="material-symbols-outlined text-[34px]">error</span>
 </div>
-<h1 class="font-headline-md text-headline-md text-on-surface">Could not load dashboard</h1>
-<p class="font-body-md text-body-md text-on-surface-variant" id="homeErrorMessage">Please refresh and try again.</p>
-<button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="homeRetryButton" type="button">Retry</button>
+<h1 class="font-headline-md text-headline-md text-on-surface" data-i18n="home.errorTitle">Could not load dashboard</h1>
+<p class="font-body-md text-body-md text-on-surface-variant" id="homeErrorMessage" data-i18n="home.errorBody">Please refresh and try again.</p>
+<button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="homeRetryButton" type="button" data-i18n="home.retry">Retry</button>
 </section>
 <div class="hidden" id="homeContent" aria-live="polite">
 <!-- Top App Bar -->
@@ -305,10 +305,10 @@
 <section class="space-y-sm">
 <div class="flex items-end justify-between">
 <div>
-<span class="font-label-md text-label-md text-on-surface-variant">Good morning,</span>
-<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName">Loading...</h2>
+<span class="font-label-md text-label-md text-on-surface-variant" data-i18n="home.greeting">Good morning,</span>
+<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName" data-i18n="home.loading">Loading...</h2>
 </div>
-<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm">
+<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm" data-i18n="home.today">
                     Today
                 </div>
 </div>
@@ -322,7 +322,7 @@
 <p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
 <span class="mt-2 inline-flex items-center gap-1 rounded-full bg-white/70 px-3 py-1 text-[12px] font-bold text-[#22a06b] dark:bg-white/10 dark:text-[#8ef0bd]" id="babyHealthyBadge">
 <span class="h-2 w-2 rounded-full bg-[#22c55e]"></span>
-Healthy
+<span data-i18n="home.healthy">Healthy</span>
 </span>
 </div>
 <div class="ml-auto">
@@ -335,11 +335,11 @@ Healthy
 <div class="hidden space-y-3" id="noBabyCta">
 <button class="h-14 w-full rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center gap-2 soft-shadow active:scale-95 transition-transform" data-screen-target="add_baby_profile" type="button">
 <span class="material-symbols-outlined">add</span>
-Create baby profile
+<span data-i18n="home.createBaby">Create baby profile</span>
 </button>
 <button class="h-14 w-full rounded-full bg-primary-container text-on-primary-container font-headline-md text-headline-md flex items-center justify-center gap-2 active:scale-95 transition-transform" data-screen-target="accept_invite" type="button">
 <span class="material-symbols-outlined">mail</span>
-Accept invitation
+<span data-i18n="home.acceptInvite">Accept invitation</span>
 </button>
 </div>
 <div class="rounded-[24px] bg-white/75 p-4 soft-shadow border border-white/70 flex items-center gap-4 dark:bg-white/10 dark:border-white/10" id="activeStatusCard">
@@ -359,7 +359,7 @@ Accept invitation
 <div class="dashboard-stat-card bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="dashboard-stat-label flex items-center gap-2 text-on-primary-container">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
-<span class="font-label-sm text-label-sm">Last Feed</span>
+<span class="font-label-sm text-label-sm" data-i18n="home.lastFeed">Last Feed</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface" id="lastFeedTime">No feeds yet</p>
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastFeedDetail"></span>
@@ -368,7 +368,7 @@ Accept invitation
 <div class="dashboard-stat-card bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#1E40AF]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
-<span class="font-label-sm text-label-sm">Today Sleep</span>
+<span class="font-label-sm text-label-sm" data-i18n="home.todaySleep">Today Sleep</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="todaySleepTotal">No sleep yet</p>
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="todaySleepDetail"></span>
@@ -377,7 +377,7 @@ Accept invitation
 <div class="dashboard-stat-card bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#166534]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
-<span class="font-label-sm text-label-sm">Diaper</span>
+<span class="font-label-sm text-label-sm" data-i18n="home.diaper">Diaper</span>
 </div>
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastDiaperDetail"></span>
@@ -386,10 +386,10 @@ Accept invitation
 <div class="dashboard-stat-card bg-[#E8F5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#6B21A8]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monitor_weight</span>
-<span class="font-label-sm text-label-sm">Growth</span>
+<span class="font-label-sm text-label-sm" data-i18n="home.growth">Growth</span>
 </div>
-<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant">Weight:</span> <span class="font-bold" id="latestWeight">Not logged</span></p>
-<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant">Height:</span> <span class="font-bold" id="latestHeight">Not logged</span></p>
+<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant" data-i18n="home.weight">Weight:</span> <span class="font-bold" id="latestWeight" data-i18n="home.notLogged">Not logged</span></p>
+<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant" data-i18n="home.height">Height:</span> <span class="font-bold" id="latestHeight" data-i18n="home.notLogged">Not logged</span></p>
 </div>
 <!-- Appointment -->
 <div class="dashboard-stat-card col-span-2 bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
@@ -408,31 +408,31 @@ Accept invitation
 <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">restaurant</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Feed</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.feed">Feed</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0369A1] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">bedtime</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Sleep</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.sleep">Sleep</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="w-14 h-14 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">baby_changing_station</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Diaper</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.diaper">Diaper</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open medicine records">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">medication</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Medicine</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.medicine">Medicine</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-open-note-log="true" role="button" tabindex="0" aria-label="Open note log">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">edit_note</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Note</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.note">Note</span>
 </div>
 </div>
 </section>
@@ -460,9 +460,9 @@ Accept invitation
 <span class="material-symbols-outlined">summarize</span>
 </div>
 <div class="min-w-0">
-<p class="font-label-sm text-label-sm text-primary uppercase">Family handoff</p>
-<h3 class="font-headline-md text-headline-md text-on-surface truncate">Today’s Care Summary</h3>
-<p class="font-body-md text-body-md text-on-surface-variant truncate">Copy or share a calm update.</p>
+<p class="font-label-sm text-label-sm text-primary uppercase" data-i18n="home.familyHandoff">Family handoff</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate" data-i18n="home.careSummaryTitle">Today’s Care Summary</h3>
+<p class="font-body-md text-body-md text-on-surface-variant truncate" data-i18n="home.careSummarySub">Copy or share a calm update.</p>
 </div>
 </div>
 <span class="material-symbols-outlined text-primary">chevron_right</span>
@@ -477,16 +477,16 @@ Accept invitation
 </div>
 <div class="min-w-0 flex-1">
 <div class="flex items-center justify-between gap-2">
-<h3 class="font-headline-md text-headline-md text-on-surface">Mama Care</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface" data-i18n="home.mamaCare">Mama Care</h3>
 <span class="material-symbols-outlined text-primary text-[20px]">chevron_right</span>
 </div>
-<p class="font-label-sm text-label-sm text-on-surface-variant truncate"><span id="mamaMoodPreview">Not checked</span> · Rest <span id="mamaRestPreview">Not logged</span> · Meds <span id="mamaMedsPreview">0/0</span></p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate"><span id="mamaMoodPreview" data-i18n="home.notChecked">Not checked</span> · <span data-i18n="home.rest">Rest</span> <span id="mamaRestPreview" data-i18n="home.notLogged">Not logged</span> · <span data-i18n="home.meds">Meds</span> <span id="mamaMedsPreview">0/0</span></p>
 </div>
 </div>
 </section>
 <!-- Timeline Section -->
 <section class="space-y-sm" id="timelineSection">
-<h3 class="font-headline-md text-headline-md text-on-surface px-1">Today's Log</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface px-1" data-i18n="home.todaysLog">Today's Log</h3>
 <div class="relative pl-12 space-y-3" id="timelineList">
 <div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>
 <!-- Timeline Items -->
@@ -497,7 +497,7 @@ Accept invitation
 <div>
 <p class="font-label-md text-label-md text-on-surface"></p>
 <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
-<p class="font-body-md text-body-md text-on-surface-variant">No activity yet. Add your first log.</p>
+<p class="font-body-md text-body-md text-on-surface-variant" data-i18n="home.noActivity">No activity yet. Add your first log.</p>
 </div>
 </div>
 </div>
@@ -530,24 +530,24 @@ Accept invitation
 <div class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-3">
 <div class="flex items-start justify-between gap-3">
 <div>
-<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Baby profile</p>
-<h2 class="font-headline-md text-headline-md text-on-surface" id="babyMenuTitle">Manage baby profile</h2>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider" data-i18n="home.babyProfile">Baby profile</p>
+<h2 class="font-headline-md text-headline-md text-on-surface" id="babyMenuTitle" data-i18n="home.manageBabyProfile">Manage baby profile</h2>
 </div>
 <button aria-label="Close baby profile menu" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center" id="babyProfileMenuClose" type="button">
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
 <button class="w-full h-12 rounded-2xl bg-primary-container text-on-primary-container font-label-md text-label-md flex items-center justify-between px-4" id="editCurrentBabyButton" type="button">
-<span>Edit Baby Profile</span><span class="material-symbols-outlined">edit</span>
+<span data-i18n="home.editBabyProfile">Edit Baby Profile</span><span class="material-symbols-outlined">edit</span>
 </button>
 <button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="switchBabyButton" type="button">
-<span>Switch Baby</span><span class="material-symbols-outlined">sync_alt</span>
+<span data-i18n="home.switchBaby">Switch Baby</span><span class="material-symbols-outlined">sync_alt</span>
 </button>
 <button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="addNewBabyButton" type="button">
-<span>Add New Baby</span><span class="material-symbols-outlined">add</span>
+<span data-i18n="home.addNewBaby">Add New Baby</span><span class="material-symbols-outlined">add</span>
 </button>
 <button class="w-full h-12 rounded-2xl bg-surface-container-low text-on-surface font-label-md text-label-md flex items-center justify-between px-4" id="manageBabyProfilesButton" type="button">
-<span>Manage Baby Profiles</span><span class="material-symbols-outlined">chevron_right</span>
+<span data-i18n="home.manageBabyProfiles">Manage Baby Profiles</span><span class="material-symbols-outlined">chevron_right</span>
 </button>
 <p class="hidden font-label-md text-label-md text-tertiary px-1" id="babyMenuFeedback" aria-live="polite"></p>
 </div>
@@ -609,6 +609,7 @@ Accept invitation
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
+        const { t } = await import(`${moduleBase}utils/i18n.mjs`);
 
         window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
         window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
@@ -654,7 +655,7 @@ Accept invitation
         };
         const formatStatDate = (value) => new Date(value).toLocaleDateString("en-MY", { day: "numeric", month: "short" });
 
-        setText("parentName", primaryParent?.name || "Parent");
+        setText("parentName", primaryParent?.name || t("home.parent"));
         const homeParentPhoto = document.getElementById("homeParentPhoto");
         const homeParentInitials = document.getElementById("homeParentInitials");
         homeParentInitials.textContent = initialsForName(primaryParent?.name);
@@ -667,8 +668,8 @@ Accept invitation
             setText("babyName", selectedBaby.name);
             setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
         } else {
-            setText("babyName", "No baby profile yet");
-            setText("babyAge", "Create a baby profile or accept an invitation to begin.");
+            setText("babyName", t("home.noBabyName"));
+            setText("babyAge", t("home.noBabyAge"));
             document.getElementById("babyProfileMenuButton")?.classList.add("hidden");
             document.getElementById("babyHealthyBadge")?.classList.add("hidden");
             document.getElementById("noBabyCta")?.classList.remove("hidden");
@@ -676,31 +677,31 @@ Accept invitation
                 .forEach((id) => document.getElementById(id)?.classList.add("hidden"));
         }
         const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
-        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "No feed yet");
-        setText("lastFeedDetail", latestFeed ? [formatTime(latestFeed.startedAt), feedAmountLabel(latestFeed)].filter(Boolean).join(" · ") : "Tap to log");
+        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : t("home.noFeedYet"));
+        setText("lastFeedDetail", latestFeed ? [formatTime(latestFeed.startedAt), feedAmountLabel(latestFeed)].filter(Boolean).join(" · ") : t("home.tapToLog"));
         setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
-        setText("todaySleepDetail", todaySleepMinutes ? "Total today" : "Tap to log");
-        setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : "No diaper yet");
-        setText("lastDiaperDetail", todayDiaperCount ? `change${todayDiaperCount === 1 ? "" : "s"} today` : "Tap to log");
+        setText("todaySleepDetail", todaySleepMinutes ? t("home.totalToday") : t("home.tapToLog"));
+        setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : t("home.noDiaperYet"));
+        setText("lastDiaperDetail", todayDiaperCount ? (todayDiaperCount === 1 ? t("home.changeToday") : t("home.changesToday")) : t("home.tapToLog"));
         const latestWeightRecord = [...allGrowthRecords].filter((r) => r.weightKg).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
         const latestHeightRecord = [...allGrowthRecords].filter((r) => r.heightCm || r.lengthCm).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : "Not logged");
-        setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : "Not logged");
-        setText("assistantTitle", "Start logging to see helpful reminders.");
-        setText("assistantMessage", "Real suggestions will appear after a few care logs.");
-        setText("babyMenuTitle", selectedBaby?.name || "Manage baby profile");
+        setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : t("home.notLogged"));
+        setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : t("home.notLogged"));
+        setText("assistantTitle", t("home.startLoggingTitle"));
+        setText("assistantMessage", t("home.startLoggingMsg"));
+        setText("babyMenuTitle", selectedBaby?.name || t("home.manageBabyProfile"));
         const babyPhoto = document.getElementById("babyPhoto");
         if (babyPhoto && selectedBaby?.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
         if (nextEvent) {
             const { relativeLabel } = formatEventDate(nextEvent.startsAt, now);
-            setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
+            setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? t("home.nextVaccine") : t("home.nextAppointment"));
             setText("nextAppointmentSummary", formatHomeEventSummary(nextEvent));
             setText("nextAppointmentRelative", relativeLabel);
         } else {
-            setText("nextAppointmentLabel", "Next Appointment");
-            setText("nextAppointmentSummary", "No upcoming");
-            setText("nextAppointmentRelative", "Tap to add");
+            setText("nextAppointmentLabel", t("home.nextAppointment"));
+            setText("nextAppointmentSummary", t("home.noUpcoming"));
+            setText("nextAppointmentRelative", t("home.tapToAdd"));
         }
         renderReminderBanner();
         renderActiveStatus();
@@ -713,7 +714,7 @@ Accept invitation
 
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;
-            const message = selectedBaby ? viewOnlyMessage : "Create a baby profile before adding logs.";
+            const message = selectedBaby ? viewOnlyMessage : t("home.createBeforeLogs");
             document.querySelectorAll('[data-screen-target="feeding_log"], [data-screen-target="sleep_log"], [data-screen-target="diaper_log"], [data-screen-target="health_records"], [data-open-note-log]').forEach((element) => {
                 element.removeAttribute("data-screen-target");
                 element.setAttribute("aria-disabled", "true");
@@ -736,7 +737,7 @@ Accept invitation
             });
             const quickActionSection = document.querySelector("section .flex.justify-between.items-center.px-2");
             if (quickActionSection && !document.getElementById("viewOnlyHomeLabel")) {
-                quickActionSection.insertAdjacentHTML("beforebegin", `<p id="viewOnlyHomeLabel" class="px-2 pb-2 font-label-md text-label-md text-primary">${selectedBaby ? "View-only access" : "Create a baby profile to start logging"}</p>`);
+                quickActionSection.insertAdjacentHTML("beforebegin", `<p id="viewOnlyHomeLabel" class="px-2 pb-2 font-label-md text-label-md text-primary">${selectedBaby ? t("home.viewOnlyAccess") : t("home.createToLog")}</p>`);
             }
         }
 
@@ -769,7 +770,7 @@ Accept invitation
                 .filter((reminder) => reminder.enabled && !reminder.sourceId && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
                 .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))[0];
             if (nextReminder) {
-                setText("assistantTitle", "Upcoming reminder");
+                setText("assistantTitle", t("home.upcomingReminder"));
                 setText("assistantMessage", `${nextReminder.title} · ${formatRelativeTime(nextReminder.scheduledAt, now)}`);
                 return;
             }
@@ -778,9 +779,9 @@ Accept invitation
             const guide = getFeedingGuideForBaby(selectedBaby.dateOfBirth);
             const reminderText = latestFeed
                 ? nextFeedReminderText(latestFeed.startedAt, enabledFeeding?.repeatRule?.intervalHours || guide.suggestedIntervalHours)
-                : "No feeds logged yet. Add what you remember.";
-            setText("assistantTitle", "Next feed may be soon");
-            setText("assistantMessage", latestFeed ? `Based on ${selectedBaby.name}'s recent feeding pattern. ${reminderText}` : reminderText);
+                : t("home.noFeedsLogged");
+            setText("assistantTitle", t("home.nextFeedTitle"));
+            setText("assistantMessage", latestFeed ? `${t("home.feedingPatternNote")} ${reminderText}` : reminderText);
         }
 
         async function renderMamaCarePreview() {
@@ -792,8 +793,8 @@ Accept invitation
             const todayCheckin = mamaCare.checkins.find((checkin) => checkin.checkinDate === todayKey);
             const todayMeds = mamaCare.medications.filter((medication) => medication.medicationTime && localDate(new Date(medication.medicationTime)) === todayKey);
             const taken = todayMeds.filter((medication) => medication.status === "taken").length;
-            setText("mamaMoodPreview", todayCheckin?.mood || "Not checked");
-            setText("mamaRestPreview", todayCheckin?.sleepHours ? `${todayCheckin.sleepHours} hrs` : "Not logged");
+            setText("mamaMoodPreview", todayCheckin?.mood || t("home.notChecked"));
+            setText("mamaRestPreview", todayCheckin?.sleepHours ? `${todayCheckin.sleepHours} hrs` : t("home.notLogged"));
             setText("mamaMedsPreview", `${taken}/${todayMeds.length}`);
         }
 
@@ -808,7 +809,7 @@ Accept invitation
             document.getElementById("homeContent")?.classList.add("hidden");
             const errorState = document.getElementById("homeErrorState");
             const errorMessage = document.getElementById("homeErrorMessage");
-            if (errorMessage) errorMessage.textContent = message || "Please refresh and try again.";
+            if (errorMessage) errorMessage.textContent = message || t("home.errorBody");
             errorState?.classList.remove("hidden");
         }
 
@@ -843,7 +844,7 @@ Accept invitation
                         id: log.id,
                         at: log.startedAt,
                         type: "sleep",
-                        title: log.status === "nap" ? "Nap" : "Sleep",
+                        title: log.status === "nap" ? t("home.nap") : t("home.sleep"),
                         detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
                     })),
                 ...allDiaperLogs
@@ -852,7 +853,7 @@ Accept invitation
                         id: log.id,
                         at: log.changedAt,
                         type: "diaper",
-                        title: "Diaper",
+                        title: t("home.diaper"),
                         detail: diaperTimelineSummary(log)
                     }))
             ].sort((a, b) => new Date(a.at) - new Date(b.at));
@@ -1041,8 +1042,8 @@ Accept invitation
                     <div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center">
                         <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">pediatrics</span>
                     </div>
-                    <p class="font-headline-md text-headline-md text-on-surface">No logs yet today</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">Tap the + button to log a feed, sleep, diaper, or note.</p>
+                    <p class="font-headline-md text-headline-md text-on-surface">${t("home.noLogsToday")}</p>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant">${t("home.noLogsHint")}</p>
                 </div>
             `;
         }
@@ -1096,27 +1097,27 @@ Accept invitation
 
         function renderActiveStatus() {
             if (activeSleep) {
-                setText("activeStatusLabel", "Sleeping now");
+                setText("activeStatusLabel", t("home.sleepingNow"));
                 setText("activeStatusTitle", formatDuration(Math.max(0, Math.round((now - new Date(activeSleep.startedAt)) / 60000))));
-                setText("activeStatusDetail", `Started ${formatTime(activeSleep.startedAt)}`);
+                setText("activeStatusDetail", `${t("home.started")} ${formatTime(activeSleep.startedAt)}`);
                 return;
             }
             if (latestFeed) {
-                setText("activeStatusLabel", "Last feed");
+                setText("activeStatusLabel", t("home.lastFeedStatus"));
                 setText("activeStatusTitle", formatRelativeTime(latestFeed.startedAt, now));
-                setText("activeStatusDetail", latestFeed.amountMl ? `${latestFeed.amountMl} ml logged` : "Feeding logged");
+                setText("activeStatusDetail", latestFeed.amountMl ? `${latestFeed.amountMl} ${t("home.mlLogged")}` : t("home.feedingLogged"));
                 return;
             }
-            setText("activeStatusLabel", "Latest status");
-            setText("activeStatusTitle", selectedBaby ? "Ready to log care" : "No baby profile yet");
-            setText("activeStatusDetail", selectedBaby ? "Recent baby activity will appear here." : "Create baby or accept invitation later.");
+            setText("activeStatusLabel", t("home.latestStatus"));
+            setText("activeStatusTitle", selectedBaby ? t("home.readyToLog") : t("home.noBabyName"));
+            setText("activeStatusDetail", selectedBaby ? t("home.activityHint") : t("home.createBabyLater"));
         }
 
         document.querySelector("[data-open-note-log]")?.addEventListener("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
             if (!permissions.canAddLogs || !selectedBaby) {
-                showViewOnlyNotice(selectedBaby ? viewOnlyMessage : "Create a baby profile before adding notes.");
+                showViewOnlyNotice(selectedBaby ? viewOnlyMessage : t("home.createBeforeNotes"));
                 return;
             }
             window.location.href = `${screenUrl("quick_log")}?type=note`;
