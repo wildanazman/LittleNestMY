@@ -62,8 +62,19 @@ export async function saveFeedingLogRemote(log) {
   }
 }
 
+// Remove every local copy that maps to the deleted id — the raw local id
+// and any pre-sync local row whose stableUuid equals the deleted uuid.
+// Without this, a leftover non-uuid duplicate is treated as "pending" by
+// the load merge and resurrects the log after deletion.
+function purgeLocalDuplicates(items, deleteLocal, targetId, prefix) {
+  (items || []).forEach((item) => {
+    if (!item?.id) return;
+    if (item.id === targetId || stableUuid(item.id, prefix) === targetId) deleteLocal(item.id);
+  });
+}
+
 export async function deleteFeedingLogRemote(logId) {
-  deleteLocalFeedingLog(logId);
+  purgeLocalDuplicates(getPersistedFeedingLogs([]), deleteLocalFeedingLog, logId, "feed");
   await deleteRemoteById("feeding_logs", logId, "delete feeding log");
 }
 
@@ -78,6 +89,9 @@ export async function saveSleepLogRemote(log) {
       .select("*")
       .single();
     if (error) throw error;
+    // Drop the pre-sync local copy when the row got a real uuid, else it
+    // lingers as a "pending" duplicate that resurrects after deletion.
+    if (data?.id && data.id !== log.id) deleteLocalSleepLog(log.id);
     return saveLocalSleepLog(fromSleepRow(data));
   } catch (error) {
     throw friendlyRlsError(error, "save sleep log");
@@ -85,7 +99,7 @@ export async function saveSleepLogRemote(log) {
 }
 
 export async function deleteSleepLogRemote(logId) {
-  deleteLocalSleepLog(logId);
+  purgeLocalDuplicates(getPersistedSleepLogs([]), deleteLocalSleepLog, logId, "sleep");
   await deleteRemoteById("sleep_logs", logId, "delete sleep log");
 }
 
@@ -103,7 +117,7 @@ export async function saveDiaperLogRemote(log) {
 }
 
 export async function deleteDiaperLogRemote(logId) {
-  deleteLocalDiaperLog(logId);
+  purgeLocalDuplicates(getPersistedDiaperLogs([]), deleteLocalDiaperLog, logId, "diaper");
   await deleteRemoteById("diaper_logs", logId, "delete diaper log");
 }
 
@@ -118,6 +132,7 @@ export async function saveHealthNoteRemote(note) {
       .select("*")
       .single();
     if (error) throw error;
+    if (data?.id && data.id !== note.id) deleteLocalHealthNote(note.id);
     return saveLocalHealthNote(fromHealthRow(data));
   } catch (error) {
     throw friendlyRlsError(error, "save health note");
@@ -125,7 +140,7 @@ export async function saveHealthNoteRemote(note) {
 }
 
 export async function deleteHealthNoteRemote(noteId) {
-  deleteLocalHealthNote(noteId);
+  purgeLocalDuplicates(getPersistedHealthNotes([]), deleteLocalHealthNote, noteId, "health");
   await deleteRemoteById("health_notes", noteId, "delete health note");
 }
 

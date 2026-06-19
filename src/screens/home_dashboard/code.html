@@ -602,7 +602,11 @@
             saveLocalDiaperLog
         } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-        const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+        const {
+            loadCoreLogsRemote,
+            deleteFeedingLogRemote, deleteSleepLogRemote, deleteDiaperLogRemote,
+            saveFeedingLogRemote, saveSleepLogRemote, saveDiaperLogRemote
+        } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { bindPrototypeActions, screenUrl, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
@@ -874,18 +878,19 @@
                     event.stopPropagation();
                     const id = btn.dataset.delId;
                     const type = btn.dataset.delType;
-                    const deleteMap = { feed: deleteLocalFeedingLog, sleep: deleteLocalSleepLog, diaper: deleteLocalDiaperLog };
-                    const saveMap = { feed: saveLocalFeedingLog, sleep: saveLocalSleepLog, diaper: saveLocalDiaperLog };
+                    const deleteMap = { feed: deleteFeedingLogRemote, sleep: deleteSleepLogRemote, diaper: deleteDiaperLogRemote };
+                    const saveMap = { feed: saveFeedingLogRemote, sleep: saveSleepLogRemote, diaper: saveDiaperLogRemote };
                     const arrayMap = { feed: allFeedingLogs, sleep: allSleepLogs, diaper: allDiaperLogs };
                     const arr = arrayMap[type];
                     const index = arr.findIndex((log) => log.id === id);
                     const removed = index >= 0 ? arr[index] : null;
-                    deleteMap[type]?.(id);
+                    // Remote delete (also purges local copies); keep UI snappy.
+                    deleteMap[type]?.(id)?.catch((error) => console.warn("Could not delete log remotely.", error));
                     if (index >= 0) arr.splice(index, 1);
                     renderTimeline(date);
                     showUndoToast("Log deleted", () => {
                         if (!removed) return;
-                        saveMap[type]?.(removed);
+                        saveMap[type]?.(removed)?.catch((error) => console.warn("Could not restore log remotely.", error));
                         arr.push(removed);
                         renderTimeline(date);
                     });
