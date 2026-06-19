@@ -187,6 +187,38 @@
                 </button>
 </div>
 </section>
+<!-- Manual Entry -->
+<section>
+<button class="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-surface-container text-on-surface font-label-md text-label-md active:scale-95 transition-transform" id="toggleManualButton" type="button">
+<span class="material-symbols-outlined !text-[20px]" data-icon="edit_calendar">edit_calendar</span>
+                    Add sleep manually
+                </button>
+<div class="hidden mt-3 bg-surface-container-low rounded-[24px] p-5 space-y-4" id="manualPanel">
+<div class="grid grid-cols-2 gap-3">
+<label class="space-y-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Type</span>
+<select class="w-full h-11 rounded-xl border-0 bg-surface-container-lowest px-3 text-on-surface font-body-md" id="manualType">
+<option value="nap">Nap</option>
+<option value="night_sleep">Night Sleep</option>
+</select>
+</label>
+<label class="space-y-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Date</span>
+<input class="w-full h-11 rounded-xl border-0 bg-surface-container-lowest px-3 text-on-surface font-body-md" id="manualDate" type="date"/>
+</label>
+<label class="space-y-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Start time</span>
+<input class="w-full h-11 rounded-xl border-0 bg-surface-container-lowest px-3 text-on-surface font-body-md" id="manualStart" type="time"/>
+</label>
+<label class="space-y-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">End time</span>
+<input class="w-full h-11 rounded-xl border-0 bg-surface-container-lowest px-3 text-on-surface font-body-md" id="manualEnd" type="time"/>
+</label>
+</div>
+<p class="hidden font-label-sm text-label-sm text-error" id="manualError" aria-live="polite"></p>
+<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" id="saveManualButton" type="button">Save sleep</button>
+</div>
+</section>
 <!-- Today's Summary Card -->
 <section class="grid grid-cols-2 gap-gutter">
 <div class="bg-tertiary-container rounded-[24px] p-5 space-y-2">
@@ -341,11 +373,81 @@
         let timerInterval;
         let sleepLogItems = getLogsForBaby(getPersistedSleepLogs(mockSleepLogs), selectedBabyId);
 
+        const toggleManualButton = document.getElementById("toggleManualButton");
+        const manualPanel = document.getElementById("manualPanel");
+        const manualType = document.getElementById("manualType");
+        const manualDate = document.getElementById("manualDate");
+        const manualStart = document.getElementById("manualStart");
+        const manualEnd = document.getElementById("manualEnd");
+        const manualError = document.getElementById("manualError");
+        const saveManualButton = document.getElementById("saveManualButton");
+
+        manualDate.value = new Date().toISOString().slice(0, 10);
+        manualStart.value = "13:00";
+        manualEnd.value = "14:00";
+
         startButton.addEventListener("click", startSleep);
         wakeButton.addEventListener("click", wakeUp);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
         viewStatsButton.addEventListener("click", () => goToScreen("weekly_insights"));
+        toggleManualButton.addEventListener("click", () => {
+            const opening = manualPanel.classList.contains("hidden");
+            manualPanel.classList.toggle("hidden");
+            if (opening) manualPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+        saveManualButton.addEventListener("click", saveManualSleep);
         await refreshLogs();
+
+        function showManualError(message) {
+            manualError.textContent = message;
+            manualError.classList.remove("hidden");
+        }
+
+        async function saveManualSleep() {
+            manualError.classList.add("hidden");
+            const date = manualDate.value;
+            const startVal = manualStart.value;
+            const endVal = manualEnd.value;
+            if (!date || !startVal || !endVal) {
+                showManualError("Choose a date, start time, and end time.");
+                return;
+            }
+            const startedAt = new Date(`${date}T${startVal}:00`);
+            const endedAt = new Date(`${date}T${endVal}:00`);
+            // End not after start means it crossed midnight (overnight sleep).
+            if (endedAt <= startedAt) endedAt.setDate(endedAt.getDate() + 1);
+            const durationMinutes = Math.round((endedAt - startedAt) / 60000);
+            if (durationMinutes <= 0) {
+                showManualError("End time must be after the start time.");
+                return;
+            }
+            if (durationMinutes > 24 * 60) {
+                showManualError("That is longer than 24 hours — please check the times.");
+                return;
+            }
+            if (startedAt > new Date()) {
+                showManualError("Start time is in the future.");
+                return;
+            }
+            saveManualButton.disabled = true;
+            saveManualButton.textContent = "Saving...";
+            try {
+                await saveSleepLogRemote({
+                    id: `sleep-local-${Date.now()}`,
+                    babyId: selectedBabyId,
+                    status: manualType.value,
+                    startedAt: startedAt.toISOString(),
+                    endedAt: endedAt.toISOString(),
+                    notes: "Added manually"
+                });
+            } catch (error) {
+                console.warn("Manual sleep saved locally but could not sync.", error);
+            }
+            saveManualButton.disabled = false;
+            saveManualButton.textContent = "Save sleep";
+            manualPanel.classList.add("hidden");
+            await refreshLogs();
+        }
 
         function startSleep() {
             const session = {
