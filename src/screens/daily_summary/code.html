@@ -112,7 +112,7 @@ const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
-const { getPersistedCalendarEvents, getLogsForBaby } = await import(`${moduleBase}utils/localState.mjs`);
+const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
 const { calculateBabyAge, formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
@@ -146,7 +146,8 @@ async function renderSummary() {
   }
 
   const core = await loadCoreLogsRemote(babyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
-  const calendarEvents = getLogsForBaby(getPersistedCalendarEvents([]), babyId);
+  const calState = await loadCalendarEventsRemote(babyId, []).catch(() => ({ calendarEvents: [] }));
+  const calendarEvents = calState.calendarEvents;
   const mama = await loadMamaCareData(babyId);
   const feedingLogs = core.feedingLogs || [];
   const sleepLogs = core.sleepLogs || [];

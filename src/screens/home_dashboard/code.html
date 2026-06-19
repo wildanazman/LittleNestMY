@@ -599,6 +599,9 @@
             deleteFeedingLogRemote, deleteSleepLogRemote, deleteDiaperLogRemote,
             saveFeedingLogRemote, saveSleepLogRemote, saveDiaperLogRemote
         } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+        const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
+        const { loadGrowthRecordsRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
+        const { loadRemindersRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
         const { bindPrototypeActions, screenUrl, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
@@ -626,9 +629,14 @@
         const allFeedingLogs = coreLogs.feedingLogs;
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
-        const allCalendarEvents = getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId);
-        const allGrowthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId);
-        const allReminders = getLogsForBaby(getPersistedReminders([]), selectedBabyId);
+        const [calState, growthState, reminderState] = await Promise.all([
+            loadCalendarEventsRemote(selectedBabyId, []).catch(() => ({ calendarEvents: getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId) })),
+            loadGrowthRecordsRemote(selectedBabyId, []).catch(() => ({ growthRecords: getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId) })),
+            loadRemindersRemote(selectedBabyId, []).catch(() => ({ reminders: getLogsForBaby(getPersistedReminders([]), selectedBabyId) }))
+        ]);
+        const allCalendarEvents = calState.calendarEvents;
+        const allGrowthRecords = growthState.growthRecords;
+        const allReminders = reminderState.reminders;
         const primaryParent = getParentProfile();
         const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
         const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];

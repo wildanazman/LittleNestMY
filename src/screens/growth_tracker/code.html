@@ -125,7 +125,7 @@ const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { getLogsForBaby, getPersistedGrowthRecords, saveLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-const { deleteGrowthRecordRemote, saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
+const { deleteGrowthRecordRemote, loadGrowthRecordsRemote, saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
 const { goToScreen, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
@@ -157,6 +157,7 @@ if (permissions.canAddLogs) {
   document.getElementById("addMeasurementSection").classList.add("hidden");
   document.getElementById("growthStatus").textContent = viewOnlyMessage;
 }
+loadGrowthRecordsRemote(selectedBabyId, []).catch(() => {});
 renderTabs(); render();
 showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }

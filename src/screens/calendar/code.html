@@ -396,7 +396,7 @@
         const { deleteLocalReminder, getLogsForBaby, getPersistedCalendarEvents, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { deleteCalendarEventRemote, saveCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
+        const { deleteCalendarEventRemote, loadCalendarEventsRemote, saveCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
         const { saveReminderRemote, deleteReminderRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
 
         const monthTitle = document.getElementById("monthTitle");
@@ -438,6 +438,7 @@
         seeAllEventsButton.addEventListener("click", () => setView("upcoming"));
         backButton.addEventListener("click", () => goToScreen("home_dashboard"));
 
+        loadCalendarEventsRemote(selectedBabyId, mockCalendarEvents).catch(() => {});
         render();
 
         function render() {
@@ -587,7 +588,7 @@
             });
         }
 
-        function saveEvent() {
+        async function saveEvent() {
             const title = eventTitleInput.value.trim();
             const date = eventDateInput.value;
             const time = eventTimeInput.value || "09:00";
