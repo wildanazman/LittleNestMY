@@ -391,34 +391,14 @@ Accept invitation
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="latestWeight">No data</p>
 <span class="font-label-sm text-label-sm text-[#6B21A8]" id="latestWeightDetail">Add growth record</span>
 </div>
-</section>
-<!-- Mama Care -->
-<section id="mamaCareSection">
-<div class="rounded-[26px] border border-[#ffd9e2] bg-[#fff5f8] p-5 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-full bg-[#ffe0e8] text-[#fb7185] flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[26px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<!-- Appointment -->
+<div class="dashboard-stat-card col-span-2 bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
+<div class="dashboard-stat-label flex items-center gap-2 text-[#6f4df2]">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">event</span>
+<span class="font-label-sm text-label-sm" id="nextAppointmentLabel">Next Appointment</span>
 </div>
-<div class="min-w-0">
-<h3 class="font-headline-lg text-headline-lg text-on-surface">Mama Care</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">How is Mama doing today?</p>
-</div>
-</div>
-<div class="grid grid-cols-3 gap-2 mt-4">
-<div class="text-center">
-<p class="font-label-sm text-label-sm text-on-surface font-bold">Mood</p>
-<p class="font-label-md text-label-md text-error" id="mamaMoodPreview">Not checked</p>
-</div>
-<div class="text-center">
-<p class="font-label-sm text-label-sm text-on-surface font-bold">Rest</p>
-<p class="font-label-md text-label-md text-error" id="mamaRestPreview">Not logged</p>
-</div>
-<div class="text-center">
-<p class="font-label-sm text-label-sm text-on-surface font-bold">Meds</p>
-<p class="font-label-md text-label-md text-error" id="mamaMedsPreview">0/0</p>
-</div>
-</div>
-<button class="mt-4 h-12 w-full rounded-full bg-white/80 text-primary font-label-md text-label-md active:scale-95 transition-transform dark:bg-white/5" data-screen-target="mama_care" type="button">Check on Mama</button>
+<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextAppointmentSummary">No upcoming</p>
+<span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="nextAppointmentRelative">Tap to add</span>
 </div>
 </section>
 <!-- Quick Actions -->
@@ -486,6 +466,21 @@ Accept invitation
 </div>
 </div>
 <span class="material-symbols-outlined text-primary">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Mama Care (compact) -->
+<section id="mamaCareSection">
+<div class="rounded-[20px] border border-[#ffd9e2] bg-[#fff5f8] p-3 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40 flex items-center gap-3" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
+<div class="w-10 h-10 rounded-full bg-[#ffe0e8] text-[#fb7185] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between gap-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Mama Care</h3>
+<span class="material-symbols-outlined text-primary text-[20px]">chevron_right</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate"><span id="mamaMoodPreview">Not checked</span> · Rest <span id="mamaRestPreview">Not logged</span> · Meds <span id="mamaMedsPreview">0/0</span></p>
 </div>
 </div>
 </section>
@@ -697,13 +692,13 @@ Accept invitation
 
         if (nextEvent) {
             const { relativeLabel } = formatEventDate(nextEvent.startsAt, now);
-            setText("nextEventLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
-            setText("nextEventDate", formatHomeEventSummary(nextEvent));
-            setText("nextEventRelative", relativeLabel);
+            setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? "Next Vaccine" : "Next Appointment");
+            setText("nextAppointmentSummary", formatHomeEventSummary(nextEvent));
+            setText("nextAppointmentRelative", relativeLabel);
         } else {
-            setText("nextEventLabel", "Next Appointment");
-            setText("nextEventDate", "No upcoming");
-            setText("nextEventRelative", "");
+            setText("nextAppointmentLabel", "Next Appointment");
+            setText("nextAppointmentSummary", "No upcoming");
+            setText("nextAppointmentRelative", "Tap to add");
         }
         renderReminderBanner();
         renderActiveStatus();
@@ -769,7 +764,7 @@ Accept invitation
         function renderReminderBanner() {
             if (!selectedBaby) return;
             const nextReminder = [...allReminders]
-                .filter((reminder) => reminder.enabled && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
+                .filter((reminder) => reminder.enabled && !reminder.sourceId && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
                 .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))[0];
             if (nextReminder) {
                 setText("assistantTitle", "Upcoming reminder");
@@ -939,12 +934,14 @@ Accept invitation
 
         function selectNextHomeAppointment(events, reminders, date) {
             const todayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const eventIds = new Set((events || []).map((event) => event.id).filter(Boolean));
             const eventCandidates = (events || [])
                 .map(normalizeCalendarCandidate)
                 .filter(Boolean);
+            // Skip event-derived reminders entirely: a live event is already a
+            // candidate, and a reminder whose source event was deleted is a
+            // stale orphan. Only standalone reminders (no sourceId) count here.
             const reminderCandidates = (reminders || [])
-                .filter((reminder) => reminder.enabled !== false && !eventIds.has(reminder.sourceId))
+                .filter((reminder) => reminder.enabled !== false && !reminder.sourceId)
                 .map(normalizeReminderCandidate)
                 .filter(Boolean);
 

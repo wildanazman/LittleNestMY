@@ -393,7 +393,7 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
-        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalCalendarEvent, deleteLocalReminder, getLogsForBaby, getPersistedCalendarEvents, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
@@ -566,10 +566,12 @@
             });
             upcomingEventsList.querySelectorAll("[data-delete-event]").forEach((button) => {
                 button.addEventListener("click", () => {
-                    if (!confirm("Delete this calendar event?")) return;
-                    deleteLocalCalendarEvent(button.dataset.deleteEvent);
+                    if (!confirm("Delete this appointment?")) return;
+                    const eventId = button.dataset.deleteEvent;
+                    deleteLocalCalendarEvent(eventId);
+                    deleteLocalReminder(`reminder-event-${eventId}`);
                     render();
-                    showFeedback("Event deleted.");
+                    showFeedback("Appointment deleted.");
                 });
             });
         }
