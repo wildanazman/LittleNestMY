@@ -94,7 +94,8 @@ export const translations = {
       createBeforeNotes: "Create a baby profile before adding notes.",
       noLogsToday: "No logs yet today",
       noLogsHint: "Tap the + button to log a feed, sleep, diaper, or note.",
-      nap: "Nap"
+      nap: "Nap",
+      stop: "Stop"
     },
     logs: {
       feeding: "Feeding",
@@ -236,7 +237,8 @@ export const translations = {
       createBeforeNotes: "Cipta profil bayi sebelum menambah nota.",
       noLogsToday: "Belum ada log hari ini",
       noLogsHint: "Klik butang + untuk rekod makanan, tidur, lampin, atau nota.",
-      nap: "Tidur sebentar"
+      nap: "Tidur sebentar",
+      stop: "Henti"
     },
     logs: {
       feeding: "Penyusuan",

@@ -320,10 +320,10 @@
 <div class="min-w-0 flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">No baby profile yet</h3>
 <p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
-<span class="mt-2 inline-flex items-center gap-1 rounded-full bg-white/70 px-3 py-1 text-[12px] font-bold text-[#22a06b] dark:bg-white/10 dark:text-[#8ef0bd]" id="babyHealthyBadge">
-<span class="h-2 w-2 rounded-full bg-[#22c55e]"></span>
-<span data-i18n="home.healthy">Healthy</span>
-</span>
+<div class="mt-2 flex flex-wrap gap-1.5" id="babyHealthyBadge">
+<span class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#6B21A8] dark:bg-white/10 dark:text-[#d6bcfa]"><span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
+<span class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#1E40AF] dark:bg-white/10 dark:text-[#a5c8ff]"><span class="material-symbols-outlined text-[14px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
+</div>
 </div>
 <div class="ml-auto">
 <button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
@@ -382,17 +382,8 @@
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="lastDiaperTime">No diapers yet</p>
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastDiaperDetail"></span>
 </div>
-<!-- Growth -->
-<div class="dashboard-stat-card bg-[#E8F5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
-<div class="dashboard-stat-label flex items-center gap-2 text-[#6B21A8]">
-<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monitor_weight</span>
-<span class="font-label-sm text-label-sm" data-i18n="home.growth">Growth</span>
-</div>
-<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant" data-i18n="home.weight">Weight:</span> <span class="font-bold" id="latestWeight" data-i18n="home.notLogged">Not logged</span></p>
-<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant" data-i18n="home.height">Height:</span> <span class="font-bold" id="latestHeight" data-i18n="home.notLogged">Not logged</span></p>
-</div>
-<!-- Appointment -->
-<div class="dashboard-stat-card col-span-2 bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
+<!-- Appointment (replaces Growth card; growth now on the baby card) -->
+<div class="dashboard-stat-card bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#6f4df2]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">event</span>
 <span class="font-label-sm text-label-sm" id="nextAppointmentLabel">Next Appointment</span>
@@ -487,8 +478,7 @@
 <!-- Timeline Section -->
 <section class="space-y-sm" id="timelineSection">
 <h3 class="font-headline-md text-headline-md text-on-surface px-1" data-i18n="home.todaysLog">Today's Log</h3>
-<div class="relative pl-12 space-y-3" id="timelineList">
-<div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>
+<div class="space-y-3" id="timelineList">
 <!-- Timeline Items -->
 <div class="relative">
 <div class="absolute -left-[26px] top-1 w-5 h-5 rounded-full bg-primary-container flex items-center justify-center border-2 border-white">
@@ -594,6 +584,8 @@
             getPersistedGrowthRecords,
             getPersistedReminders,
             getLogsForBaby,
+            getActiveSleepSession,
+            clearActiveSleepSession,
             deleteLocalFeedingLog,
             deleteLocalSleepLog,
             deleteLocalDiaperLog,
@@ -698,10 +690,9 @@
         if (babyPhoto && selectedBaby?.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
         if (nextEvent) {
-            const { relativeLabel } = formatEventDate(nextEvent.startsAt, now);
             setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? t("home.nextVaccine") : t("home.nextAppointment"));
-            setText("nextAppointmentSummary", formatHomeEventSummary(nextEvent));
-            setText("nextAppointmentRelative", relativeLabel);
+            setText("nextAppointmentSummary", shortEventTitle(nextEvent.title || nextEvent.type || "Appointment"));
+            setText("nextAppointmentRelative", new Date(nextEvent.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }));
         } else {
             setText("nextAppointmentLabel", t("home.nextAppointment"));
             setText("nextAppointmentSummary", t("home.noUpcoming"));
@@ -865,10 +856,57 @@
             const timeline = document.getElementById("timelineList");
             if (!timeline) return;
 
-            timeline.innerHTML = (events.length ? '<div class="absolute left-[22px] top-3 bottom-3 w-[2px] timeline-line rounded-full"></div>' : '') +
-        (events.length ? events.map(renderTimelineItem).join("") : renderEmptyTimeline());
+            const ongoing = getActiveSleepSession();
+            const ongoingHtml = (ongoing && (!ongoing.babyId || ongoing.babyId === selectedBabyId))
+                ? renderOngoingSleep(ongoing) : "";
+            const itemsHtml = events.length ? events.map(renderTimelineItem).join("") : "";
+            timeline.innerHTML = ongoingHtml + itemsHtml || renderEmptyTimeline();
 
-            if (permissions.canAddLogs) bindTimelineDelete(date);
+            if (permissions.canAddLogs) {
+                bindTimelineDelete(date);
+                bindTimelineStop(date);
+            }
+        }
+
+        function renderOngoingSleep(session) {
+            return `
+                <div class="bg-[#eef0ff] rounded-2xl px-4 py-3 border border-[#cdbbf5]/60 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
+                    <span class="w-9 h-9 rounded-full bg-[#e8f1ff] text-[#1E40AF] flex items-center justify-center shrink-0 animate-pulse"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">nights_stay</span></span>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-headline-md text-headline-md text-on-surface truncate">${t("home.sleepingNow")}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${t("home.started")} ${formatTime(session.startedAt)}</p>
+                    </div>
+                    <button class="shrink-0 h-9 px-4 rounded-full bg-primary text-on-primary font-label-sm text-label-sm active:scale-95 transition-transform" data-stop-sleep="1" type="button">${t("home.stop")}</button>
+                </div>`;
+        }
+
+        function bindTimelineStop(date) {
+            const btn = document.querySelector("#timelineList [data-stop-sleep]");
+            if (!btn) return;
+            btn.addEventListener("click", async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const session = getActiveSleepSession();
+                if (!session) return;
+                btn.disabled = true;
+                try {
+                    await saveSleepLogRemote({
+                        id: `sleep-local-${Date.now()}`,
+                        babyId: selectedBabyId,
+                        status: "nap",
+                        startedAt: session.startedAt,
+                        endedAt: new Date().toISOString(),
+                        notes: "Logged from Home"
+                    });
+                } catch (error) {
+                    console.warn("Could not sync stopped sleep.", error);
+                }
+                clearActiveSleepSession();
+                const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+                allSleepLogs.length = 0;
+                allSleepLogs.push(...result.sleepLogs);
+                renderTimeline(date);
+            });
         }
 
         function bindTimelineDelete(date) {
@@ -911,18 +949,16 @@
                 : "";
 
             return `
-                <div class="relative">
-                    <div class="absolute -left-[44px] top-1 w-9 h-9 rounded-full ${style.chip} flex items-center justify-center border-[3px] border-white shadow-sm">
+                <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
+                    <span class="w-9 h-9 rounded-full ${style.chip} flex items-center justify-center shrink-0">
                         <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
                     </div>
-                    <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center justify-between gap-2 dark:bg-white/10 dark:border-white/10">
-                        <div class="min-w-0 flex-1">
-                            <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
-                            <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
-                        </div>
-                        <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
-                        ${deleteButton}
-                    </div>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
+                    ${deleteButton}
                 </div>
             `;
         }
@@ -1043,7 +1079,7 @@
 
         function renderEmptyTimeline() {
             return `
-                <div class="-ml-12 rounded-2xl bg-white/70 p-6 border border-white/70 soft-shadow flex flex-col items-center text-center gap-2 dark:bg-white/10 dark:border-white/10">
+                <div class="rounded-2xl bg-white/70 p-6 border border-white/70 soft-shadow flex flex-col items-center text-center gap-2 dark:bg-white/10 dark:border-white/10">
                     <div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center">
                         <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">pediatrics</span>
                     </div>
