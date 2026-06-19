@@ -182,18 +182,6 @@
 </div>
 <div class="recap-strip" id="recapStrip"></div>
 </section>
-<!-- Developmental milestones (CDC, age-aware) -->
-<section class="mb-7 max-w-[520px] mx-auto hidden" id="cdcSection">
-<div class="flex items-end justify-between mb-3">
-<div>
-<p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-1">Development</p>
-<h3 class="font-headline-md text-headline-md text-on-surface" id="cdcTitle">What to look for now</h3>
-</div>
-<span class="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm" id="cdcAgeBadge"></span>
-</div>
-<div id="cdcBody"></div>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace. A general CDC guide — not a checklist to worry over. Mark what you've noticed; it joins the memory book.</p>
-</section>
 <!-- Category Chips -->
 <section class="mb-5 max-w-[520px] mx-auto">
 <div class="chip-row" id="categoryChips"></div>
@@ -244,7 +232,7 @@
 </div>
 <div>
 <p class="font-label-md text-label-md text-on-surface" id="milestonePhotoLabel">Add optional photo</p>
-<p class="font-label-sm text-label-sm">Saved only on this device. No upload backend.</p>
+<p class="font-label-sm text-label-sm">Synced to your account when signed in, so it's there on other devices too.</p>
 </div>
 <input class="hidden" id="milestonePhotoInput" accept="image/*" type="file"/>
 </label>
@@ -252,6 +240,21 @@
 <button class="mt-gutter w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20 active:scale-95 transition-transform" id="saveMilestoneButton" type="button">
 Save Milestone
 </button>
+</section>
+<!-- Developmental milestones (CDC, age-aware) — bottom of page -->
+<section class="mb-12 max-w-[520px] mx-auto hidden" id="cdcSection">
+<div class="rounded-[32px] bg-gradient-to-br from-[#f3eeff] to-[#fff0f6] p-5 shadow-[0_10px_30px_rgba(124,92,255,0.12)] dark:from-[#241b3a] dark:to-[#2d2033]">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-11 h-11 rounded-2xl bg-white/70 text-primary flex items-center justify-center shrink-0 dark:bg-white/10"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">flag</span></div>
+<div class="min-w-0 flex-1">
+<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-primary/80">Development</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="cdcTitle">What to look for now</h3>
+</div>
+<span class="shrink-0 inline-flex items-center h-8 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm" id="cdcAgeBadge"></span>
+</div>
+<div id="cdcBody"></div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace — a gentle CDC guide, not a checklist to worry over. Tap one you've noticed and it joins the memory book.</p>
+</div>
 </section>
 <!-- Add Milestone Floating Action -->
 <div class="fixed bottom-24 right-6 md:right-12 z-50">
@@ -305,7 +308,8 @@ Save Milestone
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, milestones: mockMilestones } = await import(`${moduleBase}data/mockData.mjs`);
         const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { getLogsForBaby, getPersistedMilestones, getSelectedBabyId, getSelectedBabyProfile } = await import(`${moduleBase}utils/localState.mjs`);
+        const { getLogsForBaby, getPersistedMilestones } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
@@ -324,8 +328,23 @@ Save Milestone
         const addPanel = document.getElementById("addMilestonePanel");
         const fab = document.getElementById("addMilestoneFab");
         const backButton = document.getElementById("milestonesBackButton");
-        const selectedBabyId = getSelectedBabyId(babyProfile);
-        const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
+        const selectedBaby = babyState.selectedBaby || null;
+        // No real baby (guest / freshly logged-in): show a CTA, never the
+        // mock "Aisyah" profile, and stop before rendering anything.
+        if (!selectedBaby || !selectedBabyId) {
+            const main = document.querySelector("main");
+            if (main) main.innerHTML = `
+                <section class="max-w-[520px] mx-auto rounded-[30px] bg-surface-container-low p-8 text-center shadow-[0_12px_34px_rgba(124,92,255,0.1)] mt-6">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-primary mx-auto flex items-center justify-center mb-4"><span class="material-symbols-outlined text-[42px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-1">No memory book yet</h3>
+                    <p class="font-body-md text-body-md text-on-surface-variant mb-5">Add a baby profile to start capturing milestones and memories.</p>
+                    <button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" id="milestonesAddBaby" type="button">Create baby profile</button>
+                </section>`;
+            document.getElementById("milestonesAddBaby")?.addEventListener("click", () => goToScreen("add_baby_profile"));
+            await new Promise(() => {});
+        }
         let milestonesCache = getLogsForBaby(getPersistedMilestones([]), selectedBabyId);
         let milestonePhotoDataUrl = "";
         let editingMilestoneId = "";
@@ -497,30 +516,32 @@ Save Milestone
         function renderCdcGroup(group, { upcoming = false } = {}) {
             if (!group) return "";
             const done = group.items.filter((it) => achievedFor(it)).length;
-            const heading = upcoming
-                ? `Coming up · by ${group.age} months`
-                : `Around ${group.age} months · ${done}/${group.items.length} noticed`;
+            const total = group.items.length;
+            const pct = total ? Math.round((done / total) * 100) : 0;
             const rows = group.items.map((it) => {
                 const hit = achievedFor(it);
                 if (hit) {
                     return `
-                        <button data-cdc-open="${hit.id}" type="button" class="w-full flex items-center gap-3 text-left py-2.5 active:scale-[0.99] transition-transform">
+                        <button data-cdc-open="${hit.id}" type="button" class="w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99] transition-all">
                             <span class="shrink-0 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check</span></span>
                             <span class="flex-1 font-body-md text-body-md text-on-surface">${escapeHtml(it)}</span>
-                            <span class="font-label-sm text-label-sm text-primary">${dateLabelOf(hit)}</span>
+                            <span class="font-label-sm text-label-sm text-primary whitespace-nowrap">${dateLabelOf(hit)}</span>
                         </button>`;
                 }
                 return `
-                    <button data-cdc-mark="${escapeHtml(it)}" type="button" class="w-full flex items-center gap-3 text-left py-2.5 group active:scale-[0.99] transition-transform">
-                        <span class="shrink-0 w-7 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary flex items-center justify-center text-transparent group-hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></span>
+                    <button data-cdc-mark="${escapeHtml(it)}" type="button" class="w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl group hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99] transition-all">
+                        <span class="shrink-0 w-7 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary flex items-center justify-center text-outline-variant group-hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></span>
                         <span class="flex-1 font-body-md text-body-md ${upcoming ? "text-on-surface-variant" : "text-on-surface"}">${escapeHtml(it)}</span>
-                        <span class="font-label-sm text-label-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">Mark</span>
+                        <span class="font-label-sm text-label-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Mark</span>
                     </button>`;
             }).join("");
+            const header = upcoming
+                ? `<div class="flex items-center gap-2 mb-2 px-2"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">schedule</span><p class="font-label-md text-label-md text-on-surface-variant">Coming up · by ${group.age} months</p></div>`
+                : `<div class="mb-2 px-2"><div class="flex items-center justify-between mb-1.5"><p class="font-label-md text-label-md text-on-surface">Around ${group.age} months</p><span class="font-label-sm text-label-sm text-primary">${done}/${total} noticed</span></div><div class="h-1.5 rounded-full bg-white/60 dark:bg-white/10 overflow-hidden"><div class="h-full rounded-full bg-primary transition-all" style="width:${pct}%"></div></div></div>`;
             return `
-                <div class="rounded-[24px] bg-surface-container-low p-4 mb-3 shadow-[0_10px_30px_rgba(124,92,255,0.08)] ${upcoming ? "opacity-90" : ""}">
-                    <p class="font-label-md text-label-md text-on-surface-variant mb-1">${heading}</p>
-                    <div class="divide-y divide-outline-variant/40">${rows}</div>
+                <div class="rounded-[24px] bg-white/70 dark:bg-white/5 p-3 mb-3 ${upcoming ? "opacity-90" : ""}">
+                    ${header}
+                    <div class="space-y-0.5">${rows}</div>
                 </div>`;
         }
 
@@ -554,7 +575,10 @@ Save Milestone
             };
             milestonesCache = [draft, ...milestonesCache.filter((item) => item.id !== draft.id)];
             try {
-                await saveMilestoneRemote(draft);
+                // Use the returned item: when synced it carries the real
+                // server id, so the card can later be deleted correctly.
+                const saved = await saveMilestoneRemote(draft);
+                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== draft.id)];
                 showFeedback("Noticed! Added to the memory book.");
             } catch (error) {
                 showFeedback(`${error.message || "Cloud save failed."} Kept on this device.`);

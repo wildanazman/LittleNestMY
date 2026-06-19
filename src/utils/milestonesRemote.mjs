@@ -38,11 +38,14 @@ export async function loadMilestonesRemote(selectedBabyId, fallback = []) {
 export { milestoneMigrationKey };
 
 export async function saveMilestoneRemote(milestone) {
-  const local = saveLocalMilestone(milestone);
-  if (!canUseSupabase(milestone.babyId)) return local;
+  // saveLocalMilestone returns the whole collection, so always return the
+  // milestone object itself — callers rely on saved.id to delete/edit, and
+  // the remote branch must hand back the real server id.
+  saveLocalMilestone(milestone);
+  if (!canUseSupabase(milestone.babyId)) return milestone;
 
   const session = await getAuthSession();
-  if (!session?.user) return local;
+  if (!session?.user) return milestone;
 
   try {
     const remoteId = stableUuid(milestone.id, "milestone");
@@ -68,7 +71,9 @@ export async function saveMilestoneRemote(milestone) {
 
     if (photoPath) await savePhotoMetadata({ babyId: milestone.babyId, path: photoPath, milestoneId: remoteId });
     if (milestone.id !== data.id) deleteLocalMilestone(milestone.id);
-    return saveLocalMilestone(fromMilestoneRow(data));
+    const savedItem = fromMilestoneRow(data);
+    saveLocalMilestone(savedItem);
+    return savedItem;
   } catch (error) {
     throw friendlyMilestoneError(error, "save memory");
   }
@@ -170,7 +175,11 @@ function stableUuid(id, prefix) {
 }
 
 function isUuid(value) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(String(value || ""));
+  // Note: the 4th group needs its own dash — the old regex merged groups 4
+  // and 5, so it rejected every real uuid. That made deleteMilestoneRemote
+  // skip the remote delete (milestones "came back") and made stableUuid
+  // regenerate ids instead of reusing the client uuid.
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
 }
 
 function cryptoUuidFromString(value) {
