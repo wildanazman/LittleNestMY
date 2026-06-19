@@ -141,11 +141,22 @@
           background-size: 200% 100%;
         }
         .baby-glass-card {
-          background: rgba(255, 255, 255, 0.58) !important;
-          border: 1px solid rgba(255, 255, 255, 0.72);
-          box-shadow: 0 18px 44px rgba(131, 83, 60, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.72);
-          backdrop-filter: blur(18px) saturate(1.25);
-          -webkit-backdrop-filter: blur(18px) saturate(1.25);
+          background: linear-gradient(135deg, #efe7ff 0%, #ffe9f2 52%, #e6f3ff 100%) !important;
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 20px 46px rgba(124, 92, 255, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+          position: relative;
+          overflow: hidden;
+        }
+        .baby-glass-card::after {
+          content: "";
+          position: absolute;
+          top: -40%;
+          right: -10%;
+          width: 160px;
+          height: 160px;
+          border-radius: 9999px;
+          background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
+          pointer-events: none;
         }
         #homeContent header:not(nav),
         #homeContent header button,
@@ -314,22 +325,22 @@
 </div>
 <!-- Baby Profile Card -->
 <div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
-<div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
+<div class="shrink-0 rounded-full p-[3px] shadow-sm" style="background:linear-gradient(135deg,#9b7cff,#ff9ec7)">
+<div class="w-[72px] h-[72px] rounded-full overflow-hidden border-2 border-white">
 <img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="../../../icons/icon-192.png"/>
 </div>
-<div class="min-w-0 flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">No baby profile yet</h3>
-<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
-<div class="mt-2 flex flex-wrap gap-1.5" id="babyHealthyBadge">
-<span class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#6B21A8] dark:bg-white/10 dark:text-[#d6bcfa]"><span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
-<span class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#1E40AF] dark:bg-white/10 dark:text-[#a5c8ff]"><span class="material-symbols-outlined text-[14px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
+</div>
+<div class="min-w-0 flex-1 relative z-10">
+<h3 class="font-headline-md text-headline-md text-on-surface truncate" id="babyName">No baby profile yet</h3>
+<p class="font-label-md text-label-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
+<div class="mt-2.5 flex flex-wrap gap-2" id="babyHealthyBadge">
+<span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-[#6B21A8] shadow-sm dark:bg-white/10 dark:text-[#d6bcfa]"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
+<span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-[#1E40AF] shadow-sm dark:bg-white/10 dark:text-[#a5c8ff]"><span class="material-symbols-outlined text-[15px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
 </div>
 </div>
-<div class="ml-auto">
-<button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
+<button aria-label="Baby profile menu" class="shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm backdrop-blur relative z-10 active:scale-95 transition-transform" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
 </button>
-</div>
 </div>
 <!-- Empty state CTAs (no baby profile) -->
 <div class="hidden space-y-3" id="noBabyCta">
@@ -477,7 +488,10 @@
 </section>
 <!-- Timeline Section -->
 <section class="space-y-sm" id="timelineSection">
-<h3 class="font-headline-md text-headline-md text-on-surface px-1" data-i18n="home.todaysLog">Today's Log</h3>
+<div class="flex items-center gap-2 px-1">
+<span class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">history</span></span>
+<h3 class="font-headline-md text-headline-md text-on-surface" data-i18n="home.todaysLog">Today's Log</h3>
+</div>
 <div class="space-y-3" id="timelineList">
 <!-- Timeline Items -->
 <div class="relative">
@@ -946,9 +960,9 @@
 
         function renderTimelineItem(event) {
             const styles = {
-                feed: { chip: "bg-[#ffe3ec] text-[#d6336c]", icon: "restaurant" },
-                sleep: { chip: "bg-[#e8f1ff] text-[#1E40AF]", icon: "bedtime" },
-                diaper: { chip: "bg-[#e5fbf2] text-[#15803D]", icon: "baby_changing_station" }
+                feed: { chip: "from-[#ffd9e6] to-[#ffb3cd] text-[#c01f5b]", icon: "restaurant", accent: "#ff6fa5" },
+                sleep: { chip: "from-[#dbeafe] to-[#bfd5ff] text-[#1E40AF]", icon: "bedtime", accent: "#5b8def" },
+                diaper: { chip: "from-[#d5f7e6] to-[#b6f0d2] text-[#0f7a44]", icon: "baby_changing_station", accent: "#22c08a" }
             };
             const style = styles[event.type] || styles.feed;
             const canDelete = permissions.canAddLogs && event.id;
@@ -957,15 +971,16 @@
                 : "";
 
             return `
-                <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
-                    <span class="w-9 h-9 rounded-full ${style.chip} flex items-center justify-center shrink-0">
-                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
+                <div class="relative bg-white rounded-[20px] pl-4 pr-3 py-3 border border-black/[0.04] shadow-[0_8px_22px_rgba(124,92,255,0.08)] flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
+                    <span class="absolute left-1.5 top-3 bottom-3 w-1 rounded-full" style="background:${style.accent}"></span>
+                    <span class="w-10 h-10 rounded-2xl bg-gradient-to-br ${style.chip} flex items-center justify-center shrink-0 ml-1.5">
+                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
                     </span>
                     <div class="min-w-0 flex-1">
-                        <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
-                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
+                        <p class="text-[15px] font-bold text-on-surface truncate leading-tight">${event.title}</p>
+                        <p class="text-[13px] text-on-surface-variant truncate mt-0.5">${event.detail}</p>
                     </div>
-                    <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
+                    <span class="text-[12px] font-semibold text-on-surface-variant shrink-0 whitespace-nowrap bg-surface-container-low rounded-full px-2.5 py-1 dark:bg-white/10">${formatTime(event.at)}</span>
                     ${deleteButton}
                 </div>
             `;
