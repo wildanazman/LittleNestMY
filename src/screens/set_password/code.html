@@ -74,10 +74,24 @@ tailwind.config = {
   const error = document.getElementById("passwordError");
   const success = document.getElementById("passwordSuccess");
   const submitButton = form.querySelector('button[type="submit"]');
+  const desc = document.querySelector("#passwordForm")?.previousElementSibling?.querySelector("p");
+  const heading = document.querySelector("#passwordForm")?.previousElementSibling?.querySelector("h1");
+
+  const isRecovery = window.location.hash && window.location.hash.includes("type=recovery");
 
   if (!(await isLoggedIn())) {
-    window.location.replace(screenUrl("login"));
+    if (isRecovery) {
+      const session = await getAuthSession();
+      if (!session) {
+        window.location.replace(screenUrl("login"));
+      }
+    } else {
+      window.location.replace(screenUrl("login"));
+    }
   }
+
+  if (isRecovery && heading) heading.textContent = "Reset your password";
+  if (isRecovery && desc) desc.textContent = "Enter a new password for your account.";
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
