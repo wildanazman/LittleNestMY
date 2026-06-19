@@ -352,15 +352,19 @@
 <span data-i18n="home.acceptInvite">Accept invitation</span>
 </button>
 </div>
-<div class="rounded-[24px] bg-white/75 p-4 soft-shadow border border-white/70 flex items-center gap-4 dark:bg-white/10 dark:border-white/10" id="activeStatusCard">
-<div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">bedtime</span>
+<div class="rounded-[24px] bg-white/75 p-4 soft-shadow border border-white/70 cursor-pointer dark:bg-white/10 dark:border-white/10" id="activeStatusCard" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Log a feed">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#ffe3ec] text-[#d6336c] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant</span>
 </div>
 <div class="min-w-0 flex-1">
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusLabel">Latest status</p>
-<p class="font-headline-md text-headline-md text-on-surface" id="activeStatusTitle">Ready to log care</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusDetail">Recent baby activity will appear here.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusLabel">Next feed</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="activeStatusTitle">—</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusDetail">Tap to log a feed</p>
 </div>
+<span class="material-symbols-outlined text-primary shrink-0">chevron_right</span>
+</div>
+<div class="h-1.5 rounded-full bg-surface-container mt-3 overflow-hidden dark:bg-white/10"><div class="h-full rounded-full transition-all" id="feedProgressBar" style="width:0%;background:#7056f4"></div></div>
 </div>
 </section>
 <!-- Status Grid -->
@@ -1221,22 +1225,57 @@
             });
         }
 
+        function feedIntervalHours() {
+            const guide = getFeedingGuideForBaby(selectedBaby?.dateOfBirth);
+            if (guide?.suggestedIntervalHours) return guide.suggestedIntervalHours;
+            const feedType = selectedBaby?.feedingPreference || selectedBaby?.feedingType || "mixed";
+            const fb = B.feedingBenchmark(B.ageInMonths(selectedBaby?.dateOfBirth), feedType);
+            if (fb.freq) return Math.max(2, Math.round(24 / ((fb.freq[0] + fb.freq[1]) / 2)));
+            return 3;
+        }
+
+        // Age-aware next-feed timer: counts down from the last feed by the
+        // recommended interval for the baby's age (e.g. ~3h at 1 month).
         function renderActiveStatus() {
-            if (activeSleep) {
-                setText("activeStatusLabel", t("home.sleepingNow"));
-                setText("activeStatusTitle", formatDuration(Math.max(0, Math.round((now - new Date(activeSleep.startedAt)) / 60000))));
-                setText("activeStatusDetail", `${t("home.started")} ${formatTime(activeSleep.startedAt)}`);
+            if (!selectedBaby) {
+                setText("activeStatusLabel", t("home.latestStatus"));
+                setText("activeStatusTitle", t("home.noBabyName"));
+                setText("activeStatusDetail", t("home.createBabyLater"));
                 return;
             }
-            if (latestFeed) {
-                setText("activeStatusLabel", t("home.lastFeedStatus"));
-                setText("activeStatusTitle", formatRelativeTime(latestFeed.startedAt, now));
-                setText("activeStatusDetail", latestFeed.amountMl ? `${latestFeed.amountMl} ${t("home.mlLogged")}` : t("home.feedingLogged"));
-                return;
-            }
-            setText("activeStatusLabel", t("home.latestStatus"));
-            setText("activeStatusTitle", selectedBaby ? t("home.readyToLog") : t("home.noBabyName"));
-            setText("activeStatusDetail", selectedBaby ? t("home.activityHint") : t("home.createBabyLater"));
+            const bar = document.getElementById("feedProgressBar");
+            const intervalH = feedIntervalHours();
+            const intervalMs = intervalH * 3600000;
+
+            const update = () => {
+                const nowMs = Date.now();
+                if (!latestFeed) {
+                    setText("activeStatusLabel", "Feeding");
+                    setText("activeStatusTitle", "Log first feed");
+                    setText("activeStatusDetail", "Start the feed timer");
+                    if (bar) { bar.style.width = "0%"; }
+                    return;
+                }
+                const last = new Date(latestFeed.startedAt).getTime();
+                const remaining = last + intervalMs - nowMs;
+                const pct = Math.max(0, Math.min(100, ((nowMs - last) / intervalMs) * 100));
+                if (bar) {
+                    bar.style.width = `${pct}%`;
+                    bar.style.background = remaining <= 0 ? "#f59e0b" : pct > 80 ? "#f59e0b" : "#7056f4";
+                }
+                if (remaining > 0) {
+                    setText("activeStatusLabel", "Next feed");
+                    setText("activeStatusTitle", `in ${formatDuration(Math.max(1, Math.round(remaining / 60000)))}`);
+                    setText("activeStatusDetail", `Every ${intervalH}h · last fed ${formatTime(latestFeed.startedAt)}`);
+                } else {
+                    setText("activeStatusLabel", "Feed due");
+                    setText("activeStatusTitle", "Now");
+                    setText("activeStatusDetail", `Last fed ${formatTime(latestFeed.startedAt)} · ${formatDuration(Math.round(-remaining / 60000))} ago`);
+                }
+            };
+            update();
+            clearInterval(window.__lnFeedTimer);
+            window.__lnFeedTimer = setInterval(update, 20000);
         }
 
         document.querySelector("[data-open-note-log]")?.addEventListener("click", (event) => {
