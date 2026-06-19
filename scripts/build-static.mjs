@@ -1,12 +1,21 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 import { screens } from "../src/data/screens.mjs";
 import { loadRuntimeEnv } from "./runtime-env.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const dist = join(root, "dist");
 const screensRoot = join(root, "src", "screens");
+
+// 1. Build Tailwind CSS
+console.log("Building Tailwind CSS…");
+execSync("npx @tailwindcss/cli -i src/styles/tailwind-input.css -o src/styles/tailwind.css", {
+  cwd: root, stdio: "inherit",
+});
+
+// 2. Load runtime env (generates src/config/runtime-env.mjs)
 await loadRuntimeEnv();
 
 const missingScreens = screens

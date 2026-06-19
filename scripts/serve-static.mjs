@@ -5,10 +5,18 @@ import { fileURLToPath } from "node:url";
 import { defaultScreenId, getScreenById } from "../src/data/screens.mjs";
 import { resolveDirectoryIndex, resolveSafePath } from "../src/utils/paths.mjs";
 import { loadRuntimeEnv } from "./runtime-env.mjs";
+import { execSync } from "node:child_process";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const screensRoot = join(root, "src", "screens");
 const port = Number(process.env.PORT || 5173);
+
+// Build Tailwind CSS on startup so screens never load the CDN
+console.log("Building Tailwind CSS…");
+execSync("npx @tailwindcss/cli -i src/styles/tailwind-input.css -o src/styles/tailwind.css", {
+  cwd: root, stdio: "inherit",
+});
+
 await loadRuntimeEnv();
 
 const contentTypes = {

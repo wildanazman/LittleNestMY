@@ -7,3 +7,4 @@ Thumbs.db
 .env
 .env.local
 src/config/runtime-env.mjs
+src/styles/tailwind.css
