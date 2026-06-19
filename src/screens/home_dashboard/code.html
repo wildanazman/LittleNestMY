@@ -439,17 +439,14 @@
 </section>
 <!-- Reminder Banner -->
 <section id="reminderSection">
-<div class="bg-primary text-on-primary p-4 rounded-xl flex items-center gap-4 relative overflow-hidden">
-<div class="absolute right-0 top-0 opacity-10 scale-150 rotate-12">
-<span class="material-symbols-outlined text-[120px]">tips_and_updates</span>
+<div class="rounded-[24px] p-4 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)">
+<div class="absolute right-[-10px] top-[-10px] opacity-15 rotate-12"><span class="material-symbols-outlined text-[110px] text-white">insights</span></div>
+<div class="flex items-center gap-2 mb-3 relative z-10">
+<span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"><span class="material-symbols-outlined text-[18px] text-white" style="font-variation-settings:'FILL' 1;">wb_sunny</span></span>
+<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/85">Today's focus</p>
 </div>
-<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">task_alt</span>
-</div>
-<div class="z-10">
-<p class="font-headline-md text-headline-md leading-tight" id="assistantTitle">Start logging to see helpful reminders.</p>
-<p class="font-label-sm text-label-sm opacity-90" id="assistantMessage">Real suggestions will appear after a few care logs.</p>
-</div>
+<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="focusHeadline">Reading today's logs…</p>
+<div class="grid grid-cols-3 gap-2 relative z-10" id="focusStats"></div>
 </div>
 </section>
 <!-- Daily Summary -->
@@ -623,6 +620,7 @@
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
         const { t } = await import(`${moduleBase}utils/i18n.mjs`);
+        const B = await import(`${moduleBase}utils/benchmarks.mjs`);
 
         window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
         window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
@@ -789,24 +787,60 @@
             setText("growthSummaryDetail", [length ? `${length} cm` : "", latestGrowth.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm head` : ""].filter(Boolean).join(" · ") || "Latest measurement saved");
         }
 
+        // "Today's focus": age-aware progress on feeds / sleep / wet nappies
+        // vs guidelines, with one gentle, actionable nudge.
         function renderReminderBanner() {
             if (!selectedBaby) return;
-            const nextReminder = [...allReminders]
-                .filter((reminder) => reminder.enabled && !reminder.sourceId && ["appointment", "medicine", "custom"].includes(reminder.type) && new Date(reminder.scheduledAt) >= now)
-                .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))[0];
-            if (nextReminder) {
-                setText("assistantTitle", t("home.upcomingReminder"));
-                setText("assistantMessage", `${nextReminder.title} · ${formatRelativeTime(nextReminder.scheduledAt, now)}`);
-                return;
+            const headlineEl = document.getElementById("focusHeadline");
+            const statsEl = document.getElementById("focusStats");
+            if (!headlineEl || !statsEl) return;
+
+            const months = B.ageInMonths(selectedBaby.dateOfBirth);
+            const feedType = selectedBaby.feedingPreference || selectedBaby.feedingType || "mixed";
+            const fb = B.feedingBenchmark(months, feedType);
+            const sb = B.sleepBenchmark(months);
+            const db = B.diaperBenchmark(months, feedType);
+
+            const feedsToday = allFeedingLogs.filter((l) => isSameLocalDay(l.startedAt, now)).length;
+            const sleepMin = getTodaySleepMinutes(allSleepLogs, now);
+            const sleepH = Math.round((sleepMin / 60) * 10) / 10;
+            const wetToday = allDiaperLogs.filter((l) => isSameLocalDay(l.changedAt, now) && l.type !== "dirty").length;
+
+            const feedMin = fb.freq ? fb.freq[0] : 6;
+            const feedMax = fb.freq ? fb.freq[1] : 8;
+            const sleepLo = sb.totalHours[0];
+            const sleepHi = sb.totalHours[1];
+            const wetMin = db.wetMin;
+
+            const stat = (val, label, pct, ok) => `
+                <div class="bg-white/15 rounded-2xl p-2.5 text-center">
+                    <p class="text-white text-[17px] font-extrabold leading-none">${val}</p>
+                    <p class="text-white/80 text-[11px] mt-1">${label}</p>
+                    <div class="h-1 rounded-full bg-white/25 mt-2 overflow-hidden"><div class="h-full rounded-full" style="width:${Math.max(4, Math.min(100, Math.round(pct * 100)))}%;background:${ok ? "#bff5d8" : "#ffffff"}"></div></div>
+                </div>`;
+            statsEl.innerHTML =
+                stat(String(feedsToday), "Feeds", feedsToday / feedMax, feedsToday >= feedMin) +
+                stat(sleepMin ? formatDuration(sleepMin) : "0h", "Sleep", sleepH / sleepHi, sleepH >= sleepLo) +
+                stat(String(wetToday), "Wet", wetToday / wetMin, wetToday >= wetMin);
+
+            // Pick the metric furthest below its target for the nudge.
+            const fracs = [
+                { key: "wet", f: wetToday / wetMin },
+                { key: "feed", f: feedsToday / feedMin },
+                { key: "sleep", f: sleepH / sleepLo }
+            ].sort((a, b) => a.f - b.f);
+            const worst = fracs[0];
+            let headline;
+            if (worst.f >= 1) {
+                headline = `Lovely rhythm today — ${feedsToday} feeds, ${sleepMin ? formatDuration(sleepMin) : "0h"} sleep, ${wetToday} wet. 🌿`;
+            } else if (worst.key === "wet") {
+                headline = `${wetToday} of ${wetMin}+ wet nappies so far — a feed helps keep hydration up.`;
+            } else if (worst.key === "feed") {
+                headline = `${feedsToday} feed${feedsToday === 1 ? "" : "s"} so far — aim for ${feedMin}–${feedMax} across the day.`;
+            } else {
+                headline = `${sleepMin ? formatDuration(sleepMin) : "No"} sleep logged — this age usually needs ${sleepLo}–${sleepHi}h.`;
             }
-            const enabledFeeding = allReminders.find((reminder) => reminder.type === "feeding" && reminder.enabled);
-            if (!latestFeed && !enabledFeeding) return;
-            const guide = getFeedingGuideForBaby(selectedBaby.dateOfBirth);
-            const reminderText = latestFeed
-                ? nextFeedReminderText(latestFeed.startedAt, enabledFeeding?.repeatRule?.intervalHours || guide.suggestedIntervalHours)
-                : t("home.noFeedsLogged");
-            setText("assistantTitle", t("home.nextFeedTitle"));
-            setText("assistantMessage", latestFeed ? `${t("home.feedingPatternNote")} ${reminderText}` : reminderText);
+            headlineEl.textContent = headline;
         }
 
         async function renderMamaCarePreview() {
