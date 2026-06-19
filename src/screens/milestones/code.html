@@ -695,11 +695,13 @@ Save Milestone
             };
             try {
                 milestonesCache = [{ ...milestoneDraft }, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
-                await saveMilestoneRemote(milestoneDraft);
+                const saved = await saveMilestoneRemote(milestoneDraft);
+                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== editingMilestoneId)];
 
                 noteInput.value = "";
                 customTitleInput.value = "";
                 typeInput.value = "First smile";
+                dateInput.value = new Date().toISOString().slice(0, 10);
                 customTitleWrapper.classList.add("hidden");
                 photoInput.value = "";
                 videoInput.value = "";
@@ -708,7 +710,7 @@ Save Milestone
                 editingMilestoneId = "";
                 saveButton.textContent = "Save Milestone";
                 renderAll();
-                showFeedback(milestoneDraft.photoUrl?.startsWith("http") ? "Saved to cloud memory book." : "Saved to memory book.");
+                showFeedback(saved.photoUrl?.startsWith("http") ? "Saved to cloud memory book." : "Saved to memory book.");
             } catch (error) {
                 milestonesCache = [milestoneDraft, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
                 renderAll();
