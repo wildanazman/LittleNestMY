@@ -237,6 +237,13 @@
 <span class="font-label-sm text-label-sm text-on-surface" id="milestoneVideoLabel">Record 5s video</span>
 </button>
 </div>
+<div class="hidden mt-3 rounded-[20px] overflow-hidden bg-surface-container-lowest" id="mediaPreview">
+<img class="w-full h-48 object-cover hidden" id="previewImage" alt="Preview"/>
+<video class="w-full h-48 object-cover hidden" id="previewVideo" muted controls playsinline></video>
+<button class="w-full h-10 text-label-md text-error font-medium flex items-center justify-center gap-1 active:scale-95 transition-transform" id="clearMediaButton" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span> Remove
+</button>
+</div>
 <p class="font-label-sm text-label-sm text-on-surface-variant mt-2 px-1">Photos and short clips sync to your account, so they're on your other devices too.</p>
 <input class="hidden" id="milestoneVideoInput" accept="video/*" capture="user" type="file"/>
 <p class="font-label-md text-label-md text-tertiary mt-sm hidden" id="milestoneFeedback" aria-live="polite">Saved.</p>
@@ -400,10 +407,16 @@ Save Milestone
         const recorderCountdownText = document.getElementById("recorderCountdownText");
         const recorderHint = document.getElementById("recorderHint");
         const recorderFlip = document.getElementById("recorderFlip");
+        const mediaPreview = document.getElementById("mediaPreview");
+        const previewImage = document.getElementById("previewImage");
+        const previewVideo = document.getElementById("previewVideo");
+        const clearMediaButton = document.getElementById("clearMediaButton");
         const MAX_VIDEO_MS = 5000;
         let recorderStream = null;
         let mediaRecorder = null;
+        let recordedBlob = null;
         let recordedDataUrl = "";
+        let pendingVideoBlobUrl = "";
         let countdownTimer = null;
         let facingMode = "user";
 
@@ -414,16 +427,59 @@ Save Milestone
             videoLabel.textContent = "Record 5s video";
         }
 
+        function showPhotoPreview(dataUrl) {
+            previewVideo.classList.add("hidden");
+            previewVideo.removeAttribute("src");
+            previewImage.classList.remove("hidden");
+            previewImage.src = dataUrl;
+            mediaPreview.classList.remove("hidden");
+        }
+
+        function showVideoPreview(blobUrl) {
+            previewImage.classList.add("hidden");
+            previewImage.src = "";
+            previewVideo.classList.remove("hidden");
+            previewVideo.src = blobUrl;
+            previewVideo.load();
+            previewVideo.play().catch(() => {});
+            mediaPreview.classList.remove("hidden");
+        }
+
+        function hidePreview() {
+            mediaPreview.classList.add("hidden");
+            previewImage.classList.add("hidden");
+            previewImage.src = "";
+            previewVideo.classList.add("hidden");
+            previewVideo.removeAttribute("src");
+        }
+
+        clearMediaButton.addEventListener("click", () => {
+            milestonePhotoDataUrl = "";
+            if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+            pendingVideoBlobUrl = "";
+            recordedBlob = null;
+            recordedDataUrl = "";
+            hidePreview();
+            resetMediaLabels();
+            photoInput.value = "";
+            videoInput.value = "";
+        });
+
         photoInput.addEventListener("change", async (event) => {
             if (!event.target.files?.[0]) return;
+            hidePreview();
+            if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+            pendingVideoBlobUrl = "";
             try {
                 milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 900, quality: 0.82 });
                 resetMediaLabels();
                 photoLabel.textContent = "Photo ready ✓";
+                showPhotoPreview(milestonePhotoDataUrl);
                 showFeedback("Photo ready. It uploads to your account when saved.");
             } catch (error) {
                 milestonePhotoDataUrl = "";
                 resetMediaLabels();
+                hidePreview();
                 showFeedback(error.message);
             }
         });
@@ -438,6 +494,7 @@ Save Milestone
             milestonePhotoDataUrl = recordedDataUrl;
             resetMediaLabels();
             videoLabel.textContent = "Video ready ✓";
+            showVideoPreview(pendingVideoBlobUrl);
             showFeedback("Clip ready. It uploads to your account when saved.");
             closeRecorder();
         });
@@ -490,6 +547,9 @@ Save Milestone
 
         function startLivePreview() {
             recordedDataUrl = "";
+            recordedBlob = null;
+            if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+            pendingVideoBlobUrl = "";
             recorderVideo.srcObject = recorderStream;
             recorderVideo.muted = true;
             recorderVideo.loop = false;
@@ -511,8 +571,10 @@ Save Milestone
             mediaRecorder.addEventListener("dataavailable", (event) => { if (event.data.size) chunks.push(event.data); });
             mediaRecorder.addEventListener("stop", async () => {
                 clearInterval(countdownTimer);
-                const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "video/webm" });
-                recordedDataUrl = await blobToDataUrl(blob);
+                recordedBlob = new Blob(chunks, { type: mediaRecorder.mimeType || "video/webm" });
+                if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+                pendingVideoBlobUrl = URL.createObjectURL(recordedBlob);
+                recordedDataUrl = await blobToDataUrl(recordedBlob);
                 showRecordedPreview();
             });
             mediaRecorder.start();
@@ -530,7 +592,7 @@ Save Milestone
 
         function showRecordedPreview() {
             recorderVideo.srcObject = null;
-            recorderVideo.src = recordedDataUrl;
+            recorderVideo.src = pendingVideoBlobUrl || recordedDataUrl;
             recorderVideo.muted = true;
             recorderVideo.loop = true;
             recorderVideo.play().catch(() => {});
@@ -557,20 +619,31 @@ Save Milestone
         videoInput.addEventListener("change", async (event) => {
             const file = event.target.files?.[0];
             if (!file) return;
+            hidePreview();
+            if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+            pendingVideoBlobUrl = URL.createObjectURL(file);
             try {
                 const dataUrl = await blobToDataUrl(file);
                 const duration = await videoDuration(dataUrl);
                 if (duration > 5.6) {
                     milestonePhotoDataUrl = "";
+                    if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+                    pendingVideoBlobUrl = "";
                     resetMediaLabels();
+                    hidePreview();
                     showFeedback("Please keep the clip to about 5 seconds.");
                     return;
                 }
                 milestonePhotoDataUrl = dataUrl;
                 resetMediaLabels();
                 videoLabel.textContent = "Video ready ✓";
+                showVideoPreview(pendingVideoBlobUrl);
                 showFeedback("Clip ready. It uploads to your account when saved.");
             } catch (error) {
+                milestonePhotoDataUrl = "";
+                if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+                pendingVideoBlobUrl = "";
+                resetMediaLabels();
                 showFeedback("Could not read that video.");
             }
         });
@@ -698,6 +771,7 @@ Save Milestone
                 const saved = await saveMilestoneRemote(milestoneDraft);
                 milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== editingMilestoneId)];
 
+                hidePreview();
                 noteInput.value = "";
                 customTitleInput.value = "";
                 typeInput.value = "First smile";
@@ -707,6 +781,9 @@ Save Milestone
                 videoInput.value = "";
                 resetMediaLabels();
                 milestonePhotoDataUrl = "";
+                if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
+                pendingVideoBlobUrl = "";
+                recordedBlob = null;
                 editingMilestoneId = "";
                 saveButton.textContent = "Save Milestone";
                 renderAll();
@@ -907,13 +984,22 @@ Save Milestone
         }
 
         function isVideoUrl(url) {
-            return typeof url === "string" && (url.startsWith("data:video") || /\.(webm|mp4|mov|m4v)(\?|$)/i.test(url));
+            return typeof url === "string" && (url.startsWith("data:video") || url.startsWith("blob:") || /\.(webm|mp4|mov|m4v)(\?|$)/i.test(url));
+        }
+
+        // Use a blob URL for freshly-recorded video instead of the raw data URL,
+        // because video data-URLs are multi-MB base64 strings that can overflow
+        // the HTML parser's attribute-value limit when set via innerHTML.
+        function renderSrc(photoUrl) {
+            return (pendingVideoBlobUrl && typeof photoUrl === "string" && photoUrl.startsWith("data:video"))
+                ? pendingVideoBlobUrl : photoUrl;
         }
 
         // Memory media keeps replaying: videos autoplay muted on a loop.
         function renderMedia(url, classes) {
-            if (isVideoUrl(url)) return `<video class="${classes}" src="${url}" muted loop autoplay playsinline></video>`;
-            return `<img class="${classes}" src="${url}" alt="">`;
+            const src = renderSrc(url);
+            if (isVideoUrl(src)) return `<video class="${classes}" src="${src}" muted loop autoplay playsinline></video>`;
+            return `<img class="${classes}" src="${src}" alt="">`;
         }
 
         function renderMemoryCard(m) {
@@ -1055,7 +1141,14 @@ Save Milestone
             dateInput.value = m.achievedAt;
             noteInput.value = m.notes || "";
             milestonePhotoDataUrl = m.photoUrl || "";
-            photoLabel.textContent = milestonePhotoDataUrl ? "Photo ready" : "Add optional photo";
+            if (milestonePhotoDataUrl) {
+                if (isVideoUrl(milestonePhotoDataUrl)) showVideoPreview(milestonePhotoDataUrl);
+                else showPhotoPreview(milestonePhotoDataUrl);
+                photoLabel.textContent = "Photo ready";
+            } else {
+                hidePreview();
+                photoLabel.textContent = "Add optional photo";
+            }
             saveButton.textContent = "Update memory";
             addPanel.scrollIntoView({ behavior: "smooth", block: "start" });
         }
