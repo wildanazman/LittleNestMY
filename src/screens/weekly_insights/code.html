@@ -101,25 +101,20 @@
       .material-symbols-outlined {
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
       }
-      .soft-shadow {
-        box-shadow: 0 4px 20px rgba(255, 191, 163, 0.15);
-      }
+      .soft-shadow {box-shadow:0 18px 45px rgba(131,83,60,.12)}
       .chart-container {
         mask-image: linear-gradient(to right, black 92%, transparent);
       }
     </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-background text-on-surface min-h-screen pb-24">
-<header class="sticky top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-50">
-<div class="flex items-center gap-base min-w-0">
-<button aria-label="Go back" class="text-primary hover:opacity-80 transition-opacity p-2 -ml-2 active:scale-95" id="backButton" type="button">
-<span class="material-symbols-outlined">arrow_back</span>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-28">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+<div class="flex items-center gap-2 min-w-0">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Weekly Insights</h1>
-</div>
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center ring-2 ring-primary/10">
-<span class="material-symbols-outlined text-[20px]">insights</span>
 </div>
 </header>
 <main class="px-container-padding pt-6 space-y-lg max-w-2xl mx-auto">

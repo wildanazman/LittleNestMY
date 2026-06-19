@@ -168,6 +168,26 @@
 </div>
 </header>
 <main class="px-container-padding pt-6 max-w-5xl mx-auto">
+<!-- Loading Skeleton -->
+<section class="space-y-5 max-w-[520px] mx-auto animate-pulse" id="milestonesLoading">
+<div class="space-y-2">
+<div class="h-3 w-24 rounded-full bg-surface-container-high"></div>
+<div class="h-7 w-64 rounded-xl bg-surface-container-high"></div>
+<div class="h-4 w-48 rounded-lg bg-surface-container-high"></div>
+</div>
+<div class="flex gap-3">
+<div class="h-8 w-20 rounded-full bg-surface-container-high"></div>
+<div class="h-8 w-24 rounded-full bg-surface-container-high"></div>
+<div class="h-8 w-16 rounded-full bg-surface-container-high"></div>
+</div>
+<div class="space-y-4">
+<div class="h-32 rounded-2xl bg-surface-container-high"></div>
+<div class="h-28 rounded-2xl bg-surface-container-high"></div>
+<div class="h-36 rounded-2xl bg-surface-container-high"></div>
+</div>
+<div class="h-48 rounded-[32px] bg-surface-container-high"></div>
+</section>
+<div class="hidden" id="milestonesContent">
 <!-- Dreamy Intro Header -->
 <section class="mb-7 max-w-[520px] mx-auto">
 <p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-1" id="memoryKicker">Memory book</p>
@@ -272,6 +292,7 @@ Save Milestone
 <span class="material-symbols-outlined">add</span>
 <span class="font-label-md text-label-md">Add Milestone</span>
 </button>
+</div>
 </div>
 </main>
 <!-- Video Recorder -->
@@ -803,6 +824,8 @@ Save Milestone
             milestonesCache = result.milestones || [];
             renderAll();
             if (result.error) showFeedback(result.error);
+            document.getElementById("milestonesLoading")?.classList.add("hidden");
+            document.getElementById("milestonesContent")?.classList.remove("hidden");
         }
 
         function renderAll() {
