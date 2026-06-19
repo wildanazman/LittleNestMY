@@ -38,7 +38,7 @@ export default async function handler(req, res) {
     .from("profiles")
     .select("stripe_customer_id, plan, email, display_name")
     .eq("id", auth.user.id)
-    .single();
+    .maybeSingle();
 
   const origin = req.headers["x-forwarded-proto"]
     ? `${req.headers["x-forwarded-proto"]}://${req.headers["x-forwarded-host"] || req.headers.host}`
