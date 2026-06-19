@@ -386,10 +386,10 @@ Accept invitation
 <div class="dashboard-stat-card bg-[#E8F5FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="growth_tracker" role="button" tabindex="0" aria-label="Open growth tracker">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#6B21A8]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monitor_weight</span>
-<span class="font-label-sm text-label-sm">Weight</span>
+<span class="font-label-sm text-label-sm">Growth</span>
 </div>
-<p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="latestWeight">No data</p>
-<span class="font-label-sm text-label-sm text-[#6B21A8]" id="latestWeightDetail">Add growth record</span>
+<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant">Weight:</span> <span class="font-bold" id="latestWeight">Not logged</span></p>
+<p class="font-label-md text-label-md text-on-surface whitespace-nowrap truncate"><span class="text-on-surface-variant">Height:</span> <span class="font-bold" id="latestHeight">Not logged</span></p>
 </div>
 <!-- Appointment -->
 <div class="dashboard-stat-card col-span-2 bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
@@ -682,8 +682,10 @@ Accept invitation
         setText("todaySleepDetail", todaySleepMinutes ? "Total today" : "Tap to log");
         setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : "No diaper yet");
         setText("lastDiaperDetail", todayDiaperCount ? `change${todayDiaperCount === 1 ? "" : "s"} today` : "Tap to log");
-        setText("latestWeight", latestGrowth?.weightKg ? `${latestGrowth.weightKg} kg` : "No data");
-        setText("latestWeightDetail", latestGrowth?.measuredAt ? formatStatDate(latestGrowth.measuredAt) : "Add growth record");
+        const latestWeightRecord = [...allGrowthRecords].filter((r) => r.weightKg).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+        const latestHeightRecord = [...allGrowthRecords].filter((r) => r.heightCm || r.lengthCm).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+        setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : "Not logged");
+        setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : "Not logged");
         setText("assistantTitle", "Start logging to see helpful reminders.");
         setText("assistantMessage", "Real suggestions will appear after a few care logs.");
         setText("babyMenuTitle", selectedBaby?.name || "Manage baby profile");
