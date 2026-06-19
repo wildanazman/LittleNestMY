@@ -126,6 +126,13 @@ function ensureNavigationStyles() {
       backface-visibility: hidden;
       overflow: visible !important;
       isolation: isolate;
+      /* Pin to its own compositor layer so iOS keeps it fixed during
+         momentum / rubber-band scroll instead of re-rasterizing the
+         backdrop-filtered bar (which made it drift up on scroll-down). */
+      transform: translateZ(0) !important;
+      -webkit-transform: translateZ(0) !important;
+      will-change: transform;
+      transition: none !important;
     }
     nav.fixed.bottom-0 > a,
     nav.fixed.bottom-0 > button {

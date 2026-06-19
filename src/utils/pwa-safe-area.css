@@ -30,6 +30,8 @@ body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   background: #fbf9f4;
+  /* Stop iOS rubber-band overscroll, which drags the fixed bottom nav. */
+  overscroll-behavior-y: none;
 }
 
 html.ln-capacitor-native body {
@@ -68,6 +70,10 @@ nav.fixed.bottom-0 {
   bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   padding-bottom: 0.55rem !important;
   z-index: 9999 !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: transform;
+  transition: none !important;
 }
 
 button.fixed.bottom-24,

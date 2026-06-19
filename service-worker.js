@@ -1,4 +1,4 @@
-const cacheName = "littlenest-my-static-v17";
+const cacheName = "littlenest-my-static-v18";
 
 // Same-origin app shell precached on install. Best-effort per item so one
 // missing route never fails the whole install.
