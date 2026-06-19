@@ -276,6 +276,9 @@ Save Milestone
 </button>
 <div class="relative w-full aspect-square max-w-[360px] rounded-[28px] overflow-hidden bg-black">
 <video class="w-full h-full object-cover" id="recorderVideo" muted playsinline></video>
+<button aria-label="Switch camera" class="hidden absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="recorderFlip" type="button">
+<span class="material-symbols-outlined">flip_camera_android</span>
+</button>
 <div class="hidden absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-error text-white font-label-md text-label-md flex items-center gap-1.5" id="recorderCountdown"><span class="w-2 h-2 rounded-full bg-white animate-pulse"></span><span id="recorderCountdownText">5</span>s</div>
 </div>
 <p class="font-body-md text-body-md text-white/80 text-center" id="recorderHint">Tap record — it stops automatically after 5 seconds.</p>
@@ -396,11 +399,13 @@ Save Milestone
         const recorderCountdown = document.getElementById("recorderCountdown");
         const recorderCountdownText = document.getElementById("recorderCountdownText");
         const recorderHint = document.getElementById("recorderHint");
+        const recorderFlip = document.getElementById("recorderFlip");
         const MAX_VIDEO_MS = 5000;
         let recorderStream = null;
         let mediaRecorder = null;
         let recordedDataUrl = "";
         let countdownTimer = null;
+        let facingMode = "user";
 
         function isVideoDataUrl(url) { return typeof url === "string" && url.startsWith("data:video"); }
 
@@ -426,6 +431,7 @@ Save Milestone
         recordVideoButton.addEventListener("click", openRecorder);
         recorderClose.addEventListener("click", closeRecorder);
         recorderStart.addEventListener("click", startRecording);
+        recorderFlip.addEventListener("click", toggleCamera);
         recorderRetake.addEventListener("click", () => { recordedDataUrl = ""; startLivePreview(); });
         recorderUse.addEventListener("click", () => {
             if (!recordedDataUrl) return;
@@ -443,9 +449,10 @@ Save Milestone
                 videoInput.click();
                 return;
             }
+            facingMode = "user";
             try {
                 recorderStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode: "user" },
+                    video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode },
                     audio: true
                 });
                 recorderModal.classList.remove("hidden");
@@ -453,6 +460,31 @@ Save Milestone
             } catch (error) {
                 showFeedback("Camera unavailable — choose a video instead.");
                 videoInput.click();
+            }
+        }
+
+        async function toggleCamera() {
+            facingMode = facingMode === "user" ? "environment" : "user";
+            const oldTracks = recorderStream?.getTracks() || [];
+            recorderStream = null;
+            recorderVideo.srcObject = null;
+            oldTracks.forEach((t) => t.stop());
+            try {
+                recorderStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode },
+                    audio: true
+                });
+                startLivePreview();
+            } catch {
+                facingMode = facingMode === "user" ? "environment" : "user";
+                showFeedback("Could not switch camera.");
+                try {
+                    recorderStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode },
+                        audio: true
+                    });
+                    startLivePreview();
+                } catch { /* give up */ }
             }
         }
 
@@ -466,6 +498,7 @@ Save Milestone
             recorderControls.classList.remove("hidden");
             recorderReview.classList.add("hidden");
             recorderCountdown.classList.add("hidden");
+            recorderFlip.classList.remove("hidden");
             recorderHint.textContent = "Tap record — it stops automatically after 5 seconds.";
         }
 
@@ -474,7 +507,7 @@ Save Milestone
             const chunks = [];
             const mime = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"]
                 .find((type) => MediaRecorder.isTypeSupported(type)) || "";
-            mediaRecorder = mime ? new MediaRecorder(recorderStream, { mimeType: mime }) : new MediaRecorder(recorderStream);
+            mediaRecorder = mime ? new MediaRecorder(recorderStream, { mimeType: mime, videoBitsPerSecond: 500_000 }) : new MediaRecorder(recorderStream, { videoBitsPerSecond: 500_000 });
             mediaRecorder.addEventListener("dataavailable", (event) => { if (event.data.size) chunks.push(event.data); });
             mediaRecorder.addEventListener("stop", async () => {
                 clearInterval(countdownTimer);
@@ -504,6 +537,7 @@ Save Milestone
             recorderControls.classList.add("hidden");
             recorderCountdown.classList.add("hidden");
             recorderReview.classList.remove("hidden");
+            recorderFlip.classList.add("hidden");
             recorderHint.textContent = "Looks good? Use it or retake.";
         }
 
