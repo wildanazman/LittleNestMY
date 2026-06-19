@@ -1,21 +1,5 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-<style>:root {
-  --background: #fbf9f4;
-  --surface: #fbf9f4;
-  --surface-container: #efeee9;
-  --surface-container-low: #f5f3ee;
-  --surface-container-lowest: #ffffff;
-  --primary: #83533c;
-  --on-primary: #ffffff;
-  --primary-container: #ffbfa3;
-  --on-primary-container: #7a4b36;
-  --tertiary: #486646;
-  --on-surface: #1b1c19;
-  --on-surface-variant: #51443e;
-  --error: #ba1a1a;
-}</style>
-<link href="/src/styles/tailwind.css" rel="stylesheet">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta name="theme-color" content="#ffbfa3"/>
@@ -29,6 +13,21 @@
 <title>LittleNest MY - Insights</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: {
+      colors: {
+        primary: "#83533c", "on-primary": "#ffffff", "primary-container": "#ffdcc8", "on-primary-container": "#321304",
+        surface: "#fbf9f4", "surface-container": "#efeee9", "surface-container-low": "#f5f3ee",
+        "surface-container-lowest": "#ffffff", "surface-container-high": "#eae8e3",
+        "on-surface": "#1b1c19", "on-surface-variant": "#51443e", tertiary: "#486646", error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    } }
+  };
+</script>
 <style>
   body { font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }

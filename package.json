@@ -8,10 +8,9 @@
     "node": "22.x"
   },
   "scripts": {
-"dev": "node scripts/serve-static.mjs",
-"start": "node scripts/serve-static.mjs",
-"build": "node scripts/build-static.mjs",
-"build:css": "npx @tailwindcss/cli -i src/styles/tailwind-input.css -o src/styles/tailwind.css"
+    "dev": "node scripts/serve-static.mjs",
+    "start": "node scripts/serve-static.mjs",
+    "build": "node scripts/build-static.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.0",
@@ -19,11 +18,5 @@
     "@capacitor/core": "^8.4.0",
     "@capacitor/ios": "^8.4.0",
     "@supabase/supabase-js": "^2.108.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/cli": "^4.3.1",
-    "@tailwindcss/container-queries": "^0.1.1",
-    "@tailwindcss/forms": "^0.5.11",
-    "tailwindcss": "^4.3.1"
   }
 }

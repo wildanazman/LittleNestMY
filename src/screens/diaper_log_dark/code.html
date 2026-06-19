@@ -1,22 +1,6 @@
 <!DOCTYPE html>
 
 <html class="dark" lang="en"><head>
-<style>:root {
-  --background: #121416;
-  --surface: #121416;
-  --surface-container: #1e2022;
-  --surface-container-low: #191b1d;
-  --surface-container-lowest: #0d0f11;
-  --primary: #ffbfa3;
-  --on-primary: #331203;
-  --primary-container: #673c27;
-  --on-primary-container: #ffdbcc;
-  --tertiary: #aecfa9;
-  --on-surface: #e4e2de;
-  --on-surface-variant: #c4c6c1;
-  --error: #ffb4ab;
-}</style>
-<link href="/src/styles/tailwind.css" rel="stylesheet">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta name="theme-color" content="#ffbfa3"/>
@@ -28,6 +12,7 @@
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Diaper Log - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -54,6 +39,95 @@
             font-variation-settings: 'FILL' 1;
         }
     </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#121416",
+                        "surface-container-high": "#282a2c",
+                        "inverse-surface": "#e2e2e5",
+                        "on-secondary-fixed-variant": "#254f3a",
+                        "tertiary": "#deebff",
+                        "tertiary-fixed": "#d2e4ff",
+                        "secondary-fixed": "#bfedd1",
+                        "primary": "#ffe4d9",
+                        "on-background": "#e2e2e5",
+                        "on-primary": "#4d2613",
+                        "inverse-on-surface": "#2f3133",
+                        "surface-container-low": "#1a1c1e",
+                        "on-secondary-container": "#93bfa5",
+                        "secondary": "#a4d1b6",
+                        "on-tertiary-fixed-variant": "#28496c",
+                        "error-container": "#93000a",
+                        "surface-variant": "#333537",
+                        "surface-bright": "#37393b",
+                        "outline-variant": "#51443e",
+                        "on-secondary": "#0c3825",
+                        "outline": "#9e8d86",
+                        "surface-container": "#1e2022",
+                        "on-primary-fixed-variant": "#673c27",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#f7b89d",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#001c37",
+                        "surface-dim": "#121416",
+                        "primary-fixed": "#ffdbcc",
+                        "inverse-primary": "#83533c",
+                        "primary-container": "#ffbfa3",
+                        "background": "#121416",
+                        "on-surface": "#e2e2e5",
+                        "on-tertiary": "#0c3254",
+                        "on-primary-container": "#7a4b36",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#331203",
+                        "secondary-container": "#254f3a",
+                        "secondary-fixed-dim": "#a4d1b6",
+                        "surface-tint": "#f7b89d",
+                        "on-surface-variant": "#d6c2bb",
+                        "on-tertiary-container": "#39597e",
+                        "surface-container-highest": "#333537",
+                        "error": "#ffb4ab",
+                        "tertiary-container": "#b0d0fb",
+                        "tertiary-fixed-dim": "#a9c9f3",
+                        "surface-container-lowest": "#0c0e10"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "margin-mobile": "20px",
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
 <style>
     body {
       min-height: max(884px, 100dvh);

@@ -1,56 +1,6 @@
 <!DOCTYPE html>
 
 <html class="light" lang="en"><head>
-<style>:root {
-  --background: #fbf9f4;
-  --surface: #fbf9f4;
-  --surface-bright: #fbf9f4;
-  --surface-dim: #dbdad5;
-  --surface-container: #efeee9;
-  --surface-container-low: #f5f3ee;
-  --surface-container-high: #eae8e3;
-  --surface-container-highest: #e4e2de;
-  --surface-container-lowest: #ffffff;
-  --surface-variant: #e4e2de;
-  --primary: #83533c;
-  --on-primary: #ffffff;
-  --primary-container: #ffbfa3;
-  --on-primary-container: #7a4b36;
-  --primary-fixed: #ffdbcc;
-  --primary-fixed-dim: #f7b89d;
-  --on-primary-fixed: #331203;
-  --on-primary-fixed-variant: #673c27;
-  --secondary: #625e56;
-  --on-secondary: #ffffff;
-  --secondary-container: #e6dfd5;
-  --on-secondary-container: #67625a;
-  --secondary-fixed: #e9e1d8;
-  --secondary-fixed-dim: #ccc5bc;
-  --on-secondary-fixed: #1e1b15;
-  --on-secondary-fixed-variant: #4a463f;
-  --tertiary: #486646;
-  --on-tertiary: #ffffff;
-  --tertiary-container: #b5d6af;
-  --on-tertiary-container: #415e3f;
-  --tertiary-fixed: #caecc4;
-  --tertiary-fixed-dim: #aecfa9;
-  --on-tertiary-fixed: #052108;
-  --on-tertiary-fixed-variant: #314d30;
-  --error: #ba1a1a;
-  --on-error: #ffffff;
-  --error-container: #ffdad6;
-  --on-error-container: #93000a;
-  --outline: #84746d;
-  --outline-variant: #d6c2bb;
-  --inverse-surface: #30312e;
-  --inverse-on-surface: #f2f1ec;
-  --inverse-primary: #f7b89d;
-  --surface-tint: #83533c;
-  --on-surface: #1b1c19;
-  --on-surface-variant: #51443e;
-  --on-background: #1b1c19;
-}</style>
-<link href="/src/styles/tailwind.css" rel="stylesheet">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta name="theme-color" content="#ffbfa3"/>
@@ -64,9 +14,104 @@
 <link rel="stylesheet" href="../../utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeee9",
+                    "surface-container-low": "#f5f3ee",
+                    "tertiary-fixed": "#caecc4",
+                    "inverse-primary": "#f7b89d",
+                    "surface-bright": "#fbf9f4",
+                    "surface-container-high": "#eae8e3",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ccc5bc",
+                    "surface-tint": "#83533c",
+                    "inverse-surface": "#30312e",
+                    "on-secondary-container": "#67625a",
+                    "on-tertiary-fixed-variant": "#314d30",
+                    "on-error": "#ffffff",
+                    "surface": "#fbf9f4",
+                    "on-primary-fixed": "#331203",
+                    "surface-container-highest": "#e4e2de",
+                    "on-tertiary-container": "#415e3f",
+                    "on-surface-variant": "#51443e",
+                    "background": "#fbf9f4",
+                    "surface-dim": "#dbdad5",
+                    "primary-fixed-dim": "#f7b89d",
+                    "secondary-fixed": "#e9e1d8",
+                    "on-background": "#1b1c19",
+                    "on-secondary-fixed-variant": "#4a463f",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#b5d6af",
+                    "primary-fixed": "#ffdbcc",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#673c27",
+                    "outline-variant": "#d6c2bb",
+                    "on-secondary": "#ffffff",
+                    "primary": "#83533c",
+                    "inverse-on-surface": "#f2f1ec",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#aecfa9",
+                    "on-tertiary-fixed": "#052108",
+                    "on-primary-container": "#7a4b36",
+                    "primary-container": "#ffbfa3",
+                    "outline": "#84746d",
+                    "secondary-container": "#e6dfd5",
+                    "surface-variant": "#e4e2de",
+                    "on-secondary-fixed": "#1e1b15",
+                    "secondary": "#625e56",
+                    "on-surface": "#1b1c19",
+                    "tertiary": "#486646"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "xl": "48px",
+                    "lg": "32px",
+                    "xs": "4px",
+                    "container-padding": "20px",
+                    "gutter": "16px",
+                    "sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Nunito Sans"],
+                    "display-lg": ["Nunito Sans"],
+                    "headline-md": ["Nunito Sans"],
+                    "label-sm": ["Nunito Sans"],
+                    "body-lg": ["Nunito Sans"],
+                    "headline-lg-mobile": ["Nunito Sans"],
+                    "label-md": ["Nunito Sans"],
+                    "body-md": ["Nunito Sans"]
+            },
+            "fontSize": {
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
         body {
           font-family: 'Nunito Sans', sans-serif;
@@ -96,22 +141,11 @@
           background-size: 200% 100%;
         }
         .baby-glass-card {
-          background: linear-gradient(135deg, #efe7ff 0%, #ffe9f2 52%, #e6f3ff 100%) !important;
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 20px 46px rgba(124, 92, 255, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
-          position: relative;
-          overflow: hidden;
-        }
-        .baby-glass-card::after {
-          content: "";
-          position: absolute;
-          top: -40%;
-          right: -10%;
-          width: 160px;
-          height: 160px;
-          border-radius: 9999px;
-          background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
-          pointer-events: none;
+          background: rgba(255, 255, 255, 0.58) !important;
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          box-shadow: 0 18px 44px rgba(131, 83, 60, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+          backdrop-filter: blur(18px) saturate(1.25);
+          -webkit-backdrop-filter: blur(18px) saturate(1.25);
         }
         #homeContent header:not(nav),
         #homeContent header button,
@@ -279,24 +313,22 @@
                 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
-<div class="flex items-center gap-4 relative z-10">
-<div class="shrink-0 rounded-full p-[3px] shadow-sm" style="background:linear-gradient(135deg,#9b7cff,#ff9ec7)">
-<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
+<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-sm shrink-0">
 <img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="../../../icons/icon-192.png"/>
 </div>
-</div>
 <div class="min-w-0 flex-1">
-<h3 class="font-headline-md text-headline-md text-on-surface truncate" id="babyName">No baby profile yet</h3>
-<p class="font-label-md text-label-md text-on-surface-variant truncate" id="babyAge">Create a baby profile, or wait for an invitation</p>
+<h3 class="font-headline-md text-headline-md text-on-surface" id="babyName">No baby profile yet</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
+<div class="mt-2 flex flex-wrap gap-1.5" id="babyHealthyBadge">
+<span id="weightBadge" class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#6B21A8] dark:bg-white/10 dark:text-[#d6bcfa] cursor-pointer"><span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
+<span id="heightBadge" class="inline-flex items-center gap-1 rounded-full bg-white/70 px-2.5 py-1 text-[12px] font-bold text-[#1E40AF] dark:bg-white/10 dark:text-[#a5c8ff] cursor-pointer"><span class="material-symbols-outlined text-[14px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
 </div>
-<button aria-label="Baby profile menu" class="shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm backdrop-blur active:scale-95 transition-transform" id="babyProfileMenuButton" type="button">
+</div>
+<div class="ml-auto">
+<button aria-label="Baby profile menu" class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
 </button>
-</div>
-<div class="mt-3 grid grid-cols-2 gap-2 relative z-10" id="babyHealthyBadge">
-<span class="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/85 px-3 py-2 text-[13px] font-bold text-[#6B21A8] shadow-sm dark:bg-white/10 dark:text-[#d6bcfa] cursor-pointer active:scale-95 transition-transform" id="weightBadge" role="button" tabindex="0" aria-label="View weight growth report"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
-<span class="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/85 px-3 py-2 text-[13px] font-bold text-[#1E40AF] shadow-sm dark:bg-white/10 dark:text-[#a5c8ff] cursor-pointer active:scale-95 transition-transform" id="heightBadge" role="button" tabindex="0" aria-label="View height growth report"><span class="material-symbols-outlined text-[16px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
 </div>
 </div>
 <!-- Empty state CTAs (no baby profile) -->
@@ -445,10 +477,7 @@
 </section>
 <!-- Timeline Section -->
 <section class="space-y-sm" id="timelineSection">
-<div class="flex items-center gap-2 px-1">
-<span class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">history</span></span>
-<h3 class="font-headline-md text-headline-md text-on-surface" data-i18n="home.todaysLog">Today's Log</h3>
-</div>
+<h3 class="font-headline-md text-headline-md text-on-surface px-1" data-i18n="home.todaysLog">Today's Log</h3>
 <div class="space-y-3" id="timelineList">
 <!-- Timeline Items -->
 <div class="relative">
@@ -573,7 +602,7 @@
         const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
         const { loadGrowthRecordsRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
         const { loadRemindersRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
-        const { bindPrototypeActions, goToScreen, screenUrl, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, screenUrl, showUndoToast, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
@@ -586,11 +615,6 @@
         document.getElementById("homeRetryButton")?.addEventListener("click", () => window.location.reload());
 
         const now = new Date();
-        const TIMELINE_STYLES = {
-            feed: { badge: "Feeding", badgeBg: "#ffe8ef", badgeFg: "#c01f5b", accent: "#ff6fa5" },
-            sleep: { badge: "Sleep", badgeBg: "#e7f5ec", badgeFg: "#0f7a44", accent: "#34b27b" },
-            diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
-        };
         if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
             await new Promise(() => {});
@@ -814,8 +838,8 @@
                         id: log.id,
                         at: log.startedAt,
                         type: "feed",
-                        main: log.amountGrams ? `${log.amountGrams}g ${labelFeedingType(log.type)}` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} ${labelFeedingType(log.type)}` : labelFeedingType(log.type),
-                        note: log.notes || ""
+                        title: labelFeedingType(log.type),
+                        detail: log.amountGrams ? `${log.amountGrams}g solid food` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} feeding` : log.notes || "Feeding logged"
                     })),
                 ...allSleepLogs
                     .filter(log => isSameLocalDay(log.startedAt, date))
@@ -823,9 +847,8 @@
                         id: log.id,
                         at: log.startedAt,
                         type: "sleep",
-                        nap: log.status === "nap",
-                        main: log.endedAt ? `Slept for ${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))}` : "Sleep started",
-                        note: log.notes || ""
+                        title: log.status === "nap" ? t("home.nap") : t("home.sleep"),
+                        detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
                     })),
                 ...allDiaperLogs
                     .filter(log => isSameLocalDay(log.changedAt, date))
@@ -833,8 +856,8 @@
                         id: log.id,
                         at: log.changedAt,
                         type: "diaper",
-                        main: diaperTimelineSummary(log),
-                        note: log.notes || ""
+                        title: t("home.diaper"),
+                        detail: diaperTimelineSummary(log)
                     }))
             ].sort((a, b) => new Date(a.at) - new Date(b.at));
 
@@ -845,10 +868,7 @@
             const ongoingHtml = (ongoing && (!ongoing.babyId || ongoing.babyId === selectedBabyId))
                 ? renderOngoingSleep(ongoing) : "";
             const itemsHtml = events.length ? events.map(renderTimelineItem).join("") : "";
-            const body = ongoingHtml + itemsHtml;
-            timeline.innerHTML = body
-                ? `<div class="relative"><span class="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style="background:linear-gradient(to bottom,rgba(124,92,255,0.35),rgba(124,92,255,0.12))"></span><div class="space-y-3">${body}</div></div>`
-                : renderEmptyTimeline();
+            timeline.innerHTML = ongoingHtml + itemsHtml || renderEmptyTimeline();
 
             if (permissions.canAddLogs) {
                 bindTimelineDelete(date);
@@ -856,40 +876,15 @@
             }
         }
 
-        function escapeHtml(value) {
-            return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
-        }
-
-        function timelineCard({ accent, time, badgeBg, badgeFg, badge, main, note, deleteButton = "" }) {
-            return `
-                <div class="relative pl-7">
-                    <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm dark:border-[#1b2233]" style="background:${accent}"></span>
-                    <div class="relative bg-white rounded-2xl px-4 py-3 border border-black/[0.04] shadow-[0_8px_22px_rgba(124,92,255,0.08)] dark:bg-white/10 dark:border-white/10">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="text-[12px] font-semibold text-on-surface-variant">${time}</span>
-                            <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:${badgeBg};color:${badgeFg}">${badge}</span>
-                        </div>
-                        <p class="text-[15px] font-bold text-on-surface leading-snug">${main}</p>
-                        ${note ? `<p class="text-[13px] italic text-on-surface-variant mt-1">“${escapeHtml(note)}”</p>` : ""}
-                        ${deleteButton}
-                    </div>
-                </div>`;
-        }
-
         function renderOngoingSleep(session) {
             return `
-                <div class="relative pl-7">
-                    <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm animate-pulse dark:border-[#1b2233]" style="background:#5b8def"></span>
-                    <div class="relative bg-[#eef0ff] rounded-2xl px-4 py-3 border border-[#cdbbf5]/60 shadow-[0_8px_22px_rgba(124,92,255,0.1)] dark:bg-white/10 dark:border-white/10">
-                        <div class="flex items-center justify-between gap-2 mb-1">
-                            <span class="text-[12px] font-semibold text-on-surface-variant">${t("home.started")} ${formatTime(session.startedAt)}</span>
-                            <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:#e7f5ec;color:#0f7a44">Sleep</span>
-                        </div>
-                        <div class="flex items-center justify-between gap-2">
-                            <p class="text-[15px] font-bold text-on-surface leading-snug">${t("home.sleepingNow")}</p>
-                            <button class="shrink-0 h-8 px-4 rounded-full bg-primary text-on-primary text-[13px] font-semibold active:scale-95 transition-transform" data-stop-sleep="1" type="button">${t("home.stop")}</button>
-                        </div>
+                <div class="bg-[#eef0ff] rounded-2xl px-4 py-3 border border-[#cdbbf5]/60 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
+                    <span class="w-9 h-9 rounded-full bg-[#e8f1ff] text-[#1E40AF] flex items-center justify-center shrink-0 animate-pulse"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">nights_stay</span></span>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-headline-md text-headline-md text-on-surface truncate">${t("home.sleepingNow")}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${t("home.started")} ${formatTime(session.startedAt)}</p>
                     </div>
+                    <button class="shrink-0 h-9 px-4 rounded-full bg-primary text-on-primary font-label-sm text-label-sm active:scale-95 transition-transform" data-stop-sleep="1" type="button">${t("home.stop")}</button>
                 </div>`;
         }
 
@@ -950,22 +945,30 @@
         }
 
         function renderTimelineItem(event) {
-            const style = TIMELINE_STYLES[event.type] || TIMELINE_STYLES.feed;
-            const badge = event.type === "sleep" ? (event.nap ? t("home.nap") : style.badge) : style.badge;
+            const styles = {
+                feed: { chip: "bg-[#ffe3ec] text-[#d6336c]", icon: "restaurant" },
+                sleep: { chip: "bg-[#e8f1ff] text-[#1E40AF]", icon: "bedtime" },
+                diaper: { chip: "bg-[#e5fbf2] text-[#15803D]", icon: "baby_changing_station" }
+            };
+            const style = styles[event.type] || styles.feed;
             const canDelete = permissions.canAddLogs && event.id;
             const deleteButton = canDelete
-                ? `<button class="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete log"><span class="material-symbols-outlined text-[16px]">delete</span></button>`
+                ? `<button class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete ${event.title} log"><span class="material-symbols-outlined text-[18px]">delete</span></button>`
                 : "";
-            return timelineCard({
-                accent: style.accent,
-                time: formatTime(event.at),
-                badgeBg: style.badgeBg,
-                badgeFg: style.badgeFg,
-                badge,
-                main: escapeHtml(event.main),
-                note: event.note,
-                deleteButton
-            });
+
+            return `
+                <div class="bg-white/80 rounded-2xl px-4 py-3 border border-white/70 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
+                    <span class="w-9 h-9 rounded-full ${style.chip} flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <p class="font-headline-md text-headline-md text-on-surface truncate">${event.title}</p>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${event.detail}</p>
+                    </div>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 whitespace-nowrap">${formatTime(event.at)}</span>
+                    ${deleteButton}
+                </div>
+            `;
         }
 
         function labelFeedingType(type) {
@@ -1169,15 +1172,9 @@
             window.location.href = `${screenUrl("quick_log")}?type=note`;
         });
 
+        document.getElementById("weightBadge")?.addEventListener("click", (e) => { e.stopPropagation(); goToScreen("growth_tracker"); });
+        document.getElementById("heightBadge")?.addEventListener("click", (e) => { e.stopPropagation(); goToScreen("growth_tracker"); });
         bindPrototypeActions();
-        document.getElementById("weightBadge")?.addEventListener("click", (event) => {
-            event.stopPropagation();
-            goToScreen("growth_tracker");
-        });
-        document.getElementById("heightBadge")?.addEventListener("click", (event) => {
-            event.stopPropagation();
-            goToScreen("growth_tracker");
-        });
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">

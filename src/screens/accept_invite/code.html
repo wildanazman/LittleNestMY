@@ -1,21 +1,5 @@
 <!DOCTYPE html>
 <html class="light" lang="en"><head>
-<style>:root {
-  --background: #fff8f5;
-  --surface: #fff8f5;
-  --surface-container: #f4ebe6;
-  --surface-container-low: #fff1ea;
-  --surface-container-lowest: #ffffff;
-  --primary: #83533c;
-  --on-primary: #fff;
-  --primary-container: #ffdcc8;
-  --on-primary-container: #321304;
-  --tertiary: #486646;
-  --tertiary-container: #b5d6af;
-  --on-surface: #211a17;
-  --on-surface-variant: #53433d;
-}</style>
-<link href="/src/styles/tailwind.css" rel="stylesheet">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <meta name="theme-color" content="#ffbfa3"/>
@@ -26,8 +10,33 @@
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Care Circle Invite - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fff8f5",
+        "surface-container": "#f4ebe6",
+        "surface-container-lowest": "#ffffff",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        "tertiary-container": "#b5d6af",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
 <style>.soft-shadow{box-shadow:0 18px 45px rgba(124,92,255,.14)}</style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>

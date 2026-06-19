@@ -172,6 +172,88 @@ function ensureNavigationStyles() {
   document.head.appendChild(style);
 }
 
+function mountGlobalSkeleton() {
+  if (window.__lnNoSkeleton || document.getElementById("ln-global-skeleton")) return;
+
+  if (!document.getElementById("ln-skeleton-styles")) {
+    const style = document.createElement("style");
+    style.id = "ln-skeleton-styles";
+    style.textContent = `
+      #ln-global-skeleton {
+        position: fixed; inset: 0; z-index: 9990;
+        background: #fbf9f4;
+        opacity: 1; transition: opacity .35s ease;
+        overflow: hidden;
+      }
+      :root.dark #ln-global-skeleton {
+        background: linear-gradient(180deg, #101a2e 0%, #0d1628 48%, #08101f 100%);
+      }
+      #ln-global-skeleton.ln-skel-hide { opacity: 0; pointer-events: none; }
+      #ln-global-skeleton .ln-skel-wrap {
+        max-width: 28rem; margin: 0 auto;
+        padding: calc(env(safe-area-inset-top) + 18px) 20px 20px;
+        display: flex; flex-direction: column; gap: 16px;
+      }
+      .ln-skel {
+        border-radius: 22px;
+        background: linear-gradient(90deg, rgba(239,238,233,.72), rgba(255,255,255,.9), rgba(239,238,233,.72));
+        background-size: 200% 100%;
+        animation: lnSkelPulse 1.4s ease-in-out infinite;
+      }
+      :root.dark .ln-skel {
+        background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.14), rgba(255,255,255,.07));
+        background-size: 200% 100%;
+      }
+      .ln-skel-row { display: flex; align-items: center; justify-content: space-between; }
+      .ln-skel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      @keyframes lnSkelPulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+      @media (prefers-reduced-motion: reduce) { .ln-skel { animation: none; } }
+    `;
+    document.head.appendChild(style);
+  }
+
+  const overlay = document.createElement("div");
+  overlay.id = "ln-global-skeleton";
+  overlay.setAttribute("aria-hidden", "true");
+  overlay.innerHTML = `
+    <div class="ln-skel-wrap">
+      <div class="ln-skel-row">
+        <div class="ln-skel" style="height:22px;width:44%;border-radius:10px"></div>
+        <div class="ln-skel" style="height:40px;width:40px;border-radius:9999px"></div>
+      </div>
+      <div class="ln-skel" style="height:104px;width:100%"></div>
+      <div class="ln-skel-grid">
+        <div class="ln-skel" style="height:104px"></div>
+        <div class="ln-skel" style="height:104px"></div>
+        <div class="ln-skel" style="height:104px"></div>
+        <div class="ln-skel" style="height:104px"></div>
+      </div>
+      <div class="ln-skel" style="height:18px;width:38%;border-radius:9px"></div>
+      <div class="ln-skel" style="height:72px;width:100%"></div>
+      <div class="ln-skel" style="height:72px;width:100%"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  let hidden = false;
+  const hide = () => {
+    if (hidden) return;
+    hidden = true;
+    overlay.classList.add("ln-skel-hide");
+    setTimeout(() => overlay.remove(), 400);
+  };
+  // Screens can hide it precisely once their content is ready.
+  window.addEventListener("littlenest:ready", hide, { once: true });
+  // Otherwise hide shortly after the page finishes loading…
+  if (document.readyState === "complete") {
+    setTimeout(hide, 500);
+  } else {
+    window.addEventListener("load", () => setTimeout(hide, 450), { once: true });
+  }
+  // …and a safety net so it can never get stuck.
+  setTimeout(hide, 3500);
+}
+
 guardAuthenticatedRoutes();
 setupBottomNavigation();
 normalizePageHeaders();
