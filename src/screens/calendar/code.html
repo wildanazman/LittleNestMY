@@ -393,9 +393,11 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
-        const { deleteLocalCalendarEvent, deleteLocalReminder, getLogsForBaby, getPersistedCalendarEvents, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalReminder, getLogsForBaby, getPersistedCalendarEvents, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { deleteCalendarEventRemote, saveCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
+        const { saveReminderRemote, deleteReminderRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
 
         const monthTitle = document.getElementById("monthTitle");
         const todaySubtitle = document.getElementById("todaySubtitle");
@@ -565,10 +567,19 @@
                 });
             });
             upcomingEventsList.querySelectorAll("[data-delete-event]").forEach((button) => {
-                button.addEventListener("click", () => {
+                button.addEventListener("click", async () => {
                     if (!confirm("Delete this appointment?")) return;
                     const eventId = button.dataset.deleteEvent;
-                    deleteLocalCalendarEvent(eventId);
+                    try {
+                        await deleteCalendarEventRemote(eventId);
+                    } catch (syncError) {
+                        console.warn("Could not delete event from cloud.", syncError);
+                    }
+                    try {
+                        await deleteReminderRemote(`reminder-event-${eventId}`);
+                    } catch (syncError) {
+                        console.warn("Could not delete reminder from cloud.", syncError);
+                    }
                     deleteLocalReminder(`reminder-event-${eventId}`);
                     render();
                     showFeedback("Appointment deleted.");
@@ -589,32 +600,42 @@
             const eventId = editingEventId || `event-local-${Date.now()}`;
             const startsAt = new Date(`${date}T${time}:00`).toISOString();
             const reminderMinutesBefore = Number(eventReminderInput.value) || 0;
-            saveLocalCalendarEvent({
-                id: eventId,
-                babyId: selectedBabyId,
-                type: eventCategoryInput.value,
-                title,
-                startsAt,
-                reminderMinutesBefore,
-                notes: eventNotesInput.value.trim() || undefined,
-                isAllDay: false
-            });
-            saveLocalReminder({
-                id: `reminder-event-${eventId}`,
-                babyId: selectedBabyId,
-                type: eventCategoryInput.value === "medicine" ? "medicine" : "appointment",
-                title,
-                scheduledAt: new Date(new Date(startsAt).getTime() - reminderMinutesBefore * 60000).toISOString(),
-                enabled: true,
-                sourceId: eventId
-            });
 
-      eventTitleInput.value = "";
-      eventNotesInput.value = "";
+            try {
+                await saveCalendarEventRemote({
+                    id: eventId,
+                    babyId: selectedBabyId,
+                    type: eventCategoryInput.value,
+                    title,
+                    startsAt,
+                    reminderMinutesBefore,
+                    notes: eventNotesInput.value.trim() || undefined,
+                    isAllDay: false
+                });
+            } catch (syncError) {
+                console.warn("Could not sync event to cloud.", syncError);
+            }
+
+            try {
+                await saveReminderRemote({
+                    id: `reminder-event-${eventId}`,
+                    babyId: selectedBabyId,
+                    type: eventCategoryInput.value === "medicine" ? "medicine" : "appointment",
+                    title,
+                    scheduledAt: new Date(new Date(startsAt).getTime() - reminderMinutesBefore * 60000).toISOString(),
+                    enabled: true,
+                    sourceId: eventId
+                });
+            } catch (syncError) {
+                console.warn("Could not sync reminder to cloud.", syncError);
+            }
+
+            eventTitleInput.value = "";
+            eventNotesInput.value = "";
             editingEventId = "";
             saveEventButton.textContent = "Save Event";
             render();
-            showFeedback("Event saved locally.");
+            showFeedback("Event saved.");
         }
 
         function changeMonth(delta) {

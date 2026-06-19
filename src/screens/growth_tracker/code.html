@@ -123,8 +123,9 @@ View Growth Report
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
-const { getLogsForBaby, getPersistedGrowthRecords, saveLocalGrowthRecord, deleteLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
+const { getLogsForBaby, getPersistedGrowthRecords, saveLocalGrowthRecord } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { deleteGrowthRecordRemote, saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
 const { goToScreen, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
@@ -159,14 +160,18 @@ if (permissions.canAddLogs) {
 renderTabs(); render();
 showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
-function saveMeasurement(){
+async function saveMeasurement(){
   const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
   const measuredAt = document.getElementById("dateInput").value;
   if (!weightKg && !heightValue && !headCircumferenceCm) return showError("Add at least one measurement.");
   const heightFields = getMeasurementLabel(selectedBaby.dateOfBirth, new Date(`${measuredAt}T09:00:00`)) === "Length"
     ? { lengthCm: heightValue || undefined }
     : { heightCm: heightValue || undefined };
-  saveLocalGrowthRecord({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, ...heightFields, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
+  try {
+    await saveGrowthRecordRemote({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, ...heightFields, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
+  } catch (syncError) {
+    console.warn("Could not sync growth record to cloud.", syncError);
+  }
   ["weightInput","heightInput","headInput","notesInput"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("formError").classList.add("hidden"); render();
 }
@@ -180,7 +185,7 @@ function render(){
   document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby.dateOfBirth), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
   renderGraph(items);
   document.getElementById("historyList").innerHTML = items.length ? [...items].reverse().map(renderHistory).join("") : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-headline-md text-headline-md">No growth records yet</p><p class="font-body-md text-body-md text-on-surface-variant">Your first measurement will appear here.</p></div>`;
-  document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",()=>{ const id=btn.dataset.deleteGrowth; const removed=records().find(r=>r.id===id); deleteLocalGrowthRecord(id); render(); showUndoToast("Measurement deleted",()=>{ if(removed){ saveLocalGrowthRecord(removed); render(); } }); }));
+  document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",async ()=>{ const id=btn.dataset.deleteGrowth; const removed=records().find(r=>r.id===id); try { await deleteGrowthRecordRemote(id); } catch (syncError) { console.warn("Could not delete growth record from cloud.", syncError); } render(); showUndoToast("Measurement deleted",async ()=>{ if(removed){ try { await saveGrowthRecordRemote(removed); } catch (e) { saveLocalGrowthRecord(removed); } render(); } }); }));
 }
 function renderTabs(){ document.getElementById("graphTabs").innerHTML = tabs.map(([id,label])=>`<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap ${id===activeTab?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant'}" data-tab="${id}" type="button">${label}</button>`).join(""); document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{activeTab=btn.dataset.tab; renderTabs(); render();})); }
 function monthsBetween(dateOfBirth, measuredAt){

@@ -363,11 +363,9 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { bindPrototypeActions, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-        const {
-            saveLocalGrowthRecord,
-        } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+        const { saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
         const { formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const babyState = await loadBabyProfilesRemote(babyProfile);
@@ -471,7 +469,7 @@
             modal.classList.remove("flex");
         }
 
-        function saveGrowth() {
+        async function saveGrowth() {
             const weightKg = parseNumber("growthWeight");
             const heightCm = parseNumber("growthHeight");
             const headCircumferenceCm = parseNumber("growthHead");
@@ -479,15 +477,19 @@
                 showQuickError("Add at least one growth measurement.");
                 return;
             }
-            saveLocalGrowthRecord({
-                id: `growth-local-${Date.now()}`,
-                babyId: selectedBabyId,
-                measuredAt: new Date().toISOString(),
-                weightKg: weightKg || undefined,
-                heightCm: heightCm || undefined,
-                headCircumferenceCm: headCircumferenceCm || undefined,
-                notes: document.getElementById("quickNoteText").value.trim() || undefined
-            });
+            try {
+                await saveGrowthRecordRemote({
+                    id: `growth-local-${Date.now()}`,
+                    babyId: selectedBabyId,
+                    measuredAt: new Date().toISOString(),
+                    weightKg: weightKg || undefined,
+                    heightCm: heightCm || undefined,
+                    headCircumferenceCm: headCircumferenceCm || undefined,
+                    notes: document.getElementById("quickNoteText").value.trim() || undefined
+                });
+            } catch (syncError) {
+                console.warn("Could not sync growth record to cloud.", syncError);
+            }
             document.getElementById("quickLogFeedback").textContent = "Growth record saved.";
             closeQuickForm();
         }
