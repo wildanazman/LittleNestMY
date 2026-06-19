@@ -226,16 +226,19 @@
 <span class="font-label-md text-label-md text-on-surface-variant">Note</span>
 <textarea class="w-full min-h-[96px] bg-surface-container-lowest border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="milestoneNote" placeholder="What made this moment special?"></textarea>
 </label>
-<label class="mt-gutter rounded-[24px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex items-center gap-3 text-on-surface-variant cursor-pointer">
-<div class="w-12 h-12 rounded-2xl bg-primary-container/40 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined">add_photo_alternate</span>
-</div>
-<div>
-<p class="font-label-md text-label-md text-on-surface" id="milestonePhotoLabel">Add optional photo</p>
-<p class="font-label-sm text-label-sm">Synced to your account when signed in, so it's there on other devices too.</p>
-</div>
+<div class="mt-gutter grid grid-cols-2 gap-3">
+<label class="rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-primary">add_photo_alternate</span>
+<span class="font-label-sm text-label-sm text-on-surface" id="milestonePhotoLabel">Add photo</span>
 <input class="hidden" id="milestonePhotoInput" accept="image/*" type="file"/>
 </label>
+<button class="rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center active:scale-[0.98] transition-transform" id="recordVideoButton" type="button">
+<span class="material-symbols-outlined text-primary">videocam</span>
+<span class="font-label-sm text-label-sm text-on-surface" id="milestoneVideoLabel">Record 5s video</span>
+</button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 px-1">Photos and short clips sync to your account, so they're on your other devices too.</p>
+<input class="hidden" id="milestoneVideoInput" accept="video/*" capture="user" type="file"/>
 <p class="font-label-md text-label-md text-tertiary mt-sm hidden" id="milestoneFeedback" aria-live="polite">Saved.</p>
 <button class="mt-gutter w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20 active:scale-95 transition-transform" id="saveMilestoneButton" type="button">
 Save Milestone
@@ -264,6 +267,27 @@ Save Milestone
 </button>
 </div>
 </main>
+<!-- Video Recorder -->
+<div class="fixed inset-0 z-[130] hidden" id="videoRecorderModal" role="dialog" aria-modal="true" aria-label="Record a 5 second memory">
+<div class="absolute inset-0 bg-[#18120f]/95 backdrop-blur-sm"></div>
+<div class="relative h-full w-full max-w-[520px] mx-auto flex flex-col items-center justify-center p-6 gap-5">
+<button aria-label="Close recorder" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="recorderClose" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="relative w-full aspect-square max-w-[360px] rounded-[28px] overflow-hidden bg-black">
+<video class="w-full h-full object-cover" id="recorderVideo" muted playsinline></video>
+<div class="hidden absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-error text-white font-label-md text-label-md flex items-center gap-1.5" id="recorderCountdown"><span class="w-2 h-2 rounded-full bg-white animate-pulse"></span><span id="recorderCountdownText">5</span>s</div>
+</div>
+<p class="font-body-md text-body-md text-white/80 text-center" id="recorderHint">Tap record — it stops automatically after 5 seconds.</p>
+<div class="flex items-center gap-4" id="recorderControls">
+<button class="h-14 px-7 rounded-full bg-white text-[#1f1714] font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderStart" type="button"><span class="material-symbols-outlined">fiber_manual_record</span>Record</button>
+</div>
+<div class="hidden flex items-center gap-3" id="recorderReview">
+<button class="h-12 px-5 rounded-full bg-white/15 text-white font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderRetake" type="button"><span class="material-symbols-outlined text-[18px]">replay</span>Retake</button>
+<button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderUse" type="button"><span class="material-symbols-outlined text-[18px]">check</span>Use clip</button>
+</div>
+</div>
+</div>
 <!-- Story View (immersive full-screen memory) -->
 <div class="fixed inset-0 z-[120] hidden" id="storyModal" role="dialog" aria-modal="true" aria-label="Memory story view">
 <div class="absolute inset-0 bg-[#18120f]/95 backdrop-blur-sm"></div>
@@ -358,17 +382,184 @@ Save Milestone
         typeInput.addEventListener("change", () => {
             customTitleWrapper.classList.toggle("hidden", typeInput.value !== "Custom milestone");
         });
+        const videoLabel = document.getElementById("milestoneVideoLabel");
+        const recordVideoButton = document.getElementById("recordVideoButton");
+        const videoInput = document.getElementById("milestoneVideoInput");
+        const recorderModal = document.getElementById("videoRecorderModal");
+        const recorderVideo = document.getElementById("recorderVideo");
+        const recorderStart = document.getElementById("recorderStart");
+        const recorderReview = document.getElementById("recorderReview");
+        const recorderControls = document.getElementById("recorderControls");
+        const recorderUse = document.getElementById("recorderUse");
+        const recorderRetake = document.getElementById("recorderRetake");
+        const recorderClose = document.getElementById("recorderClose");
+        const recorderCountdown = document.getElementById("recorderCountdown");
+        const recorderCountdownText = document.getElementById("recorderCountdownText");
+        const recorderHint = document.getElementById("recorderHint");
+        const MAX_VIDEO_MS = 5000;
+        let recorderStream = null;
+        let mediaRecorder = null;
+        let recordedDataUrl = "";
+        let countdownTimer = null;
+
+        function isVideoDataUrl(url) { return typeof url === "string" && url.startsWith("data:video"); }
+
+        function resetMediaLabels() {
+            photoLabel.textContent = "Add photo";
+            videoLabel.textContent = "Record 5s video";
+        }
+
         photoInput.addEventListener("change", async (event) => {
+            if (!event.target.files?.[0]) return;
             try {
                 milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 900, quality: 0.82 });
-                photoLabel.textContent = "Photo ready";
-                showFeedback("Photo ready. It will upload to cloud when saved.");
+                resetMediaLabels();
+                photoLabel.textContent = "Photo ready ✓";
+                showFeedback("Photo ready. It uploads to your account when saved.");
             } catch (error) {
                 milestonePhotoDataUrl = "";
-                photoLabel.textContent = "Add optional photo";
+                resetMediaLabels();
                 showFeedback(error.message);
             }
         });
+
+        recordVideoButton.addEventListener("click", openRecorder);
+        recorderClose.addEventListener("click", closeRecorder);
+        recorderStart.addEventListener("click", startRecording);
+        recorderRetake.addEventListener("click", () => { recordedDataUrl = ""; startLivePreview(); });
+        recorderUse.addEventListener("click", () => {
+            if (!recordedDataUrl) return;
+            milestonePhotoDataUrl = recordedDataUrl;
+            resetMediaLabels();
+            videoLabel.textContent = "Video ready ✓";
+            showFeedback("Clip ready. It uploads to your account when saved.");
+            closeRecorder();
+        });
+
+        async function openRecorder() {
+            // Prefer in-app capture; fall back to the native picker if the
+            // camera or MediaRecorder isn't available (older browsers, denied).
+            if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+                videoInput.click();
+                return;
+            }
+            try {
+                recorderStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 640 }, facingMode: "user" },
+                    audio: true
+                });
+                recorderModal.classList.remove("hidden");
+                startLivePreview();
+            } catch (error) {
+                showFeedback("Camera unavailable — choose a video instead.");
+                videoInput.click();
+            }
+        }
+
+        function startLivePreview() {
+            recordedDataUrl = "";
+            recorderVideo.srcObject = recorderStream;
+            recorderVideo.muted = true;
+            recorderVideo.loop = false;
+            recorderVideo.controls = false;
+            recorderVideo.play().catch(() => {});
+            recorderControls.classList.remove("hidden");
+            recorderReview.classList.add("hidden");
+            recorderCountdown.classList.add("hidden");
+            recorderHint.textContent = "Tap record — it stops automatically after 5 seconds.";
+        }
+
+        function startRecording() {
+            if (!recorderStream) return;
+            const chunks = [];
+            const mime = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"]
+                .find((type) => MediaRecorder.isTypeSupported(type)) || "";
+            mediaRecorder = mime ? new MediaRecorder(recorderStream, { mimeType: mime }) : new MediaRecorder(recorderStream);
+            mediaRecorder.addEventListener("dataavailable", (event) => { if (event.data.size) chunks.push(event.data); });
+            mediaRecorder.addEventListener("stop", async () => {
+                clearInterval(countdownTimer);
+                const blob = new Blob(chunks, { type: mediaRecorder.mimeType || "video/webm" });
+                recordedDataUrl = await blobToDataUrl(blob);
+                showRecordedPreview();
+            });
+            mediaRecorder.start();
+            recorderControls.classList.add("hidden");
+            recorderCountdown.classList.remove("hidden");
+            recorderHint.textContent = "Recording…";
+            let remaining = MAX_VIDEO_MS / 1000;
+            recorderCountdownText.textContent = String(remaining);
+            countdownTimer = setInterval(() => {
+                remaining -= 1;
+                recorderCountdownText.textContent = String(Math.max(0, remaining));
+            }, 1000);
+            setTimeout(() => { if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop(); }, MAX_VIDEO_MS);
+        }
+
+        function showRecordedPreview() {
+            recorderVideo.srcObject = null;
+            recorderVideo.src = recordedDataUrl;
+            recorderVideo.muted = true;
+            recorderVideo.loop = true;
+            recorderVideo.play().catch(() => {});
+            recorderControls.classList.add("hidden");
+            recorderCountdown.classList.add("hidden");
+            recorderReview.classList.remove("hidden");
+            recorderHint.textContent = "Looks good? Use it or retake.";
+        }
+
+        function stopStream() {
+            if (recorderStream) { recorderStream.getTracks().forEach((track) => track.stop()); recorderStream = null; }
+            clearInterval(countdownTimer);
+        }
+
+        function closeRecorder() {
+            stopStream();
+            recorderVideo.srcObject = null;
+            recorderVideo.removeAttribute("src");
+            recorderModal.classList.add("hidden");
+        }
+
+        // Native picker fallback (also enforces the 5-second limit).
+        videoInput.addEventListener("change", async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            try {
+                const dataUrl = await blobToDataUrl(file);
+                const duration = await videoDuration(dataUrl);
+                if (duration > 5.6) {
+                    milestonePhotoDataUrl = "";
+                    resetMediaLabels();
+                    showFeedback("Please keep the clip to about 5 seconds.");
+                    return;
+                }
+                milestonePhotoDataUrl = dataUrl;
+                resetMediaLabels();
+                videoLabel.textContent = "Video ready ✓";
+                showFeedback("Clip ready. It uploads to your account when saved.");
+            } catch (error) {
+                showFeedback("Could not read that video.");
+            }
+        });
+
+        function blobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error("read failed"));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function videoDuration(src) {
+            return new Promise((resolve) => {
+                const v = document.createElement("video");
+                v.preload = "metadata";
+                v.onloadedmetadata = () => resolve(v.duration || 0);
+                v.onerror = () => resolve(0);
+                v.src = src;
+            });
+        }
+
         saveButton.addEventListener("click", saveMilestone);
         fab.addEventListener("click", () => {
             addPanel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -477,7 +668,8 @@ Save Milestone
                 typeInput.value = "First smile";
                 customTitleWrapper.classList.add("hidden");
                 photoInput.value = "";
-                photoLabel.textContent = "Add optional photo";
+                videoInput.value = "";
+                resetMediaLabels();
                 milestonePhotoDataUrl = "";
                 editingMilestoneId = "";
                 saveButton.textContent = "Save Milestone";
@@ -632,7 +824,7 @@ Save Milestone
                 return `
                     <button class="recap-card shrink-0 w-[180px] text-left rounded-[24px] overflow-hidden shadow-[0_12px_34px_rgba(124,92,255,0.12)] relative" data-recap="${items[0].id}" type="button">
                         <div class="relative h-[120px] bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
-                            ${cover ? `<img class="w-full h-full object-cover" src="${cover}" alt="">` : `<div class="w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
+                            ${cover ? renderMedia(cover, "w-full h-full object-cover") : `<div class="w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                             <p class="absolute bottom-2 left-3 right-3 text-white font-headline-md text-headline-md leading-tight">${label}</p>
                         </div>
@@ -678,13 +870,23 @@ Save Milestone
             animateCards();
         }
 
+        function isVideoUrl(url) {
+            return typeof url === "string" && (url.startsWith("data:video") || /\.(webm|mp4|mov|m4v)(\?|$)/i.test(url));
+        }
+
+        // Memory media keeps replaying: videos autoplay muted on a loop.
+        function renderMedia(url, classes) {
+            if (isVideoUrl(url)) return `<video class="${classes}" src="${url}" muted loop autoplay playsinline></video>`;
+            return `<img class="${classes}" src="${url}" alt="">`;
+        }
+
         function renderMemoryCard(m) {
             const cat = CATEGORIES.find((c) => c.key === memoryCategory(m)) || CATEGORIES[CATEGORIES.length - 1];
             const notePreview = m.notes ? escapeHtml(m.notes) : "A small moment worth keeping close.";
             return `
                 <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[30px] overflow-hidden shadow-[0_18px_50px_rgba(124,92,255,0.14)] cursor-pointer">
                     <div class="relative aspect-[4/5] w-full bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
-                        ${m.photoUrl ? `<img class="w-full h-full object-cover" src="${m.photoUrl}" alt="">` : renderCardArt(cat)}
+                        ${m.photoUrl ? renderMedia(m.photoUrl, "w-full h-full object-cover") : renderCardArt(cat)}
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/10"></div>
                         <div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full">
                             <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">${ageOf(m)}</span>
@@ -776,7 +978,7 @@ Save Milestone
                 <div class="story-fade min-h-full flex flex-col">
                     <div class="relative w-full" style="height:60vh">
                         ${m.photoUrl
-                            ? `<img class="w-full h-full object-cover" src="${m.photoUrl}" alt="">`
+                            ? renderMedia(m.photoUrl, "w-full h-full object-cover")
                             : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#cdbbf5] via-[#f3c9da] to-[#bfe3f5] text-white/80"><span class="material-symbols-outlined text-[96px]" style="font-variation-settings:'FILL' 1;">${cat.icon}</span></div>`}
                         <div class="absolute inset-0 bg-gradient-to-t from-[#18120f] via-[#18120f]/10 to-[#18120f]/35"></div>
                         <div class="absolute top-5 left-5 glass-tag px-3 py-1 rounded-full">
