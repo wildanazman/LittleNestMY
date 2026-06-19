@@ -106,8 +106,8 @@
 <div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-2" id="recsCard"></div>
 </section>
 
-<!-- Premium locked -->
-<section class="rise" style="animation-delay:.25s">
+<!-- Premium locked (hidden for now) -->
+<section class="rise hidden" style="animation-delay:.25s">
 <div class="rounded-[24px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#241b3a,#3a2d63)">
 <div class="flex items-center gap-2 mb-3">
 <span class="material-symbols-outlined text-[#f7b89d]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
@@ -146,8 +146,24 @@
   document.getElementById("assistantBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
 
   const babyState = await loadBabyProfilesRemote(babyProfile);
-  const selectedBabyId = babyState.selectedBabyId || getSelectedBabyId(babyProfile);
-  const selectedBaby = babyState.selectedBaby || getSelectedBabyProfile(babyProfile) || babyProfile;
+  const selectedBabyId = babyState.selectedBabyId;
+  const selectedBaby = babyState.selectedBaby || null;
+
+  // No real baby yet (guest or freshly logged-in): never fall back to the
+  // mock profile — show a CTA instead of fake "Aisyah" insights.
+  if (!selectedBaby || !selectedBabyId) {
+    document.getElementById("insightsContent").innerHTML = `
+      <section class="rounded-[26px] bg-surface-container-lowest border border-white/60 soft-shadow p-8 text-center space-y-4 mt-6">
+        <div class="w-16 h-16 rounded-full bg-[#eee8ff] text-[#7056f4] mx-auto flex items-center justify-center"><span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1;">insights</span></div>
+        <div>
+          <h2 class="font-headline-md text-headline-md text-on-surface mb-1">No insights yet</h2>
+          <p class="font-body-md text-body-md text-on-surface-variant">Add a baby profile and a few care logs, and gentle age-aware insights will appear here.</p>
+        </div>
+        <button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" id="insightsAddBaby" type="button">Create baby profile</button>
+      </section>`;
+    document.getElementById("insightsAddBaby")?.addEventListener("click", () => goToScreen("add_baby_profile"));
+    await new Promise(() => {});
+  }
   const firstName = (selectedBaby?.name || "Baby").split(" ")[0];
   if (selectedBaby?.photoUrl) document.getElementById("insightsBabyPhoto").src = selectedBaby.photoUrl;
 
@@ -517,19 +533,36 @@
       return;
     }
     const rows = [];
-    const add = (label, val, unit, metric) => {
+    const add = (label, val, unit, metric, icon) => {
       if (!val) return;
       const med = B.whoMedian(ageMo, selectedBaby?.gender, metric);
       const cmp = B.growthComparison(val, med);
       if (!cmp) return;
       const c = toneStyle[cmp.tone];
-      rows.push(`<div class="py-2.5 ${rows.length ? "border-t border-surface-container" : ""}">
-        <div class="flex items-center justify-between"><span class="font-headline-md text-body-md text-on-surface">${label}</span><span class="font-label-md text-label-md text-on-surface-variant">${val}${unit} · WHO ${med}${unit}</span></div>
-        <p class="font-label-sm text-label-sm mt-0.5" style="color:${c}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}% vs median — ${cmp.text}</p></div>`);
+      // Marker on a track whose centre is the WHO median; clamp the offset so
+      // extreme values still stay on the bar.
+      const pos = Math.max(6, Math.min(94, 50 + Math.max(-40, Math.min(40, cmp.pctDiff * 1.3))));
+      rows.push(`<div class="py-3 ${rows.length ? "border-t border-surface-container" : ""}">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">${icon}</span></span>
+            <span class="font-headline-md text-body-md text-on-surface">${label}</span>
+          </div>
+          <span class="font-headline-md text-body-md font-bold text-on-surface">${val}${unit}</span>
+        </div>
+        <div class="relative h-2 rounded-full" style="background:linear-gradient(90deg,#e8f1ff,#eee8ff,#ffe8ef)">
+          <div class="absolute top-1/2 left-1/2 w-0.5 h-3.5 bg-on-surface-variant/45" style="transform:translate(-50%,-50%)"></div>
+          <div class="absolute top-1/2 w-3.5 h-3.5 rounded-full border-2 border-white shadow-md" style="left:${pos}%;transform:translate(-50%,-50%);background:${c}"></div>
+        </div>
+        <div class="flex items-center justify-between mt-1.5">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">WHO median ${med}${unit}</span>
+          <span class="font-label-sm text-label-sm font-semibold" style="color:${c}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}%</span>
+        </div>
+        <p class="font-label-sm text-label-sm text-on-surface-variant mt-1">${cmp.text}</p></div>`);
     };
-    add("Weight", latest.weightKg, "kg", "weight");
-    add("Length/Height", latest.heightCm || latest.lengthCm, "cm", "length");
-    add("Head", latest.headCircumferenceCm, "cm", "head");
+    add("Weight", latest.weightKg, "kg", "weight", "monitor_weight");
+    add("Length/Height", latest.heightCm || latest.lengthCm, "cm", "length", "straighten");
+    add("Head", latest.headCircumferenceCm, "cm", "head", "radio_button_checked");
     card.innerHTML = rows.join("") || `<p class="font-body-md text-body-md text-on-surface-variant">Add weight, length, or head circumference to compare with WHO medians.</p>`;
   }
 
