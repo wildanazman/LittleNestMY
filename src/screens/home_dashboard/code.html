@@ -324,23 +324,25 @@
                 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] flex items-center gap-4 soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="flex items-center gap-4 relative z-10">
 <div class="shrink-0 rounded-full p-[3px] shadow-sm" style="background:linear-gradient(135deg,#9b7cff,#ff9ec7)">
-<div class="w-[72px] h-[72px] rounded-full overflow-hidden border-2 border-white">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
 <img class="w-full h-full object-cover" id="babyPhoto" data-alt="LittleNest MY baby profile placeholder" src="../../../icons/icon-192.png"/>
 </div>
 </div>
-<div class="min-w-0 flex-1 relative z-10">
+<div class="min-w-0 flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface truncate" id="babyName">No baby profile yet</h3>
-<p class="font-label-md text-label-md text-on-surface-variant" id="babyAge">Create a baby profile, or wait for an invitation</p>
-<div class="mt-2.5 flex flex-wrap gap-2" id="babyHealthyBadge">
-<span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-[#6B21A8] shadow-sm dark:bg-white/10 dark:text-[#d6bcfa]"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
-<span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1 text-[12px] font-bold text-[#1E40AF] shadow-sm dark:bg-white/10 dark:text-[#a5c8ff]"><span class="material-symbols-outlined text-[15px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
+<p class="font-label-md text-label-md text-on-surface-variant truncate" id="babyAge">Create a baby profile, or wait for an invitation</p>
 </div>
-</div>
-<button aria-label="Baby profile menu" class="shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm backdrop-blur relative z-10 active:scale-95 transition-transform" id="babyProfileMenuButton" type="button">
+<button aria-label="Baby profile menu" class="shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm backdrop-blur active:scale-95 transition-transform" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
 </button>
+</div>
+<div class="mt-3 grid grid-cols-2 gap-2 relative z-10" id="babyHealthyBadge">
+<span class="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/85 px-3 py-2 text-[13px] font-bold text-[#6B21A8] shadow-sm dark:bg-white/10 dark:text-[#d6bcfa]"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">monitor_weight</span><span data-i18n="home.weight">Weight:</span> <span id="latestWeight" data-i18n="home.notLogged">Not logged</span></span>
+<span class="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-white/85 px-3 py-2 text-[13px] font-bold text-[#1E40AF] shadow-sm dark:bg-white/10 dark:text-[#a5c8ff]"><span class="material-symbols-outlined text-[16px]">straighten</span><span data-i18n="home.height">Height:</span> <span id="latestHeight" data-i18n="home.notLogged">Not logged</span></span>
+</div>
 </div>
 <!-- Empty state CTAs (no baby profile) -->
 <div class="hidden space-y-3" id="noBabyCta">
@@ -629,6 +631,11 @@
         document.getElementById("homeRetryButton")?.addEventListener("click", () => window.location.reload());
 
         const now = new Date();
+        const TIMELINE_STYLES = {
+            feed: { badge: "Feeding", badgeBg: "#ffe8ef", badgeFg: "#c01f5b", accent: "#ff6fa5" },
+            sleep: { badge: "Sleep", badgeBg: "#e7f5ec", badgeFg: "#0f7a44", accent: "#34b27b" },
+            diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
+        };
         if (!(await isLoggedIn())) {
             window.location.replace(screenUrl("auth_welcome"));
             await new Promise(() => {});
@@ -852,8 +859,8 @@
                         id: log.id,
                         at: log.startedAt,
                         type: "feed",
-                        title: labelFeedingType(log.type),
-                        detail: log.amountGrams ? `${log.amountGrams}g solid food` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} feeding` : log.notes || "Feeding logged"
+                        main: log.amountGrams ? `${log.amountGrams}g ${labelFeedingType(log.type)}` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} ${labelFeedingType(log.type)}` : labelFeedingType(log.type),
+                        note: log.notes || ""
                     })),
                 ...allSleepLogs
                     .filter(log => isSameLocalDay(log.startedAt, date))
@@ -861,8 +868,9 @@
                         id: log.id,
                         at: log.startedAt,
                         type: "sleep",
-                        title: log.status === "nap" ? t("home.nap") : t("home.sleep"),
-                        detail: log.endedAt ? `${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))} rest` : "Started"
+                        nap: log.status === "nap",
+                        main: log.endedAt ? `Slept for ${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))}` : "Sleep started",
+                        note: log.notes || ""
                     })),
                 ...allDiaperLogs
                     .filter(log => isSameLocalDay(log.changedAt, date))
@@ -870,8 +878,8 @@
                         id: log.id,
                         at: log.changedAt,
                         type: "diaper",
-                        title: t("home.diaper"),
-                        detail: diaperTimelineSummary(log)
+                        main: diaperTimelineSummary(log),
+                        note: log.notes || ""
                     }))
             ].sort((a, b) => new Date(a.at) - new Date(b.at));
 
@@ -882,7 +890,10 @@
             const ongoingHtml = (ongoing && (!ongoing.babyId || ongoing.babyId === selectedBabyId))
                 ? renderOngoingSleep(ongoing) : "";
             const itemsHtml = events.length ? events.map(renderTimelineItem).join("") : "";
-            timeline.innerHTML = ongoingHtml + itemsHtml || renderEmptyTimeline();
+            const body = ongoingHtml + itemsHtml;
+            timeline.innerHTML = body
+                ? `<div class="relative"><span class="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style="background:linear-gradient(to bottom,rgba(124,92,255,0.35),rgba(124,92,255,0.12))"></span><div class="space-y-3">${body}</div></div>`
+                : renderEmptyTimeline();
 
             if (permissions.canAddLogs) {
                 bindTimelineDelete(date);
@@ -890,15 +901,40 @@
             }
         }
 
+        function escapeHtml(value) {
+            return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+        }
+
+        function timelineCard({ accent, time, badgeBg, badgeFg, badge, main, note, deleteButton = "" }) {
+            return `
+                <div class="relative pl-7">
+                    <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm dark:border-[#1b2233]" style="background:${accent}"></span>
+                    <div class="relative bg-white rounded-2xl px-4 py-3 border border-black/[0.04] shadow-[0_8px_22px_rgba(124,92,255,0.08)] dark:bg-white/10 dark:border-white/10">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-[12px] font-semibold text-on-surface-variant">${time}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:${badgeBg};color:${badgeFg}">${badge}</span>
+                        </div>
+                        <p class="text-[15px] font-bold text-on-surface leading-snug">${main}</p>
+                        ${note ? `<p class="text-[13px] italic text-on-surface-variant mt-1">“${escapeHtml(note)}”</p>` : ""}
+                        ${deleteButton}
+                    </div>
+                </div>`;
+        }
+
         function renderOngoingSleep(session) {
             return `
-                <div class="bg-[#eef0ff] rounded-2xl px-4 py-3 border border-[#cdbbf5]/60 soft-shadow flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
-                    <span class="w-9 h-9 rounded-full bg-[#e8f1ff] text-[#1E40AF] flex items-center justify-center shrink-0 animate-pulse"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">nights_stay</span></span>
-                    <div class="min-w-0 flex-1">
-                        <p class="font-headline-md text-headline-md text-on-surface truncate">${t("home.sleepingNow")}</p>
-                        <p class="font-label-sm text-label-sm text-on-surface-variant truncate">${t("home.started")} ${formatTime(session.startedAt)}</p>
+                <div class="relative pl-7">
+                    <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm animate-pulse dark:border-[#1b2233]" style="background:#5b8def"></span>
+                    <div class="relative bg-[#eef0ff] rounded-2xl px-4 py-3 border border-[#cdbbf5]/60 shadow-[0_8px_22px_rgba(124,92,255,0.1)] dark:bg-white/10 dark:border-white/10">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-[12px] font-semibold text-on-surface-variant">${t("home.started")} ${formatTime(session.startedAt)}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:#e7f5ec;color:#0f7a44">Sleep</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-[15px] font-bold text-on-surface leading-snug">${t("home.sleepingNow")}</p>
+                            <button class="shrink-0 h-8 px-4 rounded-full bg-primary text-on-primary text-[13px] font-semibold active:scale-95 transition-transform" data-stop-sleep="1" type="button">${t("home.stop")}</button>
+                        </div>
                     </div>
-                    <button class="shrink-0 h-9 px-4 rounded-full bg-primary text-on-primary font-label-sm text-label-sm active:scale-95 transition-transform" data-stop-sleep="1" type="button">${t("home.stop")}</button>
                 </div>`;
         }
 
@@ -959,31 +995,22 @@
         }
 
         function renderTimelineItem(event) {
-            const styles = {
-                feed: { chip: "from-[#ffd9e6] to-[#ffb3cd] text-[#c01f5b]", icon: "restaurant", accent: "#ff6fa5" },
-                sleep: { chip: "from-[#dbeafe] to-[#bfd5ff] text-[#1E40AF]", icon: "bedtime", accent: "#5b8def" },
-                diaper: { chip: "from-[#d5f7e6] to-[#b6f0d2] text-[#0f7a44]", icon: "baby_changing_station", accent: "#22c08a" }
-            };
-            const style = styles[event.type] || styles.feed;
+            const style = TIMELINE_STYLES[event.type] || TIMELINE_STYLES.feed;
+            const badge = event.type === "sleep" ? (event.nap ? t("home.nap") : style.badge) : style.badge;
             const canDelete = permissions.canAddLogs && event.id;
             const deleteButton = canDelete
-                ? `<button class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete ${event.title} log"><span class="material-symbols-outlined text-[18px]">delete</span></button>`
+                ? `<button class="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete log"><span class="material-symbols-outlined text-[16px]">delete</span></button>`
                 : "";
-
-            return `
-                <div class="relative bg-white rounded-[20px] pl-4 pr-3 py-3 border border-black/[0.04] shadow-[0_8px_22px_rgba(124,92,255,0.08)] flex items-center gap-3 dark:bg-white/10 dark:border-white/10">
-                    <span class="absolute left-1.5 top-3 bottom-3 w-1 rounded-full" style="background:${style.accent}"></span>
-                    <span class="w-10 h-10 rounded-2xl bg-gradient-to-br ${style.chip} flex items-center justify-center shrink-0 ml-1.5">
-                        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${style.icon}</span>
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-[15px] font-bold text-on-surface truncate leading-tight">${event.title}</p>
-                        <p class="text-[13px] text-on-surface-variant truncate mt-0.5">${event.detail}</p>
-                    </div>
-                    <span class="text-[12px] font-semibold text-on-surface-variant shrink-0 whitespace-nowrap bg-surface-container-low rounded-full px-2.5 py-1 dark:bg-white/10">${formatTime(event.at)}</span>
-                    ${deleteButton}
-                </div>
-            `;
+            return timelineCard({
+                accent: style.accent,
+                time: formatTime(event.at),
+                badgeBg: style.badgeBg,
+                badgeFg: style.badgeFg,
+                badge,
+                main: escapeHtml(event.main),
+                note: event.note,
+                deleteButton
+            });
         }
 
         function labelFeedingType(type) {
