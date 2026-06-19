@@ -15,7 +15,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -119,9 +118,7 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .soft-shadow {
-            box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
-        }
+        .soft-shadow {box-shadow:0 18px 45px rgba(131,83,60,.12)}
         .list-item-hover:active {
             transform: scale(0.98);
             background-color: #f5f3ee;
@@ -240,21 +237,30 @@
 </div>
 <!-- Group: App Preferences -->
 <div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="calendar">
-<div class="flex items-center gap-4">
+<div class="flex items-center gap-4 p-4 rounded-xl">
 <div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">notifications_active</span>
 </div>
 <div class="flex flex-col">
 <span class="font-label-md text-label-md text-on-surface">Reminder settings</span>
-<span class="text-[11px] font-label-sm text-outline font-body-sm tracking-wider">In-app reminders now, push setup later</span>
 </div>
 </div>
-<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
-</a>
-<div class="mx-4 mb-2 rounded-2xl bg-surface-container-low p-3 border border-outline-variant/30">
-<p class="font-label-md text-label-md text-on-surface">Push notifications</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Push notifications require setup. In-app reminders are available now.</p>
+<div class="mx-4 space-y-2 pb-2">
+<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Feeding reminders</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Notify if 3h since last feed</p>
+</div>
+<button class="relative w-12 h-7 rounded-full transition-colors focus:outline-none" id="feedingNotifToggle" type="button" role="switch" aria-label="Toggle feeding reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="feedingNotifKnob"></span></button>
+</div>
+<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="font-label-md text-label-md text-on-surface">Appointment reminders</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Notify a day before</p>
+</div>
+<button class="relative w-12 h-7 rounded-full transition-colors focus:outline-none" id="appointmentNotifToggle" type="button" role="switch" aria-label="Toggle appointment reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="appointmentNotifKnob"></span></button>
+</div>
+<p class="min-h-5 text-[11px] font-label-sm text-tertiary px-1" id="notifFeedback"></p>
 </div>
 <div class="h-[1px] bg-surface-variant/50 mx-4"></div>
 <a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="privacy_safety">
@@ -279,14 +285,14 @@
 </div>
 <!-- Group: Subscription & Help -->
 <div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-coming-soon="Subscription" data-coming-soon-message="Subscription is only a prototype placeholder for now.">
+<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="subscription">
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
 </div>
 <div class="flex flex-col">
 <span class="font-label-md text-label-md text-on-surface">Subscription</span>
-<span class="text-[11px] font-label-sm text-primary font-bold uppercase tracking-wider">Premium Plan</span>
+<span class="text-[11px] font-label-sm text-primary font-bold uppercase tracking-wider" id="planLabel">Premium Plan</span>
 </div>
 </div>
 <span class="material-symbols-outlined text-outline-variant">chevron_right</span>
@@ -384,10 +390,12 @@
         } = await import(`${moduleBase}utils/i18n.mjs`);
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
         const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
+        const { getNotifPrefs, setNotifPrefs, requestNotifPermission } = await import(`${moduleBase}utils/notifications.mjs`);
         const languageButtons = document.querySelectorAll("[data-language-option]");
         const languageFeedback = document.getElementById("languageFeedback");
         const themeButtons = document.querySelectorAll("[data-theme-option]");
@@ -404,6 +412,8 @@
         renderThemeSelection(getThemePreference());
         renderParentProfile();
         renderPasswordReminder();
+        renderNotifToggles();
+        renderPlanLabel();
 
         document.getElementById("settingsBackButton")?.addEventListener("click", () => {
             window.location.href = screenUrl("home_dashboard");
@@ -497,6 +507,48 @@
             });
         });
 
+        function renderNotifToggles() {
+            const prefs = getNotifPrefs();
+            setToggleState("feedingNotifToggle", "feedingNotifKnob", prefs.feeding);
+            setToggleState("appointmentNotifToggle", "appointmentNotifKnob", prefs.appointment);
+            document.getElementById("feedingNotifToggle").addEventListener("click", async () => {
+                const newVal = !getNotifPrefs().feeding;
+                if (newVal) {
+                    const perm = await requestNotifPermission();
+                    if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
+                }
+                const updated = getNotifPrefs();
+                setNotifPrefs(newVal, updated.appointment);
+                setToggleState("feedingNotifToggle", "feedingNotifKnob", newVal);
+                showNotifFeedback(newVal ? "Feeding reminders on." : "Feeding reminders off.");
+            });
+            document.getElementById("appointmentNotifToggle").addEventListener("click", async () => {
+                const newVal = !getNotifPrefs().appointment;
+                if (newVal) {
+                    const perm = await requestNotifPermission();
+                    if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
+                }
+                const updated = getNotifPrefs();
+                setNotifPrefs(updated.feeding, newVal);
+                setToggleState("appointmentNotifToggle", "appointmentNotifKnob", newVal);
+                showNotifFeedback(newVal ? "Appointment reminders on." : "Appointment reminders off.");
+            });
+        }
+
+        function setToggleState(btnId, knobId, on) {
+            const btn = document.getElementById(btnId);
+            const knob = document.getElementById(knobId);
+            if (!btn || !knob) return;
+            btn.style.background = on ? "#486646" : "#d6c2bb";
+            knob.style.transform = on ? "translateX(20px)" : "translateX(0)";
+            btn.setAttribute("aria-checked", String(on));
+        }
+
+        function showNotifFeedback(msg) {
+            const el = document.getElementById("notifFeedback");
+            if (el) { el.textContent = msg; setTimeout(() => el.textContent = "", 3000); }
+        }
+
         function renderLanguageSelection(language) {
             languageButtons.forEach((button) => {
                 const isActive = button.dataset.languageOption === language;
@@ -559,6 +611,18 @@
         function closeParentProfileModal() {
             parentModal.classList.add("hidden");
             parentModal.classList.remove("flex");
+        }
+
+        async function renderPlanLabel() {
+            try {
+                const plan = await getCurrentPlan();
+                const label = document.getElementById("planLabel");
+                if (label) {
+                    label.textContent = isPremium(plan) ? "Premium · Active" : "Free Plan";
+                }
+            } catch (e) {
+                // Silently fail — badge just won't update
+            }
         }
     </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

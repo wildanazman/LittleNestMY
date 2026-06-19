@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Premium | LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fbf9f4",
+        "surface-container": "#f4ebe6",
+        "surface-container-low": "#fff6f0",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#e9e1d8",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        "tertiary-container": "#dcefd8",
+        "tertiary-fixed": "#caecc4",
+        secondary: "#625e56",
+        "secondary-container": "#e6dfd5",
+        error: "#ba1a1a",
+        "error-container": "#ffdad6",
+        "on-error-container": "#93000a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  body { font-family: "Nunito Sans", sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
+  .card { border-radius: 26px; }
+  .premium-glow { box-shadow: 0 0 30px rgba(131, 83, 60, 0.20); }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between">
+  <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button" aria-label="Back">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="text-[20px] leading-7 font-extrabold text-primary">Premium Plan</h1>
+  <div class="w-10 h-10"></div>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-4">
+  <p class="hidden rounded-2xl bg-tertiary-container p-3 text-[14px] font-extrabold text-tertiary" id="feedback" aria-live="polite"></p>
+
+  <!-- Current plan status -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow" id="planStatusCard">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined" id="planIcon">workspace_premium</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-[12px] font-bold text-on-surface-variant uppercase tracking-wide">Current plan</p>
+        <h2 class="text-[20px] font-extrabold text-on-surface" id="planName">Free</h2>
+        <p class="text-[13px] text-on-surface-variant" id="planMeta">Basic tracking features</p>
+      </div>
+      <span class="text-[12px] font-bold px-3 py-1 rounded-full bg-surface-container text-on-surface-variant hidden" id="planBadge"></span>
+    </div>
+    <div class="mt-3 text-[13px] text-on-surface-variant text-center hidden" id="purchasedNote">
+      <span class="material-symbols-outlined text-[16px] align-middle text-tertiary">check_circle</span>
+      Lifetime access — no recurring charges
+    </div>
+  </section>
+
+  <!-- Plans -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <h2 class="text-[18px] font-extrabold text-on-surface text-center">Choose your plan</h2>
+    <p class="text-[13px] text-on-surface-variant text-center mt-1">Unlock premium features for your little one</p>
+
+    <div class="mt-5 space-y-4">
+      <!-- Free plan -->
+      <div class="rounded-[22px] border-2 border-surface-container p-5" id="freePlanCard">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="text-[17px] font-extrabold text-on-surface">Free</h3>
+            <p class="text-[13px] text-on-surface-variant">For getting started</p>
+          </div>
+          <span class="text-[14px] font-bold text-tertiary bg-tertiary-container px-3 py-1 rounded-full">Current</span>
+        </div>
+        <div class="mt-4 space-y-2.5">
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Track feeding, sleep &amp; diaper logs</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Growth tracker &amp; milestones</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Calendar &amp; appointments</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px] text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span>Doctor report &amp; export</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px] text-on-surface-variant">
+            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span>AI insights &amp; weekly reports</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Premium plan -->
+      <div class="rounded-[22px] border-2 border-primary p-5 premium-glow relative" id="premiumPlanCard">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[11px] font-extrabold uppercase tracking-wider px-4 py-1 rounded-full">Popular</div>
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="text-[17px] font-extrabold text-primary">Premium</h3>
+            <p class="text-[13px] text-on-surface-variant">Everything unlocked</p>
+          </div>
+          <div class="text-right">
+            <span class="text-[22px] font-extrabold text-on-surface">RM 39.90</span>
+            <span class="text-[13px] text-on-surface-variant">one-time</span>
+          </div>
+        </div>
+        <div class="mt-4 space-y-2.5">
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Everything in Free</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Doctor report print &amp; PDF export</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Sleep predictions &amp; routine analysis</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Weekly AI reports &amp; growth correlations</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Lifetime access — pay once, use forever</span>
+          </div>
+          <div class="flex items-center gap-2.5 text-[14px]">
+            <span class="material-symbols-outlined text-[18px] text-tertiary">check</span>
+            <span>Priority support</span>
+          </div>
+        </div>
+        <button class="mt-5 w-full h-12 rounded-full bg-primary text-on-primary text-[15px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="subscribeBtn" type="button">
+          <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+          Subscribe Now
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium features detail -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <h2 class="text-[16px] font-extrabold text-on-surface">Premium features</h2>
+    <div class="mt-4 space-y-4" id="featuresList">
+      <div class="flex gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">summarize</span>
+        </div>
+        <div>
+          <p class="text-[14px] font-bold text-on-surface">Doctor Report</p>
+          <p class="text-[13px] text-on-surface-variant">Print or export a formatted report with summary, daily breakdown, growth chart, and notes — perfect for clinic visits.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">nightlight</span>
+        </div>
+        <div>
+          <p class="text-[14px] font-bold text-on-surface">Sleep Predictions</p>
+          <p class="text-[13px] text-on-surface-variant">Smart predictions that help you plan naps and bedtime based on your baby's sleep patterns.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">monitoring</span>
+        </div>
+        <div>
+          <p class="text-[14px] font-bold text-on-surface">Growth Correlations</p>
+          <p class="text-[13px] text-on-surface-variant">See how feeding, sleep, and milestones connect to your baby's growth patterns over time.</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+        </div>
+        <div>
+          <p class="text-[14px] font-bold text-on-surface">Lifetime Access</p>
+          <p class="text-[13px] text-on-surface-variant">Pay once at RM 39.90 and unlock all premium features forever. No subscription, no recurring fees.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+  <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button data-screen-target="quick_log"><span class="material-symbols-outlined">add_circle</span><span>Log</span></button>
+  <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { getAuthSession, isGuestMode, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
+const { requireSupabaseClient, isSupabaseConfigured } = await import(`${moduleBase}utils/supabaseClient.mjs`);
+
+if (!(await isLoggedIn())) {
+  window.location.replace(screenUrl("auth_welcome"));
+  await new Promise(() => {});
+}
+
+document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+document.getElementById("subscribeBtn").addEventListener("click", subscribe);
+
+await renderPlanStatus();
+bindPrototypeActions();
+
+async function renderPlanStatus() {
+  const plan = await getCurrentPlan();
+  const isOnPremium = isPremium(plan);
+
+  document.getElementById("planName").textContent = isOnPremium ? "Premium" : "Free";
+  document.getElementById("planMeta").textContent = isOnPremium
+    ? "All features unlocked"
+    : "Upgrade for doctor reports & AI insights";
+
+  const icon = document.getElementById("planIcon");
+  icon.textContent = isOnPremium ? "workspace_premium" : "star";
+
+  const badge = document.getElementById("planBadge");
+  if (isOnPremium) {
+    badge.textContent = "Active";
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+
+  const purchasedNote = document.getElementById("purchasedNote");
+  if (isOnPremium) {
+    purchasedNote.classList.remove("hidden");
+  } else {
+    purchasedNote.classList.add("hidden");
+  }
+
+  const freeCard = document.getElementById("freePlanCard");
+  const currentBadge = freeCard.querySelector("span:last-child");
+  freeCard.classList.remove("border-primary");
+  freeCard.classList.add("border-surface-container");
+  if (!isOnPremium) {
+    freeCard.classList.remove("border-surface-container");
+    freeCard.classList.add("border-primary");
+    if (currentBadge) currentBadge.textContent = "Current";
+  } else {
+    if (currentBadge) currentBadge.textContent = "";
+  }
+
+  const subscribeBtn = document.getElementById("subscribeBtn");
+  if (isOnPremium) {
+    subscribeBtn.textContent = "Already subscribed";
+    subscribeBtn.disabled = true;
+    subscribeBtn.classList.remove("bg-primary", "text-on-primary");
+    subscribeBtn.classList.add("bg-surface-container", "text-on-surface-variant");
+  } else {
+    subscribeBtn.textContent = "Subscribe Now";
+    subscribeBtn.disabled = false;
+    subscribeBtn.classList.remove("bg-surface-container", "text-on-surface-variant");
+    subscribeBtn.classList.add("bg-primary", "text-on-primary");
+  }
+}
+
+async function subscribe() {
+  const plan = await getCurrentPlan();
+  if (isPremium(plan)) {
+    showFeedback("You are already subscribed!", false);
+    return;
+  }
+
+  const guest = isGuestMode();
+  if (guest) {
+    showFeedback("Sign up for an account to subscribe.", true);
+    return;
+  }
+
+  const btn = document.getElementById("subscribeBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">hourglass_top</span> Redirecting...';
+
+  try {
+    const session = await getAuthSession();
+    if (!session?.access_token) {
+      showFeedback("Please log in first.", true);
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Subscribe Now';
+      return;
+    }
+
+    const response = await fetch("/api/stripe-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({})
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Checkout failed.");
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error("No checkout URL returned.");
+    }
+  } catch (error) {
+    showFeedback(error.message, true);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Subscribe Now';
+  }
+}
+
+function showFeedback(message, persistent = false) {
+  const f = document.getElementById("feedback");
+  f.textContent = message;
+  f.classList.remove("hidden");
+  if (!persistent) setTimeout(() => f.classList.add("hidden"), 2600);
+}
+
+function bindPrototypeActions() {
+  document.querySelectorAll("[data-screen-target]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      const target = el.getAttribute("data-screen-target");
+      if (target) goToScreen(target);
+    });
+  });
+}
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+</body></html>

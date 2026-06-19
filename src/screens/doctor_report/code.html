@@ -45,6 +45,8 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
   .report-card { border-radius: 26px; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .animate-slide-up { animation: slideUp .3s ease-out; }
   :root.dark .report-card { background: #242120; border-color: rgba(255,255,255,.10); }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
@@ -131,11 +133,37 @@ tailwind.config = {
     <p class="text-[13px] leading-6 text-on-surface-variant">This report is a caregiver-logged summary for sharing with family or your clinic. It is based on recent logs only and is not a medical diagnosis. For any health concern, please consult a doctor or Klinik Kesihatan.</p>
   </section>
 
-  <button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-2" id="printButton" type="button">
+  <div class="flex gap-3">
+  <button class="flex-1 h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-2" id="printButton" type="button">
     <span class="material-symbols-outlined">print</span>
-    Print / Export Report
+    Print
   </button>
+  <button class="flex-1 h-12 rounded-full border border-primary text-primary font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-2" id="exportButton" type="button">
+    <span class="material-symbols-outlined">file_download</span>
+    Export
+  </button>
+</div>
 </main>
+</div>
+
+<!-- Export choice sheet -->
+<div class="fixed inset-0 z-50 bg-black/40 flex items-end justify-center hidden" id="exportOverlay">
+  <div class="bg-surface w-full max-w-md rounded-t-[26px] p-6 pb-8 animate-slide-up" id="exportSheet">
+    <div class="w-10 h-1 rounded-full bg-surface-container-highest mx-auto mb-5"></div>
+    <h3 class="text-[18px] font-extrabold text-on-surface text-center">Export report</h3>
+    <p class="text-[13px] text-on-surface-variant text-center mt-1">Choose a format to export</p>
+    <div class="mt-5 space-y-3">
+      <button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="exportPdfBtn" type="button">
+        <span class="material-symbols-outlined">picture_as_pdf</span>
+        Export as PDF
+      </button>
+      <button class="w-full h-12 rounded-full border border-primary text-primary font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="exportHtmlBtn" type="button">
+        <span class="material-symbols-outlined">description</span>
+        Export as HTML
+      </button>
+      <button class="w-full h-10 text-[14px] font-bold text-on-surface-variant text-center active:opacity-60" id="exportCancelBtn" type="button">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
@@ -167,7 +195,12 @@ if (!(await isLoggedIn())) {
 
 document.getElementById("backButton").addEventListener("click", () => goToScreen("growth_tracker"));
 document.getElementById("printButton").addEventListener("click", printReport);
+document.getElementById("exportButton").addEventListener("click", showExportSheet);
 document.getElementById("shareButton").addEventListener("click", printReport);
+document.getElementById("exportPdfBtn").addEventListener("click", exportPdf);
+document.getElementById("exportHtmlBtn").addEventListener("click", exportHtml);
+document.getElementById("exportCancelBtn").addEventListener("click", hideExportSheet);
+document.getElementById("exportOverlay").addEventListener("click", (e) => { if (e.target === e.currentTarget) hideExportSheet(); });
 
 await renderReport();
 bindPrototypeActions();
@@ -353,10 +386,8 @@ function renderGrowthChart(growth) {
   setText("growthNote", `${points.length} weight measurement${points.length === 1 ? "" : "s"} saved.`);
 }
 
-function printReport() {
-  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
-  const win = window.open("", "_blank", "noopener,noreferrer");
-  if (!win) { showFeedback("Popup blocked. Please allow popups to print the report.", true); return; }
+function buildPrintHtml() {
+  if (!printPayload) return null;
   const p = printPayload;
   const summaryHtml = p.summaryRows.map(([l, v]) => `<tr><td>${escapeHtml(l)}</td><td style="text-align:right;font-weight:700">${escapeHtml(v)}</td></tr>`).join("");
   const dailyHtml = p.days.map((d) => `<tr><td>${escapeHtml(formatDayLabel(d.day))}</td><td style="text-align:center">${d.feedCount}</td><td style="text-align:center">${d.sleepMin ? formatDuration(d.sleepMin) : "–"}</td><td style="text-align:center">${d.diaperCount}</td></tr>`).join("");
@@ -366,26 +397,92 @@ function printReport() {
   const notesHtml = p.notes.length
     ? p.notes.map((n) => `<li><strong>${escapeHtml(n.title)}</strong>${n.detail ? ` — ${escapeHtml(n.detail)}` : ""} <em>(${escapeHtml(formatDate(n.at))})</em></li>`).join("")
     : "<li>No notes or milestones in this period.</li>";
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>LittleNest – Doctor Report</title>
+<style>
+  *{box-sizing:border-box;margin:0}
+  body{font-family:Arial,Helvetica,sans-serif;color:#2b211d;padding:40px 32px;line-height:1.6;max-width:720px;margin:auto}
+  h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:28px 0 10px;border-bottom:2px solid #e9e1d8;padding-bottom:4px}
+  .meta{color:#53433d;font-size:13px;margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;font-size:13px} td,th{padding:7px 10px;border-bottom:1px solid #e9e1d8;text-align:left}
+  th{background:#f4ebe6;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  ul{padding-left:20px;font-size:13px;line-height:1.8}
+  .note{margin-top:32px;padding-top:16px;border-top:1px solid #e9e1d8;font-size:11px;color:#8a746b}
+  .brand{text-align:center;margin-top:40px;font-size:12px;color:#83533c;border-top:1px solid #ffdcc8;padding-top:12px;letter-spacing:1px}
+  @media print{body{padding:20px 0}}
+</style></head><body>
+<h1>LittleNest – Doctor / Family Report</h1>
+<div class="meta"><strong>${escapeHtml(p.babyName)}</strong> · ${escapeHtml(p.meta)}</div>
+<div class="meta">Reporting period: ${escapeHtml(p.range)}</div>
+<h2>Summary</h2><table>${summaryHtml}</table>
+<h2>Daily breakdown</h2><table><tr><th>Day</th><th style="text-align:center">Feeds</th><th style="text-align:center">Sleep</th><th style="text-align:center">Diapers</th></tr>${dailyHtml}</table>
+<h2>Growth records</h2><table><tr><th>Date</th><th>Weight</th><th>Height/Length</th><th>Head</th></tr>${growthHtml}</table>
+<h2>Notes &amp; milestones</h2><ul>${notesHtml}</ul>
+<p class="note">This report is a caregiver-logged summary based on recent logs only. It is not a medical diagnosis. For health concerns, consult a doctor or Klinik Kesihatan.</p>
+<div class="brand">✦ LittleNest MY ✦</div>
+</body></html>`;
+}
 
-  win.document.write(`<html><head><title>LittleNest – Doctor Report</title>
-    <style>
-      body{font-family:Arial,Helvetica,sans-serif;color:#2b211d;padding:32px;line-height:1.5;max-width:720px;margin:auto}
-      h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:24px 0 8px;border-bottom:2px solid #eee;padding-bottom:4px}
-      .meta{color:#666;font-size:13px;margin-bottom:4px}
-      table{width:100%;border-collapse:collapse;font-size:13px} td,th{padding:6px 8px;border-bottom:1px solid #eee;text-align:left}
-      ul{padding-left:18px;font-size:13px} .note{margin-top:24px;font-size:12px;color:#777}
-    </style></head><body>
-    <h1>LittleNest – Doctor / Family Report</h1>
-    <div class="meta"><strong>${escapeHtml(p.babyName)}</strong> · ${escapeHtml(p.meta)}</div>
-    <div class="meta">Reporting period: ${escapeHtml(p.range)}</div>
-    <h2>Summary</h2><table>${summaryHtml}</table>
-    <h2>Daily breakdown</h2><table><tr><th>Day</th><th style="text-align:center">Feeds</th><th style="text-align:center">Sleep</th><th style="text-align:center">Diapers</th></tr>${dailyHtml}</table>
-    <h2>Growth records</h2><table><tr><th>Date</th><th>Weight</th><th>Height/Length</th><th>Head</th></tr>${growthHtml}</table>
-    <h2>Notes &amp; milestones</h2><ul>${notesHtml}</ul>
-    <p class="note">This report is a caregiver-logged summary based on recent logs only. It is not a medical diagnosis. For health concerns, consult a doctor or Klinik Kesihatan.</p>
-    <script>window.onload=function(){window.print();}<\/script>
-    </body></html>`);
-  win.document.close();
+function printReport() {
+  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
+  const html = buildPrintHtml();
+  if (!html) return;
+  const iframe = document.createElement("iframe");
+  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  iframe.onload = () => {
+    setTimeout(() => {
+      try { iframe.contentWindow.print(); } catch (e) { showFeedback("Print failed. Try Export instead.", true); }
+    }, 300);
+  };
+  setTimeout(() => document.body.removeChild(iframe), 30000);
+}
+
+function showExportSheet() {
+  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
+  document.getElementById("exportOverlay").classList.remove("hidden");
+}
+function hideExportSheet() { document.getElementById("exportOverlay").classList.add("hidden"); }
+
+function exportPdf() {
+  hideExportSheet();
+  if (!printPayload) return;
+  const html = buildPrintHtml();
+  if (!html) return;
+  const iframe = document.createElement("iframe");
+  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  iframe.onload = () => {
+    setTimeout(() => {
+      try { iframe.contentWindow.print(); } catch (e) { showFeedback("PDF export failed.", true); }
+    }, 300);
+  };
+  setTimeout(() => document.body.removeChild(iframe), 30000);
+}
+
+function exportHtml() {
+  hideExportSheet();
+  if (!printPayload) return;
+  const html = buildPrintHtml();
+  if (!html) return;
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `LittleNest_Report_${printPayload.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.html`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  showFeedback("Report exported as HTML.", false);
 }
 
 function setText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }

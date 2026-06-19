@@ -26,6 +26,7 @@ export const screens = [
   { id: "assistant", title: "Assistant", group: "core", path: "assistant/code.html", preview: "assistant/screen.png" },
   { id: "family_sharing", title: "Family Sharing", group: "settings", path: "family_sharing/code.html", preview: "family_sharing/screen.png" },
   { id: "mommy_guide", title: "Mommy Guide", group: "settings", path: "mommy_guide/code.html", preview: "mommy_guide/screen.png" },
+  { id: "subscription", title: "Premium Plan", group: "settings", path: "subscription/code.html", preview: "privacy_safety/screen.png" },
   { id: "privacy_safety", title: "Privacy & Safety", group: "settings", path: "privacy_safety/code.html", preview: "privacy_safety/screen.png" },
   { id: "settings", title: "Settings", group: "settings", path: "settings/code.html", preview: "settings/screen.png" }
 ];

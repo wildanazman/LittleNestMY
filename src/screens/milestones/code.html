@@ -312,6 +312,7 @@ Save Milestone
 <p class="font-body-md text-body-md text-white/80 text-center" id="recorderHint">Tap record — it stops automatically after 5 seconds.</p>
 <div class="flex items-center gap-4" id="recorderControls">
 <button class="h-14 px-7 rounded-full bg-white text-[#1f1714] font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderStart" type="button"><span class="material-symbols-outlined">fiber_manual_record</span>Record</button>
+<button class="hidden h-14 px-7 rounded-full bg-error text-white font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderStop" type="button"><span class="material-symbols-outlined">stop</span>Stop</button>
 </div>
 <div class="hidden flex items-center gap-3" id="recorderReview">
 <button class="h-12 px-5 rounded-full bg-white/15 text-white font-label-md text-label-md inline-flex items-center gap-2 active:scale-95 transition-transform" id="recorderRetake" type="button"><span class="material-symbols-outlined text-[18px]">replay</span>Retake</button>
@@ -419,6 +420,7 @@ Save Milestone
         const recorderModal = document.getElementById("videoRecorderModal");
         const recorderVideo = document.getElementById("recorderVideo");
         const recorderStart = document.getElementById("recorderStart");
+        const recorderStop = document.getElementById("recorderStop");
         const recorderReview = document.getElementById("recorderReview");
         const recorderControls = document.getElementById("recorderControls");
         const recorderUse = document.getElementById("recorderUse");
@@ -508,6 +510,7 @@ Save Milestone
         recordVideoButton.addEventListener("click", openRecorder);
         recorderClose.addEventListener("click", closeRecorder);
         recorderStart.addEventListener("click", startRecording);
+        recorderStop.addEventListener("click", () => { if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop(); });
         recorderFlip.addEventListener("click", toggleCamera);
         recorderRetake.addEventListener("click", () => { recordedDataUrl = ""; startLivePreview(); });
         recorderUse.addEventListener("click", () => {
@@ -580,7 +583,7 @@ Save Milestone
             recorderReview.classList.add("hidden");
             recorderCountdown.classList.add("hidden");
             recorderFlip.classList.remove("hidden");
-            recorderHint.textContent = "Tap record — it stops automatically after 5 seconds.";
+            recorderHint.textContent = "Tap Record (max 5s). Tap Stop to finish early.";
         }
 
         function startRecording() {
@@ -599,7 +602,8 @@ Save Milestone
                 showRecordedPreview();
             });
             mediaRecorder.start();
-            recorderControls.classList.add("hidden");
+            recorderStart.classList.add("hidden");
+            recorderStop.classList.remove("hidden");
             recorderCountdown.classList.remove("hidden");
             recorderHint.textContent = "Recording…";
             let remaining = MAX_VIDEO_MS / 1000;
@@ -617,7 +621,8 @@ Save Milestone
             recorderVideo.muted = true;
             recorderVideo.loop = true;
             recorderVideo.play().catch(() => {});
-            recorderControls.classList.add("hidden");
+            recorderStart.classList.remove("hidden");
+            recorderStop.classList.add("hidden");
             recorderCountdown.classList.add("hidden");
             recorderReview.classList.remove("hidden");
             recorderFlip.classList.add("hidden");
@@ -1179,10 +1184,163 @@ Save Milestone
         async function shareMemory(m) {
             const text = `${selectedBaby?.name || "Baby"} — ${m.title} (${dateLabelOf(m)})${m.notes ? `\n${m.notes}` : ""}\nvia LittleNest MY`;
             try {
+                const imgBlob = await buildShareImage(m);
+                if (imgBlob) {
+                    const file = new File([imgBlob], `milestone-${m.id}.png`, { type: "image/png" });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], title: m.title, text });
+                        return;
+                    }
+                    const url = URL.createObjectURL(imgBlob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `LittleNest-${m.title.replace(/\s+/g, "-")}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showFeedback("Image saved.");
+                    return;
+                }
                 if (navigator.share) { await navigator.share({ title: m.title, text }); return; }
                 await navigator.clipboard.writeText(text);
                 showFeedback("Memory copied to share.");
             } catch { /* user cancelled share */ }
+        }
+
+        async function buildShareImage(m) {
+            const canvas = document.createElement("canvas");
+            const W = 1080, H = 1350;
+            canvas.width = W;
+            canvas.height = H;
+            const ctx = canvas.getContext("2d");
+            const babyName = selectedBaby?.name || "Baby";
+            const dateStr = dateLabelOf(m);
+            const title = m.title || "Milestone";
+            const notes = m.notes ? m.notes : "";
+            const brand = "LittleNest MY";
+
+            if (m.photoUrl) {
+                try {
+                    let img;
+                    if (isVideoUrl(m.photoUrl)) {
+                        img = await captureVideoFrame(m.photoUrl);
+                    } else {
+                        img = await loadImage(m.photoUrl);
+                    }
+                    if (img) {
+                        const scale = Math.max(W / img.width, H / img.height);
+                        const sx = (img.width - W / scale) / 2;
+                        const sy = (img.height - H / scale) / 2;
+                        ctx.drawImage(img, sx, sy, W / scale, H / scale, 0, 0, W, H);
+                    } else {
+                        drawGradientBg(ctx, W, H);
+                    }
+                } catch { drawGradientBg(ctx, W, H); }
+            } else {
+                drawGradientBg(ctx, W, H);
+            }
+
+            const grad = ctx.createLinearGradient(0, H * 0.45, 0, H);
+            grad.addColorStop(0, "rgba(0,0,0,0)");
+            grad.addColorStop(1, "rgba(12,8,6,0.85)");
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            const fontSizeTitle = 72;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillStyle = "#fff";
+            ctx.font = `700 ${fontSizeTitle}px "Nunito Sans", sans-serif`;
+            wrapText(ctx, title, 64, H - 240, W - 128, fontSizeTitle + 8);
+
+            ctx.font = `400 32px "Nunito Sans", sans-serif`;
+            ctx.fillStyle = "rgba(255,255,255,0.8)";
+            const meta = `${babyName} · ${dateStr}`;
+            ctx.fillText(meta, 64, H - 170);
+
+            if (notes) {
+                ctx.font = `400 28px "Nunito Sans", sans-serif`;
+                ctx.fillStyle = "rgba(255,255,255,0.6)";
+                const maxLines = 2;
+                wrapText(ctx, notes, 64, H - 120, W - 128, 36, maxLines);
+            }
+
+            ctx.font = `600 22px "Nunito Sans", sans-serif`;
+            ctx.fillStyle = "rgba(255,255,255,0.3)";
+            ctx.textAlign = "right";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(brand, W - 64, H - 32);
+
+            return new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        }
+
+        function drawGradientBg(ctx, W, H) {
+            const g = ctx.createLinearGradient(0, 0, W, H);
+            g.addColorStop(0, "#cdbbf5");
+            g.addColorStop(0.4, "#f3c9da");
+            g.addColorStop(1, "#bfe3f5");
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+        }
+
+        function loadImage(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        function captureVideoFrame(src) {
+            return new Promise((resolve) => {
+                const video = document.createElement("video");
+                video.crossOrigin = "anonymous";
+                video.muted = true;
+                video.playsinline = true;
+                video.preload = "metadata";
+                let resolved = false;
+                video.onloadeddata = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    video.currentTime = Math.min(video.duration * 0.15, 0.5);
+                    setTimeout(() => {
+                        const canvas = document.createElement("canvas");
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        canvas.getContext("2d").drawImage(video, 0, 0);
+                        const img = new Image();
+                        img.onload = () => { video.remove(); resolve(img); };
+                        img.onerror = () => { video.remove(); resolve(null); };
+                        img.src = canvas.toDataURL("image/jpeg", 0.85);
+                    }, 300);
+                };
+                video.onerror = () => { if (!resolved) { resolved = true; video.remove(); resolve(null); } };
+                video.src = src;
+                video.load();
+                setTimeout(() => { if (!resolved) { resolved = true; video.remove(); resolve(null); } }, 8000);
+            });
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+            const words = text.split(" ");
+            let line = "", lines = 0;
+            for (const word of words) {
+                const test = line ? line + " " + word : word;
+                if (ctx.measureText(test).width > maxWidth && line) {
+                    ctx.fillText(line, x, y);
+                    lines++;
+                    if (maxLines && lines >= maxLines) {
+                        ctx.fillText("...", x, y);
+                        return;
+                    }
+                    y += lineHeight;
+                    line = word;
+                } else {
+                    line = test;
+                }
+            }
+            if (line) ctx.fillText(line, x, y);
         }
 
         function categoryForTitle(title) {

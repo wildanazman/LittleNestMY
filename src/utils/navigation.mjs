@@ -37,6 +37,7 @@ const activeGroups = {
   memory_book: "milestones",
   assistant: "assistant",
   settings: "assistant",
+  subscription: "assistant",
   privacy_safety: "assistant",
   family_sharing: "assistant",
   mommy_guide: "assistant",

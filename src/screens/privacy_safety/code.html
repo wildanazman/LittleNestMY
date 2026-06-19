@@ -10,345 +10,399 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>Privacy &amp; Safety | LittleNest MY</title>
+<title>Data & Privacy | LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script>
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              "surface-container": "#efeee9",
-              "surface-container-low": "#f5f3ee",
-              "surface-container-lowest": "#ffffff",
-              "surface-container-high": "#eae8e3",
-              "background": "#fbf9f4",
-              "surface": "#fbf9f4",
-              "primary": "#83533c",
-              "primary-container": "#ffbfa3",
-              "primary-fixed": "#ffdbcc",
-              "primary-fixed-dim": "#f7b89d",
-              "on-primary": "#ffffff",
-              "on-primary-container": "#7a4b36",
-              "on-primary-fixed": "#331203",
-              "on-primary-fixed-variant": "#673c27",
-              "secondary": "#625e56",
-              "secondary-container": "#e6dfd5",
-              "tertiary": "#486646",
-              "tertiary-container": "#b5d6af",
-              "tertiary-fixed": "#caecc4",
-              "on-tertiary-fixed": "#052108",
-              "on-surface": "#1b1c19",
-              "on-surface-variant": "#51443e",
-              "outline": "#84746d",
-              "outline-variant": "#d6c2bb",
-              "error": "#ba1a1a",
-              "error-container": "#ffdad6",
-              "on-error-container": "#93000a"
-            },
-            spacing: {
-              md: "24px",
-              base: "8px",
-              xl: "48px",
-              lg: "32px",
-              xs: "4px",
-              "container-padding": "20px",
-              gutter: "16px",
-              sm: "12px"
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              full: "9999px"
-            },
-            fontFamily: {
-              "headline-lg": ["Nunito Sans"],
-              "display-lg": ["Nunito Sans"],
-              "headline-md": ["Nunito Sans"],
-              "label-sm": ["Nunito Sans"],
-              "body-lg": ["Nunito Sans"],
-              "headline-lg-mobile": ["Nunito Sans"],
-              "label-md": ["Nunito Sans"],
-              "body-md": ["Nunito Sans"]
-            },
-            fontSize: {
-              "display-lg": ["32px", { lineHeight: "40px", fontWeight: "800" }],
-              "headline-md": ["20px", { lineHeight: "28px", fontWeight: "700" }],
-              "headline-lg-mobile": ["22px", { lineHeight: "28px", fontWeight: "700" }],
-              "label-sm": ["12px", { lineHeight: "16px", fontWeight: "700" }],
-              "label-md": ["14px", { lineHeight: "20px", fontWeight: "600" }],
-              "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }]
-            }
-          }
-        }
-      }
-    </script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fbf9f4",
+        "surface-container": "#f4ebe6",
+        "surface-container-low": "#fff6f0",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#e9e1d8",
+        "on-surface": "#211a17",
+        "on-surface-variant": "#53433d",
+        tertiary: "#486646",
+        "tertiary-container": "#dcefd8",
+        "tertiary-fixed": "#caecc4",
+        "on-tertiary-fixed": "#052108",
+        secondary: "#625e56",
+        "secondary-container": "#e6dfd5",
+        error: "#ba1a1a",
+        "error-container": "#ffdad6",
+        "on-error-container": "#93000a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
 <style>
-      body {
-        min-height: max(884px, 100dvh);
-        font-family: 'Nunito Sans', sans-serif;
-        -webkit-tap-highlight-color: transparent;
-      }
-      .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      }
-      .soft-shadow {
-        box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
-      }
-    </style>
+  body { font-family: "Nunito Sans", sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
+  .card { border-radius: 26px; }
+  .data-row { border-bottom: 1px solid #e9e1d8; }
+  .data-row:last-child { border-bottom: none; }
+</style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-background text-on-surface pb-28">
-<header class="sticky top-0 z-40 bg-surface flex items-center justify-between w-full px-container-padding h-14">
-<div class="flex items-center gap-3 min-w-0">
-<button aria-label="Back to settings" class="w-10 h-10 rounded-full text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button">
-<span class="material-symbols-outlined">arrow_back</span>
-</button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Privacy &amp; Safety</h1>
-</div>
-<div class="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-[20px]">verified_user</span>
-</div>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between">
+  <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button" aria-label="Back">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="text-[20px] leading-7 font-extrabold text-primary">Data & Privacy</h1>
+  <div class="w-10 h-10"></div>
 </header>
-<main class="max-w-md mx-auto px-container-padding pt-6 space-y-lg">
-<section class="rounded-xl bg-primary-fixed p-5 soft-shadow">
-<div class="flex items-start gap-3">
-<div class="w-12 h-12 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">lock</span>
-</div>
-<div class="space-y-1">
-<p class="font-label-sm text-label-sm text-on-primary-fixed-variant uppercase">Prototype privacy</p>
-<h2 class="font-headline-md text-headline-md text-on-primary-fixed">Your baby data stays private in this prototype</h2>
-<p class="font-body-md text-body-md text-on-primary-fixed-variant">LittleNest MY stores MVP data in this browser only. There is no backend account sync in this prototype.</p>
-</div>
-</div>
-</section>
-<section class="space-y-sm">
-<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
-<div class="flex gap-3">
-<div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">health_and_safety</span>
-</div>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">No medical diagnosis</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">LittleNest can help organize notes and reminders, but it does not diagnose, treat, or replace professional care.</p>
-</div>
-</div>
-</article>
-<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
-<div class="flex gap-3">
-<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">ios_share</span>
-</div>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Export data</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">Download a local JSON backup of LittleNest data saved in this browser.</p>
-<button class="mt-3 h-10 px-4 rounded-full bg-tertiary-container text-on-tertiary-fixed font-label-md text-label-md active:scale-95 transition-transform" id="exportDataButton" type="button">Export local data</button>
-</div>
-</div>
-</article>
-<article class="rounded-xl bg-surface-container-lowest p-4 soft-shadow border border-white/60">
-<div class="flex gap-3">
-<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">delete</span>
-</div>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">Delete local data</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">You can clear locally saved feeding, sleep, diaper, calendar, milestone, and preference data from this browser.</p>
-</div>
-</div>
-</article>
-<article class="rounded-xl bg-surface-container-high p-4 soft-shadow border border-white/60">
-<div class="flex gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined">stethoscope</span>
-</div>
-<div>
-<h3 class="font-headline-md text-body-md text-on-surface">For medical concerns, please consult a doctor</h3>
-<p class="font-body-md text-body-md text-on-surface-variant">If something feels urgent or worrying, contact your doctor, Klinik Kesihatan, or local emergency services.</p>
-</div>
-</div>
-</article>
-</section>
-<section class="rounded-xl bg-surface-container-low p-5 soft-shadow border border-outline-variant/40 space-y-sm">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Clear local app data</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">This only clears LittleNest data saved in this browser. After clearing, you will start again by creating a baby profile.</p>
-</div>
-<button class="w-full h-14 rounded-full bg-error-container text-on-error-container font-headline-md text-body-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="clearDataButton" type="button">
-<span class="material-symbols-outlined">delete_forever</span>
-Clear local app data
-</button>
-<p class="min-h-6 font-label-md text-label-md text-tertiary" id="clearDataFeedback"></p>
-</section>
-<section class="rounded-xl bg-error-container/40 p-5 soft-shadow border border-error/20 space-y-sm">
-<div>
-<h2 class="font-headline-md text-headline-md text-on-surface">Delete account</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">This deletes your Supabase account for LittleNest MY. Shared baby access for this account will be removed. Local browser data is also cleared.</p>
-</div>
-<button class="w-full h-14 rounded-full border border-error text-error font-headline-md text-body-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="deleteAccountButton" type="button">
-<span class="material-symbols-outlined">person_remove</span>
-Delete account
-</button>
-<p class="min-h-6 font-label-md text-label-md text-error" id="deleteAccountFeedback"></p>
-</section>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-4">
+  <p class="hidden rounded-2xl bg-tertiary-container p-3 text-[14px] font-extrabold text-tertiary" id="feedback" aria-live="polite"></p>
+
+  <!-- Account -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">account_circle</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-[16px] font-extrabold text-on-surface">Account</h2>
+        <p class="text-[13px] text-on-surface-variant" id="accountStatus">Loading...</p>
+      </div>
+      <button class="h-9 px-4 rounded-full bg-surface-container text-[13px] font-bold text-on-surface active:scale-95 transition-transform hidden" id="logoutButton" type="button">Log out</button>
+    </div>
+  </section>
+
+  <!-- Data overview -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[16px] font-extrabold text-on-surface">Stored data</h2>
+      <button class="h-8 px-3 rounded-full bg-surface-container text-[12px] font-bold text-primary active:scale-95 transition-transform" id="refreshDataBtn" type="button">Refresh</button>
+    </div>
+    <div class="mt-3 divide-y divide-surface-container" id="dataOverview">
+      <div class="py-2.5 flex justify-between text-[14px] text-on-surface-variant"><span>Loading...</span><span></span></div>
+    </div>
+  </section>
+
+  <!-- Export -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-full bg-secondary-container text-secondary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">file_download</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-[16px] font-extrabold text-on-surface">Backup to JSON</h2>
+        <p class="text-[13px] text-on-surface-variant">Download all your LittleNest data as a JSON file. You can restore it later via Import.</p>
+      </div>
+    </div>
+    <button class="mt-3 w-full h-11 rounded-full bg-primary text-on-primary text-[14px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="exportBtn" type="button">
+      <span class="material-symbols-outlined text-[18px]">file_download</span>
+      Export backup
+    </button>
+  </section>
+
+  <!-- Import -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-full bg-tertiary-container text-tertiary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">file_upload</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-[16px] font-extrabold text-on-surface">Restore from backup</h2>
+        <p class="text-[13px] text-on-surface-variant">Upload a previously exported .json file to restore your data on this browser.</p>
+      </div>
+    </div>
+    <input type="file" accept=".json" class="hidden" id="importInput"/>
+    <button class="mt-3 w-full h-11 rounded-full border border-primary text-primary text-[14px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="importBtn" type="button">
+      <span class="material-symbols-outlined text-[18px]">file_upload</span>
+      Import backup
+    </button>
+  </section>
+
+  <!-- Clear -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">delete</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-[16px] font-extrabold text-on-surface">Clear local data</h2>
+        <p class="text-[13px] text-on-surface-variant">Remove all LittleNest data stored in this browser. You will be returned to the welcome screen.</p>
+      </div>
+    </div>
+    <p class="min-h-5 text-[12px] font-bold text-tertiary mt-2" id="clearFeedback"></p>
+    <button class="mt-2 w-full h-11 rounded-full bg-error-container text-on-error-container text-[14px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="clearBtn" type="button">
+      <span class="material-symbols-outlined text-[18px]">delete_forever</span>
+      Clear all data
+    </button>
+  </section>
+
+  <!-- Delete account -->
+  <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-start gap-3">
+      <div class="w-10 h-10 rounded-full bg-error-container text-error flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">person_remove</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <h2 class="text-[16px] font-extrabold text-on-surface">Delete account</h2>
+        <p class="text-[13px] text-on-surface-variant">Permanently delete your online account and all synced data.</p>
+      </div>
+    </div>
+    <p class="min-h-5 text-[12px] font-bold text-error mt-2" id="deleteFeedback"></p>
+    <button class="mt-2 w-full h-11 rounded-full border border-error text-error text-[14px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="deleteAccountBtn" type="button">
+      <span class="material-symbols-outlined text-[18px]">person_remove</span>
+      Delete account
+    </button>
+  </section>
 </main>
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined">home</span>
-<span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined">add_circle</span>
-<span class="font-label-sm text-label-sm">Log</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined">calendar_month</span>
-<span class="font-label-sm text-label-sm">Calendar</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined">auto_awesome</span>
-<span class="font-label-sm text-label-sm">Milestones</span>
-</a>
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-<span class="font-label-sm text-label-sm">Assistant</span>
-</a>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
+  <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+  <button data-screen-target="quick_log"><span class="material-symbols-outlined">add_circle</span><span>Log</span></button>
+  <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
+  <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
+  <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
 </nav>
+
 <script type="module">
-      const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-      const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-      const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-      const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-      const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
-      const { getAuthSession, isGuestMode, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { getAuthSession, isGuestMode, isLoggedIn, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
 
-      const clearDataButton = document.getElementById("clearDataButton");
-      const clearDataFeedback = document.getElementById("clearDataFeedback");
-      const exportDataButton = document.getElementById("exportDataButton");
-      const deleteAccountButton = document.getElementById("deleteAccountButton");
-      const deleteAccountFeedback = document.getElementById("deleteAccountFeedback");
-      const backButton = document.getElementById("backButton");
-      let clearArmed = false;
-      let deleteArmed = false;
-      const babyState = await loadBabyProfilesRemote(babyProfile);
-      const permissions = await getBabyPermissions(babyState.selectedBabyId);
+document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+document.getElementById("refreshDataBtn").addEventListener("click", renderDataOverview);
+document.getElementById("exportBtn").addEventListener("click", exportData);
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());
+document.getElementById("importInput").addEventListener("change", importData);
+document.getElementById("clearBtn").addEventListener("click", clearLocalData);
+document.getElementById("deleteAccountBtn").addEventListener("click", deleteAccount);
+document.getElementById("logoutButton").addEventListener("click", logout);
 
-      backButton.addEventListener("click", () => {
-        goToScreen("settings");
-      });
+renderAccount();
+renderDataOverview();
 
-      exportDataButton.addEventListener("click", () => {
-        const data = {
-          exportedAt: new Date().toISOString(),
-          app: "LittleNest MY",
-          localStorage: Object.keys(window.localStorage)
-            .filter((key) => key.startsWith("littlenest:"))
-            .sort()
-            .reduce((items, key) => {
-              items[key] = safeJson(window.localStorage.getItem(key));
-              return items;
-            }, {})
-        };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `littlenest-my-export-${new Date().toISOString().slice(0, 10)}.json`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-
-      clearDataButton.addEventListener("click", () => {
-        if (babyState.profiles.length > 0 && !permissions.canManageBaby) {
-          clearDataFeedback.textContent = viewOnlyMessage;
-          return;
-        }
-        if (!clearArmed) {
-          clearArmed = true;
-          clearDataFeedback.textContent = "Tap once more to clear local LittleNest data from this browser.";
-          clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Confirm clear local data';
-          setTimeout(() => {
-            clearArmed = false;
-            clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Clear local app data';
-          }, 5000);
-          return;
-        }
-
-        Object.keys(window.localStorage)
-          .filter((key) => key.startsWith("littlenest:"))
-          .forEach((key) => window.localStorage.removeItem(key));
-        window.localStorage.removeItem("isLoggedIn");
-        window.localStorage.removeItem("currentUser");
-
-        clearArmed = false;
-        clearDataButton.innerHTML = '<span class="material-symbols-outlined">delete_forever</span>Clear local app data';
-        clearDataFeedback.textContent = "Local LittleNest data has been cleared on this browser.";
-        setTimeout(() => goToScreen("auth_welcome"), 700);
-      });
-
-      deleteAccountButton.addEventListener("click", async () => {
-        if (isGuestMode()) {
-          deleteAccountFeedback.textContent = "Guest mode has no online account. Use Clear local app data instead.";
-          return;
-        }
-        const session = await getAuthSession();
-        if (!session?.access_token) {
-          deleteAccountFeedback.textContent = "Log in first to delete your account.";
-          return;
-        }
-        if (!deleteArmed) {
-          deleteArmed = true;
-          deleteAccountFeedback.textContent = "Tap once more to permanently delete this account.";
-          deleteAccountButton.innerHTML = '<span class="material-symbols-outlined">person_remove</span>Confirm delete account';
-          setTimeout(() => {
-            deleteArmed = false;
-            deleteAccountButton.innerHTML = '<span class="material-symbols-outlined">person_remove</span>Delete account';
-          }, 5000);
-          return;
-        }
-        deleteAccountButton.disabled = true;
-        deleteAccountFeedback.textContent = "Deleting account...";
-        try {
-          const response = await fetch("/api/delete-account", {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${session.access_token}` }
-          });
-          const payload = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(payload.error || "Could not delete account.");
-          clearLittleNestLocalData();
-          await logoutLocalUser().catch(() => {});
-          deleteAccountFeedback.textContent = "Account deleted.";
-          setTimeout(() => goToScreen("auth_welcome"), 700);
-        } catch (error) {
-          deleteAccountButton.disabled = false;
-          deleteAccountFeedback.textContent = error.message || "Could not delete account.";
-        }
-      });
-
-      function clearLittleNestLocalData() {
-        Object.keys(window.localStorage)
-          .filter((key) => key.startsWith("littlenest:"))
-          .forEach((key) => window.localStorage.removeItem(key));
-        window.localStorage.removeItem("isLoggedIn");
-        window.localStorage.removeItem("currentUser");
-      }
-
-      function safeJson(value) {
-        try {
-          return JSON.parse(value);
-        } catch {
-          return value;
-        }
-      }
-    </script>
-<script type="module" src="/src/utils/navigation.mjs"></script>
-<script type="module">
-  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
-    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+async function renderAccount() {
+  const el = document.getElementById("accountStatus");
+  const logoutBtn = document.getElementById("logoutButton");
+  const loggedIn = await isLoggedIn();
+  const guest = isGuestMode();
+  if (!loggedIn) {
+    el.textContent = "Not logged in";
+    logoutBtn.classList.add("hidden");
+    return;
   }
+  if (guest) {
+    el.textContent = "Guest mode — data stored locally only";
+    logoutBtn.classList.remove("hidden");
+    logoutBtn.textContent = "Exit guest";
+    return;
+  }
+  const session = await getAuthSession();
+  if (session?.user) {
+    const email = session.user.email || "Unknown";
+    el.innerHTML = `Signed in as <strong>${escapeHtml(email)}</strong>`;
+    logoutBtn.classList.remove("hidden");
+    logoutBtn.textContent = "Log out";
+  } else {
+    el.textContent = "Session expired";
+    logoutBtn.classList.add("hidden");
+  }
+}
+
+async function renderDataOverview() {
+  const container = document.getElementById("dataOverview");
+  const counts = {
+    "Baby profiles": countKeys("littlenest:baby:"),
+    "Feeding logs": countKeys("littlenest:feed:"),
+    "Sleep logs": countKeys("littlenest:sleep:"),
+    "Diaper logs": countKeys("littlenest:diaper:"),
+    "Health notes": countKeys("littlenest:health-note:"),
+    "Growth records": countKeys("littlenest:growth:"),
+    "Milestones": countKeys("littlenest:milestone:"),
+    "Calendar events": countKeys("littlenest:calendar:"),
+    "Reminders": countKeys("littlenest:reminder:")
+  };
+  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const entries = Object.entries(counts);
+  container.innerHTML = entries.length
+    ? entries.map(([label, count]) => `
+      <div class="flex items-center justify-between py-2.5 data-row text-[14px]">
+        <span class="text-on-surface-variant">${label}</span>
+        <span class="font-extrabold text-on-surface">${count}</span>
+      </div>`).join("") + `
+      <div class="flex items-center justify-between pt-2.5 text-[14px]">
+        <span class="font-extrabold text-on-surface">Total records</span>
+        <span class="font-extrabold text-primary">${total}</span>
+      </div>`
+    : `<div class="py-2.5 text-[14px] text-on-surface-variant">No data stored yet.</div>`;
+}
+
+function countKeys(prefix) {
+  let count = 0;
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith(prefix)) count++;
+  }
+  return count;
+}
+
+function exportData() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    app: "LittleNest MY",
+    localStorage: {}
+  };
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith("littlenest:")) {
+      data.localStorage[key] = safeJson(window.localStorage.getItem(key));
+    }
+  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `littlenest-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  showFeedback("Backup downloaded!", false);
+}
+
+function importData(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target.result);
+      if (!data?.localStorage || typeof data.localStorage !== "object") {
+        showFeedback("Invalid backup file. Missing localStorage data.", true);
+        return;
+      }
+      let imported = 0;
+      Object.keys(data.localStorage).forEach((key) => {
+        if (!key.startsWith("littlenest:")) return;
+        const value = data.localStorage[key];
+        window.localStorage.setItem(key, typeof value === "string" ? value : JSON.stringify(value));
+        imported++;
+      });
+      document.getElementById("importInput").value = "";
+      renderDataOverview();
+      showFeedback(`Restored ${imported} records from backup!`, false);
+    } catch (error) {
+      showFeedback("Invalid backup file. Make sure it's a LittleNest JSON export.", true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+let clearArmed = false;
+function clearLocalData() {
+  if (!clearArmed) {
+    clearArmed = true;
+    document.getElementById("clearFeedback").textContent = "Tap once more to permanently clear all data.";
+    const btn = document.getElementById("clearBtn");
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete_forever</span>Confirm clear all data';
+    setTimeout(() => {
+      clearArmed = false;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete_forever</span>Clear all data';
+      document.getElementById("clearFeedback").textContent = "";
+    }, 5000);
+    return;
+  }
+  clearLittleNestLocalData();
+  clearArmed = false;
+  showFeedback("Data cleared. Redirecting...", false);
+  setTimeout(() => goToScreen("auth_welcome"), 700);
+}
+
+let deleteArmed = false;
+async function deleteAccount() {
+  const guest = isGuestMode();
+  if (guest) {
+    document.getElementById("deleteFeedback").textContent = "Guest mode has no account. Use Clear local data instead.";
+    return;
+  }
+  const session = await getAuthSession();
+  if (!session?.access_token) {
+    document.getElementById("deleteFeedback").textContent = "Please log in first to delete your account.";
+    return;
+  }
+  if (!deleteArmed) {
+    deleteArmed = true;
+    document.getElementById("deleteFeedback").textContent = "Tap once more to permanently delete your account.";
+    const btn = document.getElementById("deleteAccountBtn");
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">person_remove</span>Confirm delete account';
+    setTimeout(() => {
+      deleteArmed = false;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">person_remove</span>Delete account';
+      document.getElementById("deleteFeedback").textContent = "";
+    }, 5000);
+    return;
+  }
+  document.getElementById("deleteAccountBtn").disabled = true;
+  document.getElementById("deleteFeedback").textContent = "Deleting account...";
+  try {
+    const response = await fetch("/api/delete-account", {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${session.access_token}` }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "Could not delete account.");
+    clearLittleNestLocalData();
+    await logoutLocalUser().catch(() => {});
+    document.getElementById("deleteFeedback").textContent = "Account deleted.";
+    setTimeout(() => goToScreen("auth_welcome"), 700);
+  } catch (error) {
+    document.getElementById("deleteAccountBtn").disabled = false;
+    document.getElementById("deleteFeedback").textContent = error.message || "Could not delete account.";
+  }
+}
+
+async function logout() {
+  await logoutLocalUser().catch(() => {});
+  showFeedback("Logged out.", false);
+  renderAccount();
+}
+
+function clearLittleNestLocalData() {
+  const keys = [];
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i);
+    if (key && key.startsWith("littlenest:")) keys.push(key);
+  }
+  keys.forEach((key) => window.localStorage.removeItem(key));
+  window.localStorage.removeItem("isLoggedIn");
+  window.localStorage.removeItem("currentUser");
+}
+
+function showFeedback(message, persistent = false) {
+  const f = document.getElementById("feedback");
+  f.textContent = message;
+  f.classList.remove("hidden");
+  if (!persistent) setTimeout(() => f.classList.add("hidden"), 2600);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+}
+
+function safeJson(value) {
+  try { return JSON.parse(value); } catch { return value; }
+}
+
+document.querySelector("#backButton")?.focus();
 </script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
 </body></html>

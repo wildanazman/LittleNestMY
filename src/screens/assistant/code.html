@@ -110,7 +110,7 @@
 </section>
 
 <!-- Premium locked (hidden for now) -->
-<section class="rise hidden" style="animation-delay:.25s">
+<section class="rise hidden" id="premiumSection" style="animation-delay:.25s">
 <div class="rounded-[24px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#241b3a,#3a2d63)">
 <div class="flex items-center gap-2 mb-3">
 <span class="material-symbols-outlined text-[#f7b89d]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
@@ -140,6 +140,7 @@
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
   const {
     getLogsForBaby, getPersistedDiaperLogs, getPersistedFeedingLogs, getPersistedSleepLogs,
     getPersistedGrowthRecords, getSelectedBabyId, getSelectedBabyProfile
@@ -591,6 +592,18 @@
   renderNextMilestone();
   renderRecs();
   renderPremium();
+  (async () => {
+    try {
+      const plan = await getCurrentPlan();
+      if (isPremium(plan)) {
+        const section = document.getElementById("premiumSection");
+        if (section) section.classList.add("hidden");
+      } else {
+        const section = document.getElementById("premiumSection");
+        if (section) section.classList.remove("hidden");
+      }
+    } catch (e) { /* premium section stays hidden on error */ }
+  })();
 </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
