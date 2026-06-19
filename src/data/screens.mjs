@@ -17,7 +17,7 @@ export const screens = [
   { id: "health_records", title: "Health Records", group: "log", path: "health_records/code.html", preview: "quick_log/screen.png" },
   { id: "mama_care", title: "Mama Care", group: "core", path: "mama_care/code.html", preview: "home_dashboard/screen.png" },
   { id: "daily_summary", title: "Daily Summary", group: "core", path: "daily_summary/code.html", preview: "home_dashboard/screen.png" },
-  { id: "calendar", title: "Calendar", group: "core", path: "calendar/code.html", preview: "calendar/screen.png" },
+  { id: "calendar", title: "Appointment", group: "core", path: "calendar/code.html", preview: "calendar/screen.png" },
   { id: "growth_tracker", title: "Growth Tracker", group: "core", path: "growth_tracker/code.html", preview: "growth_tracker/screen.png" },
   { id: "weekly_insights", title: "Weekly Insights", group: "insight", path: "weekly_insights/code.html", preview: "weekly_insights/screen.png" },
   { id: "doctor_report", title: "Doctor Report", group: "insight", path: "doctor_report/code.html", preview: "growth_tracker/screen.png" },

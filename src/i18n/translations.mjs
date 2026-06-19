@@ -10,7 +10,7 @@ export const translations = {
     navigation: {
       home: "Home",
       log: "Log",
-      calendar: "Calendar",
+      calendar: "Appointment",
       milestones: "Milestones",
       assistant: "Insights"
     },
@@ -80,7 +80,7 @@ export const translations = {
     navigation: {
       home: "Utama",
       log: "Log",
-      calendar: "Kalendar",
+      calendar: "Temujanji",
       milestones: "Milestone",
       assistant: "Insights"
     },

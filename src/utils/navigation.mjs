@@ -268,6 +268,9 @@ function normalizeNavItem(item, key, isActive) {
   if (label) {
     label.className = "font-label-sm text-[10px] leading-4 whitespace-nowrap";
     if (key === "log") label.classList.add("hidden");
+    // Centralize the Appointment label so every screen's bottom nav matches,
+    // regardless of the per-screen hardcoded text ("Calendar").
+    if (key === "calendar") label.textContent = t("navigation.calendar", getLanguage());
   }
 }
 

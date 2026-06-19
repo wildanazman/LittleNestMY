@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>LittleNest MY - Calendar</title>
+<title>LittleNest MY - Appointment</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -138,7 +138,7 @@
 <header class="docked full-width top-0 z-50 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14">
 <div class="flex items-center gap-2">
 <button aria-label="Back to home" class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" data-icon="arrow_back" id="calendarBackButton" type="button">arrow_back</button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Calendar</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Appointment</h1>
 </div>
 <div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
 <img alt="Baby Profile Avatar" class="w-full h-full object-cover" src="/icons/placeholder.svg"/>
@@ -376,7 +376,7 @@
 </a>
 <a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
 <span class="material-symbols-outlined" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
-<span class="font-label-sm text-label-sm-mobile">Calendar</span>
+<span class="font-label-sm text-label-sm-mobile">Appointment</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" href="#">
 <span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
@@ -393,7 +393,8 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
-        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, getSelectedBabyId, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
+        const { deleteLocalCalendarEvent, getLogsForBaby, getPersistedCalendarEvents, saveLocalCalendarEvent, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
+        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
         const monthTitle = document.getElementById("monthTitle");
@@ -417,7 +418,8 @@
         const seeAllEventsButton = document.getElementById("seeAllEventsButton");
         const backButton = document.getElementById("calendarBackButton");
         const visibleMonth = new Date();
-        const selectedBabyId = getSelectedBabyId(babyProfile);
+        const babyState = await loadBabyProfilesRemote(babyProfile);
+        const selectedBabyId = babyState.selectedBabyId;
         let editingEventId = "";
 
         eventDateInput.value = new Date().toISOString().slice(0, 10);
@@ -509,7 +511,7 @@
                         <span class="material-symbols-outlined text-[34px]">calendar_month</span>
                     </div>
                     <div>
-                        <p class="font-headline-md text-headline-md text-on-surface">No calendar events yet</p>
+                        <p class="font-headline-md text-headline-md text-on-surface">No appointments yet</p>
                         <p class="font-body-md text-body-md text-on-surface-variant">Add clinic, daycare, school, or family reminders here. Simple reminders are enough.</p>
                     </div>
                 </div>`;
