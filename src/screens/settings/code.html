@@ -151,183 +151,189 @@
 </header>
 <main class="max-w-md mx-auto px-container-padding pb-32 pt-6">
 <!-- User Profile Header Section -->
-<section class="mb-lg flex flex-col items-center text-center">
-<div class="relative mb-md">
-<div class="w-24 h-24 rounded-full overflow-hidden soft-shadow border-4 border-white">
+<section class="mb-lg">
+<div class="relative overflow-hidden rounded-[28px] bg-surface-container-lowest p-5 soft-shadow border border-white/70">
+<div class="absolute -top-10 -right-8 w-32 h-32 rounded-full bg-primary-container/40 blur-2xl pointer-events-none"></div>
+<div class="relative flex items-center gap-4">
+<div class="relative shrink-0">
+<div class="w-[72px] h-[72px] rounded-full overflow-hidden border-4 border-white soft-shadow">
 <img alt="Parent Portrait" class="w-full h-full object-cover hidden" id="parentPhoto"/>
 <div class="w-full h-full bg-primary-container text-primary flex items-center justify-center font-headline-md text-headline-md" id="parentInitials">P</div>
 </div>
-<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-md" id="editParentProfileButton" type="button" aria-label="Edit parent profile">
-<span class="material-symbols-outlined text-[18px]">edit</span>
+<button class="absolute -bottom-1 -right-1 w-8 h-8 grid place-items-center bg-primary text-on-primary rounded-full shadow-md ring-2 ring-white active:scale-95 transition-transform" id="editParentProfileButton" type="button" aria-label="Edit parent profile">
+<span class="material-symbols-outlined text-[16px]">edit</span>
 </button>
 </div>
-<h2 class="font-headline-md text-headline-md text-on-surface" id="parentName">Parent</h2>
-<p class="font-label-md text-label-md text-on-surface-variant" id="parentEmail">Local prototype</p>
+<div class="min-w-0 flex-1">
+<h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Parent</h2>
+<p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">Local prototype</p>
+</div>
+</div>
+</div>
 </section>
-<!-- Menu Groups -->
-<div class="space-y-sm">
-<!-- Group: Account & Profiles -->
-<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="baby_profiles">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
+<!-- Group: Account -->
+<section class="mb-lg space-y-2.5">
+<p class="px-2 text-[11px] font-bold uppercase tracking-[0.09em] text-on-surface-variant/70">Account</p>
+<div class="bg-surface-container-lowest rounded-[26px] p-1.5 soft-shadow border border-white/60">
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="baby_profiles">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-primary-container/40 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary">child_care</span>
 </div>
-<span class="font-label-md text-label-md text-on-surface">Baby profiles</span>
-</div>
+<span class="flex-1 font-label-md text-label-md text-on-surface">Baby profiles</span>
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="family_sharing">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="family_sharing">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-tertiary/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-tertiary">diversity_1</span>
 </div>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface">Family &amp; Caregivers</span>
-<span class="text-[11px] font-label-sm text-outline font-body-sm tracking-wider">Invite spouse, grandparents, babysitter, or nursery</span>
-</div>
+<div class="flex-1 min-w-0">
+<span class="block font-label-md text-label-md text-on-surface">Family &amp; Caregivers</span>
+<span class="block text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Invite spouse, grandparents, babysitter, or nursery</span>
 </div>
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="mommy_guide">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="mommy_guide">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-primary-container/40 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary">menu_book</span>
 </div>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface">Mommy Guide</span>
-<span class="text-[11px] font-label-sm text-outline font-body-sm tracking-wider">Breastfeeding and care references</span>
-</div>
+<div class="flex-1 min-w-0">
+<span class="block font-label-md text-label-md text-on-surface">Mommy Guide</span>
+<span class="block text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Breastfeeding and care references</span>
 </div>
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<div class="p-4 rounded-xl">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center">
+</div>
+</section>
+<!-- Group: Appearance -->
+<section class="mb-lg space-y-2.5">
+<p class="px-2 text-[11px] font-bold uppercase tracking-[0.09em] text-on-surface-variant/70">Appearance</p>
+<div class="bg-surface-container-lowest rounded-[26px] p-4 soft-shadow border border-white/60 space-y-5">
+<div>
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-tertiary/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-tertiary">language</span>
 </div>
 <div class="flex flex-col flex-1">
 <span class="font-label-md text-label-md text-on-surface" data-i18n="settings.languageTitle">Language</span>
-<span class="text-[11px] font-label-sm text-outline font-body-sm tracking-wider" data-i18n="settings.languageSubtitle">Choose the app language</span>
+<span class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5" data-i18n="settings.languageSubtitle">Choose the app language</span>
 </div>
 </div>
-<div class="mt-4 bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Language">
-<button class="language-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all bg-white text-primary soft-shadow" data-language-option="en" type="button">English</button>
-<button class="language-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all text-on-surface-variant" data-language-option="ms" type="button">Bahasa Melayu</button>
+<div class="mt-3 bg-surface-container-low p-1 rounded-2xl flex gap-1" aria-label="Language">
+<button class="language-option flex-1 h-10 rounded-xl font-label-md text-label-md transition-all bg-white text-primary soft-shadow" data-language-option="en" type="button">English</button>
+<button class="language-option flex-1 h-10 rounded-xl font-label-md text-label-md transition-all text-on-surface-variant" data-language-option="ms" type="button">Bahasa Melayu</button>
 </div>
-<p class="min-h-5 mt-2 text-[11px] font-label-sm text-tertiary" id="languageFeedback"></p>
+<p class="min-h-4 mt-2 text-[11px] font-label-sm text-tertiary" id="languageFeedback"></p>
 </div>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<div class="p-4 rounded-xl">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center">
+<div class="h-px bg-surface-variant/40"></div>
+<div>
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-primary-container/40 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary">contrast</span>
 </div>
 <div class="flex flex-col flex-1">
 <span class="font-label-md text-label-md text-on-surface">Theme</span>
-<span class="text-[11px] font-label-sm text-outline font-body-sm tracking-wider">Choose app appearance</span>
+<span class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Choose app appearance</span>
 </div>
 </div>
-<div class="mt-4 bg-surface-container-low p-1 rounded-full flex gap-1" aria-label="Theme">
-<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="light" type="button">Light</button>
-<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="dark" type="button">Dark</button>
-<button class="theme-option flex-1 h-11 rounded-full font-label-md text-label-md transition-all" data-theme-option="system" type="button">System</button>
+<div class="mt-3 bg-surface-container-low p-1 rounded-2xl flex gap-1" aria-label="Theme">
+<button class="theme-option flex-1 h-10 rounded-xl font-label-md text-label-md transition-all" data-theme-option="light" type="button">Light</button>
+<button class="theme-option flex-1 h-10 rounded-xl font-label-md text-label-md transition-all" data-theme-option="dark" type="button">Dark</button>
+<button class="theme-option flex-1 h-10 rounded-xl font-label-md text-label-md transition-all" data-theme-option="system" type="button">System</button>
 </div>
-<p class="min-h-5 mt-2 text-[11px] font-label-sm text-tertiary" id="themeFeedback"></p>
-</div>
-</div>
-<!-- Group: App Preferences -->
-<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<div class="flex items-center gap-4 p-4 rounded-xl">
-<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary">notifications_active</span>
-</div>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface">Reminder settings</span>
+<p class="min-h-4 mt-2 text-[11px] font-label-sm text-tertiary" id="themeFeedback"></p>
 </div>
 </div>
-<div class="mx-4 space-y-2 pb-2">
-<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30">
-<div>
+</section>
+<!-- Group: Notifications & Privacy -->
+<section class="mb-lg space-y-2.5">
+<p class="px-2 text-[11px] font-bold uppercase tracking-[0.09em] text-on-surface-variant/70">Notifications &amp; Privacy</p>
+<div class="bg-surface-container-lowest rounded-[26px] p-1.5 soft-shadow border border-white/60">
+<div class="p-2.5 space-y-2">
+<div class="flex items-center justify-between gap-3 p-3 rounded-[18px] bg-surface-container-low/70">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">restaurant</span>
+</div>
+<div class="min-w-0">
 <p class="font-label-md text-label-md text-on-surface">Feeding reminders</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Notify if 3h since last feed</p>
+<p class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Notify if 3h since last feed</p>
 </div>
-<button class="relative w-12 h-7 rounded-full transition-colors focus:outline-none" id="feedingNotifToggle" type="button" role="switch" aria-label="Toggle feeding reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="feedingNotifKnob"></span></button>
 </div>
-<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-outline-variant/30">
-<div>
+<button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="feedingNotifToggle" type="button" role="switch" aria-label="Toggle feeding reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="feedingNotifKnob"></span></button>
+</div>
+<div class="flex items-center justify-between gap-3 p-3 rounded-[18px] bg-surface-container-low/70">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">event_available</span>
+</div>
+<div class="min-w-0">
 <p class="font-label-md text-label-md text-on-surface">Appointment reminders</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Notify a day before</p>
+<p class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Notify a day before</p>
 </div>
-<button class="relative w-12 h-7 rounded-full transition-colors focus:outline-none" id="appointmentNotifToggle" type="button" role="switch" aria-label="Toggle appointment reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="appointmentNotifKnob"></span></button>
 </div>
-<p class="min-h-5 text-[11px] font-label-sm text-tertiary px-1" id="notifFeedback"></p>
+<button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="appointmentNotifToggle" type="button" role="switch" aria-label="Toggle appointment reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="appointmentNotifKnob"></span></button>
 </div>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="privacy_safety">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
+<p class="min-h-4 text-[11px] font-label-sm text-tertiary px-1" id="notifFeedback"></p>
+</div>
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="privacy_safety">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">verified_user</span>
 </div>
-<span class="font-label-md text-label-md text-on-surface">Privacy settings</span>
-</div>
-<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+<span class="flex-1 font-label-md text-label-md text-on-surface">Privacy settings</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="doctor_report">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-secondary-container/50 flex items-center justify-center">
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="doctor_report">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
 <span class="material-symbols-outlined text-secondary">ios_share</span>
 </div>
-<span class="font-label-md text-label-md text-on-surface">Export data</span>
-</div>
-<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+<span class="flex-1 font-label-md text-label-md text-on-surface">Export data</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
 </div>
+</section>
 <!-- Group: Subscription & Help -->
-<div class="bg-surface-container-lowest rounded-[24px] p-2 soft-shadow">
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="subscription">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+<section class="mb-lg space-y-2.5">
+<p class="px-2 text-[11px] font-bold uppercase tracking-[0.09em] text-on-surface-variant/70">Subscription &amp; Support</p>
+<div class="bg-surface-container-lowest rounded-[26px] p-1.5 soft-shadow border border-white/60">
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="subscription">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-primary-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">star</span>
 </div>
-<div class="flex flex-col">
-<span class="font-label-md text-label-md text-on-surface">Subscription</span>
-<span class="text-[11px] font-label-sm text-primary font-bold uppercase tracking-wider" id="planLabel">Premium Plan</span>
+<div class="flex-1 min-w-0">
+<span class="block font-label-md text-label-md text-on-surface">Subscription</span>
+<span class="block text-[11px] font-bold uppercase tracking-wider text-primary mt-0.5" id="planLabel">Premium Plan</span>
 </div>
-</div>
-<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
-<div class="h-[1px] bg-surface-variant/50 mx-4"></div>
-<a class="flex items-center justify-between p-4 rounded-xl list-item-hover transition-all duration-200 group" href="#" data-screen-target="mommy_guide">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<a class="flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group" href="#" data-screen-target="mommy_guide">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-surface-container flex items-center justify-center">
 <span class="material-symbols-outlined text-on-surface-variant">help</span>
 </div>
-<span class="font-label-md text-label-md text-on-surface">Help &amp; Support</span>
-</div>
-<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+<span class="flex-1 font-label-md text-label-md text-on-surface">Help &amp; Support</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
 </div>
+</section>
 <!-- Danger Zone -->
-<div class="pt-md pb-md">
-<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group" id="logoutButton" type="button">
-<div class="w-10 h-10 rounded-full bg-error-container/30 flex items-center justify-center">
+<section class="mb-lg space-y-2">
+<button class="w-full flex items-center gap-3.5 p-3.5 rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow hover:bg-error-container/20 active:scale-[0.99] transition-all" id="logoutButton" type="button">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-error-container/40 flex items-center justify-center">
 <span class="material-symbols-outlined text-error">logout</span>
 </div>
-<span class="font-label-md text-label-md text-error">Logout</span>
+<span class="flex-1 text-left font-label-md text-label-md text-error">Logout</span>
 </button>
-<button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-error-container/20 transition-colors group mt-2" data-screen-target="privacy_safety" type="button">
-<div class="w-10 h-10 rounded-full bg-error-container/10 flex items-center justify-center">
+<button class="w-full flex items-center gap-3.5 p-3.5 rounded-[20px] hover:bg-error-container/15 active:scale-[0.99] transition-all" data-screen-target="privacy_safety" type="button">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-error-container/20 flex items-center justify-center">
 <span class="material-symbols-outlined text-error/60">delete_forever</span>
 </div>
-<span class="font-label-md text-label-md text-error/60">Delete data &amp; account</span>
+<span class="flex-1 text-left font-label-md text-label-md text-error/60">Delete data &amp; account</span>
 </button>
-</div>
-</div>
+</section>
 <div class="text-center mt-md opacity-30 select-none">
 <p class="font-label-sm text-label-sm">LittleNest MY Version 2.4.0 (102)</p>
 <p class="font-label-sm text-label-sm mt-1">Made with ♥ for parents</p>
