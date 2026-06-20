@@ -4,6 +4,27 @@ import { markKickedFlag, verifyDeviceSession, watchDeviceSession } from "./devic
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
+// Screens that already paint their own inline loading skeleton — the shared
+// global skeleton would double up, so it is suppressed there.
+const BESPOKE_SKELETON_SCREENS = new Set([
+  "home_dashboard", "home_dashboard_dark",
+  "growth_tracker", "mama_care", "milestones",
+  "doctor_report", "baby_profiles",
+  "sleep_log", "sleep_log_dark"
+]);
+
+// Public/auth screens never get a skeleton.
+const SKELETON_PUBLIC_SCREENS = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending", "onboarding"];
+
+// Mount the shared skeleton as early as possible so every other screen shows a
+// consistent loading state (like the homescreen) while its module fetches data.
+(function activateGlobalSkeleton() {
+  const screenId = getCurrentScreenId();
+  if (SKELETON_PUBLIC_SCREENS.includes(screenId)) return;
+  if (BESPOKE_SKELETON_SCREENS.has(screenId)) return;
+  mountGlobalSkeleton();
+})();
+
 const routes = {
   home: "home_dashboard",
   log: "quick_log",
