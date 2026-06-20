@@ -1,5 +1,6 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
-import { getAuthSession, isEmailVerified, isGuestMode, isLoggedIn } from "./localAuth.mjs";
+import { getAuthSession, isEmailVerified, isGuestMode, isLoggedIn, logoutLocalUser } from "./localAuth.mjs";
+import { markKickedFlag, verifyDeviceSession, watchDeviceSession } from "./deviceSession.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
@@ -377,7 +378,24 @@ async function guardAuthenticatedRoutes() {
   const session = await getAuthSession();
   if (!session) { redirect("auth_welcome"); return; }
   // Logged-in but unverified email → hold at the verification screen.
-  if (!isEmailVerified(session.user)) redirect("verify_pending");
+  if (!isEmailVerified(session.user)) { redirect("verify_pending"); return; }
+
+  // Single active device: if another phone has logged into this account, this
+  // session was superseded — sign out and send to login with a notice.
+  const userId = session.user?.id;
+  const status = await verifyDeviceSession(userId);
+  if (status === "superseded") {
+    await kickToLogin();
+    return;
+  }
+  // While the app is open, kick instantly if another device takes over.
+  watchDeviceSession(userId, () => { kickToLogin(); });
+}
+
+async function kickToLogin() {
+  markKickedFlag();
+  await logoutLocalUser().catch(() => {});
+  window.location.replace(screenUrl("login"));
 }
 
 async function setupPendingInviteBar() {

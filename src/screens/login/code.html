@@ -87,6 +87,7 @@ Remember me
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { getAuthConfigMessage, getPendingInviteToken, clearPendingInviteToken, hasSupabaseConfig, isEmailVerified, isValidEmail, loginLocalUser, logoutLocalUser, normalizeEmail, rememberPendingVerificationEmail, routeAfterAuth, sendPasswordReset } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { consumeKickedFlag } = await import(`${moduleBase}utils/deviceSession.mjs`);
   const { loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
@@ -97,6 +98,9 @@ Remember me
 
   if (!hasSupabaseConfig()) {
     error.textContent = getAuthConfigMessage();
+    error.classList.remove("hidden");
+  } else if (consumeKickedFlag()) {
+    error.textContent = "You were signed out because this account was used on another device. Only one device can be logged in at a time.";
     error.classList.remove("hidden");
   }
 

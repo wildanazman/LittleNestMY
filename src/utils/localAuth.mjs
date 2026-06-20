@@ -1,4 +1,5 @@
 import { isSupabaseConfigured, requireSupabaseClient, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
+import { claimDeviceSession, releaseDeviceSession } from "./deviceSession.mjs";
 
 let cachedSession = null;
 export const pendingInviteTokenKey = "littlenest:pendingInviteToken";
@@ -47,7 +48,12 @@ export async function loginLocalUser({ email, password }) {
   if (error) throw friendlyAuthError(error, "login");
 
   cachedSession = data.session || null;
-  if (data.user) await upsertProfileForUser(data.user);
+  if (data.user) {
+    await upsertProfileForUser(data.user);
+    // Claim the single active-device slot — evicts any other phone signed in
+    // to this account.
+    await claimDeviceSession(data.user.id);
+  }
   return data;
 }
 
@@ -73,7 +79,11 @@ export async function signupLocalUser({ name, email, password }) {
   }
 
   cachedSession = data.session || null;
-  if (data.user) await upsertProfileForUser(data.user, { displayName: name });
+  if (data.user) {
+    await upsertProfileForUser(data.user, { displayName: name });
+    // Only claim when signup produced a live session (email confirmation off).
+    if (data.session) await claimDeviceSession(data.user.id);
+  }
   return data;
 }
 
@@ -90,7 +100,9 @@ export async function updateCurrentUserPassword(password) {
   const client = requireSupabaseClient();
   const { data, error } = await client.auth.updateUser({ password });
   if (error) throw friendlyAuthError(error, "reset");
-  cachedSession = data?.user ? cachedSession : cachedSession;
+  // Setting a password (invite / reset flow) authenticates this device — make
+  // it the active one.
+  if (data?.user?.id) await claimDeviceSession(data.user.id).catch(() => {});
   clearNeedsPasswordSetup();
   return data;
 }
@@ -125,6 +137,8 @@ function clearGuestMode() {
 export async function logoutLocalUser() {
   clearGuestMode();
   if (!isSupabaseConfigured) return;
+  const userId = cachedSession?.user?.id || (await getCurrentUser())?.id || "";
+  await releaseDeviceSession(userId).catch(() => {});
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
   cachedSession = null;
@@ -178,6 +192,7 @@ export async function completeEmailRedirectSession() {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (error) throw friendlyAuthError(error, "login");
     cachedSession = data?.session || null;
+    if (cachedSession?.user) await claimDeviceSession(cachedSession.user.id).catch(() => {});
     window.history.replaceState({}, document.title, url.pathname);
     return cachedSession;
   }
