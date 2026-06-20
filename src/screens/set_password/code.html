@@ -67,7 +67,7 @@ tailwind.config = {
 </main>
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-  const { clearNeedsPasswordSetup, getAuthSession, isLoggedIn, updateCurrentUserPassword } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { clearNeedsPasswordSetup, completeEmailRedirectSession, getAuthSession, isLoggedIn, updateCurrentUserPassword } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
   const form = document.getElementById("passwordForm");
@@ -77,11 +77,16 @@ tailwind.config = {
   const desc = document.querySelector("#passwordForm")?.previousElementSibling?.querySelector("p");
   const heading = document.querySelector("#passwordForm")?.previousElementSibling?.querySelector("h1");
 
-  const isRecovery = window.location.hash && window.location.hash.includes("type=recovery");
+  const hashRecovery = window.location.hash && window.location.hash.includes("type=recovery");
+  const queryRecovery = new URL(window.location.href).searchParams.get("type") === "recovery";
+  const isRecovery = hashRecovery || queryRecovery;
 
   if (!(await isLoggedIn())) {
     if (isRecovery) {
-      const session = await getAuthSession();
+      let session = await getAuthSession();
+      if (!session) {
+        session = await completeEmailRedirectSession();
+      }
       if (!session) {
         window.location.replace(screenUrl("login"));
       }

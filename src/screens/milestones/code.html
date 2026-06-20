@@ -15,7 +15,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -286,13 +285,6 @@ Save Milestone
 <p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace — a gentle CDC guide, not a checklist to worry over. Tap one you've noticed and it joins the memory book.</p>
 </div>
 </section>
-<!-- Add Milestone Floating Action -->
-<div class="fixed bottom-24 right-6 md:right-12 z-50">
-<button class="flex items-center gap-2 bg-primary text-on-primary h-14 px-6 rounded-full shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all" id="addMilestoneFab" type="button">
-<span class="material-symbols-outlined">add</span>
-<span class="font-label-md text-label-md">Add Milestone</span>
-</button>
-</div>
 </div>
 </main>
 <!-- Video Recorder -->
@@ -382,7 +374,6 @@ Save Milestone
         const saveButton = document.getElementById("saveMilestoneButton");
         const feedback = document.getElementById("milestoneFeedback");
         const addPanel = document.getElementById("addMilestonePanel");
-        const fab = document.getElementById("addMilestoneFab");
         const backButton = document.getElementById("milestonesBackButton");
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
@@ -694,10 +685,6 @@ Save Milestone
         }
 
         saveButton.addEventListener("click", saveMilestone);
-        fab.addEventListener("click", () => {
-            addPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-            typeInput.focus();
-        });
         backButton.addEventListener("click", () => goToScreen("home_dashboard"));
 
         // New memory-book UI elements
