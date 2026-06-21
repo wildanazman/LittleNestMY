@@ -384,12 +384,12 @@
 <label class="block space-y-xs">
 <span class="font-label-sm text-label-sm text-on-surface-variant">Which diaper did you use?</span>
 <div class="flex flex-wrap gap-2" id="diaperBrandChips">
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Huggies">Huggies</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="MamyPoko">MamyPoko</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Drypers">Drypers</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Merries">Merries</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="PetPet">PetPet</button>
-<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="diaperBrandMoreBtn" type="button">+ More</button>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Huggies"><span>Huggies</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="MamyPoko"><span>MamyPoko</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Drypers"><span>Drypers</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Merries"><span>Merries</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="PetPet"><span>PetPet</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="diaperBrandMoreBtn">+ More</button>
 </div>
 <input type="hidden" id="diaperBrandInput"/>
 </label>
@@ -528,12 +528,22 @@
         brandQuickChips.addEventListener("click", (e) => {
             const chip = e.target.closest("[data-brand]");
             if (chip) {
+                if (e.target.closest("[data-brand-remove]")) {
+                    removeBrandChip(chip);
+                    return;
+                }
                 state.brand = chip.dataset.brand;
                 brandQuickChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
                 chip.classList.add("bg-primary", "text-on-primary", "border-primary");
             }
             if (e.target.closest("#diaperBrandMoreBtn")) openBrandSheet();
         });
+        function removeBrandChip(chip) {
+            state.brand = "";
+            brandInput.value = "";
+            chip.classList.remove("bg-primary", "text-on-primary", "border-primary");
+            if (!ALL_DIAPER_BRANDS.includes(chip.dataset.brand)) chip.remove();
+        }
 
         function openBrandSheet() {
             renderBrandSheet(ALL_DIAPER_BRANDS);
@@ -565,13 +575,11 @@
         }
         function ensureBrandChip(brand) {
             if (brandQuickChips.querySelector(`[data-brand="${brand}"]`)) return;
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold";
-            btn.dataset.brand = brand;
-            btn.textContent = brand;
-            btn.addEventListener("click", () => { state.brand = brand; brandInput.value = brand; selectChip(brand); });
-            brandQuickChips.insertBefore(btn, document.getElementById("diaperBrandMoreBtn"));
+            const div = document.createElement("div");
+            div.className = "brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer";
+            div.dataset.brand = brand;
+            div.innerHTML = `<span>${brand}</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button>`;
+            brandQuickChips.insertBefore(div, document.getElementById("diaperBrandMoreBtn"));
         }
         function selectChip(brand) {
             brandQuickChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));

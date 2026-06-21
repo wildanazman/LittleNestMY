@@ -323,12 +323,12 @@
 <div class="space-y-sm hidden" id="formulaBrandField">
 <label class="font-label-md text-label-md text-on-surface-variant px-1">Formula brand <span class="text-outline">(optional)</span></label>
 <div class="flex flex-wrap gap-2" id="formulaBrandChips">
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Similac / Gain Plus (Abbott)">Similac / Gain Plus</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Enfalac / Enfagrow A+ (Mead Johnson)">Enfalac / Enfagrow A+</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="S-26 Gold / Promil Gold (Wyeth)">S-26 Gold / Promil Gold</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Frisolac / Frisogrow (Friso)">Frisolac / Frisogrow</button>
-<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Nestlé NAN Pro / Supremepro">Nestlé NAN Pro</button>
-<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="formulaBrandMoreBtn" type="button">+ More</button>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Similac / Gain Plus (Abbott)"><span>Similac / Gain Plus</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Enfalac / Enfagrow A+ (Mead Johnson)"><span>Enfalac / Enfagrow A+</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="S-26 Gold / Promil Gold (Wyeth)"><span>S-26 Gold / Promil Gold</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Frisolac / Frisogrow (Friso)"><span>Frisolac / Frisogrow</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<div class="brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer" data-brand="Nestlé NAN Pro / Supremepro"><span>Nestlé NAN Pro</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button></div>
+<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="formulaBrandMoreBtn">+ More</button>
 </div>
 <input type="hidden" id="formulaBrandInput"/>
 </div>
@@ -516,6 +516,10 @@
         formulaBrandChips.addEventListener("click", (e) => {
             const chip = e.target.closest("[data-brand]");
             if (chip) {
+                if (e.target.closest("[data-brand-remove]")) {
+                    removeFeedingBrandChip(chip);
+                    return;
+                }
                 state.brand = chip.dataset.brand;
                 formulaBrandInput.value = state.brand;
                 formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
@@ -523,6 +527,12 @@
             }
             if (e.target.closest("#formulaBrandMoreBtn")) openFeedingBrandSheet();
         });
+        function removeFeedingBrandChip(chip) {
+            state.brand = "";
+            formulaBrandInput.value = "";
+            chip.classList.remove("bg-primary", "text-on-primary", "border-primary");
+            if (!ALL_FORMULA_BRANDS.includes(chip.dataset.brand)) chip.remove();
+        }
         function openFeedingBrandSheet() {
             renderFeedingBrandSheet(ALL_FORMULA_BRANDS);
             feedingBrandSheet.classList.remove("hidden");
@@ -553,13 +563,11 @@
         }
         function ensureFeedingBrandChip(brand) {
             if (formulaBrandChips.querySelector(`[data-brand="${brand}"]`)) return;
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold";
-            btn.dataset.brand = brand;
-            btn.textContent = brand;
-            btn.addEventListener("click", () => { state.brand = brand; formulaBrandInput.value = brand; selectFeedingChip(brand); });
-            formulaBrandChips.insertBefore(btn, document.getElementById("formulaBrandMoreBtn"));
+            const div = document.createElement("div");
+            div.className = "brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer";
+            div.dataset.brand = brand;
+            div.innerHTML = `<span>${brand}</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px]">close</span></button>`;
+            formulaBrandChips.insertBefore(div, document.getElementById("formulaBrandMoreBtn"));
         }
         function selectFeedingChip(brand) {
             formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
