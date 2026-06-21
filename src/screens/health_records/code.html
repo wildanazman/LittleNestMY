@@ -101,6 +101,14 @@ tailwind.config = {
     <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
   </button>
 
+  <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-3 hidden" id="quickSymptomSection">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[16px] font-bold text-on-surface">Quick add</h2>
+      <span class="text-[12px] text-on-surface-variant">One tap logs it now</span>
+    </div>
+    <div class="flex flex-wrap gap-2" id="quickSymptomChips"></div>
+  </section>
+
   <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4" id="entrySection">
     <div class="flex items-center justify-between gap-3">
       <h2 class="text-[20px] leading-7 font-bold text-on-surface">Add record</h2>
@@ -187,6 +195,53 @@ const form = document.getElementById("healthForm");
 const formError = document.getElementById("formError");
 
 document.getElementById("babyTitle").textContent = `${selectedBaby.name}'s health records`;
+renderQuickSymptoms();
+
+function renderQuickSymptoms() {
+  if (!permissions.canAddLogs) return;
+  const section = document.getElementById("quickSymptomSection");
+  const wrap = document.getElementById("quickSymptomChips");
+  if (!section || !wrap) return;
+  const SYMPTOMS = [
+    { label: "Teething", icon: "dentistry", type: "note" },
+    { label: "Fever", icon: "thermostat", type: "temperature" },
+    { label: "Cough", icon: "coronavirus", type: "illness" },
+    { label: "Runny nose", icon: "sick", type: "illness" },
+    { label: "Rash", icon: "healing", type: "illness" },
+    { label: "Vomiting", icon: "sick", type: "illness" },
+    { label: "Diarrhoea", icon: "sick", type: "illness" },
+    { label: "Fussy / colic", icon: "mood_bad", type: "note" }
+  ];
+  section.classList.remove("hidden");
+  wrap.innerHTML = SYMPTOMS.map((s) => `
+    <button type="button" data-symptom="${s.label}" data-symptom-type="${s.type}" class="inline-flex items-center gap-1.5 rounded-full border border-outline-variant bg-surface-container px-3.5 py-2 text-[14px] font-bold text-on-surface active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-[18px] text-primary">${s.icon}</span>${s.label}
+    </button>`).join("");
+  wrap.querySelectorAll("[data-symptom]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (btn.dataset.busy === "1") return;
+      btn.dataset.busy = "1";
+      btn.classList.add("opacity-60");
+      try {
+        await saveHealthNoteRemote({
+          id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `health-local-${Date.now()}`,
+          babyId: selectedBabyId,
+          type: btn.dataset.symptomType,
+          title: btn.dataset.symptom,
+          recordedAt: new Date().toISOString()
+        });
+        showFeedback(`${btn.dataset.symptom} logged.`);
+        await refreshRecords();
+      } catch (error) {
+        showFeedback(`${error.message || "Could not sync."} Saved locally for now.`);
+        await refreshRecords();
+      } finally {
+        btn.dataset.busy = "0";
+        btn.classList.remove("opacity-60");
+      }
+    });
+  });
+}
 document.getElementById("backButton").addEventListener("click", () => goToScreen("quick_log"));
 setDefaultDateTime();
 bindPrototypeActions();
