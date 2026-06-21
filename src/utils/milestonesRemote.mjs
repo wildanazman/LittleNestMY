@@ -6,6 +6,7 @@ import {
 } from "./localState.mjs";
 import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isSupabaseConfigured, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
+import { withTimeout, UPLOAD_TIMEOUT_MS } from "./withTimeout.mjs";
 
 const memoryBucket = "littlenest-memories";
 const milestoneMigrationKey = "littlenest:milestonesSupabaseMigratedAt";
@@ -20,11 +21,15 @@ export async function loadMilestonesRemote(selectedBabyId, fallback = []) {
 
   try {
     await migrateMilestonesOnce(selectedBabyId, local);
-    const { data, error } = await supabase
-      .from("milestones")
-      .select("*")
-      .eq("baby_id", selectedBabyId)
-      .order("happened_on", { ascending: false });
+    const { data, error } = await withTimeout(
+      supabase
+        .from("milestones")
+        .select("*")
+        .eq("baby_id", selectedBabyId)
+        .order("happened_on", { ascending: false }),
+      undefined,
+      "load memories"
+    );
     if (error) throw error;
     const remote = (data || []).map(fromMilestoneRow);
     remote.forEach(saveLocalMilestone);
@@ -62,11 +67,15 @@ export async function saveMilestoneRemote(milestone) {
       photoPath = uploaded.path || "";
     }
 
-    const { data, error } = await supabase
-      .from("milestones")
-      .upsert(toMilestoneRow({ ...milestone, id: remoteId, photoUrl }, session.user.id), { onConflict: "id" })
-      .select("*")
-      .single();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("milestones")
+        .upsert(toMilestoneRow({ ...milestone, id: remoteId, photoUrl }, session.user.id), { onConflict: "id" })
+        .select("*")
+        .single(),
+      undefined,
+      "save memory"
+    );
     if (error) throw error;
 
     if (photoPath) await savePhotoMetadata({ babyId: milestone.babyId, path: photoPath, milestoneId: remoteId });
@@ -82,7 +91,11 @@ export async function saveMilestoneRemote(milestone) {
 export async function deleteMilestoneRemote(milestoneId) {
   deleteLocalMilestone(milestoneId);
   if (!isSupabaseConfigured || isGuestMode() || !isUuid(milestoneId) || !(await getAuthSession())) return;
-  const { error } = await supabase.from("milestones").delete().eq("id", milestoneId);
+  const { error } = await withTimeout(
+    supabase.from("milestones").delete().eq("id", milestoneId),
+    undefined,
+    "delete memory"
+  );
   if (error) throw friendlyMilestoneError(error, "delete memory");
 }
 
@@ -90,9 +103,13 @@ async function uploadMilestonePhoto(dataUrl, { babyId, milestoneId }) {
   const blob = await (await fetch(dataUrl)).blob();
   const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
   const path = `milestones/${babyId}/${milestoneId}-${Date.now()}.${ext}`;
-  const { error } = await supabase.storage
-    .from(memoryBucket)
-    .upload(path, blob, { upsert: true, contentType: blob.type || "image/jpeg" });
+  const { error } = await withTimeout(
+    supabase.storage
+      .from(memoryBucket)
+      .upload(path, blob, { upsert: true, contentType: blob.type || "image/jpeg" }),
+    UPLOAD_TIMEOUT_MS,
+    "upload photo"
+  );
   if (error) throw error;
   const { data } = supabase.storage.from(memoryBucket).getPublicUrl(path);
   return { path, publicUrl: data?.publicUrl || "" };
@@ -100,14 +117,18 @@ async function uploadMilestonePhoto(dataUrl, { babyId, milestoneId }) {
 
 async function savePhotoMetadata({ babyId, path, milestoneId }) {
   try {
-    await supabase.from("photo_metadata").insert({
-      baby_id: babyId,
-      storage_bucket: memoryBucket,
-      storage_path: path,
-      purpose: "milestone_photo",
-      related_table: "milestones",
-      related_id: milestoneId
-    });
+    await withTimeout(
+      supabase.from("photo_metadata").insert({
+        baby_id: babyId,
+        storage_bucket: memoryBucket,
+        storage_path: path,
+        purpose: "milestone_photo",
+        related_table: "milestones",
+        related_id: milestoneId
+      }),
+      undefined,
+      "save photo metadata"
+    );
   } catch {
     // Metadata is useful for audit, but the photo and milestone are already saved.
   }

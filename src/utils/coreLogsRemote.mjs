@@ -16,6 +16,7 @@ import {
 } from "./localState.mjs";
 import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isSupabaseConfigured, supabase, supabaseConfigMessage } from "./supabaseClient.mjs";
+import { withTimeout } from "./withTimeout.mjs";
 
 const coreLogsMigrationKey = "littlenest:coreLogsSupabaseMigratedAt";
 
@@ -49,11 +50,15 @@ export async function saveFeedingLogRemote(log) {
   if (!canUseSupabase(log.babyId)) return local;
 
   try {
-    const { data, error } = await supabase
-      .from("feeding_logs")
-      .upsert(toFeedingRow(log), { onConflict: "id" })
-      .select("*")
-      .single();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("feeding_logs")
+        .upsert(toFeedingRow(log), { onConflict: "id" })
+        .select("*")
+        .single(),
+      undefined,
+      "save feeding log"
+    );
     if (error) throw error;
     if (data?.id && data.id !== log.id) deleteLocalFeedingLog(log.id);
     return saveLocalFeedingLog(fromFeedingRow(data));
@@ -83,11 +88,15 @@ export async function saveSleepLogRemote(log) {
   if (!canUseSupabase(log.babyId)) return local;
 
   try {
-    const { data, error } = await supabase
-      .from("sleep_logs")
-      .upsert(toSleepRow(log), { onConflict: "id" })
-      .select("*")
-      .single();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("sleep_logs")
+        .upsert(toSleepRow(log), { onConflict: "id" })
+        .select("*")
+        .single(),
+      undefined,
+      "save sleep log"
+    );
     if (error) throw error;
     // Drop the pre-sync local copy when the row got a real uuid, else it
     // lingers as a "pending" duplicate that resurrects after deletion.
@@ -126,11 +135,15 @@ export async function saveHealthNoteRemote(note) {
   if (!canUseSupabase(note.babyId)) return local;
 
   try {
-    const { data, error } = await supabase
-      .from("health_notes")
-      .upsert(toHealthRow(note), { onConflict: "id" })
-      .select("*")
-      .single();
+    const { data, error } = await withTimeout(
+      supabase
+        .from("health_notes")
+        .upsert(toHealthRow(note), { onConflict: "id" })
+        .select("*")
+        .single(),
+      undefined,
+      "save health note"
+    );
     if (error) throw error;
     if (data?.id && data.id !== note.id) deleteLocalHealthNote(note.id);
     return saveLocalHealthNote(fromHealthRow(data));
@@ -170,11 +183,15 @@ async function fetchCoreLogs(selectedBabyId) {
 }
 
 async function fetchTable(table, selectedBabyId, orderColumn) {
-  const { data, error } = await supabase
-    .from(table)
-    .select("*")
-    .eq("baby_id", selectedBabyId)
-    .order(orderColumn, { ascending: false });
+  const { data, error } = await withTimeout(
+    supabase
+      .from(table)
+      .select("*")
+      .eq("baby_id", selectedBabyId)
+      .order(orderColumn, { ascending: false }),
+    undefined,
+    `load ${table.replace("_", " ")}`
+  );
   if (error) throw error;
   return data || [];
 }
@@ -211,7 +228,11 @@ async function migrateCoreLogsOnce(selectedBabyId, local) {
 
 async function upsertMany(table, rows) {
   if (!rows.length) return;
-  const { error } = await supabase.from(table).upsert(rows, { onConflict: "id" });
+  const { error } = await withTimeout(
+    supabase.from(table).upsert(rows, { onConflict: "id" }),
+    undefined,
+    `migrate ${table.replace("_", " ")}`
+  );
   if (error) throw error;
 }
 
@@ -345,21 +366,29 @@ function toDiaperRow(log) {
 
 async function upsertDiaperRow(log) {
   const fullRow = toDiaperRow(log);
-  const { data, error } = await supabase
-    .from("diaper_logs")
-    .upsert(fullRow, { onConflict: "id" })
-    .select("*")
-    .single();
+  const { data, error } = await withTimeout(
+    supabase
+      .from("diaper_logs")
+      .upsert(fullRow, { onConflict: "id" })
+      .select("*")
+      .single(),
+    undefined,
+    "save diaper log"
+  );
   if (!error) return data;
   if (!isMissingDiaperDetailColumn(error)) throw error;
 
   console.warn("Supabase diaper detail columns are missing. Falling back to legacy diaper log columns until migration 005 is applied.", error);
   const legacyRow = toLegacyDiaperRow(log);
-  const legacyResult = await supabase
-    .from("diaper_logs")
-    .upsert(legacyRow, { onConflict: "id" })
-    .select("*")
-    .single();
+  const legacyResult = await withTimeout(
+    supabase
+      .from("diaper_logs")
+      .upsert(legacyRow, { onConflict: "id" })
+      .select("*")
+      .single(),
+    undefined,
+    "save diaper log"
+  );
   if (legacyResult.error) throw legacyResult.error;
   return legacyResult.data;
 }
@@ -428,7 +457,11 @@ function fromHealthRow(row) {
 
 async function deleteRemoteById(table, logId, action) {
   if (!isSupabaseConfigured || !(await getAuthSession()) || !isUuid(logId)) return;
-  const { error } = await supabase.from(table).delete().eq("id", logId);
+  const { error } = await withTimeout(
+    supabase.from(table).delete().eq("id", logId),
+    undefined,
+    action
+  );
   if (error) throw friendlyRlsError(error, action);
 }
 
