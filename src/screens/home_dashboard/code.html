@@ -748,7 +748,7 @@
         bindBabyProfileMenu();
         showHomeContent();
         const babyNameForNotif = selectedBaby?.name || "";
-        scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif });
+        scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif, feedIntervalHours: selectedBaby ? feedIntervalHours() : 3 });
 
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;

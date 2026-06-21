@@ -39,28 +39,33 @@ export function showNotif(title, body) {
   persistFiredReminder(title, body);
 }
 
-export function scheduleAllReminders({ feedingLogs, calendarEvents, reminders, babyName }) {
+export function scheduleAllReminders({ feedingLogs, calendarEvents, reminders, babyName, feedIntervalHours }) {
   clearAll();
   const prefs = getNotifPrefs();
+  // Nothing fires unless the browser granted notification permission.
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
   restorePendingReminders(babyName);
-  if (prefs.feeding) scheduleFeedingReminder(feedingLogs, babyName);
+  if (prefs.feeding) scheduleFeedingReminder(feedingLogs, babyName, feedIntervalHours);
   if (prefs.medicine) scheduleMedicineReminder(calendarEvents, reminders, babyName);
   if (prefs.appointment) scheduleAppointmentReminder(calendarEvents, reminders, babyName);
   if (prefs.vaccine) scheduleVaccineReminder(calendarEvents, reminders, babyName);
 }
 
-function scheduleFeedingReminder(logs, name) {
+function scheduleFeedingReminder(logs, name, feedIntervalHours) {
   if (!logs?.length) return;
+  const intervalH = Number(feedIntervalHours) > 0 ? Number(feedIntervalHours) : 3;
+  const intervalMs = intervalH * 3600000;
   const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
   const todayLogs = logs.filter((l) => new Date(l.startedAt) >= todayStart);
   if (!todayLogs.length) return;
   const last = todayLogs.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
-  const next = new Date(last.startedAt).getTime() + 3 * 3600000;
+  const next = new Date(last.startedAt).getTime() + intervalMs;
   const delay = next - Date.now();
   if (delay <= 0) return;
+  const hoursLabel = intervalH === 1 ? "1 hour" : `${intervalH} hours`;
   timers.feeding = setTimeout(() => {
-    showNotif("Feeding time?", `${name || "Baby"} hasn't been fed in 3 hours.`);
-    persistPendingReminder("feeding", Date.now() + 3 * 3600000, name);
+    showNotif("Feeding time?", `${name || "Baby"} may be due for a feed (about every ${hoursLabel}).`);
+    persistPendingReminder("feeding", Date.now() + intervalMs, name);
   }, delay);
 }
 
