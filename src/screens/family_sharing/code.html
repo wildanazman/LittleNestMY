@@ -341,7 +341,6 @@
         await renderMembers();
 
         function openSheet() {
-          if (careCircle.currentRole !== "parent") return;
           sheetName.value = ""; sheetEmail.value = ""; sheetError.textContent = "";
           selectedRole = "caregiver"; renderRoleCards();
           sheetStep2.classList.add("hidden"); sheetStep1.classList.remove("hidden");
@@ -430,18 +429,15 @@
             ? members.map(renderMemberCard).join("")
             : renderMemberCard(parent) + renderEmptyCircle();
 
-          const isParent = careCircle.currentRole === "parent";
-          pendingSection.classList.toggle("hidden", !invitations.length && !isParent);
+          pendingSection.classList.toggle("hidden", !invitations.length);
           pendingInvitesList.innerHTML = invitations.length
             ? invitations.map(renderInvitationCard).join("")
-            : (isParent ? renderNoPending() : "");
+            : renderNoPending();
 
           bindMemberActions();
-          inviteFamilyButton.classList.toggle("hidden", !isParent);
         }
 
         function renderEmptyCircle() {
-          if (careCircle.currentRole !== "parent") return "";
           return `<div class="rounded-[24px] bg-surface-container-low p-6 text-center soft-shadow">
             <div class="w-16 h-16 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-[#7056f4] mx-auto flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1;">diversity_1</span></div>
             <h3 class="font-headline-md text-headline-md text-on-surface">Start your baby's Care Circle</h3>
