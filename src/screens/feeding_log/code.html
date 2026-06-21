@@ -322,24 +322,15 @@
 
 <div class="space-y-sm hidden" id="formulaBrandField">
 <label class="font-label-md text-label-md text-on-surface-variant px-1">Formula brand <span class="text-outline">(optional)</span></label>
-<input list="formulaBrandList" id="formulaBrandInput" class="w-full h-14 bg-surface-container-low border-none rounded-2xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" placeholder="e.g. Similac, S-26, Enfalac" autocomplete="off"/>
-<datalist id="formulaBrandList">
-<option value="Similac / Gain Plus (Abbott)"></option>
-<option value="Enfalac / Enfagrow A+ (Mead Johnson)"></option>
-<option value="Frisolac / Frisogrow (Friso)"></option>
-<option value="S-26 Gold / Promil Gold (Wyeth)"></option>
-<option value="Nestlé NAN Pro / Supremepro"></option>
-<option value="Mamil Gold / Dumex Dugro"></option>
-<option value="Anmum Infacare / Essential"></option>
-<option value="Karihome (Goat Milk)"></option>
-<option value="AptaGro (Aptamil)"></option>
-<option value="Fernleaf / Fernleaf Formulated Milk Powder"></option>
-<option value="Morinaga Chil-mil / Chil-kid"></option>
-<option value="Lactogen / Lactogrow (Nestlé)"></option>
-<option value="Bellamy's Organic"></option>
-<option value="Novalac (Standard & Speciality formulas)"></option>
-<option value="Wyeth SMA Nutrition"></option>
-</datalist>
+<div class="flex flex-wrap gap-2" id="formulaBrandChips">
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Similac / Gain Plus (Abbott)">Similac / Gain Plus</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Enfalac / Enfagrow A+ (Mead Johnson)">Enfalac / Enfagrow A+</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="S-26 Gold / Promil Gold (Wyeth)">S-26 Gold / Promil Gold</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Frisolac / Frisogrow (Friso)">Frisolac / Frisogrow</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Nestlé NAN Pro / Supremepro">Nestlé NAN Pro</button>
+<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="formulaBrandMoreBtn" type="button">+ More</button>
+</div>
+<input type="hidden" id="formulaBrandInput"/>
 </div>
 
 <div class="grid grid-cols-2 gap-3">
@@ -372,6 +363,17 @@
 <span class="material-symbols-outlined">check_circle</span>
             Save Log
         </button>
+<!-- Brand Picker Sheet -->
+<div class="fixed inset-0 z-[120] hidden items-end justify-center bg-black/30" id="feedingBrandSheet">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-t-[28px] p-5 max-h-[60vh] flex flex-col">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface">Choose formula brand</h3>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" type="button" id="feedingBrandSheetClose"><span class="material-symbols-outlined">close</span></button>
+</div>
+<input class="w-full h-11 rounded-full bg-surface-container border-none px-4 my-3 text-[15px] font-bold text-on-surface placeholder:text-outline-variant" id="feedingBrandSearch" placeholder="Search brand..." autocomplete="off"/>
+<div class="flex-1 overflow-y-auto space-y-1" id="feedingBrandList"></div>
+</div>
+</div>
 <!-- Recent History Section -->
 <section class="space-y-md pt-base">
 <div class="flex justify-between items-center px-1">
@@ -504,6 +506,55 @@
         });
         amountInput.addEventListener("input", updatePresetState);
         formulaBrandInput.addEventListener("input", () => state.brand = formulaBrandInput.value.trim());
+
+        // Formula brand chips + sheet
+        const ALL_FORMULA_BRANDS = ["Similac / Gain Plus (Abbott)","Enfalac / Enfagrow A+ (Mead Johnson)","Frisolac / Frisogrow (Friso)","S-26 Gold / Promil Gold (Wyeth)","Nestlé NAN Pro / Supremepro","Mamil Gold / Dumex Dugro","Anmum Infacare / Essential","Karihome (Goat Milk)","AptaGro (Aptamil)","Fernleaf / Fernleaf Formulated Milk Powder","Morinaga Chil-mil / Chil-kid","Lactogen / Lactogrow (Nestlé)","Bellamy's Organic","Novalac (Standard & Speciality formulas)","Wyeth SMA Nutrition"];
+        const feedingBrandSheet = document.getElementById("feedingBrandSheet");
+        const feedingBrandList = document.getElementById("feedingBrandList");
+        const feedingBrandSearch = document.getElementById("feedingBrandSearch");
+        const formulaBrandChips = document.getElementById("formulaBrandChips");
+        formulaBrandChips.addEventListener("click", (e) => {
+            const chip = e.target.closest("[data-brand]");
+            if (chip) {
+                state.brand = chip.dataset.brand;
+                formulaBrandInput.value = state.brand;
+                formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
+                chip.classList.add("bg-primary", "text-on-primary", "border-primary");
+            }
+            if (e.target.closest("#formulaBrandMoreBtn")) openFeedingBrandSheet();
+        });
+        function openFeedingBrandSheet() {
+            renderFeedingBrandSheet(ALL_FORMULA_BRANDS);
+            feedingBrandSheet.classList.remove("hidden");
+            feedingBrandSheet.classList.add("flex");
+            feedingBrandSearch.value = "";
+            feedingBrandSearch.focus();
+        }
+        function closeFeedingBrandSheet() { feedingBrandSheet.classList.add("hidden"); feedingBrandSheet.classList.remove("flex"); }
+        document.getElementById("feedingBrandSheetClose").addEventListener("click", closeFeedingBrandSheet);
+        feedingBrandSheet.addEventListener("click", (e) => { if (e.target === feedingBrandSheet) closeFeedingBrandSheet(); });
+        feedingBrandSearch.addEventListener("input", () => {
+            const q = feedingBrandSearch.value.trim().toLowerCase();
+            renderFeedingBrandSheet(ALL_FORMULA_BRANDS.filter(b => b.toLowerCase().includes(q)));
+        });
+        function renderFeedingBrandSheet(brands) {
+            feedingBrandList.innerHTML = brands.length
+                ? brands.map(b => `<button type="button" class="w-full text-left h-12 px-4 rounded-xl hover:bg-surface-container flex items-center gap-3 text-[15px] font-bold text-on-surface transition-colors" data-sheet-brand="${b}"><span class="material-symbols-outlined text-primary text-[20px]">blender</span>${b}</button>`).join("")
+                : `<p class="text-center text-on-surface-variant py-4">No brands found</p>`;
+            feedingBrandList.querySelectorAll("[data-sheet-brand]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    state.brand = btn.dataset.sheetBrand;
+                    formulaBrandInput.value = state.brand;
+                    selectFeedingChip(state.brand);
+                    closeFeedingBrandSheet();
+                });
+            });
+        }
+        function selectFeedingChip(brand) {
+            formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
+            const match = formulaBrandChips.querySelector(`[data-brand="${brand}"]`);
+            if (match) match.classList.add("bg-primary", "text-on-primary", "border-primary");
+        }
         dateInput.value = getCurrentDateValue();
         timeInput.value = getCurrentTimeValue();
         setAmount(120);

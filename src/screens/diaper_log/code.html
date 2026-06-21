@@ -383,25 +383,16 @@
 <div class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-sm">
 <label class="block space-y-xs">
 <span class="font-label-sm text-label-sm text-on-surface-variant">Which diaper did you use?</span>
-<input list="diaperBrandList" id="diaperBrandInput" class="diaper-input w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" placeholder="e.g. MamyPoko, Drypers, Huggies" autocomplete="off"/>
+<div class="flex flex-wrap gap-2" id="diaperBrandChips">
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Huggies">Huggies</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="MamyPoko">MamyPoko</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Drypers">Drypers</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="Merries">Merries</button>
+<button type="button" class="brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold" data-brand="PetPet">PetPet</button>
+<button type="button" class="h-10 px-4 rounded-full border-2 border-dashed border-primary/40 bg-surface-container-lowest text-primary text-[14px] font-bold" id="diaperBrandMoreBtn" type="button">+ More</button>
+</div>
+<input type="hidden" id="diaperBrandInput"/>
 </label>
-<datalist id="diaperBrandList">
-<option value="Huggies"></option>
-<option value="MamyPoko"></option>
-<option value="Drypers"></option>
-<option value="Merries"></option>
-<option value="Applecrumby"></option>
-<option value="Hoppi"></option>
-<option value="Offspring"></option>
-<option value="PetPet"></option>
-<option value="Genki"></option>
-<option value="Diapex"></option>
-<option value="GOO.N"></option>
-<option value="Molfix"></option>
-<option value="Aiwibi"></option>
-<option value="Beenies"></option>
-<option value="Iconic Babycare"></option>
-</datalist>
 <div class="flex flex-wrap gap-xs" id="brandQuickChips"></div>
 <button type="button" id="rashToggle" aria-pressed="false" class="rash-toggle w-full flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2.5 transition-colors active:scale-[0.99]">
 <span class="flex items-center gap-2 text-left">
@@ -445,6 +436,17 @@
 </section>
 </div>
 </main>
+<!-- Brand Picker Sheet -->
+<div class="fixed inset-0 z-[120] hidden items-end justify-center bg-black/30" id="brandPickerSheet">
+<div class="w-full max-w-md bg-surface-container-lowest rounded-t-[28px] p-5 max-h-[60vh] flex flex-col">
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface">Choose brand</h3>
+<button class="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" type="button" id="brandSheetClose"><span class="material-symbols-outlined">close</span></button>
+</div>
+<input class="w-full h-11 rounded-full bg-surface-container border-none px-4 my-3 text-[15px] font-bold text-on-surface placeholder:text-outline-variant" id="brandPickerSearch" placeholder="Search brand..." autocomplete="off"/>
+<div class="flex-1 overflow-y-auto space-y-1" id="brandPickerList"></div>
+</div>
+</div>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
 <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
@@ -513,9 +515,58 @@
         const backButton = document.getElementById("diaperBackButton");
         const brandInput = document.getElementById("diaperBrandInput");
         const rashToggle = document.getElementById("rashToggle");
-        const brandQuickChips = document.getElementById("brandQuickChips");
+        const brandQuickChips = document.getElementById("diaperBrandChips");
         const rashInsight = document.getElementById("rashInsight");
         let diaperLogItems = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId);
+
+        const ALL_DIAPER_BRANDS = ["Huggies","MamyPoko","Drypers","Merries","Applecrumby","Hoppi","Offspring","PetPet","Genki","Diapex","GOO.N","Molfix","Aiwibi","Beenies","Iconic Babycare"];
+        const brandSheet = document.getElementById("brandPickerSheet");
+        const brandSheetList = document.getElementById("brandPickerList");
+        const brandSheetSearch = document.getElementById("brandPickerSearch");
+
+        // Brand chip clicks
+        brandQuickChips.addEventListener("click", (e) => {
+            const chip = e.target.closest("[data-brand]");
+            if (chip) {
+                state.brand = chip.dataset.brand;
+                brandQuickChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
+                chip.classList.add("bg-primary", "text-on-primary", "border-primary");
+            }
+            if (e.target.closest("#diaperBrandMoreBtn")) openBrandSheet();
+        });
+
+        function openBrandSheet() {
+            renderBrandSheet(ALL_DIAPER_BRANDS);
+            brandSheet.classList.remove("hidden");
+            brandSheet.classList.add("flex");
+            brandSheetSearch.value = "";
+            brandSheetSearch.focus();
+        }
+        function closeBrandSheet() { brandSheet.classList.add("hidden"); brandSheet.classList.remove("flex"); }
+        document.getElementById("brandSheetClose").addEventListener("click", closeBrandSheet);
+        brandSheet.addEventListener("click", (e) => { if (e.target === brandSheet) closeBrandSheet(); });
+        brandSheetSearch.addEventListener("input", () => {
+            const q = brandSheetSearch.value.trim().toLowerCase();
+            renderBrandSheet(ALL_DIAPER_BRANDS.filter(b => b.toLowerCase().includes(q)));
+        });
+        function renderBrandSheet(brands) {
+            brandSheetList.innerHTML = brands.length
+                ? brands.map(b => `<button type="button" class="w-full text-left h-12 px-4 rounded-xl hover:bg-surface-container flex items-center gap-3 text-[15px] font-bold text-on-surface transition-colors" data-sheet-brand="${b}"><span class="material-symbols-outlined text-primary text-[20px]">baby_changing_station</span>${b}</button>`).join("")
+                : `<p class="text-center text-on-surface-variant py-4">No brands found</p>`;
+            brandSheetList.querySelectorAll("[data-sheet-brand]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    state.brand = btn.dataset.sheetBrand;
+                    brandInput.value = state.brand;
+                    selectChip(state.brand);
+                    closeBrandSheet();
+                });
+            });
+        }
+        function selectChip(brand) {
+            brandQuickChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
+            const match = brandQuickChips.querySelector(`[data-brand="${brand}"]`);
+            if (match) match.classList.add("bg-primary", "text-on-primary", "border-primary");
+        }
 
         segmentButtons.forEach((button, index) => {
             button.addEventListener("click", () => {
@@ -535,7 +586,6 @@
         poopConsistencyOtherInput.addEventListener("input", () => state.poopConsistencyOther = poopConsistencyOtherInput.value.trim());
         poopColorOtherInput.addEventListener("input", () => state.poopColorOther = poopColorOtherInput.value.trim());
 
-        brandInput.addEventListener("input", () => state.brand = brandInput.value.trim());
         rashToggle.addEventListener("click", () => {
             state.rash = !state.rash;
             rashToggle.setAttribute("aria-pressed", String(state.rash));
@@ -700,16 +750,21 @@
         }
 
         function renderRecentBrands() {
-            const recent = [...new Set(diaperLogItems.map((log) => (log.brand || "").trim()).filter(Boolean))].slice(0, 5);
-            brandQuickChips.innerHTML = recent.map((brand) =>
-                `<button type="button" class="diaper-choice border border-outline-variant rounded-full py-1.5 px-3 font-label-sm text-label-sm text-on-surface-variant" data-brand-chip="${escapeHtml(brand)}">${escapeHtml(brand)}</button>`
-            ).join("");
-            brandQuickChips.querySelectorAll("[data-brand-chip]").forEach((chip) => {
-                chip.addEventListener("click", () => {
-                    state.brand = chip.dataset.brandChip;
-                    brandInput.value = state.brand;
-                });
+            const recent = [...new Set(diaperLogItems.map((log) => (log.brand || "").trim()).filter(Boolean))];
+            const chipContainer = brandQuickChips;
+            chipContainer.querySelectorAll("[data-brand]").forEach(c => { if (!ALL_DIAPER_BRANDS.includes(c.dataset.brand)) c.remove(); });
+            recent.filter(b => !ALL_DIAPER_BRANDS.includes(b)).slice(0, 3).forEach(b => {
+                if (!chipContainer.querySelector(`[data-brand="${b}"]`)) {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold";
+                    btn.dataset.brand = b;
+                    btn.textContent = b;
+                    chipContainer.insertBefore(btn, document.getElementById("diaperBrandMoreBtn"));
+                    btn.addEventListener("click", () => { state.brand = b; brandInput.value = b; selectChip(b); });
+                }
             });
+            if (state.brand) selectChip(state.brand);
         }
 
         function renderRashInsight() {

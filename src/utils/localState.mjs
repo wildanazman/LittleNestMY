@@ -7,6 +7,7 @@ const diaperLogsKey = "littlenest:diaperLogs";
 const healthNotesKey = "littlenest:healthNotes";
 const growthRecordsKey = "littlenest:growthRecords";
 const milestonesKey = "littlenest:milestones";
+const vaccinationRecordsKey = "littlenest:vaccinationRecords";
 const calendarEventsKey = "littlenest:calendarEvents";
 const familyMembersKey = "littlenest:familyMembers";
 const remindersKey = "littlenest:reminders";
@@ -295,6 +296,18 @@ export function saveLocalMilestone(milestone) {
 
 export function deleteLocalMilestone(milestoneId) {
   return deleteCollectionItem(milestonesKey, milestoneId);
+}
+
+export function getPersistedVaccinationRecords(fallback = []) {
+  return readCollectionWithFallback(vaccinationRecordsKey, fallback);
+}
+
+export function saveLocalVaccinationRecord(record) {
+  return upsertCollectionItem(vaccinationRecordsKey, record);
+}
+
+export function deleteLocalVaccinationRecord(recordId) {
+  return deleteCollectionItem(vaccinationRecordsKey, recordId);
 }
 
 export function getLocalCalendarEvents() {
