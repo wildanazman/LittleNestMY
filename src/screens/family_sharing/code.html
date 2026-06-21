@@ -428,13 +428,13 @@
                 const uid = session?.data?.session?.user?.id || "";
                 careCircle = {
                   currentRole: fbRows.find((m) => m.user_id === uid)?.role || "viewer",
-                  members: fbRows.map((m) => ({
-                    userId: m.user_id,
-                    role: m.role,
-                    name: pmap.get(m.user_id)?.display_name || "Care circle member",
-                    email: pmap.get(m.user_id)?.email || invitedByMap.get(m.user_id) || "",
-                    isCurrentUser: m.user_id === uid
-                  })),
+                  members: fbRows.map((m) => {
+                    const inviteEmail = invitedByMap.get(m.user_id) || "";
+                    const prof = pmap.get(m.user_id);
+                    const displayName = prof?.display_name || inviteEmail.split("@")[0] || "Care circle member";
+                    const email = prof?.email || inviteEmail || "";
+                    return { userId: m.user_id, role: m.role, name: displayName, email, isCurrentUser: m.user_id === uid };
+                  }),
                   invitations: []
                 };
               }
