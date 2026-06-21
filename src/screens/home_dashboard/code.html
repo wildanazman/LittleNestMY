@@ -445,16 +445,22 @@
 </div>
 </div>
 </section>
-<!-- Reminder Banner -->
+<!-- Vaccinations Card -->
 <section id="reminderSection">
-<div class="rounded-[24px] p-4 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)">
-<div class="absolute right-[-10px] top-[-10px] opacity-15 rotate-12"><span class="material-symbols-outlined text-[110px] text-white">insights</span></div>
-<div class="flex items-center gap-2 mb-3 relative z-10">
-<span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"><span class="material-symbols-outlined text-[18px] text-white" style="font-variation-settings:'FILL' 1;">wb_sunny</span></span>
-<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/85">Today's focus</p>
+<div class="rounded-[24px] p-4 soft-shadow relative overflow-hidden cursor-pointer active:scale-[0.99] transition-transform" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" data-screen-target="vaccinations" role="button" tabindex="0" aria-label="Open vaccinations">
+<div class="absolute right-[-10px] top-[-10px] opacity-15 rotate-12"><span class="material-symbols-outlined text-[110px] text-white">vaccines</span></div>
+<div class="flex items-center justify-between gap-2 mb-3 relative z-10">
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"><span class="material-symbols-outlined text-[18px] text-white" style="font-variation-settings:'FILL' 1;">vaccines</span></span>
+<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/85">Vaccinations</p>
 </div>
-<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="focusHeadline">Reading today's logs…</p>
-<div class="grid grid-cols-3 gap-2 relative z-10" id="focusStats"></div>
+<span class="material-symbols-outlined text-white/70 text-[20px]">chevron_right</span>
+</div>
+<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="vaccHeadline">Loading schedule…</p>
+<div class="relative z-10">
+<div class="h-2 w-full rounded-full bg-white/25 overflow-hidden"><div id="vaccHomeBar" class="h-full rounded-full bg-white transition-all" style="width:0%"></div></div>
+<p class="text-white/80 text-[11px] mt-1.5" id="vaccHomeSub"></p>
+</div>
 </div>
 </section>
 <!-- Daily Summary -->
@@ -629,6 +635,8 @@
         const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
         const { t } = await import(`${moduleBase}utils/i18n.mjs`);
         const B = await import(`${moduleBase}utils/benchmarks.mjs`);
+        const { loadVaccinationRecordsRemote } = await import(`${moduleBase}utils/vaccinationsRemote.mjs`);
+        const V = await import(`${moduleBase}utils/vaccinations.mjs`);
 
         window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
         window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
@@ -794,60 +802,45 @@
             setText("growthSummaryDetail", [length ? `${length} cm` : "", latestGrowth.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm head` : ""].filter(Boolean).join(" · ") || "Latest measurement saved");
         }
 
-        // "Today's focus": age-aware progress on feeds / sleep / wet nappies
-        // vs guidelines, with one gentle, actionable nudge.
-        function renderReminderBanner() {
+        // Vaccination card: next-due NIP dose + progress, computed from DOB.
+        async function renderReminderBanner() {
             if (!selectedBaby) return;
-            const headlineEl = document.getElementById("focusHeadline");
-            const statsEl = document.getElementById("focusStats");
-            if (!headlineEl || !statsEl) return;
+            const headlineEl = document.getElementById("vaccHeadline");
+            const barEl = document.getElementById("vaccHomeBar");
+            const subEl = document.getElementById("vaccHomeSub");
+            if (!headlineEl || !barEl || !subEl) return;
 
-            const months = B.ageInMonths(selectedBaby.dateOfBirth);
-            const feedType = selectedBaby.feedingPreference || selectedBaby.feedingType || "mixed";
-            const fb = B.feedingBenchmark(months, feedType);
-            const sb = B.sleepBenchmark(months);
-            const db = B.diaperBenchmark(months, feedType);
+            const dob = selectedBaby.dateOfBirth || selectedBaby.dob || "";
+            let region = "peninsular";
+            try { region = localStorage.getItem("littlenest:vaccRegion") || "peninsular"; } catch {}
 
-            const feedsToday = allFeedingLogs.filter((l) => isSameLocalDay(l.startedAt, now)).length;
-            const sleepMin = getTodaySleepMinutes(allSleepLogs, now);
-            const sleepH = Math.round((sleepMin / 60) * 10) / 10;
-            const wetToday = allDiaperLogs.filter((l) => isSameLocalDay(l.changedAt, now) && l.type !== "dirty").length;
+            let records = [];
+            try {
+                const loaded = await loadVaccinationRecordsRemote(selectedBabyId, []);
+                records = loaded.records || [];
+            } catch { records = []; }
 
-            const feedMin = fb.freq ? fb.freq[0] : 6;
-            const feedMax = fb.freq ? fb.freq[1] : 8;
-            const sleepLo = sb.totalHours[0];
-            const sleepHi = sb.totalHours[1];
-            const wetMin = db.wetMin;
+            const plan = V.buildVaccinationPlan(dob, records, { region });
+            const s = V.summarise(plan.nip);
+            const pct = s.total ? Math.round((s.done / s.total) * 100) : 0;
+            barEl.style.width = `${pct}%`;
+            subEl.textContent = `${s.done} of ${s.total} done`;
 
-            const stat = (val, label, pct, ok) => `
-                <div class="bg-white/15 rounded-2xl p-2.5 text-center">
-                    <p class="text-white text-[17px] font-extrabold leading-none">${val}</p>
-                    <p class="text-white/80 text-[11px] mt-1">${label}</p>
-                    <div class="h-1 rounded-full bg-white/25 mt-2 overflow-hidden"><div class="h-full rounded-full" style="width:${Math.max(4, Math.min(100, Math.round(pct * 100)))}%;background:${ok ? "#bff5d8" : "#ffffff"}"></div></div>
-                </div>`;
-            statsEl.innerHTML =
-                stat(String(feedsToday), "Feeds", feedsToday / feedMax, feedsToday >= feedMin) +
-                stat(sleepMin ? formatDuration(sleepMin) : "0h", "Sleep", sleepH / sleepHi, sleepH >= sleepLo) +
-                stat(String(wetToday), "Wet", wetToday / wetMin, wetToday >= wetMin);
-
-            // Pick the metric furthest below its target for the nudge.
-            const fracs = [
-                { key: "wet", f: wetToday / wetMin },
-                { key: "feed", f: feedsToday / feedMin },
-                { key: "sleep", f: sleepH / sleepLo }
-            ].sort((a, b) => a.f - b.f);
-            const worst = fracs[0];
-            let headline;
-            if (worst.f >= 1) {
-                headline = `Lovely rhythm today — ${feedsToday} feeds, ${sleepMin ? formatDuration(sleepMin) : "0h"} sleep, ${wetToday} wet. 🌿`;
-            } else if (worst.key === "wet") {
-                headline = `${wetToday} of ${wetMin}+ wet nappies so far — a feed helps keep hydration up.`;
-            } else if (worst.key === "feed") {
-                headline = `${feedsToday} feed${feedsToday === 1 ? "" : "s"} so far — aim for ${feedMin}–${feedMax} across the day.`;
+            if (s.overdue > 0) {
+                const nd = V.nextDue(plan.nip);
+                headlineEl.textContent = `${s.overdue} vaccine${s.overdue === 1 ? "" : "s"} overdue${nd ? ` — ${nd.vaccine} needs catching up.` : "."}`;
             } else {
-                headline = `${sleepMin ? formatDuration(sleepMin) : "No"} sleep logged — this age usually needs ${sleepLo}–${sleepHi}h.`;
+                const nd = V.nextDue(plan.nip);
+                headlineEl.textContent = nd
+                    ? `Next: ${nd.vaccine}${nd.dose ? ` (${nd.dose})` : ""} — due ${formatVaccDate(nd.dueDate)}.`
+                    : "All NIP vaccines done. 🎉";
             }
-            headlineEl.textContent = headline;
+        }
+
+        function formatVaccDate(value) {
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return "";
+            return d.toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" });
         }
 
         async function renderMamaCarePreview() {
