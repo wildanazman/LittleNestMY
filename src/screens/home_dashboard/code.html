@@ -234,7 +234,7 @@
           background: rgba(201, 241, 214, 0.68) !important;
           color: #166534 !important;
         }
-        [data-screen-target="health_records"][aria-label*="medicine"] .w-14 {
+        [data-screen-target="health_records"][aria-label*="health"] .w-14 {
           background: rgba(226, 211, 251, 0.70) !important;
           color: #5b21b6 !important;
         }
@@ -431,11 +431,11 @@
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.diaper">Diaper</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open medicine records">
+<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
-<span class="material-symbols-outlined">medication</span>
+<span class="material-symbols-outlined">heart_plus</span>
 </div>
-<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.medicine">Medicine</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.health">Health</span>
 </div>
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-open-note-log="true" role="button" tabindex="0" aria-label="Open note log">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
@@ -1134,7 +1134,7 @@
                 daycare: "Daycare reminder",
                 school: "School reminder",
                 family: "Family reminder",
-                medicine: "Medicine reminder"
+                health: "Health reminder"
             }[type] || "Appointment";
         }
 
