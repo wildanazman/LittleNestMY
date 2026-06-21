@@ -40,9 +40,14 @@ if (existsSync(join(root, "icons"))) {
   cpSync(join(root, "icons"), join(dist, "icons"), { recursive: true });
 }
 
+// Never copy secrets, VCS, or build metadata into the public output. dist is
+// served as-is by the host; .env.local etc. must not ship to the web root.
+const SKIP_ROOT_FILES = new Set(["package.json", "package-lock.json", "vercel.json", "README.md"]);
 for (const entry of readdirSync(root, { withFileTypes: true })) {
   if (["dist", "node_modules", ".git"].includes(entry.name)) continue;
   if (entry.isFile()) {
+    if (entry.name.startsWith(".")) continue;            // .env*, .gitignore, .dockerignore, …
+    if (SKIP_ROOT_FILES.has(entry.name)) continue;
     cpSync(join(root, entry.name), join(dist, entry.name));
   }
 }
