@@ -44,7 +44,16 @@ export default async function handler(req, res) {
     ? `${req.headers["x-forwarded-proto"]}://${req.headers["x-forwarded-host"] || req.headers.host}`
     : `http://localhost:${process.env.PORT || 5173}`;
 
-  const stripe = new Stripe(stripeSecretKey);
+  // Use the fetch-based HTTP client instead of Stripe's default Node `http`
+  // client. On Vercel serverless the default client can fail to open a
+  // connection to api.stripe.com ("StripeConnectionError: An error occurred
+  // with our connection to Stripe"); the fetch client (undici/global fetch)
+  // is reliable there. Also bound the request and retry transient failures.
+  const stripe = new Stripe(stripeSecretKey, {
+    httpClient: Stripe.createFetchHttpClient(),
+    maxNetworkRetries: 2,
+    timeout: 20000
+  });
 
   try {
     let customerId = profile?.stripe_customer_id;
