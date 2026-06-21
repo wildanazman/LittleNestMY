@@ -507,7 +507,17 @@
         dateInput.value = getCurrentDateValue();
         timeInput.value = getCurrentTimeValue();
         setAmount(120);
-        moveIndicator(1);
+        // Default the feeding type to the baby's feeding preference: breastfeed
+        // -> Breast, formula -> Formula, mixed/both -> Breast. Falls back to
+        // Bottle when there's no preference set.
+        const selectedProfile = (babyState.profiles || []).find((profile) => profile.id === selectedBabyId);
+        const pref = String(selectedProfile?.feedingPreference || "").toLowerCase();
+        const defaultType = pref.includes("formula")
+            ? "formula"
+            : (pref.includes("breast") || pref.includes("mix")) ? "breast" : "bottle";
+        const typeIndexMap = { breast: 0, bottle: 1, formula: 2, solid: 3 };
+        state.feedingType = defaultType;
+        moveIndicator(typeIndexMap[defaultType]);
         updateRelevantFields();
         await refreshLogs();
 
