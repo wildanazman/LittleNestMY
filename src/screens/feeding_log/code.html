@@ -530,8 +530,7 @@
         function removeFeedingBrandChip(chip) {
             state.brand = "";
             formulaBrandInput.value = "";
-            chip.classList.remove("bg-primary", "text-on-primary", "border-primary");
-            if (!ALL_FORMULA_BRANDS.includes(chip.dataset.brand)) chip.remove();
+            chip.remove();
         }
         function openFeedingBrandSheet() {
             renderFeedingBrandSheet(ALL_FORMULA_BRANDS);

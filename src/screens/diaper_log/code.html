@@ -541,8 +541,7 @@
         function removeBrandChip(chip) {
             state.brand = "";
             brandInput.value = "";
-            chip.classList.remove("bg-primary", "text-on-primary", "border-primary");
-            if (!ALL_DIAPER_BRANDS.includes(chip.dataset.brand)) chip.remove();
+            chip.remove();
         }
 
         function openBrandSheet() {
