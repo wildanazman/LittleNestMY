@@ -422,6 +422,8 @@
                 const ids = [...new Set(fbRows.map((m) => m.user_id))];
                 const { data: fbProfiles } = await supabase.from("profiles").select("id,display_name,email").in("id", ids);
                 const pmap = new Map((fbProfiles || []).map((p) => [p.id, p]));
+                const { data: fbInvites } = await supabase.from("family_invitations").select("email,accepted_by").eq("baby_id", selectedBabyId).eq("status", "accepted");
+                const invitedByMap = new Map((fbInvites || []).filter((i) => i.accepted_by).map((i) => [i.accepted_by, i.email]));
                 const session = await supabase.auth.getSession();
                 const uid = session?.data?.session?.user?.id || "";
                 careCircle = {
@@ -430,7 +432,7 @@
                     userId: m.user_id,
                     role: m.role,
                     name: pmap.get(m.user_id)?.display_name || "Care circle member",
-                    email: pmap.get(m.user_id)?.email || "",
+                    email: pmap.get(m.user_id)?.email || invitedByMap.get(m.user_id) || "",
                     isCurrentUser: m.user_id === uid
                   })),
                   invitations: []
