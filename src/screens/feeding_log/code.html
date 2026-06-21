@@ -544,12 +544,17 @@
         feedingBrandSheet.addEventListener("click", (e) => { if (e.target === feedingBrandSheet) closeFeedingBrandSheet(); });
         feedingBrandSearch.addEventListener("input", () => {
             const q = feedingBrandSearch.value.trim().toLowerCase();
-            renderFeedingBrandSheet(ALL_FORMULA_BRANDS.filter(b => b.toLowerCase().includes(q)));
+            renderFeedingBrandSheet(ALL_FORMULA_BRANDS.filter(b => b.toLowerCase().includes(q)), q);
         });
-        function renderFeedingBrandSheet(brands) {
-            feedingBrandList.innerHTML = brands.length
+        function renderFeedingBrandSheet(brands, query) {
+            let html = brands.length
                 ? brands.map(b => `<button type="button" class="w-full text-left h-12 px-4 rounded-xl hover:bg-surface-container flex items-center gap-3 text-[15px] font-bold text-on-surface transition-colors" data-sheet-brand="${b}"><span class="material-symbols-outlined text-primary text-[20px]">blender</span>${b}</button>`).join("")
-                : `<p class="text-center text-on-surface-variant py-4">No brands found</p>`;
+                : query ? "" : `<p class="text-center text-on-surface-variant py-4">No brands found</p>`;
+            if (query && !brands.some(b => b.toLowerCase() === query)) {
+                const safe = query.replace(/["']/g, "");
+                html += `<button type="button" class="w-full text-left h-12 px-4 rounded-xl bg-primary-container/60 hover:bg-primary-container flex items-center gap-3 text-[15px] font-bold text-primary transition-colors mt-1" data-add-custom="${safe}"><span class="material-symbols-outlined text-[20px]">add_circle</span>Add "${safe}"</button>`;
+            }
+            feedingBrandList.innerHTML = html || `<p class="text-center text-on-surface-variant py-4">No brands found</p>`;
             feedingBrandList.querySelectorAll("[data-sheet-brand]").forEach(btn => {
                 btn.addEventListener("click", () => {
                     state.brand = btn.dataset.sheetBrand;
@@ -558,6 +563,14 @@
                     selectFeedingChip(state.brand);
                     closeFeedingBrandSheet();
                 });
+            });
+            const addCustom = feedingBrandList.querySelector("[data-add-custom]");
+            if (addCustom) addCustom.addEventListener("click", () => {
+                state.brand = addCustom.dataset.addCustom;
+                formulaBrandInput.value = state.brand;
+                ensureFeedingBrandChip(state.brand);
+                selectFeedingChip(state.brand);
+                closeFeedingBrandSheet();
             });
         }
         function ensureFeedingBrandChip(brand) {
