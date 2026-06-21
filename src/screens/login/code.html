@@ -116,7 +116,24 @@ Remember me
       return;
     }
     try {
-      await sendPasswordReset(email, `${window.location.origin}${screenUrl("set_password")}`);
+      const redirectTo = `${window.location.origin}${screenUrl("set_password")}`;
+      // Prefer our own-brand reset email; the endpoint replies { fallback: true }
+      // when no email provider is configured, so we use Supabase's email then.
+      let useFallback = true;
+      try {
+        const resp = await fetch("/api/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, redirectTo })
+        });
+        if (resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          useFallback = Boolean(data.fallback);
+        }
+      } catch {
+        useFallback = true;
+      }
+      if (useFallback) await sendPasswordReset(email, redirectTo);
       error.textContent = "Password reset email sent. Please check your inbox.";
       error.classList.remove("hidden");
     } catch (resetError) {

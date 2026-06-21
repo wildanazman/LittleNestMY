@@ -8,6 +8,7 @@ import {
   requireParentForBaby,
   sendJson
 } from "./_supabaseAdmin.mjs";
+import { inviteEmailHtml, isEmailProviderConfigured, sendEmail } from "./_email.mjs";
 
 const validRoles = new Set(["parent", "caregiver", "viewer"]);
 
@@ -180,6 +181,36 @@ async function createInvitation(req, res, service, user) {
   if (inviteError) throw inviteError;
 
   const redirectTo = buildInviteUrl(req, invitation.token);
+
+  // Own-brand invite email via Resend when configured. The invite has its own
+  // token + accept page, so it doesn't need Supabase's email at all.
+  if (isEmailProviderConfigured()) {
+    try {
+      const [{ data: babyRow }, { data: inviterRow }] = await Promise.all([
+        service.from("babies").select("name").eq("id", babyId).maybeSingle(),
+        service.from("profiles").select("display_name").eq("id", user.id).maybeSingle()
+      ]);
+      await sendEmail({
+        to: email,
+        subject: `You're invited to care for ${babyRow?.name || "a baby"} on LittleNest MY`,
+        html: inviteEmailHtml({
+          inviteUrl: redirectTo,
+          babyName: babyRow?.name || "",
+          inviterName: inviterRow?.display_name || "",
+          role
+        })
+      });
+      return sendJson(res, 200, {
+        message: "Invitation sent.",
+        emailDelivery: "sent",
+        inviteUrl: redirectTo,
+        invitation: { ...invitation, status: "pending" }
+      });
+    } catch (sendErr) {
+      console.warn("Own-brand invite email failed; falling back to Supabase invite.", sendErr.message);
+    }
+  }
+
   const { error: emailError } = await service.auth.admin.inviteUserByEmail(email, {
     redirectTo,
     data: {
