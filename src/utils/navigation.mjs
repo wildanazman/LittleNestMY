@@ -59,6 +59,7 @@ const activeGroups = {
   weekly_insights: "calendar",
   milestones: "milestones",
   memory_book: "milestones",
+  vaccinations: "home",
   assistant: "assistant",
   settings: "assistant",
   subscription: "assistant",

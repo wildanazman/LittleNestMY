@@ -24,6 +24,7 @@ export const screens = [
   { id: "weekly_insights", title: "Weekly Insights", group: "insight", path: "weekly_insights/code.html", preview: "weekly_insights/screen.png" },
   { id: "doctor_report", title: "Doctor Report", group: "insight", path: "doctor_report/code.html", preview: "growth_tracker/screen.png" },
   { id: "milestones", title: "Milestones", group: "core", path: "milestones/code.html", preview: "milestones/screen.png" },
+  { id: "vaccinations", title: "Vaccinations", group: "core", path: "vaccinations/code.html", preview: "milestones/screen.png" },
   { id: "memory_book", title: "Memory Book", group: "core", path: "memory_book/code.html", preview: "memory_book/screen.png" },
   { id: "assistant", title: "Assistant", group: "core", path: "assistant/code.html", preview: "assistant/screen.png" },
   { id: "family_sharing", title: "Family Sharing", group: "settings", path: "family_sharing/code.html", preview: "family_sharing/screen.png" },
