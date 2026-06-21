@@ -13,7 +13,9 @@ export async function loadRuntimeEnv() {
 
   const safeEnv = {
     VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || publicEnv.VITE_SUPABASE_URL || "",
-    VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || publicEnv.VITE_SUPABASE_ANON_KEY || ""
+    VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || publicEnv.VITE_SUPABASE_ANON_KEY || "",
+    // Public VAPID key for Web Push (safe to expose). Private key stays server-side.
+    VITE_VAPID_PUBLIC_KEY: process.env.VITE_VAPID_PUBLIC_KEY || publicEnv.VITE_VAPID_PUBLIC_KEY || ""
   };
 
   mkdirSync(dirname(outputPath), { recursive: true });

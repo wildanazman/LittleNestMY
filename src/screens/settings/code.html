@@ -446,6 +446,7 @@
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
         const { getNotifPrefs, setNotifPrefs, requestNotifPermission } = await import(`${moduleBase}utils/notifications.mjs`);
+        const { enablePush, disablePush, isPushSupported, isPushConfigured } = await import(`${moduleBase}utils/pushNotifications.mjs`);
         const languageButtons = document.querySelectorAll("[data-language-option]");
         const languageFeedback = document.getElementById("languageFeedback");
         const themeButtons = document.querySelectorAll("[data-theme-option]");
@@ -571,6 +572,18 @@
                     setNotifPrefs(next);
                     setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, newVal);
                     showNotifFeedback(newVal ? `${id.charAt(0).toUpperCase() + id.slice(1)} reminders on.` : `${id.charAt(0).toUpperCase() + id.slice(1)} reminders off.`);
+                    // Keep the Web Push subscription in sync: subscribe when any
+                    // reminder is on, unsubscribe when all are off. So reminders
+                    // can be delivered even when the app is closed.
+                    if (isPushSupported() && isPushConfigured()) {
+                      const anyOn = Object.values(getNotifPrefs()).some(Boolean);
+                      if (anyOn) {
+                        const res = await enablePush();
+                        if (!res.ok && res.reason === "denied") showNotifFeedback("Allow notifications to get reminders when the app is closed.");
+                      } else {
+                        await disablePush();
+                      }
+                    }
                 });
             });
             applyNotifToggleStates();

@@ -1,4 +1,4 @@
-const cacheName = "littlenest-my-static-v19";
+const cacheName = "littlenest-my-static-v21";
 
 // Same-origin app shell precached on install. Best-effort per item so one
 // missing route never fails the whole install.
@@ -111,5 +111,38 @@ self.addEventListener("fetch", (event) => {
           cached || (request.mode === "navigate" ? caches.match("/home_dashboard/") : Response.error())
         )
       )
+  );
+});
+
+// Web Push: show the reminder the cron sent, even when the app is closed.
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { title: "LittleNest MY", body: event.data ? event.data.text() : "" };
+  }
+  const title = payload.title || "LittleNest MY";
+  const options = {
+    body: payload.body || "",
+    icon: "/icons/icon-192.png",
+    badge: "/icons/icon-192.png",
+    tag: payload.tag || "littlenest-reminder",
+    data: { url: payload.url || "/home_dashboard/" }
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data && event.notification.data.url ? event.notification.data.url : "/home_dashboard/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if (client.url.includes(target) && "focus" in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+      return undefined;
+    })
   );
 });
