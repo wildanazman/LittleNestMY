@@ -474,7 +474,7 @@
         const { formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const { getLogsForBaby, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-        const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+        const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
@@ -605,9 +605,29 @@
                 saveFeedback.textContent = `${error.message || "Could not sync diaper log."} Saved locally for now.`;
                 saveFeedback.classList.remove("hidden");
             }
+            // A flagged rash also lands in Health records so it isn't lost in
+            // the diaper history.
+            if (log.rash) {
+                try {
+                    await saveHealthNoteRemote({
+                        id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `health-local-${Date.now()}`,
+                        babyId: selectedBabyId,
+                        type: "illness",
+                        title: "Diaper rash",
+                        details: [
+                            log.brand ? `Diaper brand: ${log.brand}` : "",
+                            "Auto-logged from a diaper change marked as causing a rash."
+                        ].filter(Boolean).join("\n"),
+                        recordedAt: changedAt
+                    });
+                } catch (healthError) {
+                    console.warn("Could not auto-log rash to health records.", healthError);
+                }
+            }
+            const wasRash = log.rash;
             resetFormAfterSave();
             await refreshLogs();
-            showSavedFeedback();
+            showSavedFeedback(wasRash);
         }
 
         function buildDiaperLog(changedAt) {
@@ -774,10 +794,12 @@
             return new Date(`${dateInput.value}T${timeInput.value}:00`).toISOString();
         }
 
-        function showSavedFeedback() {
-            saveFeedback.textContent = "Saved. Dashboard will use this latest change.";
+        function showSavedFeedback(wasRash) {
+            saveFeedback.textContent = wasRash
+                ? "Saved. Rash also added to Health records."
+                : "Saved. Dashboard will use this latest change.";
             saveFeedback.classList.remove("hidden");
-            setTimeout(() => saveFeedback.classList.add("hidden"), 2200);
+            setTimeout(() => saveFeedback.classList.add("hidden"), 2600);
         }
 
         function labelForType(type) {
