@@ -365,6 +365,7 @@ Save Milestone
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
+        const { compressVideoBlob } = await import(`${moduleBase}utils/videoCompress.mjs`);
         const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
         const { ageInMonths, milestonesForAge } = await import(`${moduleBase}utils/benchmarks.mjs`);
 
@@ -490,7 +491,7 @@ Save Milestone
             if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
             pendingVideoBlobUrl = "";
             try {
-                milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 900, quality: 0.82 });
+                milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 720, quality: 0.66 });
                 resetMediaLabels();
                 photoLabel.textContent = "Photo ready ✓";
                 showPhotoPreview(milestonePhotoDataUrl);
@@ -587,7 +588,7 @@ Save Milestone
             const chunks = [];
             const mime = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"]
                 .find((type) => MediaRecorder.isTypeSupported(type)) || "";
-            mediaRecorder = mime ? new MediaRecorder(recorderStream, { mimeType: mime, videoBitsPerSecond: 500_000 }) : new MediaRecorder(recorderStream, { videoBitsPerSecond: 500_000 });
+            mediaRecorder = mime ? new MediaRecorder(recorderStream, { mimeType: mime, videoBitsPerSecond: 400_000 }) : new MediaRecorder(recorderStream, { videoBitsPerSecond: 400_000 });
             mediaRecorder.addEventListener("dataavailable", (event) => { if (event.data.size) chunks.push(event.data); });
             mediaRecorder.addEventListener("stop", async () => {
                 clearInterval(countdownTimer);
@@ -643,20 +644,22 @@ Save Milestone
             if (!file) return;
             hidePreview();
             if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
-            pendingVideoBlobUrl = URL.createObjectURL(file);
+            pendingVideoBlobUrl = "";
             try {
-                const dataUrl = await blobToDataUrl(file);
-                const duration = await videoDuration(dataUrl);
+                const checkUrl = await blobToDataUrl(file);
+                const duration = await videoDuration(checkUrl);
                 if (duration > 5.6) {
                     milestonePhotoDataUrl = "";
-                    if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
-                    pendingVideoBlobUrl = "";
                     resetMediaLabels();
                     hidePreview();
                     showFeedback("Please keep the clip to about 5 seconds.");
                     return;
                 }
-                milestonePhotoDataUrl = dataUrl;
+                // Shrink the clip before it's stored/uploaded (saves storage).
+                showFeedback("Optimising clip…");
+                const smaller = await compressVideoBlob(file, { maxDurationSec: 5.6 });
+                pendingVideoBlobUrl = URL.createObjectURL(smaller);
+                milestonePhotoDataUrl = await blobToDataUrl(smaller);
                 resetMediaLabels();
                 videoLabel.textContent = "Video ready ✓";
                 showVideoPreview(pendingVideoBlobUrl);
