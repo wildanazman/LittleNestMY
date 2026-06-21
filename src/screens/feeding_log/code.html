@@ -545,10 +545,21 @@
                 btn.addEventListener("click", () => {
                     state.brand = btn.dataset.sheetBrand;
                     formulaBrandInput.value = state.brand;
+                    ensureFeedingBrandChip(state.brand);
                     selectFeedingChip(state.brand);
                     closeFeedingBrandSheet();
                 });
             });
+        }
+        function ensureFeedingBrandChip(brand) {
+            if (formulaBrandChips.querySelector(`[data-brand="${brand}"]`)) return;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold";
+            btn.dataset.brand = brand;
+            btn.textContent = brand;
+            btn.addEventListener("click", () => { state.brand = brand; formulaBrandInput.value = brand; selectFeedingChip(brand); });
+            formulaBrandChips.insertBefore(btn, document.getElementById("formulaBrandMoreBtn"));
         }
         function selectFeedingChip(brand) {
             formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));

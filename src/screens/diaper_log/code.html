@@ -557,10 +557,21 @@
                 btn.addEventListener("click", () => {
                     state.brand = btn.dataset.sheetBrand;
                     brandInput.value = state.brand;
+                    ensureBrandChip(state.brand);
                     selectChip(state.brand);
                     closeBrandSheet();
                 });
             });
+        }
+        function ensureBrandChip(brand) {
+            if (brandQuickChips.querySelector(`[data-brand="${brand}"]`)) return;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "brand-chip h-10 px-4 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold";
+            btn.dataset.brand = brand;
+            btn.textContent = brand;
+            btn.addEventListener("click", () => { state.brand = brand; brandInput.value = brand; selectChip(brand); });
+            brandQuickChips.insertBefore(btn, document.getElementById("diaperBrandMoreBtn"));
         }
         function selectChip(brand) {
             brandQuickChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
