@@ -457,7 +457,7 @@
         const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = { feedingType: "bottle", isSaving: false, brand: "" };
@@ -496,7 +496,7 @@
 
         saveButton.addEventListener("click", saveEntry);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
-        seeAllButton.addEventListener("click", () => showComingSoon("Feeding history", "A full feeding history view is coming soon."));
+        seeAllButton.addEventListener("click", () => goToScreen("feeding_history"));
         document.getElementById("decreaseAmountButton")?.addEventListener("click", () => adjustAmount(-10));
         document.getElementById("increaseAmountButton")?.addEventListener("click", () => adjustAmount(10));
         document.querySelectorAll("[data-amount-preset]").forEach((button) => {

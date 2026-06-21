@@ -622,7 +622,7 @@
         const { loadRemindersRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
         const { bindPrototypeActions, screenUrl, showUndoToast, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { scheduleFeedingReminder, scheduleAppointmentReminder } = await import(`${moduleBase}utils/notifications.mjs`);
+        const { scheduleAllReminders } = await import(`${moduleBase}utils/notifications.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
@@ -740,8 +740,7 @@
         bindBabyProfileMenu();
         showHomeContent();
         const babyNameForNotif = selectedBaby?.name || "";
-        scheduleFeedingReminder(allFeedingLogs, babyNameForNotif);
-        scheduleAppointmentReminder(allCalendarEvents, allReminders, babyNameForNotif);
+        scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif });
 
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;

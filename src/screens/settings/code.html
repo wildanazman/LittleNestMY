@@ -275,6 +275,30 @@
 </div>
 <button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="appointmentNotifToggle" type="button" role="switch" aria-label="Toggle appointment reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="appointmentNotifKnob"></span></button>
 </div>
+<div class="flex items-center justify-between gap-3 p-3 rounded-[18px] bg-surface-container-low/70">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">medication</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface">Medicine reminders</p>
+<p class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Notify 30min before dose</p>
+</div>
+</div>
+<button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="medicineNotifToggle" type="button" role="switch" aria-label="Toggle medicine reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="medicineNotifKnob"></span></button>
+</div>
+<div class="flex items-center justify-between gap-3 p-3 rounded-[18px] bg-surface-container-low/70">
+<div class="flex items-center gap-3.5 min-w-0">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-secondary-container/60 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">vaccines</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-md text-label-md text-on-surface">Vaccine reminders</p>
+<p class="text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Notify a day before due</p>
+</div>
+</div>
+<button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="vaccineNotifToggle" type="button" role="switch" aria-label="Toggle vaccine reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="vaccineNotifKnob"></span></button>
+</div>
 <p class="min-h-4 text-[11px] font-label-sm text-tertiary px-1" id="notifFeedback"></p>
 </div>
 <div class="h-px bg-surface-variant/40 mx-[18px]"></div>
@@ -534,31 +558,27 @@
         });
 
         function renderNotifToggles() {
+            NOTIF_TYPES.forEach((id) => {
+                const btn = document.getElementById(`${id}NotifToggle`);
+                if (btn) btn.addEventListener("click", async () => {
+                    const prefs = getNotifPrefs();
+                    const newVal = !prefs[id];
+                    if (newVal) {
+                        const perm = await requestNotifPermission();
+                        if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
+                    }
+                    const next = { ...getNotifPrefs(), [id]: newVal };
+                    setNotifPrefs(next);
+                    setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, newVal);
+                    showNotifFeedback(newVal ? `${id.charAt(0).toUpperCase() + id.slice(1)} reminders on.` : `${id.charAt(0).toUpperCase() + id.slice(1)} reminders off.`);
+                });
+            });
+            applyNotifToggleStates();
+        }
+        const NOTIF_TYPES = ["feeding", "medicine", "appointment", "vaccine"];
+        function applyNotifToggleStates() {
             const prefs = getNotifPrefs();
-            setToggleState("feedingNotifToggle", "feedingNotifKnob", prefs.feeding);
-            setToggleState("appointmentNotifToggle", "appointmentNotifKnob", prefs.appointment);
-            document.getElementById("feedingNotifToggle").addEventListener("click", async () => {
-                const newVal = !getNotifPrefs().feeding;
-                if (newVal) {
-                    const perm = await requestNotifPermission();
-                    if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
-                }
-                const updated = getNotifPrefs();
-                setNotifPrefs(newVal, updated.appointment);
-                setToggleState("feedingNotifToggle", "feedingNotifKnob", newVal);
-                showNotifFeedback(newVal ? "Feeding reminders on." : "Feeding reminders off.");
-            });
-            document.getElementById("appointmentNotifToggle").addEventListener("click", async () => {
-                const newVal = !getNotifPrefs().appointment;
-                if (newVal) {
-                    const perm = await requestNotifPermission();
-                    if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
-                }
-                const updated = getNotifPrefs();
-                setNotifPrefs(updated.feeding, newVal);
-                setToggleState("appointmentNotifToggle", "appointmentNotifKnob", newVal);
-                showNotifFeedback(newVal ? "Appointment reminders on." : "Appointment reminders off.");
-            });
+            NOTIF_TYPES.forEach((id) => setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, prefs[id]));
         }
 
         function setToggleState(btnId, knobId, on) {

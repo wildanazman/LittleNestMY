@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://esm.sh" crossorigin/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Diaper History - LittleNest MY</title>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface-container": "#efeee9",
+        "surface-container-low": "#f5f3ee",
+        "tertiary-fixed": "#caecc4",
+        "inverse-primary": "#f7b89d",
+        "surface-bright": "#fbf9f4",
+        "surface-container-high": "#eae8e3",
+        "on-primary": "#ffffff",
+        "error": "#ba1a1a",
+        "error-container": "#ffdad6",
+        "secondary-fixed-dim": "#ccc5bc",
+        "surface-tint": "#83533c",
+        "inverse-surface": "#30312e",
+        "on-secondary-container": "#67625a",
+        "on-tertiary-fixed-variant": "#314d30",
+        "on-error": "#ffffff",
+        "surface": "#fbf9f4",
+        "on-primary-fixed": "#331203",
+        "surface-container-highest": "#e4e2de",
+        "on-tertiary-container": "#415e3f",
+        "on-surface-variant": "#51443e",
+        "background": "#fbf9f4",
+        "surface-dim": "#dbdad5",
+        "primary-fixed-dim": "#f7b89d",
+        "secondary-fixed": "#e9e1d8",
+        "on-background": "#1b1c19",
+        "on-secondary-fixed-variant": "#4a463f",
+        "surface-container-lowest": "#ffffff",
+        "tertiary-container": "#b5d6af",
+        "primary-fixed": "#ffdbcc",
+        "on-tertiary": "#ffffff",
+        "on-primary-fixed-variant": "#673c27",
+        "outline-variant": "#d6c2bb",
+        "on-secondary": "#ffffff",
+        "primary": "#83533c",
+        "inverse-on-surface": "#f2f1ec",
+        "on-error-container": "#93000a",
+        "tertiary-fixed-dim": "#aecfa9",
+        "on-tertiary-fixed": "#052108",
+        "on-primary-container": "#7a4b36",
+        "primary-container": "#ffbfa3",
+        "outline": "#84746d",
+        "secondary-container": "#e6dfd5",
+        "surface-variant": "#e4e2de",
+        "on-secondary-fixed": "#1e1b15",
+        "secondary": "#625e56",
+        "on-surface": "#1b1c19",
+        "tertiary": "#486646"
+      },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        full: "9999px"
+      },
+      spacing: {
+        md: "24px",
+        base: "8px",
+        xl: "48px",
+        lg: "32px",
+        xs: "4px",
+        "container-padding": "20px",
+        gutter: "16px",
+        sm: "12px"
+      },
+      fontFamily: {
+        "headline-lg": ["Nunito Sans"],
+        "display-lg": ["Nunito Sans"],
+        "headline-md": ["Nunito Sans"],
+        "label-sm": ["Nunito Sans"],
+        "body-lg": ["Nunito Sans"],
+        "headline-lg-mobile": ["Nunito Sans"],
+        "label-md": ["Nunito Sans"],
+        "body-md": ["Nunito Sans"]
+      },
+      fontSize: {
+        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+  }
+  .soft-shadow {
+    box-shadow: 0 8px 32px rgba(255, 191, 163, 0.12);
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d6c2bb;
+    border-radius: 10px;
+  }
+  .filter-chip-active {
+    background: #83533c;
+    color: #ffffff;
+    border-color: #83533c;
+  }
+  html.dark .filter-chip-active {
+    background: #ffbfa3;
+    color: #331203;
+    border-color: #ffbfa3;
+  }
+  .rash-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: #ffdad6;
+    color: #93000a;
+    border-radius: 9999px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(131,83,60,0.10);
+    color: #7a4b36;
+    border-radius: 9999px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  html.dark .brand-pill { background: rgba(255,191,163,0.14); color: #ffd6cc; }
+  @media (hover: hover) {
+    .diaper-card .delete-btn { opacity: 0; transition: opacity 0.15s ease; }
+    .diaper-card:hover .delete-btn { opacity: 1; }
+  }
+  .diaper-card .delete-btn { transition: opacity 0.15s ease; }
+</style>
+<style>
+  body { min-height: max(884px, 100dvh); }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+  <div class="flex items-center gap-2 min-w-0">
+    <button aria-label="Back to diaper log" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
+      <span class="material-symbols-outlined text-primary">arrow_back</span>
+    </button>
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Diaper History</h1>
+  </div>
+  <div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center border-2 border-primary-container shrink-0">
+    <img alt="Baby Profile Avatar" class="w-full h-full object-cover" src="/icons/placeholder.svg"/>
+  </div>
+</header>
+
+<main class="max-w-md mx-auto px-container-padding pt-5 space-y-5">
+  <div id="loadingSkeleton" class="space-y-4">
+    <div class="animate-pulse rounded-[24px] bg-surface-container-low h-[88px] w-full"></div>
+    <div class="animate-pulse rounded-[18px] bg-surface-container-low h-[44px] w-full"></div>
+    <div class="animate-pulse rounded-[22px] bg-surface-container-low h-[92px] w-full"></div>
+    <div class="animate-pulse rounded-[22px] bg-surface-container-low h-[92px] w-full"></div>
+    <div class="animate-pulse rounded-[22px] bg-surface-container-low h-[92px] w-full"></div>
+    <div class="animate-pulse rounded-[22px] bg-surface-container-low h-[92px] w-full"></div>
+    <div class="animate-pulse rounded-[22px] bg-surface-container-low h-[92px] w-full"></div>
+  </div>
+
+  <div id="mainContent" class="space-y-5 hidden">
+    <section id="statsBar" class="bg-surface-container-low rounded-[24px] p-4 soft-shadow border border-surface-container-high">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-surface-container-lowest rounded-2xl p-3 text-center">
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Today's Changes</p>
+          <p class="font-headline-lg text-headline-lg text-primary mt-1" id="todayCount">0</p>
+        </div>
+        <div class="bg-surface-container-lowest rounded-2xl p-3 text-center">
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Diapers Used</p>
+          <p class="font-headline-lg text-headline-lg text-primary mt-1" id="diaperCount">0</p>
+        </div>
+      </div>
+      <div class="flex justify-around mt-3 pt-3 border-t border-outline-variant/40">
+        <div class="text-center">
+          <p class="font-label-lg text-label-lg font-bold text-[#0369A1]">0</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Wet</p>
+        </div>
+        <div class="text-center">
+          <p class="font-label-lg text-label-lg font-bold text-primary">0</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Poop</p>
+        </div>
+        <div class="text-center">
+          <p class="font-label-lg text-label-lg font-bold text-tertiary">0</p>
+          <p class="font-label-sm text-label-sm text-on-surface-variant">Mixed</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="filterBar" class="space-y-3">
+      <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none" id="typeFilterChips">
+        <button class="filter-chip-active flex-none px-4 py-2 rounded-full border border-outline-variant font-label-md text-label-md transition-colors" data-type-filter="" type="button">All</button>
+        <button class="flex-none px-4 py-2 rounded-full border border-outline-variant font-label-md text-label-md text-on-surface-variant transition-colors" data-type-filter="pee" type="button">Wet</button>
+        <button class="flex-none px-4 py-2 rounded-full border border-outline-variant font-label-md text-label-md text-on-surface-variant transition-colors" data-type-filter="poop" type="button">Poop</button>
+        <button class="flex-none px-4 py-2 rounded-full border border-outline-variant font-label-md text-label-md text-on-surface-variant transition-colors" data-type-filter="mixed" type="button">Mixed</button>
+      </div>
+      <div class="flex gap-2">
+        <div class="flex-1">
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-2.5 font-label-md text-label-md text-on-surface focus:ring-2 focus:ring-primary-container" id="dateFilterInput" type="date"/>
+        </div>
+        <div class="flex-[2]">
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-2.5 font-label-md text-label-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container" id="searchFilterInput" placeholder="Search notes, brand..." type="search"/>
+        </div>
+      </div>
+    </section>
+
+    <p class="font-label-sm text-label-sm text-on-surface-variant" id="resultCount"></p>
+
+    <div id="diaperHistoryList" class="space-y-3"></div>
+  </div>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+    <span class="material-symbols-outlined" data-icon="home">home</span>
+    <span class="font-label-sm text-label-sm">Home</span>
+  </a>
+  <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+    <span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+    <span class="font-label-sm text-label-sm">Log</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+    <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+    <span class="font-label-sm text-label-sm">Calendar</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+    <span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+    <span class="font-label-sm text-label-sm">Milestones</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+    <span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+    <span class="font-label-sm text-label-sm">Assistant</span>
+  </a>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile, diaperLogs: mockDiaperLogs } = await import(`${moduleBase}data/mockData.mjs`);
+const { getLogsForBaby, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { deleteDiaperLogRemote, loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { formatTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+
+const state = {
+  logs: [],
+  filteredLogs: [],
+  typeFilter: "",
+  dateFilter: "",
+  searchFilter: "",
+  now: new Date()
+};
+
+const skeleton = document.getElementById("loadingSkeleton");
+const mainContent = document.getElementById("mainContent");
+const historyList = document.getElementById("diaperHistoryList");
+const todayCount = document.getElementById("todayCount");
+const diaperCount = document.getElementById("diaperCount");
+const resultCount = document.getElementById("resultCount");
+const dateFilterInput = document.getElementById("dateFilterInput");
+const searchFilterInput = document.getElementById("searchFilterInput");
+const typeChips = [...document.querySelectorAll("[data-type-filter]")];
+
+const babyState = await loadBabyProfilesRemote(babyProfile);
+const selectedBabyId = babyState.selectedBabyId;
+
+const localLogs = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId);
+const result = await loadCoreLogsRemote(selectedBabyId, { diaperLogs: mockDiaperLogs });
+state.logs = (result.diaperLogs || localLogs)
+  .sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt));
+
+dateFilterInput.value = localDateValue(state.now);
+
+applyFilters();
+
+skeleton.classList.add("hidden");
+mainContent.classList.remove("hidden");
+
+typeChips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    state.typeFilter = chip.dataset.typeFilter;
+    typeChips.forEach((c) => {
+      c.classList.toggle("filter-chip-active", c === chip);
+      c.classList.toggle("text-on-surface-variant", c !== chip);
+      c.classList.toggle("text-on-surface", c === chip);
+    });
+    applyFilters();
+  });
+});
+
+dateFilterInput.addEventListener("change", () => {
+  state.dateFilter = dateFilterInput.value;
+  applyFilters();
+});
+
+searchFilterInput.addEventListener("input", () => {
+  state.searchFilter = searchFilterInput.value.trim().toLowerCase();
+  applyFilters();
+});
+
+document.getElementById("backButton").addEventListener("click", () => goToScreen("diaper_log"));
+
+function applyFilters() {
+  state.filteredLogs = state.logs.filter((log) => {
+    if (state.typeFilter && normalizeDiaperType(log.type) !== state.typeFilter) return false;
+    if (state.dateFilter) {
+      const logDate = localDateValue(new Date(log.changedAt));
+      if (logDate !== state.dateFilter) return false;
+    }
+    if (state.searchFilter) {
+      const searchable = [log.notes, log.brand, log.color, log.peeColor, log.poopColor, log.peeColorOther, log.poopColorOther]
+        .filter(Boolean).join(" ").toLowerCase();
+      if (!searchable.includes(state.searchFilter)) return false;
+    }
+    return true;
+  });
+  renderStats();
+  renderList();
+}
+
+function renderStats() {
+  const todayLogs = state.logs.filter((log) => isSameLocalDay(log.changedAt, state.now));
+  const wetCount = todayLogs.filter((log) => normalizeDiaperType(log.type) === "pee").length;
+  const poopCount = todayLogs.filter((log) => normalizeDiaperType(log.type) === "poop").length;
+  const mixedCount = todayLogs.filter((log) => normalizeDiaperType(log.type) === "mixed").length;
+  const brands = new Set(todayLogs.map((log) => (log.brand || "").trim()).filter(Boolean));
+  const uniqueBrands = [...brands];
+
+  todayCount.textContent = todayLogs.length;
+  diaperCount.textContent = uniqueBrands.length > 0 ? uniqueBrands.length : todayLogs.length;
+
+  const breakdown = document.getElementById("statsBar").querySelector(".flex.justify-around");
+  if (breakdown) {
+    breakdown.innerHTML = `
+      <div class="text-center">
+        <p class="font-label-lg text-label-lg font-bold text-[#0369A1]">${wetCount}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Wet</p>
+      </div>
+      <div class="text-center">
+        <p class="font-label-lg text-label-lg font-bold text-primary">${poopCount}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Poop</p>
+      </div>
+      <div class="text-center">
+        <p class="font-label-lg text-label-lg font-bold text-tertiary">${mixedCount}</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant">Mixed</p>
+      </div>
+    `;
+  }
+}
+
+function renderList() {
+  const filtered = state.filteredLogs;
+
+  resultCount.textContent = filtered.length === state.logs.length
+    ? `${filtered.length} log${filtered.length === 1 ? "" : "s"}`
+    : `${filtered.length} of ${state.logs.length} log${state.logs.length === 1 ? "" : "s"}`;
+
+  if (!filtered.length) {
+    historyList.innerHTML = `
+      <div class="bg-surface-container-lowest rounded-2xl p-6 soft-shadow border border-tertiary-container/30 text-center space-y-3">
+        <div class="w-16 h-16 rounded-full bg-tertiary-container/40 text-tertiary mx-auto flex items-center justify-center">
+          <span class="material-symbols-outlined text-[34px]">baby_changing_station</span>
+        </div>
+        <div>
+          <p class="font-headline-md text-headline-md text-on-surface">No diaper logs found</p>
+          <p class="font-body-md text-body-md text-on-surface-variant">Try adjusting your filters or log a new change.</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  historyList.innerHTML = filtered.map(renderCard).join("");
+  bindDeleteButtons();
+}
+
+function renderCard(log) {
+  const type = normalizeDiaperType(log.type);
+  const typeLabel = labelForType(type);
+  const detail = diaperSummary(log);
+  return `
+    <div class="diaper-card bg-surface-container-lowest rounded-2xl p-4 soft-shadow border border-surface-container-high flex items-start gap-3">
+      <div class="w-11 h-11 rounded-2xl ${toneForType(type)} flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <p class="font-label-md text-label-md text-on-surface">${escapeHtml(typeLabel)} Diaper</p>
+            <p class="font-label-sm text-label-sm text-on-surface-variant">${relativeDay(log.changedAt)} · ${formatTime(log.changedAt)}</p>
+          </div>
+          <button class="delete-btn shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-error hover:bg-error-container/50 transition-colors" data-delete-diaper="${escapeHtml(log.id)}" type="button" aria-label="Delete diaper log">
+            <span class="material-symbols-outlined text-[20px]">delete</span>
+          </button>
+        </div>
+        ${detail ? `<p class="font-body-md text-body-md text-on-surface-variant mt-1">${escapeHtml(detail)}</p>` : ""}
+        ${(log.brand || log.rash) ? `<div class="flex flex-wrap items-center gap-1 mt-2">${log.brand ? `<span class="brand-pill"><span class="material-symbols-outlined text-[12px]">label</span>${escapeHtml(log.brand)}</span>` : ""}${log.rash ? `<span class="rash-badge"><span class="material-symbols-outlined text-[12px]">healing</span>Rash</span>` : ""}</div>` : ""}
+        ${log.notes ? `<p class="font-label-sm text-label-sm text-on-surface-variant mt-1.5 line-clamp-2">${escapeHtml(log.notes)}</p>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function bindDeleteButtons() {
+  historyList.querySelectorAll("[data-delete-diaper]").forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      if (!confirm("Delete this diaper log?")) return;
+      try {
+        await deleteDiaperLogRemote(button.dataset.deleteDiaper);
+      } catch (error) {
+        console.warn("Delete sync failed, removed locally.", error);
+      }
+      state.logs = state.logs.filter((log) => log.id !== button.dataset.deleteDiaper);
+      applyFilters();
+    });
+  });
+}
+
+function labelForType(type) {
+  return { pee: "Wet", poop: "Poop", mixed: "Mixed" }[type] || "Diaper";
+}
+
+function normalizeDiaperType(type) {
+  if (type === "wet") return "pee";
+  if (type === "dirty") return "poop";
+  return type || "mixed";
+}
+
+function toneForType(type) {
+  return type === "pee"
+    ? "bg-[#E0F2FE] text-[#0369A1]"
+    : type === "poop"
+      ? "bg-primary-container/30 text-primary"
+      : "bg-tertiary-container/40 text-tertiary";
+}
+
+function relativeDay(dateTime) {
+  const date = new Date(dateTime);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  if (date.toDateString() === today.toDateString()) return "Today";
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+  return date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+}
+
+function diaperSummary(log) {
+  const type = normalizeDiaperType(log.type);
+  if (type === "pee") {
+    const color = displayOther(log.peeColor, log.peeColorOther) || log.color;
+    return [log.peeAmount || log.texture, color].filter(Boolean).join(" · ");
+  }
+  if (type === "poop") {
+    const consistency = displayOther(log.poopConsistency, log.poopConsistencyOther) || log.texture;
+    const color = displayOther(log.poopColor, log.poopColorOther) || log.color;
+    return [consistency, color].filter(Boolean).join(" · ");
+  }
+  const pee = [log.peeAmount, displayOther(log.peeColor, log.peeColorOther)].filter(Boolean).join(", ");
+  const poop = [displayOther(log.poopConsistency, log.poopConsistencyOther), displayOther(log.poopColor, log.poopColorOther)].filter(Boolean).join(", ");
+  const fallback = [log.texture, log.color].filter(Boolean).join(" · ");
+  return [pee ? `Pee: ${pee}` : "", poop ? `Poop: ${poop}` : "", !pee && !poop ? fallback : ""].filter(Boolean).join(" · ");
+}
+
+function displayOther(value, otherValue) {
+  return value === "Other" ? otherValue || "Other" : value;
+}
+
+function localDateValue(date) {
+  const copy = new Date(date);
+  copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+  return copy.toISOString().slice(0, 10);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+  navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+}
+</script>
+</body></html>

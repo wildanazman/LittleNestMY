@@ -475,7 +475,7 @@
         const { getLogsForBaby, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = {
@@ -782,10 +782,10 @@
                 });
             });
             historyList.querySelectorAll("[data-diaper-detail]").forEach((card) => {
-                card.addEventListener("click", () => showComingSoon(
-                    "Diaper detail",
-                    `${card.dataset.diaperDetail} detail view is coming soon.`
-                ));
+                card.addEventListener("click", () => {
+                    const logId = card.dataset.diaperDetail || "";
+                    goToScreen("diaper_detail");
+                });
             });
         }
 
