@@ -28,6 +28,8 @@ export const screens = [
   { id: "mommy_guide", title: "Mommy Guide", group: "settings", path: "mommy_guide/code.html", preview: "mommy_guide/screen.png" },
   { id: "subscription", title: "Premium Plan", group: "settings", path: "subscription/code.html", preview: "privacy_safety/screen.png" },
   { id: "privacy_safety", title: "Privacy & Safety", group: "settings", path: "privacy_safety/code.html", preview: "privacy_safety/screen.png" },
+  { id: "privacy_policy", title: "Privacy Policy", group: "settings", path: "privacy_policy/code.html", preview: "privacy_safety/screen.png" },
+  { id: "terms", title: "Terms of Service", group: "settings", path: "terms/code.html", preview: "privacy_safety/screen.png" },
   { id: "settings", title: "Settings", group: "settings", path: "settings/code.html", preview: "settings/screen.png" }
 ];
 

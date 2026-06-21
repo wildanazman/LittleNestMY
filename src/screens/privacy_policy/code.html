@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<title>Privacy Policy - LittleNest MY</title>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      primary: "#83533c", "on-primary": "#ffffff", "primary-container": "#ffdcc8",
+      surface: "#fff8f5", "surface-container-lowest": "#ffffff",
+      "on-surface": "#211a17", "on-surface-variant": "#53433d"
+    },
+    fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+  } }
+};
+</script>
+<style>.legal h2{margin-top:1.5rem;margin-bottom:.4rem;font-weight:800;color:#83533c;font-size:1.05rem}.legal p,.legal li{color:#53433d;line-height:1.6;font-size:.92rem}.legal ul{list-style:disc;padding-left:1.2rem;margin:.4rem 0}.legal a{color:#83533c;font-weight:700;text-decoration:underline}</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen">
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-5 h-14 flex items-center gap-3">
+<button aria-label="Back" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary" onclick="history.length>1?history.back():location.href='/settings/'" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-xl font-extrabold text-primary">Privacy Policy</h1>
+</header>
+<main class="max-w-md mx-auto px-5 py-6 pb-24 legal">
+<p class="text-sm text-on-surface-variant">Last updated: <span id="updated">21 June 2026</span></p>
+
+<p class="mt-3">LittleNest MY ("we", "us", "the app") helps parents track their baby's care. This policy explains what personal data we collect, how we use it, and your rights. By using the app you agree to this policy.</p>
+
+<h2>1. Who we are</h2>
+<p>LittleNest MY is operated by [Your legal name / business name], Malaysia. For any privacy question or request, contact <a href="mailto:support@littlenestmy.com">support@littlenestmy.com</a>.</p>
+
+<h2>2. Data we collect</h2>
+<ul>
+<li><strong>Account data:</strong> your name and email address.</li>
+<li><strong>Baby & care data:</strong> baby profiles (name, date of birth, gender, photo) and the logs you enter — feeding, sleep, diaper, growth measurements, health notes, milestones, photos and videos.</li>
+<li><strong>Payment data:</strong> handled entirely by Stripe. We never see or store your card details — only a Stripe customer reference and your plan status.</li>
+<li><strong>Technical data:</strong> data stored on your device (localStorage) to make the app work offline, and basic request information needed to serve the app.</li>
+</ul>
+
+<h2>3. How we use your data</h2>
+<ul>
+<li>To provide the tracking features and sync your data across your devices.</li>
+<li>To share data with family members you explicitly invite.</li>
+<li>To process your one-time premium purchase.</li>
+<li>To keep the service secure and fix problems.</li>
+</ul>
+<p>We do <strong>not</strong> sell your data or use it for third-party advertising.</p>
+
+<h2>4. Children's data</h2>
+<p>The app stores information about your child that you choose to enter, as the child's parent or guardian. You are responsible for the data you enter. The app is intended for use by adults (parents/caregivers), not by children.</p>
+
+<h2>5. Service providers (processors)</h2>
+<ul>
+<li><strong>Supabase</strong> — secure database, authentication and file storage hosting.</li>
+<li><strong>Stripe</strong> — payment processing.</li>
+<li><strong>Vercel</strong> — application hosting.</li>
+</ul>
+<p>These providers process data on our behalf under their own security and privacy terms.</p>
+
+<h2>6. Data retention & deletion</h2>
+<p>We keep your data while your account is active. You can delete your account at any time from Settings, which permanently removes your account and associated data. You may also request access to or a copy of your data by emailing us.</p>
+
+<h2>7. Your rights</h2>
+<p>Depending on your location (including under Malaysia's PDPA and the EU GDPR), you may have the right to access, correct, export or delete your personal data, and to withdraw consent. To exercise these rights, contact <a href="mailto:support@littlenestmy.com">support@littlenestmy.com</a>.</p>
+
+<h2>8. Security</h2>
+<p>We use access controls and encryption in transit to protect your data. No method of transmission or storage is 100% secure, but we take reasonable measures to safeguard your information.</p>
+
+<h2>9. Changes</h2>
+<p>We may update this policy. Material changes will be reflected by the "Last updated" date above.</p>
+
+<h2>10. Contact</h2>
+<p>Questions? Email <a href="mailto:support@littlenestmy.com">support@littlenestmy.com</a>.</p>
+
+<p class="mt-6 text-xs text-on-surface-variant">This document is a starting template and not legal advice. Please review it with a qualified professional and replace the bracketed placeholders before publishing.</p>
+</main>
+</body></html>

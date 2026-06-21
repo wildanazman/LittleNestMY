@@ -14,7 +14,7 @@ const BESPOKE_SKELETON_SCREENS = new Set([
 ]);
 
 // Public/auth screens never get a skeleton.
-const SKELETON_PUBLIC_SCREENS = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending", "onboarding"];
+const SKELETON_PUBLIC_SCREENS = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending", "onboarding", "privacy_policy", "terms"];
 
 // Mount the shared skeleton as early as possible so every other screen shows a
 // consistent loading state (like the homescreen) while its module fetches data.
@@ -388,7 +388,7 @@ function normalizeNavItem(item, key, isActive) {
 
 async function guardAuthenticatedRoutes() {
   const screenId = getCurrentScreenId();
-  const publicScreens = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending"];
+  const publicScreens = ["auth_welcome", "login", "signup", "accept_invite", "set_password", "verify_pending", "privacy_policy", "terms"];
   if (publicScreens.includes(screenId)) return;
 
   // Guests stay local-only and are always allowed into the app shell.
