@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     const service = getServiceClient();
     const { data: invitation, error: invitationError } = await service
       .from("family_invitations")
-      .select("id,baby_id,email,role,status,expires_at")
+      .select("id,baby_id,email,role,status,expires_at,invited_by")
       .eq("token", token)
       .single();
 
@@ -55,7 +55,8 @@ export default async function handler(req, res) {
       .upsert({
         baby_id: invitation.baby_id,
         user_id: auth.user.id,
-        role: invitation.role
+        role: invitation.role,
+        invited_by: invitation.invited_by
       }, { onConflict: "baby_id,user_id" });
     if (memberError) throw memberError;
 
