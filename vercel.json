@@ -5,6 +5,9 @@
   "framework": null,
   "cleanUrls": true,
   "trailingSlash": true,
+  "crons": [
+    { "path": "/api/cron-reminders", "schedule": "0 1 * * *" }
+  ],
   "headers": [
     {
       "source": "/service-worker.js",
