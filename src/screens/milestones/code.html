@@ -149,12 +149,13 @@
         @keyframes storyFade { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
         .story-rise { animation: storyRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
         @keyframes storyRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-safe-top {
+            top: calc(env(safe-area-inset-top) + 1rem) !important;
+        }
+        .modal-safe-bottom {
+            bottom: calc(env(safe-area-inset-bottom) + 1.5rem) !important;
+        }
     </style>
-<style>
-    body {
-      min-height: max(884px, 100dvh);
-    }
-  </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-background text-on-surface min-h-screen pb-32">
@@ -295,7 +296,7 @@ Save Milestone
 <div class="fixed inset-0 z-[130] hidden" id="videoRecorderModal" role="dialog" aria-modal="true" aria-label="Record a 5 second memory">
 <div class="absolute inset-0 bg-[#18120f]/95 backdrop-blur-sm"></div>
 <div class="relative h-full w-full max-w-[520px] mx-auto flex flex-col items-center justify-center p-6 gap-5">
-<button aria-label="Close recorder" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="recorderClose" type="button">
+<button aria-label="Close recorder" class="absolute modal-safe-top right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="recorderClose" type="button">
 <span class="material-symbols-outlined">close</span>
 </button>
 <div class="relative w-full aspect-square max-w-[360px] rounded-[28px] overflow-hidden bg-black">
@@ -320,7 +321,7 @@ Save Milestone
 <div class="fixed inset-0 z-[120] hidden" id="storyModal" role="dialog" aria-modal="true" aria-label="Memory story view">
 <div class="absolute inset-0 bg-[#18120f]/95 backdrop-blur-sm"></div>
 <div class="relative h-full w-full max-w-[520px] mx-auto flex flex-col">
-<button aria-label="Close memory" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="storyClose" type="button">
+<button aria-label="Close memory" class="absolute modal-safe-top right-4 z-20 w-10 h-10 rounded-full bg-white/15 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform" id="storyClose" type="button">
 <span class="material-symbols-outlined">close</span>
 </button>
 <button aria-label="Previous memory" class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/12 text-white flex items-center justify-center backdrop-blur active:scale-95 transition-transform hidden" id="storyPrev" type="button">
