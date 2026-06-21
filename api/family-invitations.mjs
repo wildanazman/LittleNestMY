@@ -38,16 +38,33 @@ async function listCareCircle(req, res, service, user) {
   const babyId = new URL(req.url, "http://localhost").searchParams.get("babyId");
   if (!babyId) return await listMyPendingInvites(req, res, service, user);
 
-  const { data: memberRows, error: memberError } = await service
+  const { data: rawRows, error: memberError } = await service
     .from("baby_members")
     .select("baby_id,user_id,role,created_at,updated_at")
     .eq("baby_id", babyId);
   if (memberError) throw memberError;
+  const memberRows = rawRows || [];
 
-  const currentMember = memberRows?.find((member) => member.user_id === user.id);
-  if (!currentMember) return sendJson(res, 403, { error: "You are not a member of this baby care circle." });
+  let currentMember = memberRows.find((member) => member.user_id === user.id);
+  if (!currentMember) {
+    const { data: baby } = await service
+      .from("babies")
+      .select("id,created_by")
+      .eq("id", babyId)
+      .maybeSingle();
+    if (baby && baby.created_by === user.id) {
+      await service
+        .from("baby_members")
+        .upsert({ baby_id: babyId, user_id: user.id, role: "parent", invited_by: user.id }, { onConflict: "baby_id,user_id" });
+      const fixupRow = { baby_id: babyId, user_id: user.id, role: "parent", created_at: new Date().toISOString() };
+      memberRows.push(fixupRow);
+      currentMember = fixupRow;
+    } else {
+      return sendJson(res, 403, { error: "You are not a member of this baby care circle." });
+    }
+  }
 
-  const userIds = [...new Set((memberRows || []).map((member) => member.user_id))];
+  const userIds = [...new Set(memberRows.map((member) => member.user_id))];
   const { data: profiles } = userIds.length
     ? await service.from("profiles").select("id,display_name,email,avatar_url").in("id", userIds)
     : { data: [] };
@@ -67,7 +84,7 @@ async function listCareCircle(req, res, service, user) {
 
   return sendJson(res, 200, {
     currentRole: currentMember.role,
-    members: (memberRows || []).map((member) => ({
+    members: memberRows.map((member) => ({
       babyId: member.baby_id,
       userId: member.user_id,
       role: member.role,
