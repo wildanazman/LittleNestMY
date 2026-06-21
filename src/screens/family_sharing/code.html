@@ -283,6 +283,7 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+        const { supabase } = await import(`${moduleBase}utils/supabaseClient.mjs`);
         const { loadCareCircleRemote, removeFamilyInviteRemote, sendFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
         const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
@@ -414,7 +415,32 @@
 
         async function renderMembers() {
           try { careCircle = await loadCareCircleRemote(selectedBabyId); }
-          catch (error) { careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] }; }
+          catch (error) {
+            try {
+              const { data: fbRows } = await supabase.from("baby_members").select("baby_id,user_id,role").eq("baby_id", selectedBabyId);
+              if (fbRows?.length) {
+                const ids = [...new Set(fbRows.map((m) => m.user_id))];
+                const { data: fbProfiles } = await supabase.from("profiles").select("id,display_name,email").in("id", ids);
+                const pmap = new Map((fbProfiles || []).map((p) => [p.id, p]));
+                const session = await supabase.auth.getSession();
+                const uid = session?.data?.session?.user?.id || "";
+                careCircle = {
+                  currentRole: fbRows.find((m) => m.user_id === uid)?.role || "viewer",
+                  members: fbRows.map((m) => ({
+                    userId: m.user_id,
+                    role: m.role,
+                    name: pmap.get(m.user_id)?.display_name || "Care circle member",
+                    email: pmap.get(m.user_id)?.email || "",
+                    isCurrentUser: m.user_id === uid
+                  })),
+                  invitations: []
+                };
+              }
+            } catch {}
+            if (!careCircle?.members?.length) {
+              careCircle = { currentRole: "viewer", members: [getCurrentParentMember()], invitations: [] };
+            }
+          }
           const invitedMembers = dedupeMembers(careCircle.members.filter((m) => !m.isCurrentUser));
           const memberEmails = new Set(invitedMembers.map((m) => String(m.email || "").toLowerCase()).filter(Boolean));
           const invitations = dedupePendingInvitations(careCircle.invitations || [], memberEmails);
