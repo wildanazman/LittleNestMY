@@ -59,8 +59,7 @@ export function inviteEmailHtml({ inviteUrl, babyName, inviterName, role }) {
     <p style="color:#53433d;font-size:15px;line-height:1.6;">${who}${baby} on ${BRAND}.</p>
     ${roleLine}
     <p style="margin:16px 0;">${button(inviteUrl, "Accept invitation")}</p>
-    <p style="color:#8a7d76;font-size:13px;line-height:1.6;">Or paste this link into your browser:<br><a href="${inviteUrl}" style="color:${PRIMARY};word-break:break-all;">${inviteUrl}</a></p>
-    <p style="color:#8a7d76;font-size:13px;">This invitation expires in 7 days.</p>`;
+    <p style="color:#8a7d76;font-size:13px;">This invitation expires in 7 days. If the button doesn't work, reply to this email and we'll help.</p>`;
   return shell("Join the care circle", body);
 }
 
@@ -68,8 +67,7 @@ export function resetEmailHtml({ resetUrl }) {
   const body = `
     <p style="color:#53433d;font-size:15px;line-height:1.6;">We got a request to reset your ${BRAND} password. Tap below to choose a new one.</p>
     <p style="margin:16px 0;">${button(resetUrl, "Reset password")}</p>
-    <p style="color:#8a7d76;font-size:13px;line-height:1.6;">Or paste this link into your browser:<br><a href="${resetUrl}" style="color:${PRIMARY};word-break:break-all;">${resetUrl}</a></p>
-    <p style="color:#8a7d76;font-size:13px;">If you didn't request this, you can safely ignore this email — your password won't change.</p>`;
+    <p style="color:#8a7d76;font-size:13px;">This link expires in 1 hour. If you didn't request this, ignore this email — your password won't change.</p>`;
   return shell("Reset your password", body);
 }
 
