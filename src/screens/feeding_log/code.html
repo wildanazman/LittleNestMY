@@ -320,6 +320,28 @@
 </div>
 </div>
 
+<div class="space-y-sm hidden" id="formulaBrandField">
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Formula brand <span class="text-outline">(optional)</span></label>
+<input list="formulaBrandList" id="formulaBrandInput" class="w-full h-14 bg-surface-container-low border-none rounded-2xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" placeholder="e.g. Similac, S-26, Enfalac" autocomplete="off"/>
+<datalist id="formulaBrandList">
+<option value="Anmum Materna / Infacare"></option>
+<option value="Similac / Gain Plus (Abbott)"></option>
+<option value="Enfalac / Enfagrow (Mead Johnson)"></option>
+<option value="Frisolac / Frisogrow (Friso)"></option>
+<option value="S-26 / Promil (Wyeth)"></option>
+<option value="Nestlé NAN"></option>
+<option value="Nestlé Lactogrow / Lactogen"></option>
+<option value="Dumex Dugro / Mamil Gold"></option>
+<option value="Fernleaf"></option>
+<option value="Karihome (Goat Milk)"></option>
+<option value="Bellamy's Organic"></option>
+<option value="Appeton Weight Gain (Infant)"></option>
+<option value="Morinaga Chil-mil / Chil-kid"></option>
+<option value="Novalac"></option>
+<option value="AptaGro (Aptamil)"></option>
+</datalist>
+</div>
+
 <div class="grid grid-cols-2 gap-3">
 <label class="min-w-0 rounded-[22px] bg-surface-container-low px-3 py-3 border border-outline-variant/30 flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-[20px] shrink-0">calendar_month</span>
@@ -438,7 +460,7 @@
         const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
-        const state = { feedingType: "bottle", isSaving: false };
+        const state = { feedingType: "bottle", isSaving: false, brand: "" };
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
         const permissions = await getBabyPermissions(selectedBabyId);
@@ -455,6 +477,8 @@
         const dateInput = document.getElementById("dateInput");
         const timeInput = document.getElementById("timeInput");
         const noteInput = document.getElementById("noteInput");
+        const formulaBrandField = document.getElementById("formulaBrandField");
+        const formulaBrandInput = document.getElementById("formulaBrandInput");
         const saveButton = document.getElementById("saveFeedingButton");
         const saveFeedback = document.getElementById("saveFeedback");
         const historyList = document.getElementById("feedingHistoryList");
@@ -479,6 +503,7 @@
             button.addEventListener("click", () => setAmount(Number(button.dataset.amountValue || button.dataset.amountPreset)));
         });
         amountInput.addEventListener("input", updatePresetState);
+        formulaBrandInput.addEventListener("input", () => state.brand = formulaBrandInput.value.trim());
         dateInput.value = getCurrentDateValue();
         timeInput.value = getCurrentTimeValue();
         setAmount(120);
@@ -508,6 +533,7 @@
 
             amountField.classList.toggle("hidden", !usesAmount);
             durationField.classList.toggle("hidden", !usesDuration);
+            formulaBrandField.classList.toggle("hidden", state.feedingType !== "formula");
             amountUnit.textContent = state.feedingType === "solid" ? "g" : "ml";
             amountInput.placeholder = state.feedingType === "solid" ? "45" : "120";
             durationInput.placeholder = state.feedingType === "breast" ? "15" : "10";
@@ -552,6 +578,7 @@
                 amountGrams: usesAmount && state.feedingType === "solid" && amountValue > 0 ? amountValue : undefined,
                 durationMinutes: usesDuration && durationValue > 0 ? durationValue : undefined,
                 foodName: state.feedingType === "solid" ? "Solid food" : undefined,
+                brand: state.feedingType === "formula" ? (state.brand || undefined) : undefined,
                 notes: noteInput.value.trim() || undefined
             };
 
@@ -564,6 +591,8 @@
             amountInput.value = "";
             durationInput.value = "";
             noteInput.value = "";
+            formulaBrandInput.value = "";
+            state.brand = "";
             dateInput.value = getCurrentDateValue();
             timeInput.value = getCurrentTimeValue();
             updatePresetState();
@@ -627,7 +656,7 @@
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${iconForType(log.type)}</span>
                         </div>
                         <div class="min-w-0">
-                            <p class="font-label-md text-label-md text-on-surface truncate">${labelForType(log.type)}</p>
+                            <p class="font-label-md text-label-md text-on-surface truncate">${labelForType(log.type)}${log.brand ? ` &middot; ${escapeHtml(log.brand)}` : ""}</p>
                             <p class="font-body-md text-label-sm text-on-surface-variant">${relativeDay(log.startedAt)} &middot; ${formatTime(log.startedAt)}</p>
                             ${log.notes ? `<p class="font-body-md text-label-sm text-on-surface-variant truncate">${escapeHtml(log.notes)}</p>` : ""}
                         </div>

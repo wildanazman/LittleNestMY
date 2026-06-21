@@ -50,16 +50,7 @@ export async function saveFeedingLogRemote(log) {
   if (!canUseSupabase(log.babyId)) return local;
 
   try {
-    const { data, error } = await withTimeout(
-      supabase
-        .from("feeding_logs")
-        .upsert(toFeedingRow(log), { onConflict: "id" })
-        .select("*")
-        .single(),
-      undefined,
-      "save feeding log"
-    );
-    if (error) throw error;
+    const data = await upsertFeedingRow(log);
     if (data?.id && data.id !== log.id) deleteLocalFeedingLog(log.id);
     return saveLocalFeedingLog(fromFeedingRow(data));
   } catch (error) {
@@ -303,8 +294,33 @@ function toFeedingRow(log) {
     duration_minutes: log.durationMinutes || null,
     started_at: log.startedAt,
     ended_at: log.endedAt || null,
+    brand: log.brand || null,
     note: log.notes || null
   };
+}
+
+// Upsert with the brand column; if the DB doesn't have it yet (migration 013
+// not run), retry without brand so the feed still syncs. brand persists
+// locally meanwhile.
+async function upsertFeedingRow(log) {
+  const row = toFeedingRow(log);
+  const { data, error } = await withTimeout(
+    supabase.from("feeding_logs").upsert(row, { onConflict: "id" }).select("*").single(),
+    undefined,
+    "save feeding log"
+  );
+  if (!error) return data;
+  if (!/brand|schema cache|column/i.test(`${error?.message || ""} ${error?.details || ""} ${error?.hint || ""}`)) throw error;
+
+  const legacyRow = { ...row };
+  delete legacyRow.brand;
+  const legacy = await withTimeout(
+    supabase.from("feeding_logs").upsert(legacyRow, { onConflict: "id" }).select("*").single(),
+    undefined,
+    "save feeding log"
+  );
+  if (legacy.error) throw legacy.error;
+  return legacy.data;
 }
 
 function fromFeedingRow(row) {
@@ -317,6 +333,7 @@ function fromFeedingRow(row) {
     durationMinutes: row.duration_minutes || undefined,
     startedAt: row.started_at,
     endedAt: row.ended_at || undefined,
+    brand: row.brand || undefined,
     notes: row.note || undefined
   };
 }
