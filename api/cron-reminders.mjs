@@ -19,8 +19,6 @@ export default async function handler(req, res) {
     res.statusCode = 500;
     return res.end(JSON.stringify({ error: "Push or Supabase not configured." }));
   }
-  configurePush();
-  const service = getServiceClient();
 
   // MY local "today" (UTC+8) for due-date math.
   const nowMy = new Date(Date.now() + 8 * 3600000);
@@ -28,6 +26,13 @@ export default async function handler(req, res) {
   const isMonday = todayMy.getUTCDay() === 1;
 
   try {
+    // Inside try: an invalid VAPID key throws here, returns a clean error
+    // instead of crashing the function.
+    if (!configurePush()) {
+      res.statusCode = 500;
+      return res.end(JSON.stringify({ error: "VAPID keys missing or invalid." }));
+    }
+    const service = getServiceClient();
     const { data: subs } = await service.from("push_subscriptions").select("user_id");
     const userIds = [...new Set((subs || []).map((s) => s.user_id).filter(Boolean))];
     if (!userIds.length) return done(res, { users: 0, pushes: 0 });
