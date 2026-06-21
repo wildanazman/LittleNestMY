@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>June Memories - LittleNest MY</title>
+<title>Memories - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -140,131 +140,27 @@
 <!-- TopAppBar -->
 <header class="docked full-width top-0 z-40 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14 fixed">
 <div class="flex items-center gap-4">
-<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<button id="memBack" class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" type="button" aria-label="Back">
 <span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">June Memories</h1>
+<h1 id="memTitle" class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Memories</h1>
 </div>
-<div class="flex items-center gap-3">
-<button class="flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-label-md text-label-md active:scale-95 transition-all soft-shadow">
-<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-<span>Export PDF</span>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider milestone-tag">Pro</span>
+<button id="memAddTop" class="flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-label-md text-label-md active:scale-95 transition-all soft-shadow" type="button">
+<span class="material-symbols-outlined text-[18px]">add_a_photo</span><span>Add</span>
 </button>
-</div>
 </header>
-<main class="mt-20 px-container-padding max-w-screen-md mx-auto">
-<!-- Month Summary Header -->
-<section class="mb-lg animate-in fade-in slide-in-from-bottom-4 duration-700">
-<p class="font-body-md text-on-surface-variant mb-xs">A snapshot of baby's growth</p>
-<div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-<div class="bg-surface-container-low p-4 rounded-xl min-w-[120px] flex-shrink-0 soft-shadow">
-<span class="font-label-sm text-label-sm block text-primary mb-1">Weight</span>
-<p class="font-headline-md text-headline-md">6.8 kg</p>
-<span class="text-[10px] text-tertiary font-bold">+0.4 from May</span>
+<main class="mt-20 px-container-padding max-w-screen-md mx-auto pb-10">
+<div class="flex items-center justify-between mb-4">
+<p class="font-body-md text-on-surface-variant" id="memSub">Photos &amp; notes you've saved</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="memCount"></span>
 </div>
-<div class="bg-surface-container-low p-4 rounded-xl min-w-[120px] flex-shrink-0 soft-shadow">
-<span class="font-label-sm text-label-sm block text-primary mb-1">Sleep Avg</span>
-<p class="font-headline-md text-headline-md">11.5h</p>
-<span class="text-[10px] text-on-surface-variant font-bold">Stable pattern</span>
+<div id="memEmpty" class="hidden rounded-[24px] bg-surface-container-low p-8 text-center soft-shadow">
+<div class="w-16 h-16 rounded-full bg-primary-container/50 text-primary mx-auto flex items-center justify-center mb-3"><span class="material-symbols-outlined text-[34px]">photo_library</span></div>
+<p class="font-headline-md text-headline-md text-on-surface">No memories yet</p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4 mt-1">Save your baby's special moments with a photo, video, or note.</p>
+<button id="memAdd" class="h-11 px-5 rounded-full bg-primary text-on-primary font-label-md font-bold active:scale-95" type="button">Add a memory</button>
 </div>
-<div class="bg-surface-container-low p-4 rounded-xl min-w-[120px] flex-shrink-0 soft-shadow">
-<span class="font-label-sm text-label-sm block text-primary mb-1">Milestones</span>
-<p class="font-headline-md text-headline-md">4 New</p>
-<span class="text-[10px] text-on-surface-variant font-bold">In June</span>
-</div>
-</div>
-</section>
-<!-- Scrapbook Grid -->
-<div class="grid grid-cols-12 gap-gutter md:gap-lg">
-<!-- Hero Photo Memory -->
-<div class="col-span-12 md:col-span-8 group">
-<div class="relative bg-white p-3 pb-12 rounded-sm soft-shadow rotate-1 transform transition-transform hover:rotate-0 duration-300">
-<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-6 scrapbook-tape z-10"></div>
-<img class="w-full aspect-[4/3] object-cover rounded-sm mb-4" data-alt="A heart-warming, high-quality photograph of a sleeping newborn baby wrapped in a soft sage green muslin blanket. The baby lies on a cream-colored textured rug, illuminated by gentle morning sunlight streaming through a window. The aesthetic is clean, airy, and minimalist, utilizing a soft focus and a warm pastel color palette of peaches and creams to evoke a sense of peace and security." src="/icons/placeholder.svg"/>
-<div class="absolute bottom-4 left-6">
-<span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full milestone-tag">June 12: First Giggle</span>
-</div>
-</div>
-</div>
-<!-- Side Note Card -->
-<div class="col-span-12 md:col-span-4">
-<div class="h-full bg-secondary-container p-6 rounded-[24px] soft-shadow flex flex-col justify-between -rotate-2 transform transition-transform hover:rotate-0 duration-300">
-<div>
-<span class="material-symbols-outlined text-primary mb-4">edit_note</span>
-<h3 class="font-headline-md text-headline-md text-on-secondary-container mb-2">Growth Note</h3>
-<p class="font-body-md text-body-md text-on-secondary-fixed-variant italic">"This month, you finally started reaching for the colorful mobile. You love the little blue bird the most!"</p>
-</div>
-<div class="mt-4 pt-4 border-t border-outline-variant flex items-center justify-between">
-<span class="font-label-sm text-label-sm text-on-secondary-container">Week 24</span>
-<span class="material-symbols-outlined text-tertiary">favorite</span>
-</div>
-</div>
-</div>
-<!-- Milestone Card 1 -->
-<div class="col-span-6 md:col-span-4">
-<div class="relative bg-white p-2 pb-8 rounded-sm soft-shadow -rotate-1 transform transition-transform hover:rotate-0 duration-300">
-<img class="w-full aspect-square object-cover rounded-sm mb-2" data-alt="A close-up aesthetic shot of a baby's tiny hand grasping a parent's finger. The lighting is soft and warm, highlighting the delicate skin textures. The background is softly blurred in shades of warm cream and soft peach. This professional photography piece captures an emotional, intimate moment with a minimalist digital sanctuary vibe." src="/icons/placeholder.svg"/>
-<p class="font-label-sm text-label-sm text-center text-on-surface-variant">Holding Hands</p>
-<div class="absolute -top-1 -right-1 w-8 h-8 bg-tertiary-container rounded-full flex items-center justify-center milestone-tag">
-<span class="material-symbols-outlined text-on-tertiary-container text-[16px]">star</span>
-</div>
-</div>
-</div>
-<!-- Milestone Card 2 -->
-<div class="col-span-6 md:col-span-4">
-<div class="relative bg-white p-2 pb-8 rounded-sm soft-shadow rotate-2 transform transition-transform hover:rotate-0 duration-300">
-<img class="w-full aspect-square object-cover rounded-sm mb-2" data-alt="A beautiful overhead shot of a baby lying on their tummy on a soft cream blanket, lifting their head with curious eyes. The scene is bright and airy with a modern light-mode aesthetic. The color palette is dominated by neutral tones with subtle accents of primary peach. The mood is one of discovery and quiet achievement." src="/icons/placeholder.svg"/>
-<p class="font-label-sm text-label-sm text-center text-on-surface-variant">Tummy Time Champ</p>
-</div>
-</div>
-<!-- Milestone Card 3 (Text Focus) -->
-<div class="col-span-12 md:col-span-4">
-<div class="bg-surface-container-high p-6 rounded-[24px] soft-shadow h-full border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center">
-<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center mb-4">
-<span class="material-symbols-outlined text-on-primary-container">add_a_photo</span>
-</div>
-<p class="font-label-md text-label-md text-primary">Add another memory</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">June 28 - 30 still empty</p>
-</div>
-</div>
-<!-- Timeline Segment -->
-<div class="col-span-12 mt-md">
-<h2 class="font-headline-md text-headline-md mb-base">Activity Timeline</h2>
-<div class="space-y-gutter relative before:absolute before:left-[15px] before:top-2 before:bottom-2 before:w-[2px] before:bg-dotted before:bg-outline-variant">
-<style>
-                        .bg-dotted { background-image: radial-gradient(#d6c2bb 1px, transparent 1px); background-size: 1px 8px; }
-                    </style>
-<div class="flex items-start gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-[#E0F2FE] flex-shrink-0 flex items-center justify-center z-10 milestone-tag">
-<span class="material-symbols-outlined text-[18px] text-[#0369A1]">bedtime</span>
-</div>
-<div class="pt-1">
-<p class="font-label-md text-label-md text-on-surface">Full Night Sleep!</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">June 18 • 8 hours continuous</p>
-</div>
-</div>
-<div class="flex items-start gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 flex items-center justify-center z-10 milestone-tag">
-<span class="material-symbols-outlined text-[18px] text-on-primary-container">restaurant</span>
-</div>
-<div class="pt-1">
-<p class="font-label-md text-label-md text-on-surface">Tried Pear Puree</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">June 22 • Loved the sweet taste</p>
-</div>
-</div>
-<div class="flex items-start gap-4 relative">
-<div class="w-8 h-8 rounded-full bg-tertiary-fixed flex-shrink-0 flex items-center justify-center z-10 milestone-tag">
-<span class="material-symbols-outlined text-[18px] text-on-tertiary-fixed-variant">medical_services</span>
-</div>
-<div class="pt-1">
-<p class="font-label-md text-label-md text-on-surface">6-Month Checkup</p>
-<p class="font-label-sm text-label-sm text-on-surface-variant">June 25 • All health markers normal</p>
-</div>
-</div>
-</div>
-</div>
-</div>
+<div id="memGrid" class="grid grid-cols-2 gap-3"></div>
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
@@ -289,20 +185,75 @@
 <span class="font-label-sm text-[10px]">Assistant</span>
 </button>
 </nav>
-<script>
-        // Simple micro-interaction for tapping cards
-        document.querySelectorAll('.soft-shadow').forEach(card => {
-            card.addEventListener('mousedown', () => {
-                card.style.transform = 'scale(0.98) translateY(2px)';
-            });
-            card.addEventListener('mouseup', () => {
-                card.style.transform = '';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-            });
-        });
-    </script>
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
+  const screenUrl = (id) => window.location.protocol === "file:" ? `../${id}/code.html` : `/${id}/`;
+
+  document.getElementById("memBack").addEventListener("click", () => { window.location.href = screenUrl("home_dashboard"); });
+  const goAdd = () => { window.location.href = screenUrl("milestones"); };
+  document.getElementById("memAddTop").addEventListener("click", goAdd);
+
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  const selectedBabyId = babyState.selectedBabyId;
+  const babyName = (babyState.selectedBaby && babyState.selectedBaby.name) || "Baby";
+  document.getElementById("memTitle").textContent = `${babyName}'s memories`;
+
+  let memories = [];
+  if (selectedBabyId) {
+    try {
+      const loaded = await loadMilestonesRemote(selectedBabyId, []);
+      memories = (loaded.milestones || []).slice().sort((a, b) => new Date(b.achievedAt || 0) - new Date(a.achievedAt || 0));
+    } catch (e) { memories = []; }
+  }
+  render();
+  window.dispatchEvent(new Event("littlenest:ready"));
+
+  function render() {
+    const grid = document.getElementById("memGrid");
+    const empty = document.getElementById("memEmpty");
+    document.getElementById("memCount").textContent = memories.length ? `${memories.length} ${memories.length === 1 ? "memory" : "memories"}` : "";
+    if (!memories.length) { empty.classList.remove("hidden"); grid.innerHTML = ""; const add = document.getElementById("memAdd"); if (add) add.addEventListener("click", goAdd); return; }
+    empty.classList.add("hidden");
+    grid.innerHTML = memories.map(renderCard).join("");
+    grid.querySelectorAll("[data-share]").forEach((b) => b.addEventListener("click", () => shareMemory(memories.find((m) => m.id === b.dataset.share))));
+  }
+
+  function renderCard(m) {
+    const media = m.photoUrl ? renderMedia(m.photoUrl) : `<div class="w-full aspect-square rounded-xl bg-gradient-to-br from-primary-container/60 to-tertiary-container/50 flex items-center justify-center"><span class="material-symbols-outlined text-[40px] text-primary">favorite</span></div>`;
+    const noteHtml = m.notes ? `<p class="text-[12px] text-on-surface-variant px-1 mt-0.5 truncate">${escapeHtml(m.notes)}</p>` : "";
+    return `<div class="bg-white rounded-2xl p-2 soft-shadow flex flex-col">${media}<p class="font-label-md text-label-md text-on-surface mt-2 px-1 truncate">${escapeHtml(m.title || "Memory")}</p><p class="text-[11px] text-on-surface-variant px-1">${m.achievedAt ? fmt(m.achievedAt) : ""}</p>${noteHtml}<button data-share="${escapeHtml(m.id)}" class="mt-2 mx-1 mb-1 h-9 rounded-full bg-surface-container text-primary text-[13px] font-bold inline-flex items-center justify-center gap-1.5 active:scale-95" type="button"><span class="material-symbols-outlined text-[16px]">ios_share</span>Share</button></div>`;
+  }
+
+  function renderMedia(url) {
+    const isVideo = /^data:video|\.(mp4|webm|mov)(\?|$)/i.test(url);
+    return isVideo
+      ? `<video src="${escapeHtml(url)}" class="w-full aspect-square object-cover rounded-xl bg-black" muted loop playsinline></video>`
+      : `<img src="${escapeHtml(url)}" class="w-full aspect-square object-cover rounded-xl" alt="Memory"/>`;
+  }
+
+  async function shareMemory(m) {
+    if (!m) return;
+    const text = `${babyName} — ${m.title || "Memory"}${m.notes ? `\n${m.notes}` : ""}\nvia LittleNest MY`;
+    try {
+      if (m.photoUrl && m.photoUrl.indexOf("http") === 0 && navigator.canShare) {
+        try {
+          const blob = await (await fetch(m.photoUrl)).blob();
+          const file = new File([blob], "memory." + ((blob.type.split("/")[1]) || "jpg"), { type: blob.type || "image/jpeg" });
+          if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: m.title || "Memory", text }); return; }
+        } catch (e) {}
+      }
+      if (navigator.share) { await navigator.share({ title: m.title || "Memory", text }); return; }
+      await navigator.clipboard.writeText(text);
+      alert("Memory copied to clipboard.");
+    } catch (e) {}
+  }
+
+  function fmt(v) { const d = new Date(v); return isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
+  function escapeHtml(v) { return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+</script>
 <script type="module" src="/src/utils/navigation.mjs"></script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
