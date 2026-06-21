@@ -8,12 +8,13 @@ import { buildVaccinationPlan } from "../src/utils/vaccinations.mjs";
 // table by only firing on those specific day offsets.
 
 export default async function handler(req, res) {
-  // Only allow Vercel Cron (or a caller with the secret).
-  const secret = process.env.CRON_SECRET || "";
-  const auth = req.headers.authorization || "";
-  if (secret && auth !== `Bearer ${secret}`) {
+  // Only allow Vercel Cron (or a caller with the secret). Tolerate stray
+  // whitespace/quotes that can sneak into env values when pasted.
+  const secret = (process.env.CRON_SECRET || "").trim().replace(/^["']|["']$/g, "");
+  const provided = (req.headers.authorization || "").replace(/^Bearer\s+/i, "").trim().replace(/^["']|["']$/g, "");
+  if (secret && provided !== secret) {
     res.statusCode = 401;
-    return res.end(JSON.stringify({ error: "Unauthorized." }));
+    return res.end(JSON.stringify({ error: "Unauthorized.", hint: `expected length ${secret.length}` }));
   }
   if (!hasServerSupabaseConfig() || !isPushConfigured()) {
     res.statusCode = 500;
