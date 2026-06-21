@@ -416,6 +416,8 @@
         async function renderMembers() {
           try { careCircle = await loadCareCircleRemote(selectedBabyId); }
           catch (error) {
+            console.warn("Care circle API failed:", error?.message || error);
+            memberSummary.textContent = "Loading from app data...";
             try {
               const { data: fbRows } = await supabase.from("baby_members").select("baby_id,user_id,role").eq("baby_id", selectedBabyId);
               if (fbRows?.length) {
