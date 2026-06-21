@@ -800,7 +800,7 @@ function setupPullToRefresh() {
   let pullDistance = 0;
   let isPulling = false;
   let isRefreshing = false;
-  const threshold = 92;
+  const threshold = 72;
   const indicator = createPullRefreshIndicator();
 
   window.addEventListener("touchstart", (event) => {
@@ -823,9 +823,10 @@ function setupPullToRefresh() {
       return;
     }
 
+    event.preventDefault();
     pullDistance = Math.min(120, deltaY * 0.55);
     updatePullIndicator(indicator, pullDistance, pullDistance >= threshold);
-  }, { passive: true });
+  }, { passive: false });
 
   window.addEventListener("touchend", () => {
     if (!isPulling || isRefreshing) return;
@@ -833,8 +834,9 @@ function setupPullToRefresh() {
     if (pullDistance >= threshold) {
       isRefreshing = true;
       indicator.textContent = "Refreshing...";
-      indicator.style.transform = "translate(-50%, 72px)";
-      setTimeout(() => window.location.reload(), 180);
+      indicator.style.transform = "translate(-50%, 24px)";
+      indicator.classList.add("ptr-spinning");
+      setTimeout(() => window.location.reload(), 200);
       return;
     }
     resetPullIndicator(indicator);
@@ -846,13 +848,12 @@ function createPullRefreshIndicator() {
   if (existing) return existing;
   const indicator = document.createElement("div");
   indicator.id = "littleNestPullRefresh";
-  indicator.textContent = "Pull to refresh";
   indicator.setAttribute("aria-hidden", "true");
   indicator.style.cssText = [
     "position:fixed",
     "left:50%",
-    "top:0",
-    "z-index:120",
+    "top:56px",
+    "z-index:35",
     "transform:translate(-50%,-56px)",
     "height:40px",
     "padding:0 16px",
@@ -860,10 +861,11 @@ function createPullRefreshIndicator() {
     "display:flex",
     "align-items:center",
     "justify-content:center",
-    "background:var(--color-surface-container-lowest,#fff)",
+    "gap:8px",
+    "background:var(--color-surface-container,#efeee9)",
     "color:var(--color-primary,#83533c)",
-    "box-shadow:0 10px 30px rgba(131,83,60,.16)",
-    "font:700 13px/1 'Nunito Sans',sans-serif",
+    "box-shadow:0 2px 12px rgba(131,83,60,.12)",
+    "font:700 12px/1 'Nunito Sans',sans-serif",
     "pointer-events:none",
     "transition:transform 160ms ease,opacity 160ms ease",
     "opacity:0"
@@ -874,8 +876,8 @@ function createPullRefreshIndicator() {
 
 function updatePullIndicator(indicator, distance, ready) {
   indicator.textContent = ready ? "Release to refresh" : "Pull to refresh";
-  indicator.style.opacity = String(Math.min(1, distance / 60));
-  indicator.style.transform = `translate(-50%, ${Math.max(-48, distance - 56)}px)`;
+  indicator.style.opacity = String(Math.min(1, distance / 40));
+  indicator.style.transform = `translate(-50%, ${Math.max(-52, distance - 56)}px)`;
 }
 
 function resetPullIndicator(indicator) {
