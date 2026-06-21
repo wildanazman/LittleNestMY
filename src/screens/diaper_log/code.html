@@ -178,6 +178,58 @@
             border-color: rgba(255, 255, 255, 0.18);
             box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.14);
         }
+        /* Rash toggle switch */
+        .ln-switch {
+            width: 46px;
+            height: 28px;
+            border-radius: 9999px;
+            background: #d6c2bb;
+            position: relative;
+            transition: background 0.2s ease;
+            flex-shrink: 0;
+        }
+        .ln-switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 9999px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+            transition: transform 0.2s ease;
+        }
+        .rash-toggle[aria-pressed="true"] {
+            border-color: #ba1a1a !important;
+            background: #ffdad6;
+        }
+        .rash-toggle[aria-pressed="true"] .ln-switch { background: #ba1a1a; }
+        .rash-toggle[aria-pressed="true"] .ln-switch::after { transform: translateX(18px); }
+        html.dark .rash-toggle[aria-pressed="true"] { background: rgba(186,26,26,0.22); }
+        .rash-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #ffdad6;
+            color: #93000a;
+            border-radius: 9999px;
+            padding: 1px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(131,83,60,0.10);
+            color: #7a4b36;
+            border-radius: 9999px;
+            padding: 1px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        html.dark .brand-pill { background: rgba(255,191,163,0.14); color: #ffd6cc; }
     </style>
 <style>
     body {
@@ -322,6 +374,44 @@
 </div>
 </div>
 </section>
+<!-- Diaper brand + skin -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center px-1">
+<h3 class="font-label-md text-label-md text-on-surface-variant">Diaper brand &amp; skin</h3>
+<span class="font-label-sm text-label-sm text-outline">Optional</span>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-sm border border-surface-container-high space-y-sm">
+<label class="block space-y-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Which diaper did you use?</span>
+<input list="diaperBrandList" id="diaperBrandInput" class="diaper-input w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" placeholder="e.g. MamyPoko, Drypers, Huggies" autocomplete="off"/>
+</label>
+<datalist id="diaperBrandList">
+<option value="MamyPoko"></option>
+<option value="Drypers"></option>
+<option value="Huggies"></option>
+<option value="Pampers"></option>
+<option value="Merries"></option>
+<option value="Sweet Baby"></option>
+<option value="Offspring"></option>
+<option value="Rascal + Friends"></option>
+<option value="Pureen"></option>
+<option value="EQ Dry"></option>
+</datalist>
+<div class="flex flex-wrap gap-xs" id="brandQuickChips"></div>
+<button type="button" id="rashToggle" aria-pressed="false" class="rash-toggle w-full flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2.5 transition-colors active:scale-[0.99]">
+<span class="flex items-center gap-2 text-left">
+<span class="material-symbols-outlined text-[20px] text-error">healing</span>
+<span class="min-w-0">
+<span class="block font-label-md text-label-md text-on-surface">Caused a rash</span>
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Flag if this diaper irritated baby's skin</span>
+</span>
+</span>
+<span class="ln-switch"></span>
+</button>
+</div>
+</section>
+<!-- Rash insight -->
+<section id="rashInsight" class="hidden"></section>
 <!-- Safety Note -->
 <section class="bg-primary-container/20 border border-primary-container rounded-2xl p-sm">
 <p class="font-label-sm text-label-sm text-on-primary-container">Track diaper changes for patterns. Contact Klinik Kesihatan or doctor if you see red, black, or white/pale stool, signs of dehydration, or if baby seems unwell.</p>
@@ -336,7 +426,7 @@
 </section>
 <!-- Large Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="diaperSaveFeedback" aria-live="polite">Saved.</p>
-<button class="w-full h-14 bg-primary-container text-on-primary-container font-headline-md text-headline-md rounded-full inner-glow-primary soft-shadow active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
+<button class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full soft-shadow active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                 Log Change
             </button>
@@ -391,7 +481,9 @@
             poopConsistency: "Soft",
             poopConsistencyOther: "",
             poopColor: "Brown",
-            poopColorOther: ""
+            poopColorOther: "",
+            brand: "",
+            rash: false
         };
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
@@ -414,6 +506,10 @@
         const saveFeedback = document.getElementById("diaperSaveFeedback");
         const historyList = document.getElementById("diaperHistoryList");
         const backButton = document.getElementById("diaperBackButton");
+        const brandInput = document.getElementById("diaperBrandInput");
+        const rashToggle = document.getElementById("rashToggle");
+        const brandQuickChips = document.getElementById("brandQuickChips");
+        const rashInsight = document.getElementById("rashInsight");
         let diaperLogItems = getLogsForBaby(getPersistedDiaperLogs(mockDiaperLogs), selectedBabyId);
 
         segmentButtons.forEach((button, index) => {
@@ -433,6 +529,12 @@
         peeColorOtherInput.addEventListener("input", () => state.peeColorOther = peeColorOtherInput.value.trim());
         poopConsistencyOtherInput.addEventListener("input", () => state.poopConsistencyOther = poopConsistencyOtherInput.value.trim());
         poopColorOtherInput.addEventListener("input", () => state.poopColorOther = poopColorOtherInput.value.trim());
+
+        brandInput.addEventListener("input", () => state.brand = brandInput.value.trim());
+        rashToggle.addEventListener("click", () => {
+            state.rash = !state.rash;
+            rashToggle.setAttribute("aria-pressed", String(state.rash));
+        });
 
         saveButton.addEventListener("click", saveDiaperLog);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
@@ -528,6 +630,8 @@
                 poopColorOther: poopColor === "Other" ? state.poopColorOther || undefined : undefined,
                 color: poopColor || peeColor || undefined,
                 texture: poopConsistency || state.peeAmount || undefined,
+                brand: state.brand || undefined,
+                rash: state.rash || undefined,
                 notes: notesInput.value.trim() || undefined
             };
         }
@@ -537,9 +641,13 @@
             peeColorOtherInput.value = "";
             poopConsistencyOtherInput.value = "";
             poopColorOtherInput.value = "";
+            brandInput.value = "";
             state.peeColorOther = "";
             state.poopConsistencyOther = "";
             state.poopColorOther = "";
+            state.brand = "";
+            state.rash = false;
+            rashToggle.setAttribute("aria-pressed", "false");
             setDefaultDateTime();
         }
 
@@ -562,6 +670,40 @@
         ? logs.map(renderHistoryCard).join("")
                 : renderEmptyHistory();
             bindHistoryCards();
+            renderRecentBrands();
+            renderRashInsight();
+        }
+
+        function renderRecentBrands() {
+            const recent = [...new Set(diaperLogItems.map((log) => (log.brand || "").trim()).filter(Boolean))].slice(0, 5);
+            brandQuickChips.innerHTML = recent.map((brand) =>
+                `<button type="button" class="diaper-choice border border-outline-variant rounded-full py-1.5 px-3 font-label-sm text-label-sm text-on-surface-variant" data-brand-chip="${escapeHtml(brand)}">${escapeHtml(brand)}</button>`
+            ).join("");
+            brandQuickChips.querySelectorAll("[data-brand-chip]").forEach((chip) => {
+                chip.addEventListener("click", () => {
+                    state.brand = chip.dataset.brandChip;
+                    brandInput.value = state.brand;
+                });
+            });
+        }
+
+        function renderRashInsight() {
+            const counts = new Map();
+            diaperLogItems.forEach((log) => {
+                if (!log.rash) return;
+                const brand = (log.brand || "").trim() || "Unknown brand";
+                counts.set(brand, (counts.get(brand) || 0) + 1);
+            });
+            if (!counts.size) { rashInsight.classList.add("hidden"); rashInsight.innerHTML = ""; return; }
+            const ranked = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+            const rows = ranked.map(([brand, n]) =>
+                `<div class="flex items-center justify-between"><span class="font-label-md text-label-md text-on-surface">${escapeHtml(brand)}</span><span class="rash-badge"><span class="material-symbols-outlined text-[13px]">healing</span>${n} rash${n > 1 ? "es" : ""}</span></div>`
+            ).join("");
+            rashInsight.className = "bg-error-container/40 border border-error/30 rounded-2xl p-sm space-y-xs";
+            rashInsight.innerHTML = `
+                <p class="font-label-md text-label-md text-on-error-container flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">monitoring</span>Diapers linked to rashes</p>
+                ${rows}
+                <p class="font-label-sm text-label-sm text-on-surface-variant pt-xs">If one brand keeps showing up, it may not suit your baby. Try switching and watch the skin.</p>`;
         }
 
         function renderEmptyHistory() {
@@ -589,7 +731,8 @@
                         <div class="min-w-0">
                             <p class="font-label-md text-label-md text-on-surface truncate">${detail}</p>
                             <p class="font-label-sm text-label-sm text-on-surface-variant">${relativeDay(log.changedAt)} · ${formatTime(log.changedAt)}</p>
-                            ${log.notes ? `<p class="font-label-sm text-label-sm text-on-surface-variant truncate">${escapeHtml(log.notes)}</p>` : ""}
+                            ${(log.brand || log.rash) ? `<p class="flex flex-wrap items-center gap-1 mt-1">${log.brand ? `<span class="brand-pill"><span class="material-symbols-outlined text-[12px]">label</span>${escapeHtml(log.brand)}</span>` : ""}${log.rash ? `<span class="rash-badge"><span class="material-symbols-outlined text-[12px]">healing</span>Rash</span>` : ""}</p>` : ""}
+                            ${log.notes ? `<p class="font-label-sm text-label-sm text-on-surface-variant truncate mt-0.5">${escapeHtml(log.notes)}</p>` : ""}
                         </div>
                     </div>
                     <button class="text-label-sm text-error shrink-0" data-delete-diaper="${log.id}" type="button">Delete</button>

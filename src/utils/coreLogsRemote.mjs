@@ -359,6 +359,8 @@ function toDiaperRow(log) {
     poop_consistency_other: log.poopConsistencyOther || null,
     poop_color: log.poopColor || null,
     poop_color_other: log.poopColorOther || null,
+    brand: log.brand || null,
+    had_rash: Boolean(log.rash) || false,
     note: log.notes || null,
     logged_at: log.changedAt || log.loggedAt || new Date().toISOString()
   };
@@ -402,12 +404,14 @@ function toLegacyDiaperRow(log) {
   delete row.poop_consistency_other;
   delete row.poop_color;
   delete row.poop_color_other;
+  delete row.brand;
+  delete row.had_rash;
   return row;
 }
 
 function isMissingDiaperDetailColumn(error) {
   const message = `${error?.message || ""} ${error?.details || ""} ${error?.hint || ""}`;
-  return /pee_amount|pee_color|poop_consistency|poop_color|schema cache|column/i.test(message);
+  return /pee_amount|pee_color|poop_consistency|poop_color|brand|had_rash|schema cache|column/i.test(message);
 }
 
 function fromDiaperRow(row) {
@@ -424,6 +428,8 @@ function fromDiaperRow(row) {
     poopConsistencyOther: row.poop_consistency_other || undefined,
     poopColor: row.poop_color || undefined,
     poopColorOther: row.poop_color_other || undefined,
+    brand: row.brand || undefined,
+    rash: row.had_rash || undefined,
     notes: row.note || undefined,
     changedAt: row.logged_at
   };
