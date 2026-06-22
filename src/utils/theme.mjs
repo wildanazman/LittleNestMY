@@ -46,3 +46,31 @@ export function watchSystemTheme() {
 
 applyTheme();
 watchSystemTheme();
+lockViewportZoom();
+
+function lockViewportZoom() {
+  const meta = document.querySelector('meta[name="viewport"]');
+  if (!meta) return;
+  const content = meta.getAttribute("content") || "";
+
+  // Hammer in user-scalable=no on touchstart so iOS can't override it
+  // after the gesture recognizer has already decided to allow zoom.
+  document.addEventListener("touchstart", () => {
+    if (!meta.content.includes("user-scalable=no")) {
+      meta.setAttribute("content", `${content}, user-scalable=no`);
+    }
+  }, { passive: true });
+
+  // Also clamp on focus to prevent iOS auto-zoom on inputs
+  document.addEventListener("focusin", (e) => {
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || tag === "select") {
+      meta.setAttribute("content", `width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no`);
+    }
+  });
+
+  document.addEventListener("focusout", () => {
+    meta.setAttribute("content", content);
+  });
+}
+lockViewportZoom();

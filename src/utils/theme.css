@@ -101,6 +101,10 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+html {
+  touch-action: manipulation;
+}
+
 body {
   background: var(--ln-bg) !important;
   color: var(--ln-text) !important;
@@ -162,6 +166,7 @@ select {
     border-color var(--ln-motion-medium) var(--ln-ease-out),
     background-color var(--ln-motion-medium) var(--ln-ease-out),
     color var(--ln-motion-medium) var(--ln-ease-out);
+  font-size: 16px !important;
 }
 
 input:focus,
