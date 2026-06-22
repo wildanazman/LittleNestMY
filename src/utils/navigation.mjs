@@ -534,6 +534,10 @@ function normalizePageHeaders(root = document) {
       backButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopImmediatePropagation();
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
         navigateWithTransition(window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/");
       }, true);
     }
