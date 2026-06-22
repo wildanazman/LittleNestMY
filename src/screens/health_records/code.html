@@ -419,7 +419,7 @@ function renderHistory() {
 function renderRecord(record) {
   const date = new Date(record.recordedAt).toLocaleString("en-MY", { day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
   const type = labelType(record.type);
-  const details = [record.temperatureC ? `${record.temperatureC} C` : "", record.medicineName ? `Health: ${record.medicineName}` : "", record.details || ""].filter(Boolean);
+  const details = [record.temperatureC ? `${record.temperatureC} C` : "", record.medicineName || "", record.details || ""].filter(Boolean);
   return `
     <article class="rounded-[22px] bg-surface-container-lowest p-4 soft-shadow border border-white/60 space-y-3">
       <div class="flex items-start justify-between gap-3">
@@ -466,12 +466,12 @@ function defaultTitle(type) {
 
 function labelType(type) {
   return {
-    health: "Health",
+    health: "Medicine",
     illness: "Sickness",
     temperature: "Temperature",
     clinic: "Clinic",
     note: "Health note"
-  }[type] || "Health";
+  }[type] || "Medicine";
 }
 
 function iconForType(type) {
