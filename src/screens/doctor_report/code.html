@@ -479,13 +479,9 @@ async function printReport() {
   }
 
   const blob = doc.output("blob");
-  const file = new File([blob], `LittleNest_Report_${p.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`, { type: "application/pdf" });
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: "Doctor Report" }); showFeedback("PDF shared.", false); return; } catch {}
-  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = file.name;
+  a.href = url; a.download = `LittleNest_Report_${p.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   showFeedback("PDF downloaded.", false);

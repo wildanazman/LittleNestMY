@@ -382,13 +382,9 @@
           y += 15;
         }
         const blob = doc.output("blob");
-        const file = new File([blob], `LittleNest_Insights_${new Date().toISOString().slice(0, 10)}.pdf`, { type: "application/pdf" });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try { await navigator.share({ files: [file], title: "Weekly Insights Report" }); return; } catch {}
-        }
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = url; a.download = file.name;
+        a.href = url; a.download = `LittleNest_Insights_${new Date().toISOString().slice(0, 10)}.pdf`;
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 10000);
         showFeedback("PDF downloaded.", false);
