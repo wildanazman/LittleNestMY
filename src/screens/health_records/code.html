@@ -328,14 +328,22 @@ function renderSymptomTracker() {
   const DAY = 86400000;
   const now = Date.now();
   const since = now - 30 * DAY;
-  // Symptoms only — skip medicine and clinic record types.
+  // Allowlist what counts as a symptom: the quick-add symptoms (and the
+  // diaper-rash auto-log) by title, plus the symptom record types. This keeps
+  // medicine, clinic and generic "Health record" notes out of the tracker.
+  const SYMPTOM_TYPES = new Set(["illness", "temperature"]);
+  const SYMPTOM_TITLES = new Set([
+    "teething", "fever", "cough", "runny nose", "rash", "vomiting", "diarrhoea", "fussy / colic", "diaper rash"
+  ]);
   const groups = new Map();
   for (const r of healthRecords) {
     const type = String(r.type || "note").toLowerCase();
-    if (type === "medicine" || type === "clinic") continue;
+    const title = String(r.title || "Symptom").trim() || "Symptom";
+    const isSymptom = SYMPTOM_TYPES.has(type) || SYMPTOM_TITLES.has(title.toLowerCase());
+    if (!isSymptom) continue;
     const at = new Date(r.recordedAt).getTime();
     if (Number.isNaN(at) || at < since) continue;
-    const key = String(r.title || "Symptom").trim() || "Symptom";
+    const key = title;
     const g = groups.get(key) || { title: key, count: 0, first: at, last: at };
     g.count += 1;
     g.first = Math.min(g.first, at);
