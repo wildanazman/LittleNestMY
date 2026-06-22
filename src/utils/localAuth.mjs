@@ -36,7 +36,6 @@ export async function getAuthSession() {
 
   if (cachedSession && cachedSession.user && cachedSession !== prev) {
     await upsertProfileForUser(cachedSession.user).catch(() => {});
-    await claimDeviceSession(cachedSession.user.id).catch(() => {});
   }
 
   return cachedSession;
