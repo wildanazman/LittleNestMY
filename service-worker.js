@@ -66,6 +66,29 @@ function isCacheFirstAsset(url) {
     || /(^|\.)fonts\.gstatic\.com$/.test(url.hostname);
 }
 
+function networkFirst(request, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    let resolved = false;
+    const timer = setTimeout(() => {
+      if (!resolved) caches.match(request).then((cached) => {
+        if (cached) { resolved = true; resolve(cached); }
+      });
+    }, timeoutMs);
+    fetch(request).then((response) => {
+      if (resolved) return;
+      clearTimeout(timer);
+      resolved = true;
+      if (response.ok && new URL(request.url).origin === self.location.origin) {
+        const copy = response.clone();
+        caches.open(cacheName).then((cache) => cache.put(request, copy)).catch(() => {});
+      }
+      resolve(response);
+    }).catch((err) => {
+      if (!resolved) { clearTimeout(timer); reject(err); }
+    });
+  });
+}
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -95,17 +118,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Same-origin: network-first (fresh while online), fall back to cache offline,
-  // and keep the cache warm so the next offline load works.
+  // Same-origin: network-first with 5s timeout. If network is slow, fall
+  // back to cache immediately so the app doesn't stall on mobile data.
   event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (response.ok && url.origin === self.location.origin) {
-          const copy = response.clone();
-          caches.open(cacheName).then((cache) => cache.put(request, copy)).catch(() => {});
-        }
-        return response;
-      })
+    networkFirst(request, 5000)
       .catch(() =>
         caches.match(request).then((cached) =>
           cached || (request.mode === "navigate" ? caches.match("/home_dashboard/") : Response.error())
