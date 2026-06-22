@@ -118,7 +118,7 @@ tailwind.config = {
       <label class="block space-y-1">
         <span class="text-[13px] font-bold text-on-surface">Record type</span>
         <select class="w-full h-12 rounded-2xl border-0 bg-surface-container px-3 text-on-surface" id="recordType">
-          <option value="health">Health record</option>
+          <option value="health">Medicine</option>
           <option value="illness">Sickness / illness</option>
           <option value="temperature">Temperature / fever</option>
           <option value="clinic">Clinic note</option>
@@ -282,7 +282,7 @@ form.addEventListener("submit", async (event) => {
     form.reset();
     setDefaultDateTime();
     updateLabels();
-    showFeedback("Health record saved.");
+    showFeedback("Medicine record saved.");
     await refreshRecords();
   } catch (error) {
     showFeedback(`${error.message || "Could not sync record."} Saved locally for now.`);
@@ -322,7 +322,7 @@ function renderRecord(record) {
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
           <p class="text-[12px] font-bold uppercase tracking-wide text-primary">${type}</p>
-          <h3 class="text-[18px] leading-6 font-bold text-on-surface truncate">${escapeHtml(record.title || "Health record")}</h3>
+          <h3 class="text-[18px] leading-6 font-bold text-on-surface truncate">${escapeHtml(record.title || "Medicine record")}</h3>
           <p class="text-[13px] font-bold text-on-surface-variant">${date}</p>
         </div>
         <span class="material-symbols-outlined text-primary">${iconForType(record.type)}</span>
@@ -353,12 +353,12 @@ function buildRecordedAt() {
 
 function defaultTitle(type) {
   return {
-    health: "Health record",
+    health: "Medicine record",
     illness: "Sickness note",
     temperature: "Temperature note",
     clinic: "Clinic note",
     note: "Health note"
-  }[type] || "Health record";
+  }[type] || "Medicine record";
 }
 
 function labelType(type) {
