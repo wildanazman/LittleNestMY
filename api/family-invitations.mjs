@@ -12,6 +12,25 @@ import { inviteEmailHtml, isEmailProviderConfigured, sendEmail } from "./_email.
 
 const validRoles = new Set(["parent", "caregiver", "viewer"]);
 
+const inviteRateMap = new Map();
+const INVITE_MAX = 5;
+const INVITE_WINDOW_MS = 15 * 60 * 1000;
+
+function checkInviteRate(userId) {
+  const now = Date.now();
+  const attempts = inviteRateMap.get(userId) || [];
+  const recent = attempts.filter((t) => t > now - INVITE_WINDOW_MS);
+  inviteRateMap.set(userId, recent);
+  return recent.length >= INVITE_MAX;
+}
+
+function recordInviteAttempt(userId) {
+  const now = Date.now();
+  const attempts = inviteRateMap.get(userId) || [];
+  attempts.push(now);
+  inviteRateMap.set(userId, attempts);
+}
+
 export default async function handler(req, res) {
   if (!hasServerSupabaseConfig()) {
     return sendJson(res, 500, { error: getConfigError() });
@@ -132,6 +151,9 @@ async function listMyPendingInvites(req, res, service, user) {
 }
 
 async function createInvitation(req, res, service, user) {
+  if (checkInviteRate(user.id)) {
+    return sendJson(res, 429, { error: "Too many invites. Please wait 15 minutes." });
+  }
   const body = await readJsonBody(req);
   const babyId = body.babyId;
   const email = String(body.email || "").trim().toLowerCase();
@@ -141,6 +163,8 @@ async function createInvitation(req, res, service, user) {
   if (!babyId) return sendJson(res, 400, { error: "Missing babyId." });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: "Enter a valid email address." });
   if (!validRoles.has(role)) return sendJson(res, 400, { error: "Choose a valid role." });
+
+  recordInviteAttempt(user.id);
 
   const parent = await requireParentForBaby(service, babyId, user.id);
   if (!parent.ok) return sendJson(res, 403, { error: parent.error, currentRole: parent.role });
