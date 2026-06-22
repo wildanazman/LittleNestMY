@@ -405,11 +405,7 @@ export async function signInWithGoogle(redirectTo = "") {
   const { data, error } = await client.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: redirectTo || `${window.location.origin}/home_dashboard/`,
-      queryParams: {
-        access_type: "offline",
-        prompt: "consent"
-      }
+      redirectTo: redirectTo || `${window.location.origin}/home_dashboard/`
     }
   });
   if (error) throw transformAuthError(error, "Google sign-in");

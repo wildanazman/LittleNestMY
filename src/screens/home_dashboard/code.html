@@ -683,18 +683,23 @@
         };
         if (!(await isLoggedIn())) {
             const hash = window.location.hash;
-            if (hash.includes("access_token") || hash.includes("refresh_token")) {
-                let ok = false;
-                for (let i = 0; i < 5; i++) {
-                    const session = await getAuthSession();
-                    if (session) { ok = true; break; }
-                    await new Promise((r) => setTimeout(r, 400));
-                }
-                if (!ok) { window.location.replace(screenUrl("auth_welcome")); await new Promise(() => {}); }
-            } else {
-                window.location.replace(screenUrl("auth_welcome"));
+            if (hash.includes("error=") || hash.includes("error_description=")) {
+                const p = new URLSearchParams(hash.replace(/^#/, ""));
+                const msg = p.get("error_description") || p.get("error") || "OAuth failed";
+                document.body.innerHTML = `<main style="padding:40px;text-align:center;font-family:Arial"><h2>Sign-in failed</h2><p style="color:#ba1a1a">${msg}</p><a href="/login/" style="color:#83533c">Try again</a></main>`;
                 await new Promise(() => {});
             }
+            if (hash.includes("access_token") || hash.includes("refresh_token")) {
+                let ok = false;
+                for (let i = 0; i < 8; i++) {
+                    const session = await getAuthSession();
+                    if (session) { ok = true; break; }
+                    await new Promise((r) => setTimeout(r, 500));
+                }
+                if (ok) { window.location.hash = ""; window.location.reload(); return; }
+            }
+            window.location.replace(screenUrl("auth_welcome"));
+            await new Promise(() => {});
         }
         await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
