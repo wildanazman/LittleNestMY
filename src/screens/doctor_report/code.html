@@ -52,6 +52,12 @@ tailwind.config = {
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .animate-slide-up { animation: slideUp .3s ease-out; }
   :root.dark .report-card { background: #242120; border-color: rgba(255,255,255,.10); }
+  #printArea { display: none; }
+  @media print {
+    body > :not(#printArea) { display: none !important; }
+    #printArea { display: block !important; padding: 0; }
+    #printArea * { color: #2b211d !important; }
+  }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -431,45 +437,19 @@ function printReport() {
   if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
   const html = buildPrintHtml();
   if (!html) return;
-  const iframe = document.createElement("iframe");
-  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0";
-  document.body.appendChild(iframe);
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(html);
-  doc.close();
-  iframe.onload = () => {
-    setTimeout(() => {
-      try { iframe.contentWindow.print(); } catch (e) { showFeedback("Print failed. Try Export instead.", true); }
-    }, 300);
-  };
-  setTimeout(() => document.body.removeChild(iframe), 30000);
+  let printArea = document.getElementById("printArea");
+  if (!printArea) {
+    printArea = document.createElement("div");
+    printArea.id = "printArea";
+    document.body.appendChild(printArea);
+  }
+  printArea.innerHTML = html;
+  window.print();
 }
-
-function showExportSheet() {
-  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
-  document.getElementById("exportOverlay").classList.remove("hidden");
-}
-function hideExportSheet() { document.getElementById("exportOverlay").classList.add("hidden"); }
 
 function exportPdf() {
   hideExportSheet();
-  if (!printPayload) return;
-  const html = buildPrintHtml();
-  if (!html) return;
-  const iframe = document.createElement("iframe");
-  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0";
-  document.body.appendChild(iframe);
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(html);
-  doc.close();
-  iframe.onload = () => {
-    setTimeout(() => {
-      try { iframe.contentWindow.print(); } catch (e) { showFeedback("PDF export failed.", true); }
-    }, 300);
-  };
-  setTimeout(() => document.body.removeChild(iframe), 30000);
+  printReport();
 }
 
 function exportHtml() {
@@ -488,6 +468,12 @@ function exportHtml() {
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   showFeedback("Report exported as HTML.", false);
 }
+
+function showExportSheet() {
+  if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
+  document.getElementById("exportOverlay").classList.remove("hidden");
+}
+function hideExportSheet() { document.getElementById("exportOverlay").classList.add("hidden"); }
 
 function setText(id, value) { const el = document.getElementById(id); if (el) el.textContent = value; }
 function formatDate(value) { return new Date(typeof value === "string" && value.length === 10 ? `${value}T00:00:00` : value).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
