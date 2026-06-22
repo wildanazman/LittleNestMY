@@ -391,3 +391,20 @@ function friendlyAuthError(error, mode) {
   }
   return error;
 }
+
+export async function signInWithGoogle(redirectTo = "") {
+  if (!isSupabaseConfigured) throw new Error(supabaseConfigMessage);
+  const client = requireSupabaseClient();
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectTo || `${window.location.origin}/home_dashboard/`,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent"
+      }
+    }
+  });
+  if (error) throw transformAuthError(error, "Google sign-in");
+  return data;
+}
