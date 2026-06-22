@@ -455,6 +455,7 @@
         const parentForm = document.getElementById("parentProfileForm");
         const parentError = document.getElementById("parentProfileError");
         let parentPhotoDataUrl = "";
+        const NOTIF_TYPES = ["feeding", "medicine", "appointment", "vaccine"];
 
         applyTranslations();
         bindPrototypeActions();
@@ -588,7 +589,6 @@
             });
             applyNotifToggleStates();
         }
-        const NOTIF_TYPES = ["feeding", "medicine", "appointment", "vaccine"];
         function applyNotifToggleStates() {
             const prefs = getNotifPrefs();
             NOTIF_TYPES.forEach((id) => setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, prefs[id]));
