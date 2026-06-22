@@ -79,11 +79,6 @@ tailwind.config = {
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Sleep Pattern</h1>
 </div>
-<div class="flex items-center gap-1">
-<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="7" type="button" id="period7">7d</button>
-<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="14" type="button" id="period14">14d</button>
-<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="30" type="button" id="period30">30d</button>
-</div>
 </header>
 
 <main class="max-w-lg mx-auto px-container-padding pt-5 pb-10 space-y-5" id="sleepPatternContent">
@@ -127,28 +122,15 @@ let periodDays = 7;
 const chartSvg = document.getElementById("sleepChart");
 const logList = document.getElementById("sleepLogList");
 const rangeLabel = document.getElementById("selectedRange");
-
-document.getElementById("period7").addEventListener("click", () => setPeriod(7));
-document.getElementById("period14").addEventListener("click", () => setPeriod(14));
-document.getElementById("period30").addEventListener("click", () => setPeriod(30));
+rangeLabel.textContent = "7 days";
 
 const babyState = await loadBabyProfilesRemote(babyProfile);
 const selectedBabyId = babyState.selectedBabyId;
 sleepLogItems = getLogsForBaby(getPersistedSleepLogs(mockSleepLogs), selectedBabyId);
 try { const r = await loadCoreLogsRemote(selectedBabyId, { sleepLogs: mockSleepLogs }); sleepLogItems = r.sleepLogs; } catch {}
 
-setPeriod(7);
-
-function setPeriod(days) {
-  periodDays = days;
-  [7, 14, 30].forEach((d) => {
-    const btn = document.getElementById(`period${d}`);
-    if (btn) { btn.classList.toggle("bg-primary", d === days); btn.classList.toggle("text-on-primary", d === days); btn.classList.toggle("bg-surface-container-low", d !== days); btn.classList.toggle("text-on-surface-variant", d !== days); }
-  });
-  rangeLabel.textContent = `${days} days`;
-  renderChart();
-  renderList();
-}
+renderChart();
+renderList();
 
 function getSleepDays() {
   const now = new Date();
