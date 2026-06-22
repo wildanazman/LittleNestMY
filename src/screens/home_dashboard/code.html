@@ -660,7 +660,7 @@
         const { loadGrowthRecordsRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
         const { loadRemindersRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
         const { bindPrototypeActions, screenUrl, showUndoToast, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { completeEmailRedirectSession, getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { scheduleAllReminders } = await import(`${moduleBase}utils/notifications.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
         const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
@@ -682,8 +682,14 @@
             diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
         };
         if (!(await isLoggedIn())) {
-            window.location.replace(screenUrl("auth_welcome"));
-            await new Promise(() => {});
+            const hash = window.location.hash;
+            if (hash.includes("access_token")) {
+                try { await completeEmailRedirectSession(); } catch {}
+                if (!(await isLoggedIn())) { window.location.replace(screenUrl("auth_welcome")); await new Promise(() => {}); }
+            } else {
+                window.location.replace(screenUrl("auth_welcome"));
+                await new Promise(() => {});
+            }
         }
         await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
