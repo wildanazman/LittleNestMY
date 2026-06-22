@@ -698,7 +698,7 @@
                     await new Promise((r) => setTimeout(r, 500));
                 }
                 if (ok) {
-                    window.location.hash = "";
+                    history.replaceState(null, "", window.location.pathname);
                 } else {
                     window.location.replace(screenUrl("auth_welcome"));
                     await new Promise(() => {});
