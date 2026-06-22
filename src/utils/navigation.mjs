@@ -98,11 +98,13 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
       link.addEventListener("click", (event) => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
+        popNavIcon(link);
         navigateWithTransition(route);
       });
     } else {
       link.type = "button";
       link.addEventListener("click", () => {
+        popNavIcon(link);
         navigateWithTransition(route);
       });
     }
@@ -697,7 +699,17 @@ function navigateWithTransition(url) {
   document.documentElement.classList.add("ln-page-exit");
   window.setTimeout(() => {
     window.location.href = url;
-  }, 120);
+  }, 170);
+}
+
+// Quick squash-and-pop on the tapped nav icon for tactile feedback.
+function popNavIcon(link) {
+  const icon = link?.querySelector(".material-symbols-outlined");
+  if (!icon) return;
+  icon.classList.remove("ln-nav-pop");
+  void icon.offsetWidth; // restart the animation if tapped again
+  icon.classList.add("ln-nav-pop");
+  setTimeout(() => icon.classList.remove("ln-nav-pop"), 420);
 }
 
 function isSameLocation(url) {
