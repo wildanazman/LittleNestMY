@@ -281,7 +281,14 @@ form.addEventListener("submit", async (event) => {
   const recordedAt = buildRecordedAt();
   if (!title && !details && !temperatureC) return showError("Add a title, temperature, or note to save.");
 
-  const medicineName = type === "health" ? title : "";
+  // Auto-classify common medicines so "Paracetamol" logged as a generic
+  // Health record still counts as Medicine.
+  const MEDICINE_KEYWORDS = ["paracetamol", "panadol", "calpol", "ibuprofen", "nurofen", "ponstan", "zyrtec", "fenistil", "amoxicillin", "augmentin", "klacid", "antibiotic", "syrup", "ubat", "vitamin", "probiotic", "zinc", "ors", "oralite"];
+  let finalType = type;
+  if ((type === "health" || type === "note") && MEDICINE_KEYWORDS.some((k) => title.toLowerCase().includes(k))) {
+    finalType = "medicine";
+  }
+  const medicineName = finalType === "medicine" ? title : "";
   const body = [
     dose ? `Dose: ${dose}` : "",
     details
@@ -291,8 +298,8 @@ form.addEventListener("submit", async (event) => {
     await saveHealthNoteRemote({
       id: crypto.randomUUID ? crypto.randomUUID() : `health-local-${Date.now()}`,
       babyId: selectedBabyId,
-      type,
-      title: title || defaultTitle(type),
+      type: finalType,
+      title: title || defaultTitle(finalType),
       temperatureC: temperatureC || undefined,
       medicineName: medicineName || undefined,
       details: body || undefined,
