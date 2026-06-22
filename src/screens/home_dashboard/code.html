@@ -261,6 +261,26 @@
         :root.dark #homeContent header .text-primary {
           color: #22d3ee !important;
         }
+        :root.dark [data-screen-target="feeding_log"] .w-14 {
+          background: rgba(34, 211, 238, 0.16) !important;
+          color: #22d3ee !important;
+        }
+        :root.dark [data-screen-target="sleep_log"] .w-14 {
+          background: rgba(147, 197, 253, 0.18) !important;
+          color: #93c5fd !important;
+        }
+        :root.dark [data-screen-target="diaper_log"] .w-14 {
+          background: rgba(134, 239, 172, 0.16) !important;
+          color: #86efac !important;
+        }
+        :root.dark [data-screen-target="health_records"][aria-label*="health"] .w-14 {
+          background: rgba(216, 180, 254, 0.16) !important;
+          color: #d8b4fe !important;
+        }
+        :root.dark #homeContent .flex.flex-col.items-center.gap-2 .w-14 {
+          border-color: rgba(255, 255, 255, 0.08) !important;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
         @keyframes homeSkeletonPulse {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
