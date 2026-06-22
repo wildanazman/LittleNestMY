@@ -755,6 +755,11 @@ Save Milestone
         function ageOf(m) { return calculateBabyAgeShort(selectedBaby.dateOfBirth, memDate(m)); }
 
         async function saveMilestone() {
+          try {
+            if (!selectedBabyId) {
+                showFeedback("No baby selected yet. Reopen this screen and try again.");
+                return;
+            }
             const title = typeInput.value === "Custom milestone" ? customTitleInput.value.trim() : typeInput.value.trim();
             const achievedAt = dateInput.value;
             const notes = noteInput.value.trim();
@@ -763,11 +768,12 @@ Save Milestone
                 showFeedback("Choose a milestone type and date.");
                 return;
             }
-            const babyDob = new Date(`${selectedBaby.dateOfBirth}T00:00:00+08:00`);
+            // Guard: selectedBaby can be null on iOS if the profile load was slow.
+            const dob = (selectedBaby && selectedBaby.dateOfBirth) || "";
             const milestoneDate = new Date(`${achievedAt}T00:00:00+08:00`);
             const today = new Date();
             today.setHours(23, 59, 59, 999);
-            if (milestoneDate < babyDob) {
+            if (dob && milestoneDate < new Date(`${dob}T00:00:00+08:00`)) {
                 showFeedback("Milestone date cannot be before baby's date of birth.");
                 return;
             }
@@ -817,6 +823,12 @@ Save Milestone
             } finally {
                 saveButton.disabled = false;
             }
+          } catch (outerError) {
+            // Surface any unexpected error (e.g. iOS quirk) instead of failing silently.
+            saveButton.disabled = false;
+            saveButton.textContent = editingMilestoneId ? "Update memory" : "Save Milestone";
+            showFeedback(`Could not save: ${outerError.message || outerError}`);
+          }
         }
 
         async function refreshMilestones() {
