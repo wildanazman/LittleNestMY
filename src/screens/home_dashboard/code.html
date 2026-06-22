@@ -719,6 +719,7 @@
             sleep: { badge: "Sleep", badgeBg: "#e7f5ec", badgeFg: "#0f7a44", accent: "#34b27b" },
             diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
         };
+        const TIMELINE_ALLOWED_TYPES = new Set(["feed", "sleep", "diaper"]);
         if (!(await isLoggedIn())) {
             const raw = window.location.search + window.location.hash;
             if (raw.includes("error=") || raw.includes("error_description=")) {
@@ -1077,7 +1078,9 @@
                         main: diaperTimelineSummary(log),
                         note: log.notes || ""
                     }))
-            ].sort((a, b) => new Date(a.at) - new Date(b.at));
+            ]
+                .filter((event) => TIMELINE_ALLOWED_TYPES.has(event.type))
+                .sort((a, b) => new Date(a.at) - new Date(b.at));
 
             const timeline = document.getElementById("timelineList");
             if (!timeline) return;
@@ -1085,10 +1088,10 @@
             const ongoing = getActiveSleepSession();
             const ongoingHtml = (ongoing && (!ongoing.babyId || ongoing.babyId === selectedBabyId))
                 ? renderOngoingSleep(ongoing) : "";
-            const itemsHtml = events.length ? events.map(renderTimelineItem).join("") : "";
+            const itemsHtml = events.length ? events.map((event, index) => renderTimelineItem(event, index, events.length)).join("") : "";
             const body = ongoingHtml + itemsHtml;
             timeline.innerHTML = body
-                ? `<div class="relative"><span class="absolute left-[7px] top-2 bottom-2 w-0.5 rounded-full" style="background:linear-gradient(to bottom,rgba(124,92,255,0.35),rgba(124,92,255,0.12))"></span><div class="space-y-3">${body}</div></div>`
+                ? `<div class="space-y-3">${body}</div>`
                 : renderEmptyTimeline();
 
             if (permissions.canAddLogs) {
@@ -1101,9 +1104,11 @@
             return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
         }
 
-        function timelineCard({ accent, time, badgeBg, badgeFg, badge, main, note, deleteButton = "" }) {
+        function timelineCard({ accent, time, badgeBg, badgeFg, badge, main, note, deleteButton = "", railTop = true, railBottom = true }) {
             return `
                 <div class="relative pl-7">
+                    ${railTop ? `<span class="absolute left-[7px] -top-3 h-[calc(50%+12px)] w-0.5" style="background:${accent};opacity:.22"></span>` : ""}
+                    ${railBottom ? `<span class="absolute left-[7px] top-[25px] bottom-[-12px] w-0.5" style="background:${accent};opacity:.22"></span>` : ""}
                     <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm dark:border-[#1b2233]" style="background:${accent}"></span>
                     <div class="relative bg-white rounded-2xl px-4 py-3 border border-black/[0.04] shadow-[0_8px_22px_rgba(124,92,255,0.08)] dark:bg-white/10 dark:border-white/10">
                         <div class="flex items-center justify-between gap-2 mb-1">
@@ -1190,7 +1195,7 @@
             });
         }
 
-        function renderTimelineItem(event) {
+        function renderTimelineItem(event, index = 0, total = 1) {
             const style = TIMELINE_STYLES[event.type] || TIMELINE_STYLES.feed;
             const badge = event.type === "sleep" ? (event.nap ? t("home.nap") : style.badge) : style.badge;
             const canDelete = permissions.canAddLogs && event.id;
@@ -1205,7 +1210,9 @@
                 badge,
                 main: escapeHtml(event.main),
                 note: event.note,
-                deleteButton
+                deleteButton,
+                railTop: index > 0,
+                railBottom: index < total - 1
             });
         }
 
