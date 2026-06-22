@@ -323,7 +323,11 @@ export async function upsertProfileForUser(user, options = {}) {
 
   if (error) {
     console.warn("Supabase profile upsert skipped.", error);
-    return null;
+  } else {
+    try {
+      const key = `littlenest:parentProfile:${user.id}`;
+      window.localStorage.setItem(key, JSON.stringify({ name: displayName, email: user.email || "", photoUrl: user.user_metadata?.avatar_url || "", updatedAt: new Date().toISOString() }));
+    } catch {}
   }
 
   rememberParentProfile(profile);
