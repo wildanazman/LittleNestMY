@@ -717,7 +717,7 @@
         const TIMELINE_STYLES = {
             feed: { badge: "Feeding", badgeBg: "#ffe8ef", badgeFg: "#c01f5b", accent: "#ff6fa5" },
             sleep: { badge: "Sleep", badgeBg: "#e7f5ec", badgeFg: "#0f7a44", accent: "#34b27b" },
-            diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
+            diaper: { badge: "Diaper", badgeBg: "#fff0d6", badgeFg: "#9a4a22", accent: "#f59e0b" }
         };
         const TIMELINE_ALLOWED_TYPES = new Set(["feed", "sleep", "diaper"]);
         if (!(await isLoggedIn())) {
@@ -1067,7 +1067,7 @@
                         type: "sleep",
                         nap: log.status === "nap",
                         main: log.endedAt ? `Slept for ${formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))}` : "Sleep started",
-                        note: log.notes || ""
+                        note: sleepTimelineNote(log.notes)
                     })),
                 ...allDiaperLogs
                     .filter(log => isSameLocalDay(log.changedAt, date))
@@ -1214,6 +1214,13 @@
                 railTop: index > 0,
                 railBottom: index < total - 1
             });
+        }
+
+        function sleepTimelineNote(note) {
+            return String(note || "")
+                .replace(/\badded manually\b\.?/ig, "")
+                .replace(/^[-\s.]+|[-\s.]+$/g, "")
+                .trim();
         }
 
         function labelFeedingType(type) {
