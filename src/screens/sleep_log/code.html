@@ -304,16 +304,21 @@
 </div>
 </div>
 </div>
-</section>
-<!-- Decorative Illustration / Placeholder -->
-<section class="py-xl">
-<div class="aspect-video rounded-[32px] overflow-hidden relative">
-<img class="w-full h-full object-cover" data-alt="A cinematic, high-key photograph of a sleeping baby in a serene, modern nursery. The image features soft peach and warm cream lighting, creating a calm and secure atmosphere. The composition uses a wide shot to show a hint of a minimalist crib and a plush toy in the corner. The focus is soft and dreamy, embodying a digital sanctuary aesthetic with no harsh shadows." src="/icons/placeholder.svg"/>
-<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-6">
-<p class="text-white font-label-md italic">"Sleep is the golden chain that ties health and our bodies together."</p>
-</div>
-</div>
-</section>
+  </section>
+  <!-- Sleep Pattern Chart (7-day) -->
+  <section class="max-w-[520px] mx-auto" id="sleepPatternSection">
+    <div class="flex items-center justify-between mb-3 px-1">
+      <h3 class="font-headline-md text-headline-md text-on-surface">Sleep pattern</h3>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">7 days</span>
+    </div>
+    <div class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow border border-white/60">
+      <div class="flex items-center gap-2 mb-3 px-1">
+        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#0f7a44]"><span class="w-2.5 h-2.5 rounded-full bg-[#0f7a44] inline-block"></span>Night</span>
+        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#22c08a]"><span class="w-2.5 h-2.5 rounded-full bg-[#22c08a] inline-block"></span>Nap</span>
+      </div>
+      <svg class="w-full" id="sleepChart" viewBox="0 0 340 210" role="img" aria-label="Sleep pattern chart - 7 days"></svg>
+    </div>
+  </section>
 </main>
 <!-- Bottom Nav Bar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
@@ -497,6 +502,7 @@
             renderTimer(activeSession);
             renderSummary(activeSession);
             renderHistory(activeSession);
+            renderSleepChart();
         }
 
         function setActiveState(isActive) {
@@ -610,6 +616,69 @@
                     `${card.dataset.sleepDetail} detail view is coming soon.`
                 ));
             });
+        }
+
+        function renderSleepChart() {
+            const svg = document.getElementById("sleepChart");
+            if (!svg) return;
+            const now = new Date();
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                const dayLogs = sleepLogItems.filter((l) => {
+                    const s = new Date(l.startedAt);
+                    const e = l.endedAt ? new Date(l.endedAt) : new Date();
+                    return isSameLocalDay(s, d) || isSameLocalDay(e, d);
+                });
+                days.push({ date: d, logs: dayLogs });
+            }
+            const margin = { left: 38, right: 8, top: 12, bottom: 6 };
+            const rowH = 24, chartW = 340 - margin.left - margin.right;
+            const totalH = days.length * rowH + margin.top + margin.bottom;
+            svg.setAttribute("viewBox", `0 0 340 ${Math.max(210, totalH)}`);
+
+            const hourLabels = [0, 3, 6, 9, 12, 15, 18, 21, 24];
+            let html = "";
+            // Hour markers
+            html += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left + chartW}" y2="${margin.top}" stroke="rgba(15,122,68,0.12)" stroke-width="1"/>`;
+            for (const h of hourLabels) {
+                const x = margin.left + (h / 24) * chartW;
+                html += `<line x1="${x}" y1="${margin.top - 3}" x2="${x}" y2="${margin.top}" stroke="rgba(15,122,68,0.2)" stroke-width="1"/>`;
+                const label = h === 24 ? "24" : `${h}`;
+                html += `<text x="${x}" y="${margin.top - 7}" text-anchor="middle" fill="#8a746b" font-size="9" font-family="Nunito Sans">${label}</text>`;
+            }
+            // Day rows
+            for (let i = 0; i < days.length; i++) {
+                const d = days[i];
+                const y = margin.top + i * rowH;
+                const label = d.date.toLocaleDateString("en-MY", { weekday: "short" });
+                const isToday = i === days.length - 1;
+                html += `<text x="${margin.left - 6}" y="${y + 16}" text-anchor="end" fill="${isToday ? "#0f7a44" : "#8a746b"}" font-size="10" font-weight="${isToday ? "700" : "400"}" font-family="Nunito Sans">${label}</text>`;
+                html += `<line x1="${margin.left}" y1="${y + rowH - 2}" x2="${margin.left + chartW}" y2="${y + rowH - 2}" stroke="rgba(15,122,68,0.06)" stroke-width="1"/>`;
+                for (const log of d.logs) {
+                    const start = new Date(log.startedAt);
+                    const end = log.endedAt ? new Date(log.endedAt) : new Date();
+                    const startMins = start.getHours() * 60 + start.getMinutes();
+                    const endMins = end.getHours() * 60 + end.getMinutes() || 1440;
+                    let duration = endMins - startMins;
+                    if (duration <= 0) duration += 1440;
+                    const x1 = margin.left + (startMins / 1440) * chartW;
+                    const w = Math.max(4, (duration / 1440) * chartW);
+                    const isNight = start.getHours() >= 19 || start.getHours() < 6;
+                    const color = isNight ? "#0f7a44" : "#22c08a";
+                    html += `<rect x="${x1}" y="${y + 4}" width="${Math.min(w, margin.left + chartW - x1)}" height="${rowH - 8}" rx="5" fill="${color}" opacity="${isToday ? "1" : "0.7"}"/>`;
+                }
+                const totalMin = d.logs.reduce((sum, l) => {
+                    const s = new Date(l.startedAt), e = l.endedAt ? new Date(l.endedAt) : new Date();
+                    let min = Math.round((e - s) / 60000);
+                    if (min <= 0) min += 1440;
+                    return sum + min;
+                }, 0);
+                const h = Math.floor(totalMin / 60), m = totalMin % 60;
+                html += `<text x="${margin.left + chartW + 8}" y="${y + 16}" text-anchor="start" fill="${isToday ? "#0f7a44" : "#8a746b"}" font-size="10" font-weight="600" font-family="Nunito Sans">${h}h${m > 0 ? m + "m" : ""}</text>`;
+            }
+            svg.innerHTML = html;
+            document.getElementById("sleepPatternSection").classList.toggle("hidden", !days.some((d) => d.logs.length));
         }
 
         function renderEmptyHistory() {
