@@ -728,36 +728,7 @@
                 setText("babyAge", calculateBabyAge(cachedBaby.dateOfBirth, now));
                 if (cachedBaby.photoUrl) { const i = document.getElementById("babyPhoto"); if (i) { i.src = cachedBaby.photoUrl; } }
             }
-            const feeds = getLogsForBaby(getPersistedFeedingLogs([]), cachedBabyId);
-            const sleeps = getLogsForBaby(getPersistedSleepLogs([]), cachedBabyId);
-            const diapers = getLogsForBaby(getPersistedDiaperLogs([]), cachedBabyId);
-            const growth = getLogsForBaby(getPersistedGrowthRecords([]), cachedBabyId);
-            const calendar = getLogsForBaby(getPersistedCalendarEvents([]), cachedBabyId);
-            const latestFeed = [...feeds].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
-            const todayDiapers = diapers.filter((l) => isSameLocalDay(l.changedAt, now)).length;
-            const todaySleep = sleeps.reduce((t, l) => l.endedAt ? t + Math.max(0, Math.round((new Date(l.endedAt) - new Date(l.startedAt)) / 60000)) : t, 0);
-            const activeSleep = [...sleeps].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).find((l) => !l.endedAt);
-            const latestGrowth = [...growth].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-            if (latestFeed) {
-                setText("lastFeedTime", formatRelativeTime(latestFeed.startedAt, now));
-                const d = formatTime(latestFeed.startedAt) + (latestFeed.amountMl ? ` · ${latestFeed.amountMl} ml` : latestFeed.durationMinutes ? ` · ${formatDuration(latestFeed.durationMinutes)}` : "");
-                setText("lastFeedDetail", d);
-            }
-            setText("todaySleepTotal", todaySleep ? formatDuration(todaySleep) : "0h");
-            setText("todaySleepDetail", activeSleep ? "Sleeping…" : todaySleep ? "Total today" : "Tap to log");
-            setText("lastDiaperTime", todayDiapers ? `${todayDiapers}` : "No diapers yet");
-            setText("lastDiaperDetail", todayDiapers ? `${todayDiapers} change${todayDiapers === 1 ? "" : "s"} today` : "Tap to log");
-            if (latestGrowth) {
-                setText("latestWeight", latestGrowth.weightKg ? `${latestGrowth.weightKg} kg` : "Not logged");
-                setText("latestHeight", latestGrowth.heightCm ? `${latestGrowth.heightCm} cm` : latestGrowth.lengthCm ? `${latestGrowth.lengthCm} cm` : "Not logged");
-            }
-            const nextEv = selectNextHomeAppointment(calendar, [], now);
-            if (nextEv) {
-                setText("nextAppointmentSummary", nextEv.title.slice(0, 30) + (nextEv.title.length > 30 ? "…" : ""));
-                setText("nextAppointmentRelative", new Date(nextEv.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "short" }));
-            }
         }
-        renderFromCache();
         showHomeContent();
         await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
