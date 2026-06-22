@@ -532,6 +532,13 @@ function normalizePageHeaders(root = document) {
       backButton.setAttribute("aria-label", "Back to home");
       backButton.dataset.headerBackHomeBound = "true";
       backButton.addEventListener("click", (event) => {
+        const explicit = backButton.getAttribute("data-back-to");
+        if (explicit) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          navigateWithTransition(window.location.protocol === "file:" ? `../${explicit}/code.html` : `/${explicit}/`);
+          return;
+        }
         event.preventDefault();
         event.stopImmediatePropagation();
         if (window.history.length > 1) {
