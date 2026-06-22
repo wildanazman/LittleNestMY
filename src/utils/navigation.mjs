@@ -771,7 +771,6 @@ function renderHeaderProfileAvatar(target, image) {
 
 function setupPullToRefresh() {
   if (window.__littleNestPullToRefreshBound) return;
-  if (!("ontouchstart" in window)) return;
 
   window.__littleNestPullToRefreshBound = true;
 
@@ -780,37 +779,40 @@ function setupPullToRefresh() {
   let pullDistance = 0;
   let isPulling = false;
   let isRefreshing = false;
+  let activePointerId = null;
   const threshold = 72;
   const indicator = createPullRefreshIndicator();
 
-  window.addEventListener("touchstart", (event) => {
-    if (isRefreshing || window.scrollY > 0 || isInteractiveTarget(event.target)) return;
-    const touch = event.touches[0];
-    startY = touch.clientY;
-    startX = touch.clientX;
+  const beginPull = (event, point) => {
+    if (isRefreshing || getScrollTop() > 0 || isInteractiveTarget(event.target)) return;
+    activePointerId = event.pointerId ?? null;
+    startY = point.clientY;
+    startX = point.clientX;
     pullDistance = 0;
     isPulling = true;
-  }, { passive: true });
+  };
 
-  window.addEventListener("touchmove", (event) => {
+  const movePull = (event, point) => {
     if (!isPulling || isRefreshing) return;
-    const touch = event.touches[0];
-    const deltaY = touch.clientY - startY;
-    const deltaX = Math.abs(touch.clientX - startX);
-    if (deltaX > 40 || deltaY <= 0 || window.scrollY > 0) {
+    if (activePointerId !== null && event.pointerId !== undefined && event.pointerId !== activePointerId) return;
+    const deltaY = point.clientY - startY;
+    const deltaX = Math.abs(point.clientX - startX);
+    if (deltaX > 40 || deltaY <= 0 || getScrollTop() > 0) {
       resetPullIndicator(indicator);
       isPulling = false;
+      activePointerId = null;
       return;
     }
 
     event.preventDefault();
     pullDistance = Math.min(120, deltaY * 0.55);
     updatePullIndicator(indicator, pullDistance, pullDistance >= threshold);
-  }, { passive: false });
+  };
 
-  window.addEventListener("touchend", () => {
+  const endPull = () => {
     if (!isPulling || isRefreshing) return;
     isPulling = false;
+    activePointerId = null;
     if (pullDistance >= threshold) {
       isRefreshing = true;
       indicator.textContent = "Refreshing...";
@@ -820,7 +822,24 @@ function setupPullToRefresh() {
       return;
     }
     resetPullIndicator(indicator);
+  };
+
+  window.addEventListener("touchstart", (event) => beginPull(event, event.touches[0]), { passive: true });
+  window.addEventListener("touchmove", (event) => movePull(event, event.touches[0]), { passive: false });
+  window.addEventListener("touchend", endPull, { passive: true });
+  window.addEventListener("touchcancel", endPull, { passive: true });
+
+  window.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "touch") return;
+    if (event.button !== undefined && event.button !== 0) return;
+    beginPull(event, event);
   }, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "touch") return;
+    movePull(event, event);
+  }, { passive: false });
+  window.addEventListener("pointerup", endPull, { passive: true });
+  window.addEventListener("pointercancel", endPull, { passive: true });
 }
 
 function createPullRefreshIndicator() {
@@ -832,8 +851,8 @@ function createPullRefreshIndicator() {
   indicator.style.cssText = [
     "position:fixed",
     "left:50%",
-    "top:56px",
-    "z-index:35",
+    "top:calc(62px + env(safe-area-inset-top))",
+    "z-index:10000",
     "transform:translate(-50%,-56px)",
     "height:40px",
     "padding:0 16px",
@@ -852,6 +871,10 @@ function createPullRefreshIndicator() {
   ].join(";");
   document.body.appendChild(indicator);
   return indicator;
+}
+
+function getScrollTop() {
+  return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
 }
 
 function updatePullIndicator(indicator, distance, ready) {
