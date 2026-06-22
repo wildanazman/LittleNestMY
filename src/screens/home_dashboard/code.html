@@ -715,21 +715,6 @@
                 await new Promise(() => {});
             }
         }
-        function renderFromCache() {
-            const parent = getParentProfile();
-            const cachedProfiles = getBabyProfiles(babyProfile);
-            const cachedBabyId = getSelectedBabyId(babyProfile);
-            const cachedBaby = cachedProfiles.find((p) => p.id === cachedBabyId) || cachedProfiles[0] || null;
-            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-            setText("parentName", parent?.name || "Loading...");
-            document.getElementById("homeParentInitials").textContent = initialsForName(parent?.name);
-            if (cachedBaby) {
-                setText("babyName", cachedBaby.name);
-                setText("babyAge", calculateBabyAge(cachedBaby.dateOfBirth, now));
-                if (cachedBaby.photoUrl) { const i = document.getElementById("babyPhoto"); if (i) { i.src = cachedBaby.photoUrl; } }
-            }
-        }
-        showHomeContent();
         await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
         const profiles = babyProfileState.profiles;
