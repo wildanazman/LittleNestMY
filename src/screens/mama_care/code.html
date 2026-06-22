@@ -94,16 +94,49 @@ tailwind.config = {
   </button>
 </header>
 
-<main class="max-w-md mx-auto px-5 pt-5 space-y-5" id="mamaApp">
-  <section class="space-y-2">
+<main class="max-w-md mx-auto px-5 pt-5 flex flex-col gap-5" id="mamaApp">
+  <section class="order-1 space-y-2">
     <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
     <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Care for baby. Care for mama too.</h1>
     <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.</p>
   </section>
 
-  <p class="hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
+  <p class="order-2 hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
+  <section class="order-3 mama-card rounded-[26px] p-4 soft-shadow space-y-3">
+    <div>
+      <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Quick Log</p>
+      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">What do you need to record?</h2>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+      <button class="mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
+        <span class="material-symbols-outlined">favorite</span>
+        <span class="text-[12px]">Check-in</span>
+      </button>
+      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
+        <span class="material-symbols-outlined">water_drop</span>
+        <span class="text-[12px]">Pump</span>
+      </button>
+      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMilkButton" type="button">
+        <span class="material-symbols-outlined">inventory_2</span>
+        <span class="text-[12px]">Milk</span>
+      </button>
+      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMedButton" type="button">
+        <span class="material-symbols-outlined">pill</span>
+        <span class="text-[12px]">Meds</span>
+      </button>
+      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickTaskButton" type="button">
+        <span class="material-symbols-outlined">volunteer_activism</span>
+        <span class="text-[12px]">Help</span>
+      </button>
+      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickNoteButton" type="button">
+        <span class="material-symbols-outlined">edit_note</span>
+        <span class="text-[12px]">Note</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="order-4 mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Today's Care Plan</p>
@@ -117,7 +150,7 @@ tailwind.config = {
     <div class="rounded-2xl bg-surface-container-low p-3" id="nextMamaAction"></div>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="pumpingModule">
+  <section class="order-10 mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="pumpingModule">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
@@ -170,20 +203,33 @@ tailwind.config = {
       <div class="mt-3 space-y-2" id="milkStorageList"></div>
     </div>
 
-    <div class="flex gap-2 overflow-x-auto pb-1">
-      <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold shrink-0" id="generatePumpScheduleButton" type="button">Smart schedule</button>
-      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="addPumpScheduleButton" type="button">Add time</button>
-      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="addPumpPartButton" type="button">Maintenance</button>
-      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="workPlannerButton" type="button">Work planner</button>
-    </div>
-
     <div class="space-y-3" id="pumpAlertList"></div>
-    <div class="space-y-3" id="pumpScheduleList"></div>
-    <div class="rounded-[24px] bg-surface-container-low p-4 space-y-3" id="pumpAnalyticsPanel"></div>
-    <div class="space-y-3" id="pumpMaintenanceList"></div>
+    <details class="rounded-[24px] bg-surface-container-low p-4" open>
+      <summary class="cursor-pointer list-none flex items-center justify-between gap-3">
+        <span class="font-extrabold text-on-surface">Schedule</span>
+        <span class="material-symbols-outlined text-primary">expand_more</span>
+      </summary>
+      <div class="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold shrink-0" id="generatePumpScheduleButton" type="button">Smart schedule</button>
+        <button class="mama-action h-10 rounded-full bg-white px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="addPumpScheduleButton" type="button">Add time</button>
+        <button class="mama-action h-10 rounded-full bg-white px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="workPlannerButton" type="button">Work plan</button>
+      </div>
+      <div class="mt-3 space-y-3" id="pumpScheduleList"></div>
+    </details>
+    <details class="rounded-[24px] bg-surface-container-low p-4">
+      <summary class="cursor-pointer list-none flex items-center justify-between gap-3">
+        <span class="font-extrabold text-on-surface">Insights & maintenance</span>
+        <span class="material-symbols-outlined text-primary">expand_more</span>
+      </summary>
+      <div class="mt-3 rounded-[20px] bg-white p-4 space-y-3 dark:bg-white/10" id="pumpAnalyticsPanel"></div>
+      <div class="mt-3">
+        <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold" id="addPumpPartButton" type="button">Update maintenance</button>
+      </div>
+      <div class="mt-3 space-y-3" id="pumpMaintenanceList"></div>
+    </details>
   </section>
 
-  <section class="rounded-[28px] bg-primary-container p-5 soft-shadow">
+  <section class="order-5 rounded-[28px] bg-primary-container p-5 soft-shadow">
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container">Today's Mama Check-in</h2>
@@ -215,7 +261,7 @@ tailwind.config = {
     </div>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-6 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Support Crew</p>
@@ -233,7 +279,7 @@ tailwind.config = {
     <div class="space-y-3" id="supportTaskList"></div>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-7 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Mama Medication</h2>
@@ -244,7 +290,7 @@ tailwind.config = {
     <div class="space-y-3" id="medicationList"></div>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-8 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Mama Appointments</h2>
@@ -255,7 +301,7 @@ tailwind.config = {
     <div class="space-y-3" id="appointmentList"></div>
   </section>
 
-  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-9 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Recovery Notes</h2>
@@ -266,7 +312,7 @@ tailwind.config = {
     <div class="space-y-3" id="recoveryNoteList"></div>
   </section>
 
-  <section class="rounded-[26px] bg-[#ffe5e5] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
+  <section class="order-11 rounded-[26px] bg-[#ffe5e5] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
     <div class="flex items-start gap-3">
       <span class="material-symbols-outlined text-error mt-1">info</span>
       <p class="text-[16px] leading-7 text-error">For tracking and family support only. Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
@@ -368,6 +414,12 @@ document.getElementById("addPumpScheduleButton").addEventListener("click", () =>
 document.getElementById("generatePumpScheduleButton").addEventListener("click", () => openSmartPumpScheduleForm());
 document.getElementById("addPumpPartButton").addEventListener("click", () => openPumpPartForm());
 document.getElementById("workPlannerButton").addEventListener("click", () => openWorkPlannerForm());
+document.getElementById("quickCheckinButton").addEventListener("click", () => openCheckinForm());
+document.getElementById("quickPumpButton").addEventListener("click", () => openPumpSessionForm());
+document.getElementById("quickMilkButton").addEventListener("click", () => openMilkStorageForm());
+document.getElementById("quickMedButton").addEventListener("click", () => openMedicationForm());
+document.getElementById("quickTaskButton").addEventListener("click", () => openTaskForm());
+document.getElementById("quickNoteButton").addEventListener("click", () => openNoteForm());
 
 await bootstrap();
 bindPrototypeActions();
