@@ -739,7 +739,7 @@
             const activeSleep = [...sleeps].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).find((l) => !l.endedAt);
             const latestGrowth = [...growth].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
             if (latestFeed) {
-                setText("lastFeedTime", relativeTime(new Date(latestFeed.startedAt), now));
+                setText("lastFeedTime", formatRelativeTime(latestFeed.startedAt, now));
                 const d = formatTime(latestFeed.startedAt) + (latestFeed.amountMl ? ` · ${latestFeed.amountMl} ml` : latestFeed.durationMinutes ? ` · ${formatDuration(latestFeed.durationMinutes)}` : "");
                 setText("lastFeedDetail", d);
             }
