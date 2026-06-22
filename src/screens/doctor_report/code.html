@@ -429,22 +429,66 @@ function buildPrintHtml() {
 
 async function printReport() {
   if (!printPayload) { showFeedback("Create a baby profile first.", true); return; }
-  const html = buildPrintHtml();
-  if (!html) return;
-  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-  const file = new File([blob], `LittleNest_Report_${printPayload.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.html`, { type: "text/html" });
+  showFeedback("Generating PDF...");
+  const { jsPDF } = await import("https://esm.sh/jspdf@2.5.2");
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const p = printPayload;
+  let y = 50;
+  doc.setFont("Helvetica", "bold"); doc.setFontSize(18);
+  doc.text(`LittleNest — Doctor Report`, 40, y); y += 28;
+  doc.setFont("Helvetica", "normal"); doc.setFontSize(12);
+  doc.text(`${p.babyName} · ${p.meta}`, 40, y); y += 18;
+  doc.setFontSize(10); doc.setTextColor(100);
+  doc.text(`Period: ${p.range}`, 40, y); y += 22;
+  doc.setTextColor(0);
+
+  doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
+  doc.text("Summary", 40, y); y += 18;
+  doc.setFont("Helvetica", "normal"); doc.setFontSize(11);
+  for (const [label, value] of p.summaryRows) {
+    if (y > 780) { doc.addPage(); y = 50; }
+    doc.text(label, 40, y); doc.text(value, 400, y, { align: "right" }); y += 16;
+  }
+  y += 10;
+
+  doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
+  doc.text("Daily Breakdown", 40, y); y += 18;
+  doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
+  const dHead = ["Day", "Feeds", "Sleep", "Diapers"];
+  dHead.forEach((h, i) => doc.text(h, 40 + i * 100, y));
+  y += 14;
+  for (const d of p.days) {
+    if (y > 780) { doc.addPage(); y = 50; }
+    doc.text(formatDayLabel(d.day), 40, y);
+    doc.text(String(d.feedCount), 140, y);
+    doc.text(d.sleepMin ? formatDuration(d.sleepMin) : "—", 240, y);
+    doc.text(String(d.diaperCount), 340, y);
+    y += 14;
+  }
+  y += 10;
+
+  if (p.notes.length) {
+    doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Notes & Milestones", 40, y); y += 16;
+    doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
+    for (const n of p.notes) {
+      if (y > 780) { doc.addPage(); y = 50; }
+      doc.text(`${n.title}${n.detail ? " — " + n.detail : ""} (${formatDate(n.at)})`, 40, y);
+      y += 14;
+    }
+  }
+
+  const blob = doc.output("blob");
+  const file = new File([blob], `LittleNest_Report_${p.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`, { type: "application/pdf" });
   if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try { await navigator.share({ files: [file], title: "Doctor Report" }); return; } catch {}
+    try { await navigator.share({ files: [file], title: "Doctor Report" }); showFeedback("PDF shared.", false); return; } catch {}
   }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
-  a.download = file.name;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  a.href = url; a.download = file.name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
-  showFeedback("Report downloaded. Open in Safari to print as PDF.", false);
+  showFeedback("PDF downloaded.", false);
 }
 
 function exportPdf() {
