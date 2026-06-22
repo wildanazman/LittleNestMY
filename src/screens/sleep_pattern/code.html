@@ -65,6 +65,7 @@ tailwind.config = {
   body { font-family: 'Nunito Sans', sans-serif; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 45px rgba(131,83,60,0.12); }
+  .highlighted { outline: 2px solid #0f7a44; outline-offset: 2px; border-radius: 18px; }
   :root.dark .text-on-surface { color: #eef6ff !important; }
   :root.dark .text-on-surface-variant { color: #a8b5ca !important; }
 </style>
@@ -204,7 +205,7 @@ function renderChart() {
       const hh = Math.max(0.15, ((endH - startH) / maxH) * chartH);
       if (hh < 0.3) continue;
       const isNight = start.getHours() >= 19 || start.getHours() < 6;
-      html += `<rect x="${x}" y="${y1}" width="${barW}" height="${Math.min(hh, margin.top + chartH - y1)}" rx="3" fill="${isNight ? '#0f7a44' : '#22c08a'}" opacity="${isToday ? '1' : '0.75'}"><title>${formatTime(log.startedAt)} – ${log.endedAt ? formatTime(log.endedAt) : 'now'} · ${formatDuration(Math.max(1, Math.round((end - start) / 60000)))}</title></rect>`;
+      html += `<rect x="${x}" y="${y1}" width="${barW}" height="${Math.min(hh, margin.top + chartH - y1)}" rx="3" fill="${isNight ? '#0f7a44' : '#22c08a'}" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-id="${log.id || log.startedAt}"><title>${formatTime(log.startedAt)} – ${log.endedAt ? formatTime(log.endedAt) : 'now'} · ${formatDuration(Math.max(1, Math.round((end - start) / 60000)))}</title></rect>`;
     }
     html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 18}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="10" font-weight="${isToday ? '800' : '600'}" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</text>`;
     html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 32}" text-anchor="middle" fill="#a8b5ca" font-size="9" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { weekday: "short" })}</text>`;
@@ -215,14 +216,20 @@ function renderChart() {
     x += barW + barGap;
   }
   chartSvg.innerHTML = html;
-
-  // Click-to-log
-  chartSvg.querySelectorAll("[data-log-day]").forEach((el) => {
-    el.addEventListener("click", () => {
-      const day = days.find((d) => d.date.toISOString().slice(0, 10) === el.dataset.logDay);
-      if (day) renderList(day.date);
-    });
+  chartSvg.querySelectorAll("[data-log-id]").forEach((el) => {
+    el.addEventListener("click", () => scrollToLog(el.dataset.logId));
   });
+}
+
+function scrollToLog(logId) {
+  if (!logId) return;
+  logList.querySelectorAll(".highlighted").forEach((e) => e.classList.remove("highlighted"));
+  const target = logList.querySelector(`[data-log-id="${logId}"]`);
+  if (target) {
+    target.classList.add("highlighted");
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => target.classList.remove("highlighted"), 2500);
+  }
 }
 
 function renderList(scrollToDate) {
@@ -235,7 +242,7 @@ function renderList(scrollToDate) {
     const min = Math.max(1, Math.round((end - start) / 60000));
     const isNight = start.getHours() >= 19 || start.getHours() < 6;
     const dateStr = log._day.toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "short" });
-    return `<div class="flex items-center gap-3 rounded-[18px] bg-surface-container-lowest p-3 soft-shadow border border-white/60" data-log-date="${log._day.toISOString().slice(0, 10)}">
+    return `<div class="flex items-center gap-3 rounded-[18px] bg-surface-container-lowest p-3 soft-shadow border border-white/60" data-log-id="${log.id || log.startedAt}" data-log-date="${log._day.toISOString().slice(0, 10)}">
       <div class="w-2 h-10 rounded-full shrink-0" style="background:${isNight ? '#0f7a44' : '#22c08a'}"></div>
       <div class="flex-1 min-w-0">
         <p class="font-label-md text-label-md text-on-surface">${isNight ? "Night sleep" : "Nap"} · ${formatDuration(min)}</p>
