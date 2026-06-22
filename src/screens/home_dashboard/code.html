@@ -713,8 +713,10 @@
         const profiles = babyProfileState.profiles;
         const selectedBabyId = babyProfileState.selectedBabyId;
         const selectedBaby = babyProfileState.selectedBaby || null;
-        const coreLogs = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
-        const permissions = await getBabyPermissions(selectedBabyId);
+        const [coreLogs, permissions] = await Promise.all([
+            loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] }),
+            getBabyPermissions(selectedBabyId)
+        ]);
         const allFeedingLogs = coreLogs.feedingLogs;
         const allSleepLogs = coreLogs.sleepLogs;
         const allDiaperLogs = coreLogs.diaperLogs;
