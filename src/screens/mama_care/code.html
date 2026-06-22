@@ -103,6 +103,71 @@ tailwind.config = {
 
   <p class="hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="pumpingModule">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
+        <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pump & Milk Storage</h2>
+        <p class="text-[14px] leading-5 text-on-surface-variant">Premium tracking for sessions, stash, expiry, and return-to-work planning.</p>
+      </div>
+      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold shrink-0" id="addPumpSessionButton" type="button">Log</button>
+    </div>
+
+    <div class="rounded-[24px] bg-[#fff3e8] border border-[#ffd9ba] p-4 dark:bg-white/5 dark:border-white/10">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#a14f20] dark:text-primary">Next Pump Session</p>
+          <p class="text-[28px] leading-8 font-extrabold text-on-surface" id="nextPumpCountdown">No schedule</p>
+          <p class="text-[14px] text-on-surface-variant" id="nextPumpTime">Generate or add pump times.</p>
+        </div>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-[#a14f20] font-extrabold dark:bg-white/10 dark:text-primary" data-action="pump-snooze" type="button">Snooze</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="rounded-2xl bg-surface-container-low p-3">
+        <p class="text-[12px] font-bold text-on-surface-variant">Today's Output</p>
+        <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodayMl">0 ml</p>
+      </div>
+      <div class="rounded-2xl bg-surface-container-low p-3">
+        <p class="text-[12px] font-bold text-on-surface-variant">Sessions</p>
+        <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodaySessions">0</p>
+      </div>
+      <div class="rounded-2xl bg-surface-container-low p-3">
+        <p class="text-[12px] font-bold text-on-surface-variant">Average</p>
+        <p class="text-[22px] font-extrabold text-on-surface" id="pumpAverageMl">0 ml</p>
+      </div>
+      <div class="rounded-2xl bg-surface-container-low p-3">
+        <p class="text-[12px] font-bold text-on-surface-variant">Longest</p>
+        <p class="text-[22px] font-extrabold text-on-surface" id="pumpLongest">0m</p>
+      </div>
+    </div>
+
+    <div class="rounded-[24px] bg-[#eefbf7] border border-[#c8efe2] p-4 dark:bg-white/5 dark:border-white/10">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857]">Storage Summary</p>
+          <p class="text-[25px] leading-8 font-extrabold text-on-surface" id="storedMilkTotal">0 ml</p>
+          <p class="text-[14px] text-on-surface-variant" id="storedMilkMeta">0 containers · 0 days supply</p>
+        </div>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-[#047857] font-extrabold dark:bg-white/10" id="addMilkStorageButton" type="button">Add</button>
+      </div>
+      <div class="mt-3 rounded-2xl bg-white/70 p-3 dark:bg-white/10" id="fifoRecommendation"></div>
+    </div>
+
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold shrink-0" id="generatePumpScheduleButton" type="button">Smart schedule</button>
+      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="addPumpScheduleButton" type="button">Add time</button>
+      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="addPumpPartButton" type="button">Maintenance</button>
+      <button class="mama-action h-10 rounded-full bg-surface-container px-4 text-on-surface-variant font-extrabold shrink-0" id="workPlannerButton" type="button">Work planner</button>
+    </div>
+
+    <div class="space-y-3" id="pumpAlertList"></div>
+    <div class="space-y-3" id="pumpScheduleList"></div>
+    <div class="rounded-[24px] bg-surface-container-low p-4 space-y-3" id="pumpAnalyticsPanel"></div>
+    <div class="space-y-3" id="pumpMaintenanceList"></div>
+  </section>
+
   <section class="rounded-[28px] bg-primary-container p-5 soft-shadow">
     <div class="flex items-start justify-between gap-3">
       <div>
@@ -241,11 +306,23 @@ const {
   updateMamaMedicationStatus,
   updateMamaSupportTaskStatus
 } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
+const {
+  deleteMilkStorage,
+  deletePumpSchedule,
+  deletePumpSession,
+  loadPumpingCareData,
+  saveMilkStorage,
+  savePumpPart,
+  savePumpSchedule,
+  savePumpSession,
+  useMilkStorage
+} = await import(`${moduleBase}utils/pumpingCareRemote.mjs`);
 
 const today = localDate(new Date());
 let selectedBabyId = "";
 let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
 let mamaData = emptyMamaData();
+let pumpingData = emptyPumpingData();
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
@@ -264,6 +341,12 @@ document.getElementById("addTaskButton").addEventListener("click", () => openTas
 document.getElementById("addMedicationButton").addEventListener("click", () => openMedicationForm());
 document.getElementById("addAppointmentButton").addEventListener("click", () => openAppointmentForm());
 document.getElementById("addNoteButton").addEventListener("click", () => openNoteForm());
+document.getElementById("addPumpSessionButton").addEventListener("click", () => openPumpSessionForm());
+document.getElementById("addMilkStorageButton").addEventListener("click", () => openMilkStorageForm());
+document.getElementById("addPumpScheduleButton").addEventListener("click", () => openPumpScheduleForm());
+document.getElementById("generatePumpScheduleButton").addEventListener("click", () => openSmartPumpScheduleForm());
+document.getElementById("addPumpPartButton").addEventListener("click", () => openPumpPartForm());
+document.getElementById("workPlannerButton").addEventListener("click", () => openWorkPlannerForm());
 
 await bootstrap();
 bindPrototypeActions();
@@ -293,12 +376,17 @@ async function bootstrap() {
 }
 
 async function refreshMamaCare() {
-  mamaData = await loadMamaCareData(selectedBabyId);
+  [mamaData, pumpingData] = await Promise.all([
+    loadMamaCareData(selectedBabyId),
+    loadPumpingCareData(selectedBabyId)
+  ]);
   if (mamaData.error) showFeedback(mamaData.error, true);
+  if (pumpingData.error) showFeedback(pumpingData.error, true);
   renderAll();
 }
 
 function renderAll() {
+  renderPumpingModule();
   renderCheckin();
   renderSupportTasks();
   renderMedications();
@@ -310,6 +398,159 @@ function showMamaContent() {
   document.getElementById("mamaLoadingState")?.classList.add("hidden");
   document.getElementById("noBabyState")?.classList.add("hidden");
   document.getElementById("mamaContent")?.classList.remove("hidden");
+}
+
+function renderPumpingModule() {
+  const sessionsToday = pumpingData.sessions.filter((session) => localDate(new Date(session.startedAt)) === today);
+  const totalToday = sum(sessionsToday, (session) => Number(session.totalMl || 0));
+  const longest = Math.max(0, ...sessionsToday.map((session) => Number(session.durationMinutes || 0)));
+  const activeStorage = pumpingData.storage.filter((entry) => Number(entry.remainingMl ?? entry.quantityMl) > 0);
+  const storedMl = sum(activeStorage, (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
+  const next = getNextPumpSession();
+  document.getElementById("nextPumpCountdown").textContent = next ? formatCountdown(next.date) : "No schedule";
+  document.getElementById("nextPumpTime").textContent = next ? `Scheduled for ${formatClock(next.schedule.pumpTime)}` : "Generate or add pump times.";
+  document.getElementById("pumpTodayMl").textContent = `${Math.round(totalToday)} ml`;
+  document.getElementById("pumpTodaySessions").textContent = String(sessionsToday.length);
+  document.getElementById("pumpAverageMl").textContent = `${sessionsToday.length ? Math.round(totalToday / sessionsToday.length) : 0} ml`;
+  document.getElementById("pumpLongest").textContent = formatMinutes(longest);
+  document.getElementById("storedMilkTotal").textContent = formatMilk(storedMl);
+  document.getElementById("storedMilkMeta").textContent = `${activeStorage.length} container${activeStorage.length === 1 ? "" : "s"} · ${Math.floor(storedMl / 720)} days supply`;
+  renderFifo(activeStorage);
+  renderPumpAlerts(activeStorage);
+  renderPumpSchedules(sessionsToday);
+  renderPumpAnalytics();
+  renderPumpMaintenance();
+}
+
+function renderFifo(activeStorage) {
+  const fifo = [...activeStorage].sort((a, b) => new Date(a.expirationDate) - new Date(b.expirationDate))[0];
+  const panel = document.getElementById("fifoRecommendation");
+  if (!fifo) {
+    panel.innerHTML = `<p class="text-[14px] font-bold text-on-surface">No stored milk yet.</p><p class="text-[13px] text-on-surface-variant">Add milk after pumping to build FIFO recommendations.</p>`;
+    return;
+  }
+  panel.innerHTML = `
+    <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857]">Use this next</p>
+    <div class="mt-1 flex items-center justify-between gap-3">
+      <div>
+        <p class="text-[17px] font-extrabold text-on-surface">${Math.round(fifo.remainingMl ?? fifo.quantityMl)} ml · ${escapeHtml(fifo.label || fifo.containerType)}</p>
+        <p class="text-[13px] text-on-surface-variant">Stored ${formatDate(fifo.pumpDate)} · expires ${expiryText(fifo.expirationDate)}</p>
+      </div>
+      ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-[#dcfce7] px-3 text-[#047857] font-extrabold" data-action="milk-use" data-id="${fifo.id}" type="button">Use</button>` : ""}
+    </div>
+  `;
+}
+
+function renderPumpAlerts(activeStorage) {
+  const alerts = [];
+  const expiringTomorrow = activeStorage.filter((entry) => daysUntil(entry.expirationDate) <= 1 && daysUntil(entry.expirationDate) >= 0);
+  const expiringWeekMl = sum(activeStorage.filter((entry) => daysUntil(entry.expirationDate) <= 7 && daysUntil(entry.expirationDate) >= 0), (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
+  if (expiringTomorrow.length) alerts.push(`${expiringTomorrow.length} milk container${expiringTomorrow.length === 1 ? "" : "s"} expire by tomorrow.`);
+  if (expiringWeekMl) alerts.push(`${Math.round(expiringWeekMl)} ml should be used this week.`);
+  const list = document.getElementById("pumpAlertList");
+  list.innerHTML = alerts.length ? alerts.map((alert) => `
+    <div class="rounded-2xl bg-error-container p-3 text-error font-bold flex items-start gap-2">
+      <span class="material-symbols-outlined text-[20px]">notification_important</span>
+      <span>${escapeHtml(alert)}</span>
+    </div>
+  `).join("") : "";
+}
+
+function renderPumpSchedules(sessionsToday) {
+  const schedules = [...pumpingData.schedules].filter((item) => item.active !== false).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
+  const list = document.getElementById("pumpScheduleList");
+  if (!schedules.length) {
+    list.innerHTML = emptyState("schedule", "No pump schedule yet.", "Use Smart schedule or add your preferred pump times.");
+    return;
+  }
+  list.innerHTML = `
+    <div class="flex items-center justify-between">
+      <h3 class="text-[18px] font-extrabold text-on-surface">Pumping Schedule</h3>
+      <p class="text-[13px] font-bold text-on-surface-variant">${sessionsToday.length}/${schedules.length} completed today</p>
+    </div>
+    ${schedules.map((schedule) => {
+      const done = sessionsToday.some((session) => minutesBetweenTime(schedule.pumpTime, session.startedAt) <= 75);
+      return `
+        <article class="rounded-[22px] bg-surface-container-low p-3 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[18px] font-extrabold text-on-surface">${formatClock(schedule.pumpTime)}</p>
+            <p class="text-[13px] text-on-surface-variant">${escapeHtml(schedule.label || (done ? "Completed" : "Scheduled"))}</p>
+          </div>
+          <div class="flex gap-2">
+            ${done ? `<span class="status-chip bg-tertiary-container text-primary">Done</span>` : permissions.canAddLogs ? `<button class="h-9 rounded-full bg-primary px-3 text-on-primary font-bold" data-action="pump-complete" data-id="${schedule.id}" type="button">Done</button>` : ""}
+            ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-surface-container px-3 text-on-surface-variant font-bold" data-action="pump-schedule-delete" data-id="${schedule.id}" type="button">Delete</button>` : ""}
+          </div>
+        </article>
+      `;
+    }).join("")}
+  `;
+}
+
+function renderPumpAnalytics() {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - 6);
+  const previousStart = new Date(now);
+  previousStart.setDate(now.getDate() - 13);
+  const thisWeek = pumpingData.sessions.filter((session) => new Date(session.startedAt) >= startOfDay(weekStart));
+  const lastWeek = pumpingData.sessions.filter((session) => new Date(session.startedAt) >= startOfDay(previousStart) && new Date(session.startedAt) < startOfDay(weekStart));
+  const thisTotal = sum(thisWeek, (session) => Number(session.totalMl || 0));
+  const lastTotal = sum(lastWeek, (session) => Number(session.totalMl || 0));
+  const growth = lastTotal ? Math.round(((thisTotal - lastTotal) / lastTotal) * 100) : 0;
+  const bestWindow = bestPumpWindow(pumpingData.sessions);
+  const leftAvg = average(pumpingData.sessions, (session) => Number(session.leftMl || 0));
+  const rightAvg = average(pumpingData.sessions, (session) => Number(session.rightMl || 0));
+  const recent = [...pumpingData.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
+  document.getElementById("pumpAnalyticsPanel").innerHTML = `
+    <div class="flex items-center justify-between">
+      <h3 class="text-[18px] font-extrabold text-on-surface">Pumping Analytics</h3>
+      <span class="material-symbols-outlined text-primary">monitoring</span>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div><p class="text-[12px] text-on-surface-variant">This week</p><p class="text-[20px] font-extrabold">${formatMilk(thisTotal)}</p></div>
+      <div><p class="text-[12px] text-on-surface-variant">Growth</p><p class="text-[20px] font-extrabold">${lastTotal ? `${growth >= 0 ? "+" : ""}${growth}%` : "New"}</p></div>
+      <div><p class="text-[12px] text-on-surface-variant">Best time</p><p class="text-[16px] font-extrabold">${bestWindow}</p></div>
+      <div><p class="text-[12px] text-on-surface-variant">Left vs right</p><p class="text-[16px] font-extrabold">${Math.round(leftAvg)} / ${Math.round(rightAvg)} ml</p></div>
+    </div>
+    <p class="text-[13px] leading-5 text-on-surface-variant">${pumpInsight(thisTotal, lastTotal, bestWindow)}</p>
+    ${recent.length ? `<div class="space-y-2 pt-2 border-t border-primary-container/40">
+      <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Recent sessions</p>
+      ${recent.map((session) => `
+        <article class="rounded-2xl bg-surface-container-lowest p-3 flex items-center justify-between gap-3">
+          <div>
+            <p class="font-extrabold text-on-surface">${Math.round(session.totalMl || 0)} ml · ${formatMinutes(session.durationMinutes)}</p>
+            <p class="text-[13px] text-on-surface-variant">${formatDateTime(session.startedAt)}${session.pumpUsed ? ` · ${escapeHtml(session.pumpUsed)}` : ""}</p>
+          </div>
+          ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-error-container px-3 text-error font-bold" data-action="pump-session-delete" data-id="${session.id}" type="button">Delete</button>` : ""}
+        </article>
+      `).join("")}
+    </div>` : ""}
+  `;
+}
+
+function renderPumpMaintenance() {
+  const parts = pumpingData.parts.length ? pumpingData.parts : defaultPumpParts();
+  const due = parts.filter((part) => daysUntil(addDays(part.lastChangedDate, Number(part.intervalDays || 30))) <= 0);
+  const list = document.getElementById("pumpMaintenanceList");
+  list.innerHTML = `
+    <div class="flex items-center justify-between">
+      <h3 class="text-[18px] font-extrabold text-on-surface">Pump Maintenance</h3>
+      <p class="text-[13px] font-bold ${due.length ? "text-error" : "text-on-surface-variant"}">${due.length ? `${due.length} due` : "All okay"}</p>
+    </div>
+    ${parts.slice(0, 4).map((part) => {
+      const nextDate = addDays(part.lastChangedDate, Number(part.intervalDays || 30));
+      const dueNow = daysUntil(nextDate) <= 0;
+      return `
+        <article class="rounded-[22px] bg-surface-container-low p-3 flex items-center justify-between gap-3">
+          <div>
+            <p class="font-extrabold text-on-surface">${escapeHtml(part.partType)}</p>
+            <p class="text-[13px] text-on-surface-variant">Last changed ${formatDate(part.lastChangedDate)}</p>
+          </div>
+          <span class="status-chip ${dueNow ? "bg-error-container text-error" : "bg-primary-container text-primary"}">${dueNow ? "Replace" : `${daysUntil(nextDate)}d`}</span>
+        </article>
+      `;
+    }).join("")}
+  `;
 }
 
 function renderCheckin() {
@@ -446,6 +687,12 @@ document.body.addEventListener("click", async (event) => {
     if (action === "med-delete") await deleteMamaMedication(id);
     if (action === "appointment-delete") await deleteMamaAppointment(id);
     if (action === "note-delete") await deleteMamaRecoveryNote(id);
+    if (action === "pump-complete") await quickCompletePumpSchedule(id);
+    if (action === "pump-schedule-delete") await deletePumpSchedule(id);
+    if (action === "pump-session-delete") await deletePumpSession(id);
+    if (action === "milk-delete") await deleteMilkStorage(id);
+    if (action === "milk-use") await openUseMilkForm(id);
+    if (action === "pump-snooze") await snoozeNextPump();
     await refreshMamaCare();
   } catch (error) {
     showFeedback(error.message || "Could not update Mama Care.", true);
@@ -560,6 +807,184 @@ function openNoteForm(existing = {}) {
     if (!form.note.value.trim()) throw new Error("Add a note.");
     await saveMamaRecoveryNote({ id: existing.id, babyId: selectedBabyId, noteType: form.noteType.value, noteDate: form.noteDate.value || today, note: form.note.value });
   });
+}
+
+function openPumpSessionForm(existing = {}) {
+  if (!canWrite()) return;
+  const now = new Date();
+  const started = existing.startedAt ? new Date(existing.startedAt) : new Date(now.getTime() - 20 * 60000);
+  const ended = existing.endedAt ? new Date(existing.endedAt) : now;
+  openModal(existing.id ? "Edit Pump Session" : "Log Pump Session", `
+    ${inputField("startedAt", "Start time", toDatetimeLocal(started), "", "datetime-local")}
+    ${inputField("endedAt", "End time", toDatetimeLocal(ended), "", "datetime-local")}
+    <div class="grid grid-cols-2 gap-3">
+      ${numberField("leftMl", "Left breast (ml)", existing.leftMl || "", 0, 999, "1")}
+      ${numberField("rightMl", "Right breast (ml)", existing.rightMl || "", 0, 999, "1")}
+    </div>
+    ${selectField("pumpUsed", "Pump used", ["Spectra S1", "Momcozy M5", "Elvie", "Other"], existing.pumpUsed || "Spectra S1")}
+    ${textareaField("notes", "Notes", existing.notes || "", "Engorged, missed previous session, stressful day")}
+    ${submitButton("Save Pump Session")}
+  `, async (form) => {
+    const startedAt = fromDatetimeLocal(form.startedAt.value);
+    const endedAt = fromDatetimeLocal(form.endedAt.value);
+    const durationMinutes = Math.round((new Date(endedAt) - new Date(startedAt)) / 60000);
+    if (!startedAt || !endedAt || durationMinutes <= 0) throw new Error("Check the pumping start and end time.");
+    const leftMl = Number(form.leftMl.value || 0);
+    const rightMl = Number(form.rightMl.value || 0);
+    await savePumpSession({
+      id: existing.id,
+      babyId: selectedBabyId,
+      startedAt,
+      endedAt,
+      durationMinutes,
+      leftMl,
+      rightMl,
+      totalMl: leftMl + rightMl,
+      pumpUsed: form.pumpUsed.value,
+      notes: form.notes.value
+    });
+  });
+}
+
+function openMilkStorageForm(existing = {}) {
+  if (!canWrite()) return;
+  const pumpDate = existing.pumpDate || today;
+  const storageType = existing.storageType || "freezer";
+  openModal(existing.id ? "Edit Milk Storage" : "Add Milk Storage", `
+    ${numberField("quantityMl", "Quantity (ml)", existing.quantityMl || "", 1, 999, "1")}
+    ${selectField("storageType", "Storage type", ["Freezer", "Refrigerator"], storageType)}
+    ${inputField("pumpDate", "Pump date", pumpDate, "", "date")}
+    ${selectField("containerType", "Container", ["Storage Bag", "Bottle", "Container"], existing.containerType || "Storage Bag")}
+    ${inputField("label", "Label", existing.label || nextBagLabel(), "Storage Bag #17")}
+    ${textareaField("notes", "Notes", existing.notes || "", "Optional storage note")}
+    ${submitButton("Save Milk")}
+  `, async (form) => {
+    const normalizedType = form.storageType.value.toLowerCase();
+    const quantityMl = Number(form.quantityMl.value || 0);
+    if (quantityMl <= 0) throw new Error("Enter the milk quantity.");
+    await saveMilkStorage({
+      id: existing.id,
+      babyId: selectedBabyId,
+      quantityMl,
+      remainingMl: existing.remainingMl ?? quantityMl,
+      storageType: normalizedType,
+      containerType: form.containerType.value,
+      pumpDate: form.pumpDate.value || today,
+      expirationDate: calculateMilkExpiry(form.pumpDate.value || today, normalizedType),
+      label: form.label.value,
+      notes: form.notes.value
+    });
+  });
+}
+
+function openPumpScheduleForm(existing = {}) {
+  if (!canWrite()) return;
+  openModal(existing.id ? "Edit Pump Time" : "Add Pump Time", `
+    ${inputField("pumpTime", "Pump time", existing.pumpTime || "09:00", "", "time")}
+    ${inputField("label", "Label", existing.label || "", "Before work, lunch break, before bed")}
+    ${submitButton("Save Pump Time")}
+  `, async (form) => {
+    if (!form.pumpTime.value) throw new Error("Choose a pump time.");
+    await savePumpSchedule({ id: existing.id, babyId: selectedBabyId, pumpTime: form.pumpTime.value, label: form.label.value, active: true });
+  });
+}
+
+function openSmartPumpScheduleForm() {
+  if (!canWrite()) return;
+  openModal("Smart Pump Schedule", `
+    ${selectField("feedingMethod", "Feeding method", ["Exclusive Pumping", "Direct Breastfeeding + Pumping", "Mixed Feeding", "Formula Supplementation"])}
+    ${selectField("babyAge", "Baby age", ["0-1 month", "1-3 months", "3-6 months", "6-12 months"])}
+    ${selectField("situation", "Mother's situation", ["Stay-at-home mom", "Working mom", "Night shift worker", "Custom"])}
+    ${submitButton("Generate Schedule")}
+  `, async (form) => {
+    const times = recommendedPumpTimes(form.feedingMethod.value, form.babyAge.value, form.situation.value);
+    const existingTimes = new Set(pumpingData.schedules.map((item) => item.pumpTime));
+    await Promise.all(times.filter((time) => !existingTimes.has(time)).map((time) => savePumpSchedule({
+      babyId: selectedBabyId,
+      pumpTime: time,
+      label: "Smart schedule",
+      active: true
+    })));
+  });
+}
+
+function openPumpPartForm() {
+  if (!canWrite()) return;
+  openModal("Pump Part Maintenance", `
+    ${selectField("partType", "Part", ["Valve", "Membrane", "Backflow Protector", "Tubing Inspection"])}
+    ${inputField("lastChangedDate", "Last changed / inspected", today, "", "date")}
+    ${numberField("intervalDays", "Reminder interval (days)", 30, 1, 365, "1")}
+    ${textareaField("notes", "Notes", "", "Optional maintenance note")}
+    ${submitButton("Save Maintenance")}
+  `, async (form) => {
+    await savePumpPart({
+      babyId: selectedBabyId,
+      partType: form.partType.value,
+      lastChangedDate: form.lastChangedDate.value || today,
+      intervalDays: form.intervalDays.value || 30,
+      notes: form.notes.value
+    });
+  });
+}
+
+function openWorkPlannerForm() {
+  if (!canWrite()) return;
+  openModal("Return-To-Work Planner", `
+    ${inputField("workStartDate", "Work start date", today, "", "date")}
+    ${inputField("workStart", "Work starts", "08:00", "", "time")}
+    ${inputField("workEnd", "Work ends", "17:00", "", "time")}
+    ${numberField("targetStorageMl", "Target storage (ml)", 4000, 0, 50000, "50")}
+    ${submitButton("Create Work Plan")}
+  `, async (form) => {
+    const planTimes = ["06:00", "10:00", "13:00", "16:00", "20:00"];
+    const existingTimes = new Set(pumpingData.schedules.map((item) => item.pumpTime));
+    await Promise.all(planTimes.filter((time) => !existingTimes.has(time)).map((time) => savePumpSchedule({
+      babyId: selectedBabyId,
+      pumpTime: time,
+      label: ["06:00", "20:00"].includes(time) ? "Home pump" : "Work pump",
+      active: true
+    })));
+    const stored = sum(pumpingData.storage, (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
+    showFeedback(`Work plan created. Stash target needs ${Math.max(0, Number(form.targetStorageMl.value || 0) - stored)} ml more.`);
+  });
+}
+
+async function openUseMilkForm(id) {
+  const entry = pumpingData.storage.find((item) => item.id === id);
+  if (!entry) return;
+  openModal("Use Stored Milk", `
+    <p class="rounded-2xl bg-surface-container-low p-3 text-[14px] font-bold text-on-surface">${escapeHtml(entry.label || entry.containerType)} has ${Math.round(entry.remainingMl ?? entry.quantityMl)} ml remaining.</p>
+    ${numberField("usedMl", "Used milk (ml)", Math.min(120, Number(entry.remainingMl ?? entry.quantityMl)), 1, 999, "1")}
+    ${submitButton("Update Inventory")}
+  `, async (form) => {
+    await useMilkStorage(id, form.usedMl.value);
+  });
+}
+
+async function quickCompletePumpSchedule(id) {
+  const schedule = pumpingData.schedules.find((item) => item.id === id);
+  const now = new Date();
+  const started = setDateTimeFromTime(now, schedule?.pumpTime || `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`);
+  const ended = new Date(started.getTime() + 20 * 60000);
+  await savePumpSession({
+    babyId: selectedBabyId,
+    startedAt: started.toISOString(),
+    endedAt: ended.toISOString(),
+    durationMinutes: 20,
+    leftMl: 0,
+    rightMl: 0,
+    totalMl: 0,
+    pumpUsed: "",
+    notes: "Completed from schedule"
+  });
+}
+
+async function snoozeNextPump() {
+  const next = getNextPumpSession();
+  if (!next) return showFeedback("Add a pump schedule first.", true);
+  const snoozed = new Date(next.date.getTime() + 15 * 60000);
+  await savePumpSchedule({ ...next.schedule, pumpTime: `${String(snoozed.getHours()).padStart(2, "0")}:${String(snoozed.getMinutes()).padStart(2, "0")}`, label: "Snoozed" });
+  showFeedback("Next pump snoozed 15 minutes.");
 }
 
 function openModal(title, body, onSubmit) {
@@ -713,8 +1138,142 @@ function showFeedback(message, persistent = false) {
   if (!persistent) setTimeout(() => feedback.classList.add("hidden"), 2500);
 }
 
+function getNextPumpSession() {
+  const schedules = pumpingData.schedules.filter((item) => item.active !== false).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
+  if (!schedules.length) return null;
+  const now = new Date();
+  const candidates = schedules.map((schedule) => ({ schedule, date: setDateTimeFromTime(now, schedule.pumpTime) }));
+  candidates.forEach((item) => {
+    if (item.date <= now) item.date.setDate(item.date.getDate() + 1);
+  });
+  return candidates.sort((a, b) => a.date - b.date)[0];
+}
+
+function formatCountdown(date) {
+  const seconds = Math.max(0, Math.floor((date - new Date()) / 1000));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")} remaining`;
+}
+
+function recommendedPumpTimes(method, age, situation) {
+  if (situation === "Working mom") return ["06:00", "10:00", "13:00", "16:00", "20:00"];
+  if (situation === "Night shift worker") return ["09:00", "12:00", "15:00", "18:00", "22:00", "02:00", "06:00"];
+  if (method === "Exclusive Pumping" && age === "0-1 month") return ["00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
+  if (method === "Exclusive Pumping") return ["05:00", "08:00", "11:00", "14:00", "17:00", "20:00", "23:00"];
+  if (method === "Direct Breastfeeding + Pumping") return ["06:00", "10:00", "15:00", "21:00"];
+  if (method === "Formula Supplementation") return ["07:00", "13:00", "20:00"];
+  return ["06:00", "09:00", "12:00", "15:00", "18:00", "21:00"];
+}
+
+function calculateMilkExpiry(pumpDate, storageType) {
+  const date = new Date(`${pumpDate}T00:00:00`);
+  if (storageType === "refrigerator") date.setDate(date.getDate() + 4);
+  else date.setMonth(date.getMonth() + 6);
+  return localDate(date);
+}
+
+function nextBagLabel() {
+  return `Storage Bag #${pumpingData.storage.length + 1}`;
+}
+
+function formatMilk(ml) {
+  const rounded = Math.round(Number(ml || 0));
+  return rounded >= 1000 ? `${(rounded / 1000).toFixed(1)} L` : `${rounded} ml`;
+}
+
+function formatMinutes(minutes) {
+  const value = Math.round(Number(minutes || 0));
+  if (value < 60) return `${value}m`;
+  return `${Math.floor(value / 60)}h ${String(value % 60).padStart(2, "0")}m`;
+}
+
+function formatClock(time) {
+  const [hour, minute] = String(time || "00:00").split(":").map(Number);
+  return new Date(2000, 0, 1, hour || 0, minute || 0).toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit" });
+}
+
+function expiryText(dateValue) {
+  const days = daysUntil(dateValue);
+  if (days < 0) return "expired";
+  if (days === 0) return "today";
+  if (days === 1) return "tomorrow";
+  return `in ${days} days`;
+}
+
+function daysUntil(dateValue) {
+  return Math.ceil((new Date(`${dateValue}T00:00:00`) - startOfToday()) / 86400000);
+}
+
+function addDays(dateValue, days) {
+  const date = new Date(`${dateValue}T00:00:00`);
+  date.setDate(date.getDate() + Number(days || 0));
+  return localDate(date);
+}
+
+function setDateTimeFromTime(date, time) {
+  const [hour, minute] = String(time || "00:00").split(":").map(Number);
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour || 0, minute || 0);
+}
+
+function minutesBetweenTime(time, isoDate) {
+  const scheduled = setDateTimeFromTime(new Date(isoDate), time);
+  return Math.abs((new Date(isoDate) - scheduled) / 60000);
+}
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function sum(items, getter) {
+  return items.reduce((total, item) => total + Number(getter(item) || 0), 0);
+}
+
+function average(items, getter) {
+  return items.length ? sum(items, getter) / items.length : 0;
+}
+
+function bestPumpWindow(sessions) {
+  if (!sessions.length) return "Not enough data";
+  const windows = new Map();
+  sessions.forEach((session) => {
+    const hour = new Date(session.startedAt).getHours();
+    const key = `${String(hour).padStart(2, "0")}:00`;
+    const current = windows.get(key) || { total: 0, count: 0 };
+    windows.set(key, { total: current.total + Number(session.totalMl || 0), count: current.count + 1 });
+  });
+  const best = [...windows.entries()].sort((a, b) => (b[1].total / b[1].count) - (a[1].total / a[1].count))[0];
+  if (!best) return "Not enough data";
+  const start = best[0];
+  const endHour = (Number(start.slice(0, 2)) + 2) % 24;
+  return `${formatClock(start)} - ${formatClock(`${String(endHour).padStart(2, "0")}:00`)}`;
+}
+
+function pumpInsight(thisTotal, lastTotal, bestWindow) {
+  if (!pumpingData.sessions.length) return "Log a few sessions and LittleNest will start showing production trends and stash guidance.";
+  if (lastTotal) {
+    const growth = Math.round(((thisTotal - lastTotal) / lastTotal) * 100);
+    return `Your milk production is ${growth >= 0 ? "up" : "down"} ${Math.abs(growth)}% vs last week. Highest output is currently around ${bestWindow}.`;
+  }
+  return `You consistently produce the most milk around ${bestWindow}. Keep logging to unlock weekly trend comparisons.`;
+}
+
+function defaultPumpParts() {
+  return [
+    { partType: "Valve", lastChangedDate: today, intervalDays: 30 },
+    { partType: "Membrane", lastChangedDate: today, intervalDays: 30 },
+    { partType: "Backflow Protector", lastChangedDate: today, intervalDays: 60 },
+    { partType: "Tubing Inspection", lastChangedDate: today, intervalDays: 30 }
+  ];
+}
+
 function emptyMamaData() {
   return { checkins: [], supportTasks: [], medications: [], appointments: [], recoveryNotes: [] };
+}
+
+function emptyPumpingData() {
+  return { sessions: [], schedules: [], storage: [], parts: [], error: "" };
 }
 
 function escapeHtml(value) {
