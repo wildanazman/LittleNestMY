@@ -754,7 +754,7 @@
             const nextEv = selectNextHomeAppointment(calendar, [], now);
             if (nextEv) {
                 setText("nextAppointmentSummary", nextEv.title.slice(0, 30) + (nextEv.title.length > 30 ? "…" : ""));
-                setText("nextAppointmentRelative", formatDate(new Date(nextEv.startsAt)));
+                setText("nextAppointmentRelative", new Date(nextEv.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "short" }));
             }
         }
         renderFromCache();
