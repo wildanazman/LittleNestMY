@@ -165,8 +165,8 @@
 </button>
 </div>
 <div class="min-w-0 flex-1">
-<h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Parent</h2>
-<p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">Local prototype</p>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Loading...</h2>
+<p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">Loading...</p>
 </div>
 </div>
 </div>
@@ -633,8 +633,10 @@
         function renderParentProfile() {
             const profile = getParentProfile();
             const initials = initialsForName(profile.name);
-            document.getElementById("parentName").textContent = profile.name || "Parent";
-            document.getElementById("parentEmail").textContent = profile.email || "Guest data saved on this device";
+            const name = profile.name || "Parent";
+            const email = profile.email || "";
+            document.getElementById("parentName").textContent = name === "Parent" ? "Loading..." : name;
+            document.getElementById("parentEmail").textContent = email || "Loading...";
             document.getElementById("parentInitials").textContent = initials;
             document.getElementById("topParentInitials").textContent = initials;
             renderPhoto("parentPhoto", "parentInitials", profile.photoUrl);
