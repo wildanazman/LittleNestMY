@@ -176,44 +176,37 @@ function getSleepDays() {
 
 function renderChart() {
   const days = getSleepDays();
-  const maxY = Math.max(360, Math.ceil(Math.max(...days.map((d) => d.totalMin), 1) / 60) * 60 + 60);
-  const margin = { left: 40, right: 16, top: 20, bottom: 36 };
+  const maxH = 24;
+  const margin = { left: 40, right: 16, top: 20, bottom: 44 };
   const chartW = 360 - margin.left - margin.right;
   const chartH = 260 - margin.top - margin.bottom;
   const barW = Math.max(6, Math.floor(chartW / days.length) - 4);
   const barGap = Math.max(2, (chartW - barW * days.length) / (days.length + 1));
 
   let html = "";
-  // Y axis gridlines
-  for (let h = 0; h <= Math.ceil(maxY / 60); h++) {
-    const mins = h * 60;
-    const y = margin.top + chartH - (mins / maxY) * chartH;
-    html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h % 4 === 0 ? "rgba(15,122,68,0.12)" : "rgba(15,122,68,0.05)"}" stroke-width="1"/>`;
-    if (h % 2 === 0) {
-      html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${h}h</text>`;
-    }
+  for (let h = 0; h <= 24; h += 3) {
+    const y = margin.top + (h / maxH) * chartH;
+    html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h === 0 ? 'rgba(15,122,68,0.16)' : 'rgba(15,122,68,0.06)'}" stroke-width="1"/>`;
+    const label = h === 0 ? "12 AM" : h === 12 ? "12 PM" : h < 12 ? `${h} AM` : `${h - 12} PM`;
+    html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${label}</text>`;
   }
-  // Bars
   let x = margin.left + barGap;
   const todayIdx = days.length - 1;
   for (let i = 0; i < days.length; i++) {
     const d = days[i];
     if (!d.totalMin) { x += barW + barGap; continue; }
     const isToday = i === todayIdx;
-    const barH = (d.totalMin / maxY) * chartH;
+    const totalH = Math.min(d.totalMin / 60, maxH);
+    const barH = (totalH / maxH) * chartH;
     const barY = margin.top + chartH - barH;
-    const nightH = (d.nightMin / d.totalMin) * barH;
+    const nightH = d.totalMin ? (d.nightMin / d.totalMin) * barH : 0;
     const napH = barH - nightH;
 
-    // Night portion
     html += `<rect x="${x}" y="${barY}" width="${barW}" height="${nightH}" rx="3" fill="#0f7a44" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Night: ${Math.floor(d.nightMin / 60)}h${d.nightMin % 60 > 0 ? d.nightMin % 60 + 'm' : ''}</title></rect>`;
-    // Nap portion
     html += `<rect x="${x}" y="${barY + nightH}" width="${barW}" height="${napH}" rx="0" fill="#22c08a" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Nap: ${Math.floor(d.napMin / 60)}h${d.napMin % 60 > 0 ? d.napMin % 60 + 'm' : ''}</title></rect>`;
-    // Total label
-    html += `<text x="${x + barW / 2}" y="${barY - 4}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="9" font-weight="700" font-family="Nunito Sans">${Math.floor(d.totalMin / 60)}h${d.totalMin % 60 > 0 ? d.totalMin % 60 + 'm' : ''}</text>`;
-    // Day label
-    const dayLabel = d.date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
-    html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 16}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="10" font-weight="${isToday ? '800' : '600'}" font-family="Nunito Sans">${dayLabel}</text>`;
+    html += `<text x="${x + barW / 2}" y="${barY - 4}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="9" font-weight="700" font-family="Nunito Sans">${Math.floor(totalH)}h${Math.round(totalH % 1 * 60) > 0 ? Math.round(totalH % 1 * 60) + 'm' : ''}</text>`;
+    html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 18}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="10" font-weight="${isToday ? '800' : '600'}" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</text>`;
+    html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 32}" text-anchor="middle" fill="#a8b5ca" font-size="9" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { weekday: "short" })}</text>`;
     x += barW + barGap;
   }
   chartSvg.innerHTML = html;
