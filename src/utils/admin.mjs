@@ -5,7 +5,8 @@
 // (multiple concurrent sessions allowed) — for the owner's own testing/use.
 
 const ADMIN_EMAILS = [
-  "wildanazman072@gmail.com"
+  "wildanazman072@gmail.com",
+  "athifahyus@gmail.com"
 ];
 
 export function isAdminEmail(email) {
