@@ -22,10 +22,33 @@ export function isPushConfigured() {
   return Boolean(VAPID_PUBLIC_KEY);
 }
 
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); // iPadOS
+}
+
+function isStandalone() {
+  return window.matchMedia?.("(display-mode: standalone)")?.matches
+    || window.navigator.standalone === true;
+}
+
+// Why push can't be enabled here (for user-facing messaging).
+// "needs-install" = iOS requires the app added to the Home Screen first.
+export function pushUnavailableReason() {
+  if (isIOS() && !isStandalone()) return "needs-install";
+  if (!isPushSupported()) return "unsupported";
+  if (!isPushConfigured()) return "not-configured";
+  return "";
+}
+
 export async function enablePush() {
+  // iOS only allows web push from an installed (Home Screen) PWA.
+  if (isIOS() && !isStandalone()) return { ok: false, reason: "needs-install" };
   if (!isPushSupported()) return { ok: false, reason: "unsupported" };
   if (!VAPID_PUBLIC_KEY || !isSupabaseConfigured) return { ok: false, reason: "not-configured" };
 
+  // Request permission as the first async step so it stays inside the user
+  // gesture (iOS rejects permission prompts that aren't gesture-initiated).
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return { ok: false, reason: "denied" };
 

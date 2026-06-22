@@ -438,7 +438,14 @@
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
         const { getNotifPrefs, setNotifPrefs, requestNotifPermission } = await import(`${moduleBase}utils/notifications.mjs`);
-        const { enablePush, disablePush, isPushSupported, isPushConfigured } = await import(`${moduleBase}utils/pushNotifications.mjs`);
+        const { enablePush, disablePush, isPushSupported, isPushConfigured, pushUnavailableReason } = await import(`${moduleBase}utils/pushNotifications.mjs`);
+        function pushFailMessage(reason) {
+            if (reason === "needs-install") return "On iPhone, add LittleNest to your Home Screen first, then open it from there to turn on reminders.";
+            if (reason === "denied") return "Notifications are blocked. Allow them in your device settings, then try again.";
+            if (reason === "unsupported") return "This browser doesn't support reminders. Try Chrome, or add the app to your Home Screen.";
+            if (reason === "not-configured") return "Reminders aren't available yet.";
+            return "Could not turn on reminders. Please try again.";
+        }
         const languageButtons = document.querySelectorAll("[data-language-option]");
         const languageFeedback = document.getElementById("languageFeedback");
         const themeButtons = document.querySelectorAll("[data-theme-option]");
@@ -564,27 +571,34 @@
             NOTIF_TYPES.forEach((id) => {
                 const btn = document.getElementById(`${id}NotifToggle`);
                 if (btn) btn.addEventListener("click", async () => {
+                    const label = id.charAt(0).toUpperCase() + id.slice(1);
                     const prefs = getNotifPrefs();
                     const newVal = !prefs[id];
+
                     if (newVal) {
-                        const perm = await requestNotifPermission();
-                        if (perm !== "granted" && perm !== "denied") { showNotifFeedback("Please allow notifications in your browser settings."); return; }
+                        // Turning a reminder ON: request permission + subscribe push
+                        // in THIS tap (iOS needs the gesture). enablePush() requests
+                        // permission as its first step.
+                        if (isPushConfigured()) {
+                            const res = await enablePush();
+                            if (!res.ok) { showNotifFeedback(pushFailMessage(res.reason)); return; }
+                        } else {
+                            // No push provider configured — foreground reminders only.
+                            const reason = pushUnavailableReason();
+                            if (reason === "needs-install") { showNotifFeedback("Add LittleNest to your Home Screen first, then turn on reminders."); return; }
+                            const perm = await requestNotifPermission();
+                            if (perm === "denied") { showNotifFeedback("Allow notifications in your browser settings."); return; }
+                        }
                     }
+
                     const next = { ...getNotifPrefs(), [id]: newVal };
                     setNotifPrefs(next);
                     setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, newVal);
-                    showNotifFeedback(newVal ? `${id.charAt(0).toUpperCase() + id.slice(1)} reminders on.` : `${id.charAt(0).toUpperCase() + id.slice(1)} reminders off.`);
-                    // Keep the Web Push subscription in sync: subscribe when any
-                    // reminder is on, unsubscribe when all are off. So reminders
-                    // can be delivered even when the app is closed.
-                    if (isPushSupported() && isPushConfigured()) {
-                      const anyOn = Object.values(getNotifPrefs()).some(Boolean);
-                      if (anyOn) {
-                        const res = await enablePush();
-                        if (!res.ok && res.reason === "denied") showNotifFeedback("Allow notifications to get reminders when the app is closed.");
-                      } else {
+                    showNotifFeedback(newVal ? `${label} reminders on.` : `${label} reminders off.`);
+
+                    // All reminders off → drop the push subscription.
+                    if (!Object.values(getNotifPrefs()).some(Boolean) && isPushSupported()) {
                         await disablePush();
-                      }
                     }
                 });
             });
