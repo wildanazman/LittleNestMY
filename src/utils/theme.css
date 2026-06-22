@@ -244,6 +244,8 @@ select:focus {
 }
 
 :root.dark .bg-surface,
+:root.dark .bg-surface\/95,
+:root.dark .bg-surface\/90,
 :root.dark .bg-background,
 :root.dark .bg-\[\#FFF8F5\],
 :root.dark .bg-\[\#fff8f5\] {
@@ -261,6 +263,10 @@ select:focus {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.32) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
+}
+
+html.dark header[style] {
+  background: linear-gradient(180deg, #101a2e, #0d1628) !important;
 }
 
 :root.dark header h1,
