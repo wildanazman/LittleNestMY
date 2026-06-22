@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
 <link rel="manifest" href="/manifest.json"/>
+<link rel="preconnect" href="https://rfckmplagoydehcwbxdj.supabase.co"/>
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
@@ -708,7 +709,6 @@
                 await new Promise(() => {});
             }
         }
-        await getAuthSession();
         const babyProfileState = await loadBabyProfilesRemote(babyProfile);
         const profiles = babyProfileState.profiles;
         const selectedBabyId = babyProfileState.selectedBabyId;
