@@ -638,14 +638,8 @@
         } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const {
             getPersistedCalendarEvents,
-            getPersistedFeedingLogs,
-            getPersistedSleepLogs,
-            getPersistedDiaperLogs,
-            getPersistedHealthNotes,
             getPersistedGrowthRecords,
             getPersistedReminders,
-            getBabyProfiles,
-            getSelectedBabyId,
             getLogsForBaby,
             getActiveSleepSession,
             clearActiveSleepSession,
@@ -687,8 +681,7 @@
             sleep: { badge: "Sleep", badgeBg: "#e7f5ec", badgeFg: "#0f7a44", accent: "#34b27b" },
             diaper: { badge: "Diaper", badgeBg: "#e5fbf2", badgeFg: "#0f7a44", accent: "#22c08a" }
         };
-        const loggedIn = await isLoggedIn();
-        if (!loggedIn) {
+        if (!(await isLoggedIn())) {
             const raw = window.location.search + window.location.hash;
             if (raw.includes("error=") || raw.includes("error_description=")) {
                 const q = (window.location.search + window.location.hash.replace(/^#/, "&")).replace(/^[?&]/, "");
