@@ -433,7 +433,7 @@
         const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
-        const { getParentProfile, initialsForName, saveParentProfile } = await import(`${moduleBase}utils/profile.mjs`);
+        const { getParentProfile, initialsForName, refreshParentProfileFromSupabase, saveParentProfile, syncParentProfileToSupabase } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
 
@@ -455,6 +455,9 @@
         renderLanguageSelection(getLanguage());
         renderThemeSelection(getThemePreference());
         renderParentProfile();
+        refreshParentProfileFromSupabase()
+            .then(() => renderParentProfile())
+            .catch(() => {});
         renderPasswordReminder();
         renderNotifToggles();
         renderPlanLabel();
@@ -528,7 +531,7 @@
             }
         });
 
-        parentForm.addEventListener("submit", (event) => {
+        parentForm.addEventListener("submit", async (event) => {
             event.preventDefault();
             const name = document.getElementById("parentNameInput").value.trim();
             const email = document.getElementById("parentEmailInput").value.trim();
@@ -537,9 +540,15 @@
                 parentError.classList.remove("hidden");
                 return;
             }
-            saveParentProfile({ name, email, photoUrl: parentPhotoDataUrl });
+            const savedProfile = saveParentProfile({ name, email, photoUrl: parentPhotoDataUrl });
             renderParentProfile();
-            closeParentProfileModal();
+            try {
+                await syncParentProfileToSupabase(savedProfile);
+                closeParentProfileModal();
+            } catch (error) {
+                parentError.textContent = "Saved on this device, but could not sync to Supabase. Please try again.";
+                parentError.classList.remove("hidden");
+            }
         });
 
         document.querySelectorAll(".list-item-hover").forEach(item => {

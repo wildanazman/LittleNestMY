@@ -626,9 +626,45 @@
 </div>
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const {
-            babyProfile,
-        } = await import(`${moduleBase}data/mockData.mjs`);
+        const [
+            dateFormatModule,
+            localStateModule,
+            babyProfilesRemoteModule,
+            coreLogsRemoteModule,
+            calendarEventsRemoteModule,
+            growthRecordsRemoteModule,
+            remindersRemoteModule,
+            prototypeUiModule,
+            localAuthModule,
+            notificationsModule,
+            profileModule,
+            careGuidesModule,
+            permissionsModule,
+            mamaCareRemoteModule,
+            i18nModule,
+            B,
+            vaccinationsRemoteModule,
+            V
+        ] = await Promise.all([
+            import(`${moduleBase}utils/dateFormat.mjs`),
+            import(`${moduleBase}utils/localState.mjs`),
+            import(`${moduleBase}utils/babyProfilesRemote.mjs`),
+            import(`${moduleBase}utils/coreLogsRemote.mjs`),
+            import(`${moduleBase}utils/calendarEventsRemote.mjs`),
+            import(`${moduleBase}utils/growthRecordsRemote.mjs`),
+            import(`${moduleBase}utils/remindersRemote.mjs`),
+            import(`${moduleBase}utils/prototypeUi.mjs`),
+            import(`${moduleBase}utils/localAuth.mjs`),
+            import(`${moduleBase}utils/notifications.mjs`),
+            import(`${moduleBase}utils/profile.mjs`),
+            import(`${moduleBase}utils/careGuides.mjs`),
+            import(`${moduleBase}utils/permissions.mjs`),
+            import(`${moduleBase}utils/mamaCareRemote.mjs`),
+            import(`${moduleBase}utils/i18n.mjs`),
+            import(`${moduleBase}utils/benchmarks.mjs`),
+            import(`${moduleBase}utils/vaccinationsRemote.mjs`),
+            import(`${moduleBase}utils/vaccinations.mjs`)
+        ]);
         const {
             calculateBabyAge,
             formatDuration,
@@ -636,11 +672,14 @@
             formatRelativeTime,
             formatTime,
             isSameLocalDay
-        } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        } = dateFormatModule;
         const {
             getPersistedCalendarEvents,
+            getPersistedDiaperLogs,
+            getPersistedFeedingLogs,
             getPersistedGrowthRecords,
             getPersistedReminders,
+            getPersistedSleepLogs,
             getLogsForBaby,
             getActiveSleepSession,
             clearActiveSleepSession,
@@ -650,27 +689,25 @@
             saveLocalFeedingLog,
             saveLocalSleepLog,
             saveLocalDiaperLog
-        } = await import(`${moduleBase}utils/localState.mjs`);
-        const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+        } = localStateModule;
+        const { loadBabyProfilesRemote } = babyProfilesRemoteModule;
         const {
             loadCoreLogsRemote,
             deleteFeedingLogRemote, deleteSleepLogRemote, deleteDiaperLogRemote,
             saveFeedingLogRemote, saveSleepLogRemote, saveDiaperLogRemote
-        } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
-        const { loadGrowthRecordsRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
-        const { loadRemindersRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
-        const { bindPrototypeActions, screenUrl, showUndoToast, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { getAuthSession, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { scheduleAllReminders } = await import(`${moduleBase}utils/notifications.mjs`);
-        const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
-        const { getFeedingGuideForBaby } = await import(`${moduleBase}utils/careGuides.mjs`);
-        const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
-        const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
-        const { t } = await import(`${moduleBase}utils/i18n.mjs`);
-        const B = await import(`${moduleBase}utils/benchmarks.mjs`);
-        const { loadVaccinationRecordsRemote } = await import(`${moduleBase}utils/vaccinationsRemote.mjs`);
-        const V = await import(`${moduleBase}utils/vaccinations.mjs`);
+        } = coreLogsRemoteModule;
+        const { loadCalendarEventsRemote } = calendarEventsRemoteModule;
+        const { loadGrowthRecordsRemote } = growthRecordsRemoteModule;
+        const { loadRemindersRemote } = remindersRemoteModule;
+        const { bindPrototypeActions, screenUrl, showUndoToast, goToScreen } = prototypeUiModule;
+        const { getAuthSession, isLoggedIn } = localAuthModule;
+        const { scheduleAllReminders } = notificationsModule;
+        const { getParentProfile, initialsForName } = profileModule;
+        const { getFeedingGuideForBaby } = careGuidesModule;
+        const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = permissionsModule;
+        const { loadMamaCareData } = mamaCareRemoteModule;
+        const { t } = i18nModule;
+        const { loadVaccinationRecordsRemote } = vaccinationsRemoteModule;
 
         window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
         window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
@@ -710,32 +747,20 @@
                 await new Promise(() => {});
             }
         }
-        const babyProfileState = await loadBabyProfilesRemote(babyProfile);
-        const profiles = babyProfileState.profiles;
-        const selectedBabyId = babyProfileState.selectedBabyId;
-        const selectedBaby = babyProfileState.selectedBaby || null;
-        const [coreLogs, permissions] = await Promise.all([
-            loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] }),
-            getBabyPermissions(selectedBabyId)
-        ]);
-        const allFeedingLogs = coreLogs.feedingLogs;
-        const allSleepLogs = coreLogs.sleepLogs;
-        const allDiaperLogs = coreLogs.diaperLogs;
-        const [calState, growthState, reminderState] = await Promise.all([
-            loadCalendarEventsRemote(selectedBabyId, []).catch(() => ({ calendarEvents: getLogsForBaby(getPersistedCalendarEvents([]), selectedBabyId) })),
-            loadGrowthRecordsRemote(selectedBabyId, []).catch(() => ({ growthRecords: getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId) })),
-            loadRemindersRemote(selectedBabyId, []).catch(() => ({ reminders: getLogsForBaby(getPersistedReminders([]), selectedBabyId) }))
-        ]);
-        const allCalendarEvents = calState.calendarEvents;
-        const allGrowthRecords = growthState.growthRecords;
-        const allReminders = reminderState.reminders;
+        const babyProfileState = await loadBabyProfilesRemote(null);
+        const profiles = productionBabyProfiles(babyProfileState.profiles);
+        const selectedBaby = isPrototypeBabyProfile(babyProfileState.selectedBaby) ? profiles[0] || null : babyProfileState.selectedBaby || profiles[0] || null;
+        const selectedBabyId = selectedBaby?.id || "";
+        const permissions = await getBabyPermissions(selectedBabyId);
+        const allFeedingLogs = productionRecords(getLogsForBaby(getPersistedFeedingLogs([]), selectedBabyId));
+        const allSleepLogs = productionRecords(getLogsForBaby(getPersistedSleepLogs([]), selectedBabyId));
+        const allDiaperLogs = productionRecords(getLogsForBaby(getPersistedDiaperLogs([]), selectedBabyId));
+        const allCalendarEvents = [];
+        const allGrowthRecords = productionRecords(getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId));
+        const allReminders = [];
         const primaryParent = getParentProfile();
-        const latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
-        const latestDiaper = [...allDiaperLogs].sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt))[0];
-        const latestGrowth = [...allGrowthRecords].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        const activeSleep = [...allSleepLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).find((log) => !log.endedAt);
-        const todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
-        const nextEvent = selectNextHomeAppointment(allCalendarEvents, allReminders, now);
+        let latestFeed = null;
+        let todayDiaperCount = 0;
 
         const setText = (id, value) => {
             const element = document.getElementById(id);
@@ -772,42 +797,119 @@
             ["activeStatusCard", "statusGridSection", "mamaCareSection", "quickActionsSection", "reminderSection", "dailySummarySection", "timelineSection"]
                 .forEach((id) => document.getElementById(id)?.classList.add("hidden"));
         }
-        const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
-        setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : t("home.noFeedYet"));
-        setText("lastFeedDetail", latestFeed ? [formatTime(latestFeed.startedAt), feedAmountLabel(latestFeed)].filter(Boolean).join(" · ") : t("home.tapToLog"));
-        setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
-        setText("todaySleepDetail", todaySleepMinutes ? t("home.totalToday") : t("home.tapToLog"));
-        setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : t("home.noDiaperYet"));
-        setText("lastDiaperDetail", todayDiaperCount ? (todayDiaperCount === 1 ? t("home.changeToday") : t("home.changesToday")) : t("home.tapToLog"));
-        const latestWeightRecord = [...allGrowthRecords].filter((r) => r.weightKg).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        const latestHeightRecord = [...allGrowthRecords].filter((r) => r.heightCm || r.lengthCm).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-        setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : t("home.notLogged"));
-        setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : t("home.notLogged"));
+        renderDashboardStats();
         setText("assistantTitle", t("home.startLoggingTitle"));
         setText("assistantMessage", t("home.startLoggingMsg"));
         setText("babyMenuTitle", selectedBaby?.name || t("home.manageBabyProfile"));
         const babyPhoto = document.getElementById("babyPhoto");
         if (babyPhoto && selectedBaby?.photoUrl) babyPhoto.src = selectedBaby.photoUrl;
 
-        if (nextEvent) {
-            setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? t("home.nextVaccine") : t("home.nextAppointment"));
-            setText("nextAppointmentSummary", shortEventTitle(nextEvent.title || nextEvent.type || "Appointment"));
-            setText("nextAppointmentRelative", new Date(nextEvent.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }));
-        } else {
-            setText("nextAppointmentLabel", t("home.nextAppointment"));
-            setText("nextAppointmentSummary", t("home.noUpcoming"));
-            setText("nextAppointmentRelative", t("home.tapToAdd"));
-        }
-        renderReminderBanner();
+        renderAppointmentSummary();
         renderActiveStatus();
 
         renderTimeline(now);
         applyPermissions();
-        await renderMamaCarePreview();
         bindBabyProfileMenu();
         showHomeContent();
+        renderReminderBanner();
+        renderMamaCarePreview().catch(() => {});
+        hydrateHomeData();
         const babyNameForNotif = selectedBaby?.name || "";
         scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif, feedIntervalHours: selectedBaby ? feedIntervalHours() : 3 });
+
+        function renderDashboardStats() {
+            latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
+            todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
+            const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
+            setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : t("home.noFeedYet"));
+            setText("lastFeedDetail", latestFeed ? [formatTime(latestFeed.startedAt), feedAmountLabel(latestFeed)].filter(Boolean).join(" - ") : t("home.tapToLog"));
+            setText("todaySleepTotal", todaySleepMinutes ? formatDuration(todaySleepMinutes) : "0h");
+            setText("todaySleepDetail", todaySleepMinutes ? t("home.totalToday") : t("home.tapToLog"));
+            setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : t("home.noDiaperYet"));
+            setText("lastDiaperDetail", todayDiaperCount ? (todayDiaperCount === 1 ? t("home.changeToday") : t("home.changesToday")) : t("home.tapToLog"));
+            const latestWeightRecord = [...allGrowthRecords].filter((r) => r.weightKg).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+            const latestHeightRecord = [...allGrowthRecords].filter((r) => r.heightCm || r.lengthCm).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+            setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : t("home.notLogged"));
+            setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : t("home.notLogged"));
+        }
+
+        function renderAppointmentSummary() {
+            const nextEvent = selectNextHomeAppointment(allCalendarEvents, allReminders, now);
+            if (nextEvent) {
+                setText("nextAppointmentLabel", nextEvent.type === "vaccine" ? t("home.nextVaccine") : t("home.nextAppointment"));
+                setText("nextAppointmentSummary", shortEventTitle(nextEvent.title || nextEvent.type || "Appointment"));
+                setText("nextAppointmentRelative", new Date(nextEvent.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "long", year: "numeric" }));
+            } else {
+                setText("nextAppointmentLabel", t("home.nextAppointment"));
+                setText("nextAppointmentSummary", t("home.noUpcoming"));
+                setText("nextAppointmentRelative", t("home.tapToAdd"));
+            }
+        }
+
+        function replaceItems(target, items) {
+            target.length = 0;
+            target.push(...productionRecords(items || []));
+        }
+
+        function productionBabyProfiles(items = []) {
+            return (items || []).filter((profile) => !isPrototypeBabyProfile(profile));
+        }
+
+        function isPrototypeBabyProfile(profile) {
+            return String(profile?.id || "") === "baby-aisyah";
+        }
+
+        function productionRecords(items = []) {
+            return (items || []).filter((item) => !isPrototypeRecord(item));
+        }
+
+        function isPrototypeRecord(item) {
+            const id = String(item?.id || "");
+            const babyId = String(item?.babyId || item?.baby_id || "");
+            const title = String(item?.title || "").trim().toLowerCase();
+            const prototypeTitles = new Set([
+                "klinik kesihatan appointment",
+                "6-month vaccine",
+                "daycare payment reminder",
+                "pediatric checkup",
+                "first big smile",
+                "held head up during tummy time",
+                "first daycare settling day"
+            ]);
+            return babyId === "baby-aisyah"
+                || /^(feed|sleep|diaper|health|event|milestone|family|suggestion)-00\d$/i.test(id)
+                || prototypeTitles.has(title)
+                || String(item?.source || "").toLowerCase() === "mock";
+        }
+
+        function hydrateHomeData() {
+            if (!selectedBabyId) return;
+            loadCoreLogsRemote(selectedBabyId, { feedingLogs: allFeedingLogs, sleepLogs: allSleepLogs, diaperLogs: allDiaperLogs, healthNotes: [] })
+                .then((coreLogs) => {
+                    replaceItems(allFeedingLogs, coreLogs.feedingLogs);
+                    replaceItems(allSleepLogs, coreLogs.sleepLogs);
+                    replaceItems(allDiaperLogs, coreLogs.diaperLogs);
+                    renderDashboardStats();
+                    renderActiveStatus();
+                    renderTimeline(now);
+                    scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif, feedIntervalHours: selectedBaby ? feedIntervalHours() : 3 });
+                })
+                .catch((error) => console.warn("Could not refresh home logs.", error));
+
+            Promise.all([
+                loadCalendarEventsRemote(selectedBabyId, []).catch(() => ({ calendarEvents: allCalendarEvents })),
+                loadGrowthRecordsRemote(selectedBabyId, []).catch(() => ({ growthRecords: allGrowthRecords })),
+                loadRemindersRemote(selectedBabyId, []).catch(() => ({ reminders: allReminders }))
+            ]).then(([calState, growthState, reminderState]) => {
+                replaceItems(allCalendarEvents, calState.calendarEvents);
+                replaceItems(allGrowthRecords, growthState.growthRecords);
+                replaceItems(allReminders, reminderState.reminders);
+                renderDashboardStats();
+                renderAppointmentSummary();
+                renderGrowthSummary();
+                scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif, feedIntervalHours: selectedBaby ? feedIntervalHours() : 3 });
+            }).catch((error) => console.warn("Could not refresh home summary data.", error));
+        }
 
         function applyPermissions() {
             if (permissions.canAddLogs && selectedBaby) return;

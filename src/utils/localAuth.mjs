@@ -2,6 +2,8 @@ import { isSupabaseConfigured, requireSupabaseClient, supabase, supabaseConfigMe
 import { claimDeviceSession, releaseDeviceSession } from "./deviceSession.mjs";
 
 let cachedSession = null;
+let profileSyncUserId = "";
+let sessionLoadPromise = null;
 export const pendingInviteTokenKey = "littlenest:pendingInviteToken";
 export const needsPasswordSetupKey = "littlenest:needsPasswordSetup";
 export const guestModeKey = "littlenest:isGuest";
@@ -23,7 +25,16 @@ export async function isLoggedIn() {
 export async function getAuthSession() {
   if (isGuestMode()) return null;
   if (!isSupabaseConfigured) return null;
+  if (cachedSession) return cachedSession;
+  if (sessionLoadPromise) return sessionLoadPromise;
 
+  sessionLoadPromise = readAuthSession().finally(() => {
+    sessionLoadPromise = null;
+  });
+  return sessionLoadPromise;
+}
+
+async function readAuthSession() {
   const { data, error } = await supabase.auth.getSession();
   if (error) {
     console.warn("Unable to read Supabase session.", error);
@@ -31,11 +42,13 @@ export async function getAuthSession() {
   }
 
   clearStaleProfileCacheForSession(data.session || null);
-  const prev = cachedSession;
   cachedSession = data.session || null;
 
-  if (cachedSession && cachedSession.user && cachedSession !== prev) {
-    await upsertProfileForUser(cachedSession.user).catch(() => {});
+  if (cachedSession?.user && cachedSession.user.id !== profileSyncUserId) {
+    profileSyncUserId = cachedSession.user.id;
+    upsertProfileForUser(cachedSession.user).catch(() => {
+      profileSyncUserId = "";
+    });
   }
 
   return cachedSession;
@@ -303,17 +316,33 @@ export function getCachedAuthUser() {
 export async function upsertProfileForUser(user, options = {}) {
   if (!user || !isSupabaseConfigured) return null;
 
+  const { data: existingProfile, error: readError } = await supabase
+    .from("profiles")
+    .select("display_name,email,avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (readError) {
+    console.warn("Supabase profile read skipped.", readError);
+  }
+
   const displayName = options.displayName
+    || existingProfile?.display_name
     || user.user_metadata?.display_name
     || user.user_metadata?.name
     || user.email?.split("@")[0]
     || "Parent";
 
+  const avatarUrl = options.avatarUrl
+    || existingProfile?.avatar_url
+    || user.user_metadata?.avatar_url
+    || null;
+
   const profile = {
     id: user.id,
-    email: user.email || "",
+    email: user.email || existingProfile?.email || "",
     display_name: displayName,
-    avatar_url: user.user_metadata?.avatar_url || null,
+    avatar_url: avatarUrl,
     updated_at: new Date().toISOString()
   };
 
@@ -323,11 +352,6 @@ export async function upsertProfileForUser(user, options = {}) {
 
   if (error) {
     console.warn("Supabase profile upsert skipped.", error);
-  } else {
-    try {
-      const key = `littlenest:parentProfile:${user.id}`;
-      window.localStorage.setItem(key, JSON.stringify({ name: displayName, email: user.email || "", photoUrl: user.user_metadata?.avatar_url || "", updatedAt: new Date().toISOString() }));
-    } catch {}
   }
 
   rememberParentProfile(profile);

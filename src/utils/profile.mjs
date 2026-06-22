@@ -1,4 +1,5 @@
 import { getCachedAuthUser } from "./localAuth.mjs";
+import { isSupabaseConfigured, supabase } from "./supabaseClient.mjs";
 
 const parentProfileKey = "littlenest:parentProfile";
 
@@ -25,6 +26,49 @@ export function saveParentProfile(profile) {
   writeJson(parentProfileStorageKey(user.id), nextProfile);
   removeLegacyParentProfileIfDifferentUser(user);
   return nextProfile;
+}
+
+export async function syncParentProfileToSupabase(profile = getParentProfile()) {
+  const user = getCachedAuthUser();
+  if (!user?.id || !isSupabaseConfigured) return profile;
+
+  const row = {
+    id: user.id,
+    email: profile.email || user.email || "",
+    display_name: profile.name || user.user_metadata?.display_name || user.user_metadata?.name || "Parent",
+    avatar_url: profile.photoUrl || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase
+    .from("profiles")
+    .upsert(row, { onConflict: "id" });
+
+  if (error) throw error;
+  return profile;
+}
+
+export async function refreshParentProfileFromSupabase() {
+  const user = getCachedAuthUser();
+  if (!user?.id || !isSupabaseConfigured) return getParentProfile();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("display_name,email,avatar_url,updated_at")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (error || !data) return getParentProfile();
+
+  const remoteProfile = {
+    name: data.display_name || user.user_metadata?.display_name || user.user_metadata?.name || "Parent",
+    email: data.email || user.email || "",
+    photoUrl: data.avatar_url || "",
+    updatedAt: data.updated_at || new Date().toISOString()
+  };
+  writeJson(parentProfileStorageKey(user.id), remoteProfile);
+  removeLegacyParentProfileIfDifferentUser(user);
+  return remoteProfile;
 }
 
 export function initialsForName(name) {
