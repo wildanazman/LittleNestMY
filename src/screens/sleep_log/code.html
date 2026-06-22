@@ -248,7 +248,7 @@
   </div>
 </div>
 </section>
-<a href="#" class="block max-w-[520px] mx-auto rounded-[18px] bg-surface-container-lowest p-3.5 flex items-center justify-between border border-white/60 soft-shadow active:scale-[0.99] transition-transform" data-screen-target="sleep_pattern">
+<a href="#" class="block max-w-[520px] mx-auto rounded-[18px] bg-surface-container-lowest p-3.5 flex items-center justify-between border border-white/60 soft-shadow active:scale-[0.99] transition-transform" id="sleepPatternLink">
   <div class="flex items-center gap-3">
     <div class="w-10 h-10 rounded-full bg-[#e5fbf2] flex items-center justify-center shrink-0">
       <span class="material-symbols-outlined text-[#0f7a44]">bar_chart</span>
@@ -397,6 +397,7 @@
         wakeButton.addEventListener("click", wakeUp);
         backButton.addEventListener("click", () => goToScreen("quick_log"));
         viewStatsButton.addEventListener("click", () => goToScreen("weekly_insights"));
+        document.getElementById("sleepPatternLink")?.addEventListener("click", () => goToScreen("sleep_pattern"));
         toggleManualButton.addEventListener("click", () => {
             const opening = manualPanel.classList.contains("hidden");
             manualPanel.classList.toggle("hidden");
