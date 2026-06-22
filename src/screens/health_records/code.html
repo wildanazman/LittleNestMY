@@ -372,9 +372,27 @@ function renderSymptomTracker() {
           <p class="font-bold text-[16px] text-on-surface truncate">${escapeHtml(g.title)}</p>
           <p class="text-[13px] text-on-surface-variant">${spanLabel} · last ${lastLabel}</p>
         </div>
-        <span class="shrink-0 rounded-full px-3 py-1 text-[12px] font-extrabold" style="${badge}">${status}</span>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="rounded-full px-3 py-1 text-[12px] font-extrabold" style="${badge}">${status}</span>
+          ${permissions.canAddLogs ? `<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error-container/30 active:scale-90 transition-all" data-clear-symptom="${escapeHtml(g.title)}" aria-label="Clear ${escapeHtml(g.title)} records" type="button"><span class="material-symbols-outlined text-[19px]">delete</span></button>` : ""}
+        </div>
       </div>`;
   }).join("");
+
+  list.querySelectorAll("[data-clear-symptom]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const title = btn.dataset.clearSymptom;
+      const ids = healthRecords.filter((r) => String(r.title || "").trim() === title).map((r) => r.id);
+      if (!ids.length) return;
+      if (!confirm(`Clear all "${title}" records (${ids.length})?`)) return;
+      btn.disabled = true;
+      for (const id of ids) {
+        try { await deleteHealthNoteRemote(id); } catch (e) { console.warn(e); }
+      }
+      await refreshRecords();
+      showFeedback(`Cleared "${title}".`);
+    });
+  });
 }
 
 function renderHistory() {
