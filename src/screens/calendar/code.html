@@ -442,7 +442,9 @@
         seeAllEventsButton.addEventListener("click", () => setView("upcoming"));
         backButton.addEventListener("click", () => goToScreen("home_dashboard"));
 
-        loadCalendarEventsRemote(selectedBabyId, mockCalendarEvents).catch(() => {});
+        loadCalendarEventsRemote(selectedBabyId, mockCalendarEvents).catch((error) => {
+            showFeedback(error?.message || "Could not sync calendar events. Showing local data.");
+        });
         render();
 
         function render() {

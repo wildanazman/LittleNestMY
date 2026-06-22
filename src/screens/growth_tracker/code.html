@@ -163,7 +163,9 @@ if (permissions.canAddLogs) {
   document.getElementById("addMeasurementSection").classList.add("hidden");
   document.getElementById("growthStatus").textContent = viewOnlyMessage;
 }
-loadGrowthRecordsRemote(selectedBabyId, []).catch(() => {});
+loadGrowthRecordsRemote(selectedBabyId, []).catch((error) => {
+    showError(error?.message || "Could not sync growth records. Using local data.");
+});
 renderTabs(); render();
 showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
