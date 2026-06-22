@@ -278,6 +278,48 @@ html.dark header[style] {
   color: #22d3ee !important;
 }
 
+/* Settings / list pages — opacity-variant tailwind classes that theme.css misses */
+:root.dark [class*="text-on-surface-variant\/"],
+:root.dark [class*="text-on-surface-variant/"] {
+  color: #a8b5ca !important;
+}
+
+:root.dark [class*="bg-secondary-container\/"],
+:root.dark [class*="bg-secondary-container/"],
+:root.dark [class*="bg-surface-container-low\/"],
+:root.dark [class*="bg-surface-container-low/"] {
+  background-color: rgba(34, 211, 238, 0.10) !important;
+}
+
+:root.dark .list-item-hover:active,
+:root.dark .list-item-hover:active * {
+  background-color: rgba(34, 211, 238, 0.08) !important;
+}
+
+:root.dark .text-outline-variant,
+:root.dark .group-hover\:text-primary,
+:root.dark .group:hover .group-hover\:text-primary {
+  color: #a8b5ca !important;
+}
+
+:root.dark .group:hover .group-hover\:text-primary {
+  color: #22d3ee !important;
+}
+
+/* Toggle switch track in dark — replace light pink off-color */
+:root.dark [role="switch"] {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+:root.dark [role="switch"][aria-checked="true"] {
+  background-color: #22d3ee !important;
+}
+
+/* Section header labels ("Account", "Appearance", etc.) */
+:root.dark .text-on-surface-variant\/70,
+:root.dark [class*="text-on-surface-variant/70"] {
+  color: #a8b5ca !important;
+}
+
 :root.dark .bg-surface-container,
 :root.dark .bg-surface-container-highest,
 :root.dark .bg-surface-container-high {
