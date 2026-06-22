@@ -9,6 +9,25 @@ import {
 } from "./_supabaseAdmin.mjs";
 import { isEmailProviderConfigured, resetEmailHtml, sendEmail } from "./_email.mjs";
 
+const rateMap = new Map();
+const MAX_ATTEMPTS = 3;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function checkRateLimit(key) {
+  const now = Date.now();
+  const attempts = rateMap.get(key) || [];
+  const recent = attempts.filter((t) => t > now - WINDOW_MS);
+  rateMap.set(key, recent);
+  return recent.length >= MAX_ATTEMPTS;
+}
+
+function recordAttempt(key) {
+  const now = Date.now();
+  const attempts = rateMap.get(key) || [];
+  attempts.push(now);
+  rateMap.set(key, attempts);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("allow", "POST");
@@ -23,6 +42,14 @@ export default async function handler(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return sendJson(res, 400, { error: "Enter a valid email address." });
   }
+
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
+  if (checkRateLimit(email) || checkRateLimit(ip)) {
+    return sendJson(res, 429, { error: "Too many attempts. Please wait 15 minutes." });
+  }
+
+  recordAttempt(email);
+  recordAttempt(ip);
 
   // No own-brand provider yet → let the client send the normal Supabase reset
   // email so the flow still works before Resend is configured.
