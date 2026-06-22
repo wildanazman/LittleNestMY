@@ -103,6 +103,10 @@
 
 html {
   touch-action: manipulation;
+  background: #fdfbff;
+}
+:root.dark html {
+  background: #101a2e;
 }
 
 body {
