@@ -796,7 +796,7 @@ Save Milestone
             try {
                 milestonesCache = [{ ...milestoneDraft }, ...milestonesCache.filter((item) => item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
                 const saved = await saveMilestoneRemote(milestoneDraft);
-                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== editingMilestoneId)];
+                milestonesCache = [saved, ...milestonesCache.filter((item) => item.id !== saved.id && item.id !== milestoneDraft.id && item.id !== editingMilestoneId)];
 
                 hidePreview();
                 noteInput.value = "";
