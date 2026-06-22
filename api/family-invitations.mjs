@@ -264,14 +264,13 @@ async function createInvitation(req, res, service, user) {
 }
 
 async function findAuthUserByEmail(service, email) {
-  for (let page = 1; page <= 10; page += 1) {
-    const { data, error } = await service.auth.admin.listUsers({ page, perPage: 1000 });
+  try {
+    const { data, error } = await service.auth.admin.getUserByEmail(email);
     if (error) return null;
-    const match = data?.users?.find((authUser) => String(authUser.email || "").toLowerCase() === email);
-    if (match) return match;
-    if (!data?.users || data.users.length < 1000) return null;
+    return data?.user || null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 function buildInviteUrl(req, token) {
