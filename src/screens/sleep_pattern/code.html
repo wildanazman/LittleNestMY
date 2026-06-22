@@ -177,36 +177,41 @@ function getSleepDays() {
 function renderChart() {
   const days = getSleepDays();
   const maxH = 24;
-  const margin = { left: 40, right: 16, top: 20, bottom: 44 };
+  const margin = { left: 40, right: 52, top: 20, bottom: 44 };
   const chartW = 360 - margin.left - margin.right;
   const chartH = 260 - margin.top - margin.bottom;
-  const barW = Math.max(6, Math.floor(chartW / days.length) - 4);
+  const barW = Math.max(8, Math.floor(chartW / days.length) - 6);
   const barGap = Math.max(2, (chartW - barW * days.length) / (days.length + 1));
 
   let html = "";
   for (let h = 0; h <= 24; h += 3) {
     const y = margin.top + (h / maxH) * chartH;
-    html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h === 0 ? 'rgba(15,122,68,0.16)' : 'rgba(15,122,68,0.06)'}" stroke-width="1"/>`;
-    const label = `${String(h).padStart(2, "0")}:00`;
-    html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${label}</text>`;
+    html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h === 0 || h === 24 ? 'rgba(15,122,68,0.16)' : 'rgba(15,122,68,0.06)'}" stroke-width="1"/>`;
+    html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${String(h).padStart(2, "0")}:00</text>`;
   }
   let x = margin.left + barGap;
   const todayIdx = days.length - 1;
   for (let i = 0; i < days.length; i++) {
     const d = days[i];
-    if (!d.totalMin) { x += barW + barGap; continue; }
     const isToday = i === todayIdx;
-    const totalH = Math.min(d.totalMin / 60, maxH);
-    const barH = (totalH / maxH) * chartH;
-    const barY = margin.top + chartH - barH;
-    const nightH = d.totalMin ? (d.nightMin / d.totalMin) * barH : 0;
-    const napH = barH - nightH;
-
-    html += `<rect x="${x}" y="${barY}" width="${barW}" height="${nightH}" rx="3" fill="#0f7a44" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Night: ${Math.floor(d.nightMin / 60)}h${d.nightMin % 60 > 0 ? d.nightMin % 60 + 'm' : ''}</title></rect>`;
-    html += `<rect x="${x}" y="${barY + nightH}" width="${barW}" height="${napH}" rx="0" fill="#22c08a" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Nap: ${Math.floor(d.napMin / 60)}h${d.napMin % 60 > 0 ? d.napMin % 60 + 'm' : ''}</title></rect>`;
-    html += `<text x="${x + barW / 2}" y="${barY - 4}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="9" font-weight="700" font-family="Nunito Sans">${Math.floor(totalH)}h${Math.round(totalH % 1 * 60) > 0 ? Math.round(totalH % 1 * 60) + 'm' : ''}</text>`;
+    for (const log of d.logs) {
+      const start = new Date(log.startedAt);
+      const end = log.endedAt ? new Date(log.endedAt) : new Date();
+      const startH = start.getHours() + start.getMinutes() / 60;
+      let endH = end.getHours() + end.getMinutes() / 60;
+      if (endH <= startH) endH += 24;
+      const y1 = margin.top + (startH / maxH) * chartH;
+      const hh = Math.max(0.15, ((endH - startH) / maxH) * chartH);
+      if (hh < 0.3) continue;
+      const isNight = start.getHours() >= 19 || start.getHours() < 6;
+      html += `<rect x="${x}" y="${y1}" width="${barW}" height="${Math.min(hh, margin.top + chartH - y1)}" rx="3" fill="${isNight ? '#0f7a44' : '#22c08a'}" opacity="${isToday ? '1' : '0.75'}"><title>${formatTime(log.startedAt)} – ${log.endedAt ? formatTime(log.endedAt) : 'now'} · ${formatDuration(Math.max(1, Math.round((end - start) / 60000)))}</title></rect>`;
+    }
     html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 18}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="10" font-weight="${isToday ? '800' : '600'}" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { day: "numeric", month: "short" })}</text>`;
     html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 32}" text-anchor="middle" fill="#a8b5ca" font-size="9" font-family="Nunito Sans">${d.date.toLocaleDateString("en-MY", { weekday: "short" })}</text>`;
+    // Total label
+    if (d.totalMin > 0) {
+      html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 44}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="9" font-weight="700" font-family="Nunito Sans">${Math.floor(d.totalMin / 60)}h${d.totalMin % 60 > 0 ? d.totalMin % 60 + 'm' : ''}</text>`;
+    }
     x += barW + barGap;
   }
   chartSvg.innerHTML = html;
