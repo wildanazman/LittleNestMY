@@ -1,5 +1,6 @@
 import { requireSupabaseClient, isSupabaseConfigured } from "./supabaseClient.mjs";
 import { getAuthSession, isGuestMode } from "./localAuth.mjs";
+import { isAdminEmail } from "./admin.mjs";
 
 const PLAN_KEY = "littlenest:plan";
 const PLAN_CACHE_TTL = 5 * 60 * 1000;
@@ -18,6 +19,12 @@ export async function getCurrentPlan() {
   if (!session?.user?.id || !isSupabaseConfigured) {
     planCache = { plan: getLocalPlan(), fetchedAt: now };
     return planCache.plan;
+  }
+
+  // Admin accounts always have premium.
+  if (isAdminEmail(session.user.email)) {
+    planCache = { plan: "premium", fetchedAt: now };
+    return "premium";
   }
 
   try {

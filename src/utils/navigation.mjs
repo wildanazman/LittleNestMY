@@ -1,6 +1,7 @@
 import { applyTranslations, getLanguage, t } from "./i18n.mjs";
 import { getAuthSession, isEmailVerified, isGuestMode, isLoggedIn, logoutLocalUser } from "./localAuth.mjs";
 import { markKickedFlag, verifyDeviceSession, watchDeviceSession } from "./deviceSession.mjs";
+import { isAdminEmail } from "./admin.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 
@@ -403,6 +404,9 @@ async function guardAuthenticatedRoutes() {
   if (!session) { redirect("auth_welcome"); return; }
   // Logged-in but unverified email → hold at the verification screen.
   if (!isEmailVerified(session.user)) { redirect("verify_pending"); return; }
+
+  // Admin accounts may use multiple devices at once — skip single-device kick.
+  if (isAdminEmail(session.user?.email)) return;
 
   // Single active device: if another phone has logged into this account, this
   // session was superseded — sign out and send to login with a notice.
