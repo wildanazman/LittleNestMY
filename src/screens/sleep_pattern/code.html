@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://esm.sh" crossorigin/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Sleep Pattern - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "surface-container": "#efeee9",
+        "surface-container-low": "#f5f3ee",
+        "surface-bright": "#fbf9f4",
+        "on-primary": "#ffffff",
+        "surface": "#fbf9f4",
+        "on-surface": "#1b1c19",
+        "on-surface-variant": "#51443e",
+        "background": "#fbf9f4",
+        "primary": "#83533c",
+        "primary-container": "#ffbfa3",
+        "on-primary-container": "#7a4b36",
+        "outline-variant": "#d6c2bb",
+        "error": "#ba1a1a",
+        "tertiary": "#486646",
+        "secondary": "#625e56",
+        "secondary-container": "#e6dfd5",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-highest": "#e4e2de",
+      },
+      fontFamily: {
+        "headline-lg-mobile": ["Nunito Sans"],
+        "headline-md": ["Nunito Sans"],
+        "label-sm": ["Nunito Sans"],
+        "label-md": ["Nunito Sans"],
+        "body-md": ["Nunito Sans"]
+      },
+      fontSize: {
+        "headline-lg-mobile": ["22px", {"lineHeight": "28px", "fontWeight": "700"}],
+        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+      }
+    }
+  }
+};
+</script>
+<style>
+  body { font-family: 'Nunito Sans', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(131,83,60,0.12); }
+  :root.dark .text-on-surface { color: #eef6ff !important; }
+  :root.dark .text-on-surface-variant { color: #a8b5ca !important; }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<header class="bg-surface sticky top-0 z-40 flex justify-between items-center w-full px-container-padding h-14">
+<div class="flex items-center gap-2 min-w-0">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Sleep Pattern</h1>
+</div>
+<div class="flex items-center gap-1">
+<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="7" type="button" id="period7">7d</button>
+<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="14" type="button" id="period14">14d</button>
+<button class="h-8 px-3 rounded-full font-label-sm text-label-sm transition-colors" data-period="30" type="button" id="period30">30d</button>
+</div>
+</header>
+
+<main class="max-w-lg mx-auto px-container-padding pt-5 pb-10 space-y-5" id="sleepPatternContent">
+<section class="rounded-[26px] bg-surface-container-lowest p-4 soft-shadow border border-white/60">
+<div class="flex items-center gap-2 mb-4 px-1">
+<span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#0f7a44]"><span class="w-3 h-3 rounded-sm bg-[#0f7a44] inline-block"></span>Night</span>
+<span class="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#22c08a]"><span class="w-3 h-3 rounded-sm bg-[#22c08a] inline-block"></span>Nap</span>
+</div>
+<svg class="w-full" id="sleepChart" viewBox="0 0 360 300" role="img" aria-label="Sleep pattern chart"></svg>
+</section>
+
+<section>
+<div class="flex items-center justify-between px-1 mb-3">
+<h3 class="font-headline-md text-headline-md text-on-surface">Recent sleep logs</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="selectedRange">7 days</span>
+</div>
+<div class="space-y-3" id="sleepLogList"></div>
+</section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span class="font-label-sm">Home</span></button>
+<button data-screen-target="quick_log"><span class="material-symbols-outlined">add_circle</span><span class="font-label-sm">Log</span></button>
+<button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span class="font-label-sm">Calendar</span></button>
+<button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span class="font-label-sm">Milestones</span></button>
+<button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span class="font-label-sm">Assistant</span></button>
+</nav>
+
+<script type="module">
+const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+const { babyProfile, sleepLogs: mockSleepLogs } = await import(`${moduleBase}data/mockData.mjs`);
+const { formatDuration, formatTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { getLogsForBaby, getPersistedSleepLogs } = await import(`${moduleBase}utils/localState.mjs`);
+const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+
+document.getElementById("backButton").addEventListener("click", () => goToScreen("sleep_log"));
+let sleepLogItems = [];
+let periodDays = 7;
+const chartSvg = document.getElementById("sleepChart");
+const logList = document.getElementById("sleepLogList");
+const rangeLabel = document.getElementById("selectedRange");
+
+document.getElementById("period7").addEventListener("click", () => setPeriod(7));
+document.getElementById("period14").addEventListener("click", () => setPeriod(14));
+document.getElementById("period30").addEventListener("click", () => setPeriod(30));
+
+const babyState = await loadBabyProfilesRemote(babyProfile);
+const selectedBabyId = babyState.selectedBabyId;
+sleepLogItems = getLogsForBaby(getPersistedSleepLogs(mockSleepLogs), selectedBabyId);
+try { const r = await loadCoreLogsRemote(selectedBabyId, { sleepLogs: mockSleepLogs }); sleepLogItems = r.sleepLogs; } catch {}
+
+setPeriod(7);
+
+function setPeriod(days) {
+  periodDays = days;
+  [7, 14, 30].forEach((d) => {
+    const btn = document.getElementById(`period${d}`);
+    if (btn) { btn.classList.toggle("bg-primary", d === days); btn.classList.toggle("text-on-primary", d === days); btn.classList.toggle("bg-surface-container-low", d !== days); btn.classList.toggle("text-on-surface-variant", d !== days); }
+  });
+  rangeLabel.textContent = `${days} days`;
+  renderChart();
+  renderList();
+}
+
+function getSleepDays() {
+  const now = new Date();
+  const days = [];
+  for (let i = periodDays - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+    const dayLogs = sleepLogItems.filter((l) => {
+      const s = new Date(l.startedAt);
+      const e = l.endedAt ? new Date(l.endedAt) : new Date();
+      return isSameLocalDay(s, d) || isSameLocalDay(e, d);
+    });
+    const nightMin = dayLogs.reduce((sum, l) => {
+      const s = new Date(l.startedAt);
+      if (s.getHours() >= 19 || s.getHours() < 6) { const e = l.endedAt ? new Date(l.endedAt) : new Date(); let m = Math.round((e - s) / 60000); if (m <= 0) m += 1440; return sum + m; }
+      return sum;
+    }, 0);
+    const napMin = dayLogs.reduce((sum, l) => {
+      const s = new Date(l.startedAt);
+      if (s.getHours() >= 6 && s.getHours() < 19) { const e = l.endedAt ? new Date(l.endedAt) : new Date(); let m = Math.round((e - s) / 60000); if (m <= 0) m += 1440; return sum + m; }
+      return sum;
+    }, 0);
+    days.push({ date: d, logs: dayLogs, nightMin, napMin, totalMin: nightMin + napMin });
+  }
+  return days;
+}
+
+function renderChart() {
+  const days = getSleepDays();
+  const maxY = Math.max(360, Math.ceil(Math.max(...days.map((d) => d.totalMin), 1) / 60) * 60 + 60);
+  const margin = { left: 40, right: 16, top: 20, bottom: 36 };
+  const chartW = 360 - margin.left - margin.right;
+  const chartH = 260 - margin.top - margin.bottom;
+  const barW = Math.max(6, Math.floor(chartW / days.length) - 4);
+  const barGap = Math.max(2, (chartW - barW * days.length) / (days.length + 1));
+
+  let html = "";
+  // Y axis gridlines
+  for (let h = 0; h <= Math.ceil(maxY / 60); h++) {
+    const mins = h * 60;
+    const y = margin.top + chartH - (mins / maxY) * chartH;
+    html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h % 4 === 0 ? "rgba(15,122,68,0.12)" : "rgba(15,122,68,0.05)"}" stroke-width="1"/>`;
+    if (h % 2 === 0) {
+      html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${h}h</text>`;
+    }
+  }
+  // Bars
+  let x = margin.left + barGap;
+  const todayIdx = days.length - 1;
+  for (let i = 0; i < days.length; i++) {
+    const d = days[i];
+    if (!d.totalMin) { x += barW + barGap; continue; }
+    const isToday = i === todayIdx;
+    const barH = (d.totalMin / maxY) * chartH;
+    const barY = margin.top + chartH - barH;
+    const nightH = (d.nightMin / d.totalMin) * barH;
+    const napH = barH - nightH;
+
+    // Night portion
+    html += `<rect x="${x}" y="${barY}" width="${barW}" height="${nightH}" rx="3" fill="#0f7a44" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Night: ${Math.floor(d.nightMin / 60)}h${d.nightMin % 60 > 0 ? d.nightMin % 60 + 'm' : ''}</title></rect>`;
+    // Nap portion
+    html += `<rect x="${x}" y="${barY + nightH}" width="${barW}" height="${napH}" rx="0" fill="#22c08a" opacity="${isToday ? '1' : '0.75'}" cursor="pointer" data-log-day="${d.date.toISOString().slice(0, 10)}"><title>Nap: ${Math.floor(d.napMin / 60)}h${d.napMin % 60 > 0 ? d.napMin % 60 + 'm' : ''}</title></rect>`;
+    // Total label
+    html += `<text x="${x + barW / 2}" y="${barY - 4}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="9" font-weight="700" font-family="Nunito Sans">${Math.floor(d.totalMin / 60)}h${d.totalMin % 60 > 0 ? d.totalMin % 60 + 'm' : ''}</text>`;
+    // Day label
+    const dayLabel = d.date.toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+    html += `<text x="${x + barW / 2}" y="${margin.top + chartH + 16}" text-anchor="middle" fill="${isToday ? '#0f7a44' : '#665650'}" font-size="10" font-weight="${isToday ? '800' : '600'}" font-family="Nunito Sans">${dayLabel}</text>`;
+    x += barW + barGap;
+  }
+  chartSvg.innerHTML = html;
+
+  // Click-to-log
+  chartSvg.querySelectorAll("[data-log-day]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const day = days.find((d) => d.date.toISOString().slice(0, 10) === el.dataset.logDay);
+      if (day) renderList(day.date);
+    });
+  });
+}
+
+function renderList(scrollToDate) {
+  const days = getSleepDays();
+  const allLogs = days.flatMap((d) => d.logs.map((l) => ({ ...l, _day: d.date }))).sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+
+  logList.innerHTML = allLogs.length ? allLogs.map((log) => {
+    const start = new Date(log.startedAt);
+    const end = log.endedAt ? new Date(log.endedAt) : new Date();
+    const min = Math.max(1, Math.round((end - start) / 60000));
+    const isNight = start.getHours() >= 19 || start.getHours() < 6;
+    const dateStr = log._day.toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "short" });
+    return `<div class="flex items-center gap-3 rounded-[18px] bg-surface-container-lowest p-3 soft-shadow border border-white/60" data-log-date="${log._day.toISOString().slice(0, 10)}">
+      <div class="w-2 h-10 rounded-full shrink-0" style="background:${isNight ? '#0f7a44' : '#22c08a'}"></div>
+      <div class="flex-1 min-w-0">
+        <p class="font-label-md text-label-md text-on-surface">${isNight ? "Night sleep" : "Nap"} · ${formatDuration(min)}</p>
+        <p class="text-[12px] text-on-surface-variant">${dateStr} · ${formatTime(log.startedAt)} – ${log.endedAt ? formatTime(log.endedAt) : "ongoing"}</p>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+    </div>`;
+  }).join("") : `<p class="text-center py-8 text-on-surface-variant font-label-md">No sleep logs in this period.</p>`;
+
+  if (scrollToDate) {
+    const el = logList.querySelector(`[data-log-date="${scrollToDate.toISOString().slice(0, 10)}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

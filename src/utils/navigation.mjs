@@ -51,6 +51,7 @@ const activeGroups = {
   feeding_history: "log",
   sleep_log: "log",
   sleep_log_dark: "log",
+  sleep_pattern: "log",
   diaper_log: "log",
   diaper_log_dark: "log",
   diaper_detail: "log",

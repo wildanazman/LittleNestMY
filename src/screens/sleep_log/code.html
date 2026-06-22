@@ -245,9 +245,21 @@
 <div class="flex items-baseline gap-1">
 <span class="font-display-lg text-display-lg text-on-surface" id="napCount">0</span>
 <span class="font-label-md text-label-md text-on-surface-variant">today</span>
-</div>
+  </div>
 </div>
 </section>
+<a href="#" class="block max-w-[520px] mx-auto rounded-[18px] bg-surface-container-lowest p-3.5 flex items-center justify-between border border-white/60 soft-shadow active:scale-[0.99] transition-transform" data-screen-target="sleep_pattern">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full bg-[#e5fbf2] flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined text-[#0f7a44]">bar_chart</span>
+    </div>
+    <div>
+      <p class="font-label-md text-label-md text-on-surface">Sleep pattern</p>
+      <p class="text-[12px] text-on-surface-variant">See your baby's sleep rhythm over time</p>
+    </div>
+  </div>
+  <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</a>
 <!-- Nap History Timeline -->
 <section class="space-y-md">
 <div class="flex justify-between items-center">
@@ -304,20 +316,6 @@
 </div>
 </div>
 </div>
-  </section>
-  <!-- Sleep Pattern Chart (7-day) -->
-  <section class="max-w-[520px] mx-auto" id="sleepPatternSection">
-    <div class="flex items-center justify-between mb-3 px-1">
-      <h3 class="font-headline-md text-headline-md text-on-surface">Sleep pattern</h3>
-      <span class="font-label-sm text-label-sm text-on-surface-variant">7 days</span>
-    </div>
-    <div class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow border border-white/60">
-      <div class="flex items-center gap-2 mb-3 px-1">
-        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#0f7a44]"><span class="w-2.5 h-2.5 rounded-full bg-[#0f7a44] inline-block"></span>Night</span>
-        <span class="inline-flex items-center gap-1 text-[11px] font-bold text-[#22c08a]"><span class="w-2.5 h-2.5 rounded-full bg-[#22c08a] inline-block"></span>Nap</span>
-      </div>
-      <svg class="w-full" id="sleepChart" viewBox="0 0 340 210" role="img" aria-label="Sleep pattern chart - 7 days"></svg>
-    </div>
   </section>
 </main>
 <!-- Bottom Nav Bar -->
@@ -502,7 +500,6 @@
             renderTimer(activeSession);
             renderSummary(activeSession);
             renderHistory(activeSession);
-            renderSleepChart();
         }
 
         function setActiveState(isActive) {
@@ -616,74 +613,6 @@
                     `${card.dataset.sleepDetail} detail view is coming soon.`
                 ));
             });
-        }
-
-        function renderSleepChart() {
-            const svg = document.getElementById("sleepChart");
-            if (!svg) return;
-            const now = new Date();
-            const days = [];
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
-                const dayLogs = sleepLogItems.filter((l) => {
-                    const s = new Date(l.startedAt);
-                    const e = l.endedAt ? new Date(l.endedAt) : new Date();
-                    return isSameLocalDay(s, d) || isSameLocalDay(e, d);
-                });
-                days.push({ date: d, logs: dayLogs });
-            }
-            const margin = { left: 44, right: 52, top: 16, bottom: 4 };
-            const rowH = 28, chartW = 340 - margin.left - margin.right;
-            const chartH = days.length * rowH;
-            svg.setAttribute("viewBox", `0 0 340 ${chartH + margin.top + margin.bottom}`);
-
-            let html = "";
-            // Hour gridlines + labels
-            for (let h = 0; h <= 24; h++) {
-                const x = margin.left + (h / 24) * chartW;
-                html += `<line x1="${x}" y1="${margin.top}" x2="${x}" y2="${margin.top + chartH}" stroke="${h % 6 === 0 ? "rgba(15,122,68,0.15)" : "rgba(15,122,68,0.06)"}" stroke-width="${h % 6 === 0 ? "1" : "0.5"}"/>`;
-                if (h % 3 === 0) {
-                    html += `<text x="${x}" y="${margin.top - 6}" text-anchor="middle" fill="#665650" font-size="10" font-weight="700" font-family="Nunito Sans">${h === 24 ? "24" : `${h}:00`}</text>`;
-                }
-            }
-            // Day rows
-            for (let i = 0; i < days.length; i++) {
-                const d = days[i];
-                const y = margin.top + i * rowH;
-                const dayName = d.date.toLocaleDateString("en-MY", { weekday: "short" });
-                const isToday = i === days.length - 1;
-                const dayBg = isToday ? "rgba(15,122,68,0.04)" : "transparent";
-                if (isToday) html += `<rect x="${margin.left}" y="${y}" width="${chartW}" height="${rowH}" rx="6" fill="${dayBg}"/>`;
-
-                html += `<text x="${margin.left - 6}" y="${y + 18}" text-anchor="end" fill="${isToday ? "#0f7a44" : "#665650"}" font-size="11" font-weight="${isToday ? "800" : "600"}" font-family="Nunito Sans">${dayName}</text>`;
-
-                if (!d.logs.length) {
-                    html += `<text x="${margin.left + chartW / 2}" y="${y + 18}" text-anchor="middle" fill="#c4b5ad" font-size="10" font-family="Nunito Sans">—</text>`;
-                }
-                for (const log of d.logs) {
-                    const start = new Date(log.startedAt);
-                    const end = log.endedAt ? new Date(log.endedAt) : new Date();
-                    const startMins = start.getHours() * 60 + start.getMinutes();
-                    const endMins = end.getHours() * 60 + end.getMinutes() || 1440;
-                    let duration = endMins - startMins;
-                    if (duration <= 0) duration += 1440;
-                    const x1 = margin.left + (startMins / 1440) * chartW;
-                    const w = Math.max(6, (duration / 1440) * chartW);
-                    const isNight = start.getHours() >= 19 || start.getHours() < 6;
-                    const color = isNight ? "#0f7a44" : "#22c08a";
-                    html += `<rect x="${x1}" y="${y + 5}" width="${Math.min(w, margin.left + chartW - x1)}" height="${rowH - 10}" rx="6" fill="${color}" opacity="0.85"><title>${formatTime(log.startedAt)} – ${log.endedAt ? formatTime(log.endedAt) : "now"} · ${formatDuration(Math.max(1, Math.round(duration)))}</title></rect>`;
-                }
-                const totalMin = d.logs.reduce((sum, l) => {
-                    const s = new Date(l.startedAt), e = l.endedAt ? new Date(l.endedAt) : new Date();
-                    let min = Math.round((e - s) / 60000);
-                    if (min <= 0) min += 1440;
-                    return sum + min;
-                }, 0);
-                const h = Math.floor(totalMin / 60), m = totalMin % 60;
-                html += `<text x="${margin.left + chartW + 6}" y="${y + 18}" text-anchor="start" fill="${isToday ? "#0f7a44" : "#665650"}" font-size="10" font-weight="${isToday ? "800" : "600"}" font-family="Nunito Sans">${h}h${m > 0 ? m + "m" : ""}</text>`;
-            }
-            svg.innerHTML = html;
-            document.getElementById("sleepPatternSection").classList.toggle("hidden", !days.some((d) => d.logs.length));
         }
 
         function renderEmptyHistory() {

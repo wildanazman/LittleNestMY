@@ -14,6 +14,7 @@ export const screens = [
   { id: "feeding_log", title: "Feeding Log", group: "log", path: "feeding_log/code.html", preview: "feeding_log/screen.png" },
   { id: "feeding_history", title: "Feeding History", group: "log", path: "feeding_history/code.html", preview: "feeding_log/screen.png" },
   { id: "sleep_log", title: "Sleep Log", group: "log", path: "sleep_log/code.html", preview: "sleep_log/screen.png" },
+  { id: "sleep_pattern", title: "Sleep Pattern", group: "log", path: "sleep_pattern/code.html", preview: "sleep_log/screen.png" },
   { id: "diaper_log", title: "Diaper Log", group: "log", path: "diaper_log/code.html", preview: "diaper_log/screen.png" },
   { id: "diaper_detail", title: "Diaper History", group: "log", path: "diaper_detail/code.html", preview: "diaper_log/screen.png" },
   { id: "health_records", title: "Health Records", group: "log", path: "health_records/code.html", preview: "quick_log/screen.png" },
