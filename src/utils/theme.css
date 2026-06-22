@@ -254,12 +254,22 @@ select:focus {
 :root.dark header.bg-surface,
 :root.dark header.sticky,
 :root.dark header[class*="bg-surface"] {
-  background: linear-gradient(180deg, rgba(16, 26, 46, 0.96), rgba(13, 22, 40, 0.76)) !important;
+  background: linear-gradient(180deg, #101a2e, #0d1628) !important;
+  background-color: #0d1628 !important;
   color: #eef6ff !important;
-  border-color: rgba(34, 211, 238, 0.10) !important;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24) !important;
-  backdrop-filter: blur(18px) saturate(1.15) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.15) !important;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.32) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+:root.dark header h1,
+:root.dark header .text-primary {
+  color: #22d3ee !important;
+}
+
+:root.dark header .material-symbols-outlined {
+  color: #22d3ee !important;
 }
 
 :root.dark .bg-surface-container,
