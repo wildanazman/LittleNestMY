@@ -187,7 +187,7 @@ function renderChart() {
   for (let h = 0; h <= 24; h += 3) {
     const y = margin.top + (h / maxH) * chartH;
     html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + chartW}" y2="${y}" stroke="${h === 0 ? 'rgba(15,122,68,0.16)' : 'rgba(15,122,68,0.06)'}" stroke-width="1"/>`;
-    const label = h === 0 ? "12 AM" : h === 12 ? "12 PM" : h < 12 ? `${h} AM` : `${h - 12} PM`;
+    const label = `${String(h).padStart(2, "0")}:00`;
     html += `<text x="${margin.left - 6}" y="${y + 4}" text-anchor="end" fill="#8a746b" font-size="9" font-family="Nunito Sans">${label}</text>`;
   }
   let x = margin.left + barGap;
