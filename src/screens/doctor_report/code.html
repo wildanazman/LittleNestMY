@@ -184,6 +184,7 @@ const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { getPersistedGrowthRecords, getPersistedMilestones, getLogsForBaby } = await import(`${moduleBase}utils/localState.mjs`);
+const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
 const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
@@ -233,7 +234,8 @@ async function renderReport() {
   const healthNotes = core.healthNotes || [];
   const growth = getLogsForBaby(getPersistedGrowthRecords([]), babyId)
     .sort((a, b) => new Date(a.measuredAt) - new Date(b.measuredAt));
-  const milestones = getLogsForBaby(getPersistedMilestones([]), babyId);
+  const milestones = (await loadMilestonesRemote(babyId, []).catch(() => null))?.milestones
+    || getLogsForBaby(getPersistedMilestones([]), babyId);
 
   const start = rangeStart();
   const inRange = (value) => { const d = new Date(value); return d >= start && d <= now; };
@@ -293,19 +295,22 @@ async function renderReport() {
   renderGrowthChart(growth);
 
   // Notes & milestones
+  const payloadHealthNotes = healthNotes.filter((n) => inRange(n.recordedAt || n.loggedAt)).map((n) => ({
+    at: n.recordedAt || n.loggedAt,
+    type: n.type || "Health note",
+    detail: n.notes || n.detail || n.title || ""
+  })).sort((a, b) => new Date(b.at) - new Date(a.at));
+
+  const payloadMilestones = milestones.filter((m) => inRange(m.achievedAt || m.date || m.createdAt)).map((m) => ({
+    at: m.achievedAt || m.date || m.createdAt,
+    title: m.title || "Milestone",
+    detail: m.notes || m.description || ""
+  })).sort((a, b) => new Date(b.at) - new Date(a.at));
+
+  // Combined for on-screen display
   const recentNotes = [
-    ...healthNotes.filter((n) => inRange(n.recordedAt || n.loggedAt)).map((n) => ({
-      at: n.recordedAt || n.loggedAt,
-      icon: "medical_information",
-      title: n.title || n.type || "Health note",
-      detail: n.notes || n.detail || ""
-    })),
-    ...milestones.filter((m) => inRange(m.achievedAt || m.date || m.createdAt)).map((m) => ({
-      at: m.achievedAt || m.date || m.createdAt,
-      icon: "auto_awesome",
-      title: m.title || "Milestone",
-      detail: m.notes || m.description || ""
-    }))
+    ...payloadHealthNotes.map((n) => ({ ...n, icon: "medical_information", title: n.type })),
+    ...payloadMilestones.map((m) => ({ ...m, icon: "auto_awesome" }))
   ].sort((a, b) => new Date(b.at) - new Date(a.at));
 
   document.getElementById("notesList").innerHTML = recentNotes.length
@@ -330,7 +335,8 @@ async function renderReport() {
     summaryRows,
     days,
     growth,
-    notes: recentNotes
+    healthNotes: payloadHealthNotes,
+    milestones: payloadMilestones
   };
 }
 
@@ -454,27 +460,46 @@ async function printReport() {
   doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
   doc.text("Daily Breakdown", 40, y); y += 18;
   doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-  const dHead = ["Day", "Feeds", "Sleep", "Diapers"];
-  dHead.forEach((h, i) => doc.text(h, 40 + i * 100, y));
-  y += 14;
+  doc.text("Day", 40, y); doc.text("Feeds", 170, y); doc.text("Sleep", 240, y); doc.text("Diapers", 340, y);
+  y += 16;
   for (const d of p.days) {
     if (y > 780) { doc.addPage(); y = 50; }
     doc.text(formatDayLabel(d.day), 40, y);
-    doc.text(String(d.feedCount), 140, y);
+    doc.text(String(d.feedCount), 170, y);
     doc.text(d.sleepMin ? formatDuration(d.sleepMin) : "—", 240, y);
     doc.text(String(d.diaperCount), 340, y);
-    y += 14;
+    y += 15;
   }
-  y += 10;
+  y += 12;
 
-  if (p.notes.length) {
+  if (p.healthNotes.length) {
     doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
-    doc.text("Notes & Milestones", 40, y); y += 16;
+    doc.text("Health Notes", 40, y); y += 18;
     doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-    for (const n of p.notes) {
+    doc.text("Date", 40, y); doc.text("Type", 140, y); doc.text("Details", 220, y);
+    y += 16;
+    for (const n of p.healthNotes) {
       if (y > 780) { doc.addPage(); y = 50; }
-      doc.text(`${n.title}${n.detail ? " — " + n.detail : ""} (${formatDate(n.at)})`, 40, y);
-      y += 14;
+      doc.text(formatDate(n.at), 40, y);
+      doc.text(n.type, 140, y);
+      doc.text(n.detail || "—", 220, y);
+      y += 15;
+    }
+    y += 10;
+  }
+
+  if (p.milestones.length) {
+    doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Milestones", 40, y); y += 18;
+    doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
+    doc.text("Date", 40, y); doc.text("Milestone", 140, y); doc.text("Notes", 280, y);
+    y += 16;
+    for (const m of p.milestones) {
+      if (y > 780) { doc.addPage(); y = 50; }
+      doc.text(formatDate(m.at), 40, y);
+      doc.text(m.title, 140, y);
+      doc.text(m.detail || "—", 280, y);
+      y += 15;
     }
   }
 
