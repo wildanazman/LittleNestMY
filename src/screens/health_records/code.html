@@ -166,6 +166,14 @@ tailwind.config = {
     </form>
   </section>
 
+  <section class="space-y-3 hidden" id="symptomTrackerSection">
+    <div class="flex items-center justify-between">
+      <h2 class="text-[20px] leading-7 font-bold text-on-surface">Symptom tracker</h2>
+      <span class="text-[12px] font-bold text-on-surface-variant">Last 30 days</span>
+    </div>
+    <div class="space-y-2.5" id="symptomTrackerList"></div>
+  </section>
+
   <section class="space-y-3">
     <div class="flex items-center justify-between">
       <h2 class="text-[20px] leading-7 font-bold text-on-surface">History</h2>
@@ -307,7 +315,58 @@ async function refreshRecords() {
   const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
   healthRecords = result.healthNotes.sort((a, b) => new Date(b.recordedAt) - new Date(a.recordedAt));
   document.getElementById("recordCount").textContent = `${healthRecords.length} record${healthRecords.length === 1 ? "" : "s"}`;
+  renderSymptomTracker();
   renderHistory();
+}
+
+// Aggregate symptom records (last 30 days) into per-symptom summaries so the
+// parent can see how long something has been going and whether it's resolved.
+function renderSymptomTracker() {
+  const section = document.getElementById("symptomTrackerSection");
+  const list = document.getElementById("symptomTrackerList");
+  if (!section || !list) return;
+  const DAY = 86400000;
+  const now = Date.now();
+  const since = now - 30 * DAY;
+  // Symptoms only — skip medicine and clinic record types.
+  const groups = new Map();
+  for (const r of healthRecords) {
+    const type = String(r.type || "note").toLowerCase();
+    if (type === "medicine" || type === "clinic") continue;
+    const at = new Date(r.recordedAt).getTime();
+    if (Number.isNaN(at) || at < since) continue;
+    const key = String(r.title || "Symptom").trim() || "Symptom";
+    const g = groups.get(key) || { title: key, count: 0, first: at, last: at };
+    g.count += 1;
+    g.first = Math.min(g.first, at);
+    g.last = Math.max(g.last, at);
+    groups.set(key, g);
+  }
+  const rows = [...groups.values()].sort((a, b) => b.last - a.last);
+  if (!rows.length) { section.classList.add("hidden"); list.innerHTML = ""; return; }
+  section.classList.remove("hidden");
+
+  const dayDiff = (ms) => Math.floor((now - ms) / DAY);
+  list.innerHTML = rows.map((g) => {
+    const sinceLast = dayDiff(g.last);
+    const status = sinceLast <= 2 ? "Active" : sinceLast <= 7 ? "Watching" : "Resolved";
+    const badge = status === "Active"
+      ? "background:#ffdad6;color:#93000a"
+      : status === "Watching"
+        ? "background:#ffe2b8;color:#7a4b06"
+        : "background:#b5d6af;color:#1f3a1e";
+    const spanDays = Math.max(1, Math.round((g.last - g.first) / DAY) + 1);
+    const spanLabel = g.count === 1 ? "once" : `${g.count}× over ${spanDays} day${spanDays === 1 ? "" : "s"}`;
+    const lastLabel = sinceLast <= 0 ? "today" : sinceLast === 1 ? "yesterday" : `${sinceLast} days ago`;
+    return `
+      <div class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <p class="font-bold text-[16px] text-on-surface truncate">${escapeHtml(g.title)}</p>
+          <p class="text-[13px] text-on-surface-variant">${spanLabel} · last ${lastLabel}</p>
+        </div>
+        <span class="shrink-0 rounded-full px-3 py-1 text-[12px] font-extrabold" style="${badge}">${status}</span>
+      </div>`;
+  }).join("");
 }
 
 function renderHistory() {
