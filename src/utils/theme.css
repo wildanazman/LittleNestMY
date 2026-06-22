@@ -337,7 +337,9 @@ html.dark header[style] {
 :root.dark .bg-\[\#FFF7ED\],
 :root.dark .bg-\[\#EFF6FF\],
 :root.dark .bg-\[\#F0FDF4\],
-:root.dark .bg-\[\#FAF5FF\] {
+:root.dark .bg-\[\#FAF5FF\],
+:root.dark .bg-\[\#FFF8F5\],
+:root.dark .bg-\[\#fff8f5\] {
   background-color: #121b2d !important;
 }
 
@@ -420,8 +422,18 @@ html.dark header[style] {
 :root.dark .border-white,
 :root.dark .border-white\/50,
 :root.dark .border-white\/60,
-:root.dark .border-white\/70 {
+:root.dark .border-white\/70,
+:root.dark .border-white\/80 {
   border-color: rgba(132, 204, 255, 0.14) !important;
+}
+
+:root.dark .bg-white\/60,
+:root.dark .bg-white\/70,
+:root.dark .bg-white\/75,
+:root.dark .bg-white\/80,
+:root.dark .bg-white\/85,
+:root.dark .bg-white\/90 {
+  background-color: rgba(18, 27, 45, 0.82) !important;
 }
 
 :root.dark input,
