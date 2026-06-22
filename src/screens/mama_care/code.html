@@ -860,7 +860,7 @@ function openPumpSessionForm(existing = {}) {
       ${numberField("leftMl", "Left breast (ml)", existing.leftMl || "", 0, 999, "1")}
       ${numberField("rightMl", "Right breast (ml)", existing.rightMl || "", 0, 999, "1")}
     </div>
-    ${selectField("pumpUsed", "Pump used", ["Spectra S1", "Momcozy M5", "Elvie", "Other"], existing.pumpUsed || "Spectra S1")}
+    ${selectField("pumpUsed", "Pump used", ["Spectra S1", "Momcozy M5", "Momcozy V1 Pro", "Elvie", "Other"], existing.pumpUsed || "Spectra S1")}
     ${textareaField("notes", "Notes", existing.notes || "", "Engorged, missed previous session, stressful day")}
     ${submitButton("Save Pump Session")}
   `, async (form) => {
