@@ -687,7 +687,8 @@
             if (raw.includes("error=") || raw.includes("error_description=")) {
                 const q = (window.location.search + window.location.hash.replace(/^#/, "&")).replace(/^[?&]/, "");
                 const p = new URLSearchParams(q);
-                const msg = p.get("error_description") || p.get("error") || "OAuth failed";
+                const rawMsg = p.get("error_description") || p.get("error") || "OAuth failed";
+                const msg = String(rawMsg).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
                 document.body.innerHTML = `<main style="padding:40px;text-align:center;font-family:Arial"><h2>Sign-in failed</h2><p style="color:#ba1a1a">${msg}</p><a href="/login/" style="color:#83533c">Try again</a></main>`;
                 await new Promise(() => {});
             }

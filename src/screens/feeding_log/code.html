@@ -578,7 +578,8 @@
             const div = document.createElement("div");
             div.className = "brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer";
             div.dataset.brand = brand;
-            div.innerHTML = `<span>${brand}</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px] pointer-events-none">close</span></button>`;
+            const safe = String(brand).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+            div.innerHTML = `<span>${safe}</span><button type="button" class="w-5 h-5 rounded-full flex items-center justify-center text-outline hover:bg-outline/10 shrink-0" data-brand-remove><span class="material-symbols-outlined text-[14px] pointer-events-none">close</span></button>`;
             formulaBrandChips.insertBefore(div, document.getElementById("formulaBrandMoreBtn"));
         }
         function selectFeedingChip(brand) {
