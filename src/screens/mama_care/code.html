@@ -103,6 +103,20 @@ tailwind.config = {
 
   <p class="hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
+  <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Today's Care Plan</p>
+        <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="carePlanTitle">Start with a gentle check-in.</h2>
+        <p class="text-[14px] leading-5 text-on-surface-variant" id="carePlanDetail">Mama Care will turn check-ins, meds, and appointments into practical next steps.</p>
+      </div>
+      <span class="material-symbols-outlined text-primary text-[30px]">favorite</span>
+    </div>
+    <div class="hidden rounded-2xl bg-error-container p-3 text-error font-bold" id="carePlanAlert"></div>
+    <div class="grid grid-cols-3 gap-2" id="carePlanGoals"></div>
+    <div class="rounded-2xl bg-surface-container-low p-3" id="nextMamaAction"></div>
+  </section>
+
   <section class="mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="pumpingModule">
     <div class="flex items-start justify-between gap-3">
       <div>
@@ -209,6 +223,12 @@ tailwind.config = {
         <p class="text-[14px] leading-5 text-on-surface-variant">Helping Mama recover starts with the small things today.</p>
       </div>
       <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addTaskButton" type="button">Add</button>
+    </div>
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="water" type="button">Water</button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="meal" type="button">Meal</button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="rest" type="button">Rest block</button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="chores" type="button">Chores</button>
     </div>
     <div class="space-y-3" id="supportTaskList"></div>
   </section>
@@ -387,6 +407,7 @@ async function refreshMamaCare() {
 }
 
 function renderAll() {
+  renderMamaCarePlan();
   renderPumpingModule();
   renderCheckin();
   renderSupportTasks();
@@ -399,6 +420,43 @@ function showMamaContent() {
   document.getElementById("mamaLoadingState")?.classList.add("hidden");
   document.getElementById("noBabyState")?.classList.add("hidden");
   document.getElementById("mamaContent")?.classList.remove("hidden");
+}
+
+function renderMamaCarePlan() {
+  const checkin = mamaData.checkins.find((item) => item.checkinDate === today);
+  const medsToday = todayItems(mamaData.medications, (item) => item.medicationTime);
+  const tasksToday = mamaData.supportTasks.filter((task) => task.taskDate === today);
+  const upcomingAppointments = mamaData.appointments
+    .filter((item) => item.appointmentTime && new Date(item.appointmentTime) >= new Date())
+    .sort((a, b) => new Date(a.appointmentTime) - new Date(b.appointmentTime));
+  const redFlags = mamaRedFlags(checkin);
+  const nextMed = medsToday
+    .filter((item) => item.status === "pending" && item.medicationTime && new Date(item.medicationTime) >= new Date())
+    .sort((a, b) => new Date(a.medicationTime) - new Date(b.medicationTime))[0];
+  const pendingTask = tasksToday.find((task) => task.status === "pending");
+  const nextAppt = upcomingAppointments[0];
+
+  document.getElementById("carePlanTitle").textContent = checkin ? carePlanTitle(checkin, redFlags) : "Start with a gentle check-in.";
+  document.getElementById("carePlanDetail").textContent = checkin
+    ? carePlanDetail(checkin, medsToday, tasksToday)
+    : "Log mood, pain, rest, water, and meals once today so the family knows how to support Mama.";
+
+  const alert = document.getElementById("carePlanAlert");
+  if (redFlags.length) {
+    alert.innerHTML = `<span class="material-symbols-outlined align-[-5px] mr-1">warning</span>${escapeHtml(redFlags[0])}`;
+    alert.classList.remove("hidden");
+  } else {
+    alert.classList.add("hidden");
+    alert.textContent = "";
+  }
+
+  document.getElementById("carePlanGoals").innerHTML = [
+    careGoal("water_drop", "Water", checkin?.waterCups ? `${checkin.waterCups}/8` : "0/8", Number(checkin?.waterCups || 0) >= 8),
+    careGoal("restaurant", "Meals", checkin?.mealsCount ? `${checkin.mealsCount}/3` : "0/3", Number(checkin?.mealsCount || 0) >= 3),
+    careGoal("bedtime", "Rest", checkin?.sleepHours ? `${checkin.sleepHours}h` : "0h", Number(checkin?.sleepHours || 0) >= 5)
+  ].join("");
+
+  document.getElementById("nextMamaAction").innerHTML = nextMamaAction({ checkin, nextMed, pendingTask, nextAppt });
 }
 
 function renderPumpingModule() {
@@ -712,6 +770,7 @@ document.body.addEventListener("click", async (event) => {
     if (action === "med-edit") return openMedicationForm(mamaData.medications.find((item) => item.id === id));
     if (action === "appointment-edit") return openAppointmentForm(mamaData.appointments.find((item) => item.id === id));
     if (action === "note-edit") return openNoteForm(mamaData.recoveryNotes.find((item) => item.id === id));
+    if (action === "task-template") await createSupportTaskTemplate(button.dataset.template);
     if (action === "task-done") await updateMamaSupportTaskStatus(id, "done");
     if (action === "task-skip") await updateMamaSupportTaskStatus(id, "skipped");
     if (action === "task-reset") await updateMamaSupportTaskStatus(id, "pending");
@@ -771,6 +830,18 @@ function openCheckinForm() {
       notes: form.notes.value
     });
   });
+}
+
+async function createSupportTaskTemplate(template) {
+  const task = supportTaskTemplate(template);
+  await saveMamaSupportTask({
+    babyId: selectedBabyId,
+    taskTitle: task.title,
+    taskDate: today,
+    status: "pending",
+    notes: task.notes
+  });
+  showFeedback(`${task.title} added.`);
 }
 
 function openTaskForm(existing = {}) {
@@ -1138,6 +1209,70 @@ function taskIcon(title) {
   if (lower.includes("sleep") || lower.includes("nap") || lower.includes("rest")) return "bedtime";
   if (lower.includes("med")) return "pill";
   return "volunteer_activism";
+}
+
+function mamaRedFlags(checkin) {
+  if (!checkin) return [];
+  const flags = [];
+  const mood = String(checkin.mood || "").toLowerCase();
+  if (String(checkin.bleeding || "").toLowerCase() === "heavy") flags.push("Heavy bleeding logged. Please contact doctor, Klinik Kesihatan, or emergency care if this is sudden or worrying.");
+  if (Number(checkin.painLevel || 0) >= 7) flags.push("Pain is high today. Consider medical advice, especially with fever, bleeding, or severe headache.");
+  if (["overwhelmed", "sad", "anxious"].includes(mood)) flags.push("Mama may need extra emotional support today. Check in gently and do not leave her carrying everything alone.");
+  if (String(checkin.breastfeedingComfort || "").toLowerCase() === "painful") flags.push("Breastfeeding is painful today. Consider lactation support if pain continues.");
+  return flags;
+}
+
+function carePlanTitle(checkin, redFlags) {
+  if (redFlags.length) return "Mama needs extra support today.";
+  if (Number(checkin.sleepHours || 0) < 4) return "Protect Mama's rest window.";
+  if (Number(checkin.waterCups || 0) < 5) return "Hydration is the next easy win.";
+  if (Number(checkin.mealsCount || 0) < 2) return "Make food simple for Mama.";
+  return "Mama's basics are covered today.";
+}
+
+function carePlanDetail(checkin, meds, tasks) {
+  const pendingMeds = meds.filter((item) => item.status === "pending").length;
+  const pendingTasks = tasks.filter((item) => item.status === "pending").length;
+  if (pendingMeds) return `${pendingMeds} medication reminder${pendingMeds === 1 ? "" : "s"} still pending today.`;
+  if (pendingTasks) return `${pendingTasks} support task${pendingTasks === 1 ? "" : "s"} still waiting for the family.`;
+  if (Number(checkin.sleepHours || 0) < 5) return "Try to create one protected rest block before the day ends.";
+  return "Keep the day light: water, meals, meds, and one real rest moment.";
+}
+
+function careGoal(icon, label, value, done) {
+  return `
+    <div class="rounded-2xl ${done ? "bg-[#e8f5ee] text-[#147a45]" : "bg-surface-container-low text-on-surface"} p-3 text-center dark:bg-white/10">
+      <span class="material-symbols-outlined text-[22px]">${icon}</span>
+      <p class="text-[12px] font-bold">${label}</p>
+      <p class="text-[16px] font-extrabold">${value}</p>
+    </div>
+  `;
+}
+
+function nextMamaAction({ checkin, nextMed, pendingTask, nextAppt }) {
+  if (!checkin) {
+    return `<p class="font-extrabold text-on-surface">Next: Add today's check-in</p><p class="text-[13px] text-on-surface-variant">It takes under a minute and makes the rest of Mama Care smarter.</p>`;
+  }
+  if (nextMed) {
+    return `<p class="font-extrabold text-on-surface">Next medicine: ${escapeHtml(nextMed.medicationName)}</p><p class="text-[13px] text-on-surface-variant">${escapeHtml(nextMed.dose || "Dose not set")} at ${formatTime(nextMed.medicationTime)}</p>`;
+  }
+  if (pendingTask) {
+    return `<p class="font-extrabold text-on-surface">Next family help: ${escapeHtml(pendingTask.taskTitle)}</p><p class="text-[13px] text-on-surface-variant">${escapeHtml(pendingTask.notes || "Mark done when completed.")}</p>`;
+  }
+  if (nextAppt) {
+    return `<p class="font-extrabold text-on-surface">Next appointment: ${escapeHtml(nextAppt.title)}</p><p class="text-[13px] text-on-surface-variant">${formatDateTime(nextAppt.appointmentTime)}</p>`;
+  }
+  return `<p class="font-extrabold text-on-surface">Next: keep today gentle</p><p class="text-[13px] text-on-surface-variant">No urgent Mama Care action is pending right now.</p>`;
+}
+
+function supportTaskTemplate(template) {
+  const templates = {
+    water: { title: "Refill Mama's water bottle", notes: "Put it within reach before nursing or pumping." },
+    meal: { title: "Prepare an easy meal", notes: "Bring food Mama can eat one-handed if needed." },
+    rest: { title: "Protect a 45-minute rest block", notes: "Handle baby, doorbell, and chores so Mama can truly rest." },
+    chores: { title: "Clear one household chore", notes: "Laundry, dishes, bottles, or trash. Pick one and finish it." }
+  };
+  return templates[template] || templates.water;
 }
 
 function localDate(date) {
