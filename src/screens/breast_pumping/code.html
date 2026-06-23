@@ -459,6 +459,8 @@ const {
 } = await import(`${moduleBase}utils/pumpingCareRemote.mjs`);
 
 const today = localDate(new Date());
+const pumpBrandStorageKey = "littleNestCustomPumpBrands";
+const defaultPumpBrands = ["Spectra S1", "Momcozy M5", "Momcozy V1 Pro", "Elvie"];
 let selectedBabyId = "";
 let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
 let mamaData = emptyMamaData();
@@ -1051,6 +1053,9 @@ function openPumpSessionForm(existing = {}) {
   const now = new Date();
   const started = existing.startedAt ? new Date(existing.startedAt) : new Date(now.getTime() - 20 * 60000);
   const ended = existing.endedAt ? new Date(existing.endedAt) : now;
+  const pumpOptions = pumpBrandOptions(existing.pumpUsed);
+  const selectedPump = pumpOptions.some((brand) => sameText(brand, existing.pumpUsed)) ? existing.pumpUsed : existing.pumpUsed ? "Other" : "Spectra S1";
+  const customPumpValue = selectedPump === "Other" ? existing.pumpUsed : "";
   openModal(existing.id ? "Edit Pump Session" : "Log Pump Session", `
     ${inputField("startedAt", "Start time", toDatetimeLocal(started), "", "datetime-local")}
     ${inputField("endedAt", "End time", toDatetimeLocal(ended), "", "datetime-local")}
@@ -1058,7 +1063,12 @@ function openPumpSessionForm(existing = {}) {
       ${numberField("leftMl", "Left breast (ml)", existing.leftMl || "", 0, 999, "1")}
       ${numberField("rightMl", "Right breast (ml)", existing.rightMl || "", 0, 999, "1")}
     </div>
-    ${selectField("pumpUsed", "Pump used", ["Spectra S1", "Momcozy M5", "Momcozy V1 Pro", "Elvie", "Other"], existing.pumpUsed || "Spectra S1")}
+    ${selectField("pumpUsed", "Pump used", pumpOptions, selectedPump)}
+    <label class="${selectedPump === "Other" ? "block" : "hidden"} space-y-1" id="customPumpBrandField">
+      <span class="text-[13px] font-extrabold text-on-surface">Other pump brand</span>
+      <input class="mama-input" name="pumpUsedOther" type="text" value="${escapeAttr(customPumpValue)}" placeholder="Type pump brand or model"/>
+      <span class="block text-[12px] font-bold text-on-surface-variant">Saved to this device for your next pump log.</span>
+    </label>
     ${textareaField("notes", "Notes", existing.notes || "", "Engorged, missed previous session, stressful day")}
     ${submitButton("Save Pump Session")}
   `, async (form) => {
@@ -1068,6 +1078,8 @@ function openPumpSessionForm(existing = {}) {
     if (!startedAt || !endedAt || durationMinutes <= 0) throw new Error("Check the pumping start and end time.");
     const leftMl = Number(form.leftMl.value || 0);
     const rightMl = Number(form.rightMl.value || 0);
+    const pumpUsed = resolvePumpBrand(form);
+    saveCustomPumpBrand(pumpUsed);
     await savePumpSession({
       id: existing.id,
       babyId: selectedBabyId,
@@ -1077,10 +1089,11 @@ function openPumpSessionForm(existing = {}) {
       leftMl,
       rightMl,
       totalMl: leftMl + rightMl,
-      pumpUsed: form.pumpUsed.value,
+      pumpUsed,
       notes: form.notes.value
     });
   });
+  bindPumpBrandControls();
 }
 
 function openMilkStorageForm(existing = {}) {
@@ -1310,6 +1323,55 @@ function inputField(name, label, value = "", placeholder = "", type = "text") {
 
 function numberField(name, label, value = "", min = "", max = "", step = "1") {
   return `<label class="block space-y-1"><span class="text-[13px] font-extrabold text-on-surface">${label}</span><input class="mama-input" name="${name}" type="number" min="${min}" max="${max}" step="${step}" value="${escapeAttr(value)}"/></label>`;
+}
+
+function pumpBrandOptions(currentValue = "") {
+  const options = [...defaultPumpBrands, ...loadCustomPumpBrands()];
+  if (currentValue && !sameText(currentValue, "Other") && !options.some((brand) => sameText(brand, currentValue))) {
+    options.push(currentValue);
+  }
+  return [...new Map(options.filter(Boolean).map((brand) => [brand.toLowerCase(), brand])).values(), "Other"];
+}
+
+function loadCustomPumpBrands() {
+  try {
+    return JSON.parse(localStorage.getItem(pumpBrandStorageKey) || "[]").filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function saveCustomPumpBrand(brand) {
+  const cleanBrand = String(brand || "").trim();
+  if (!cleanBrand || defaultPumpBrands.some((item) => sameText(item, cleanBrand)) || sameText(cleanBrand, "Other")) return;
+  const brands = loadCustomPumpBrands().filter((item) => !sameText(item, cleanBrand));
+  localStorage.setItem(pumpBrandStorageKey, JSON.stringify([cleanBrand, ...brands].slice(0, 12)));
+}
+
+function resolvePumpBrand(form) {
+  const selected = form.pumpUsed.value;
+  if (!sameText(selected, "Other")) return selected;
+  const custom = form.pumpUsedOther.value.trim();
+  if (!custom) throw new Error("Add the pump brand or model.");
+  return custom;
+}
+
+function bindPumpBrandControls() {
+  const form = document.getElementById("mamaForm");
+  const select = form?.elements?.pumpUsed;
+  const customField = document.getElementById("customPumpBrandField");
+  const customInput = form?.elements?.pumpUsedOther;
+  if (!select || !customField || !customInput) return;
+  select.addEventListener("change", () => {
+    const showCustom = sameText(select.value, "Other");
+    customField.classList.toggle("hidden", !showCustom);
+    customField.classList.toggle("block", showCustom);
+    if (showCustom) customInput.focus();
+  });
+}
+
+function sameText(a, b) {
+  return String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
 }
 
 function selectField(name, label, options, value = "") {
