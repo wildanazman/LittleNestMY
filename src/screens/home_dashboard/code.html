@@ -118,10 +118,10 @@
         body {
           font-family: 'Nunito Sans', sans-serif;
           background:
-            radial-gradient(circle at 12% 8%, rgba(255, 182, 193, 0.34), transparent 34%),
-            radial-gradient(circle at 88% 12%, rgba(191, 226, 255, 0.42), transparent 36%),
-            radial-gradient(circle at 50% 82%, rgba(255, 221, 226, 0.28), transparent 42%),
-            linear-gradient(180deg, #fff3f7 0%, #f5fbff 50%, #fff7f2 100%);
+            radial-gradient(circle at 16% 8%, rgba(255, 219, 204, 0.48), transparent 32%),
+            radial-gradient(circle at 88% 14%, rgba(181, 214, 175, 0.20), transparent 34%),
+            radial-gradient(circle at 50% 84%, rgba(255, 231, 235, 0.22), transparent 42%),
+            linear-gradient(180deg, #fffaf6 0%, #fbf9f4 50%, #f3eee8 100%);
         }
         :root.dark body {
           background:
@@ -130,7 +130,7 @@
             linear-gradient(180deg, #101a2e 0%, #0d1628 48%, #08101f 100%) !important;
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
+        .soft-shadow { box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78); }
         .timeline-line { background: linear-gradient(to bottom, rgba(124,92,255,0.28), rgba(124,92,255,0.12)); }
         .home-skeleton-block {
           border-radius: 24px;
@@ -143,9 +143,9 @@
           background-size: 200% 100%;
         }
         .baby-glass-card {
-          background: linear-gradient(135deg, #efe7ff 0%, #ffe9f2 52%, #e6f3ff 100%) !important;
+          background: linear-gradient(135deg, #fff5ee 0%, #fff9f4 48%, #eff8ef 100%) !important;
           border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 20px 46px rgba(124, 92, 255, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+          box-shadow: 0 20px 46px rgba(75, 50, 39, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.85);
           position: relative;
           overflow: hidden;
         }
@@ -161,9 +161,9 @@
           pointer-events: none;
         }
         .home-panel {
-          background: rgba(255, 255, 255, 0.62);
+          background: rgba(255, 255, 255, 0.76);
           border: 1px solid rgba(255, 255, 255, 0.74);
-          box-shadow: 0 12px 34px rgba(103, 78, 87, 0.08);
+          box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78);
         }
         .home-pressable {
           transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, box-shadow 180ms ease;
@@ -177,9 +177,7 @@
           }
         }
         #homeContent header:not(nav),
-        #homeContent header button,
         #babyProfileMenuButton,
-        #homeContent .dashboard-stat-card,
         #homeContent [data-screen-target]:not(nav *):not([data-screen-target="mama_care"]) .w-14,
         #homeContent [data-screen-target="mama_care"][role="button"],
         #homeContent [data-screen-target="mama_care"][role="button"] .bg-white\/70,
@@ -191,9 +189,14 @@
           -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
         }
         #homeContent header:not(nav) {
-          background: rgba(255, 248, 252, 0.62) !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.58);
-          box-shadow: 0 12px 32px rgba(128, 88, 92, 0.08);
+          top: max(10px, env(safe-area-inset-top));
+          width: calc(100% - 28px);
+          max-width: 448px;
+          margin: 0 auto;
+          border-radius: 999px;
+          background: rgba(255, 248, 243, 0.88) !important;
+          border: 1px solid rgba(255, 255, 255, 0.78);
+          box-shadow: 0 16px 42px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.86);
         }
         #homeContent header button,
         #babyProfileMenuButton {
@@ -218,11 +221,11 @@
           color: #6b3fc4 !important;
         }
         #homeContent .dashboard-stat-card {
-          border: 0 !important;
+          border: 1px solid rgba(255, 255, 255, 0.72) !important;
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
-          border-radius: 30px !important;
-          box-shadow: 0 10px 26px rgba(96, 84, 140, 0.10), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
+          border-radius: 28px !important;
+          box-shadow: 0 12px 28px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
         }
         [data-screen-target="mama_care"][role="button"] {
           background: rgba(255, 231, 235, 0.62) !important;
@@ -303,6 +306,26 @@
           border-color: rgba(255, 255, 255, 0.08) !important;
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
         }
+        .home-bottom-nav {
+          width: calc(100% - 28px);
+          max-width: 448px;
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: max(10px, env(safe-area-inset-bottom));
+          border: 1px solid rgba(255, 255, 255, 0.78);
+          border-radius: 28px;
+          box-shadow: 0 18px 44px rgba(75, 50, 39, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.86);
+        }
+        .home-section-card {
+          background: rgba(255, 255, 255, 0.80) !important;
+          border: 1px solid rgba(255, 255, 255, 0.74) !important;
+          box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
+        }
+        .home-pill {
+          background: rgba(255, 255, 255, 0.72) !important;
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.74);
+        }
         @keyframes homeSkeletonPulse {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
@@ -357,17 +380,17 @@
 </section>
 <div class="hidden" id="homeContent" aria-live="polite">
 <!-- Top App Bar -->
-<header class="bg-surface sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-14">
+<header class="bg-surface sticky z-50 flex justify-between items-center px-3 h-14">
 <div class="flex items-center gap-3 min-w-0">
 <img class="w-9 h-9 rounded-xl object-cover shrink-0" src="../../../icons/littlenest-logo.png" alt="LittleNest MY logo"/>
 <h1 class="font-headline-lg text-headline-lg text-primary truncate">LittleNest MY</h1>
 </div>
-<button aria-label="Open settings and reminders" class="w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button">
+<button aria-label="Open settings and reminders" class="home-pressable w-10 h-10 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95" data-screen-target="settings" type="button">
 <img class="w-full h-full object-cover hidden" id="homeParentPhoto" alt="Parent profile"/>
 <span class="font-headline-md text-headline-md text-primary" id="homeParentInitials">P</span>
 </button>
 </header>
-<main class="max-w-md mx-auto px-container-padding pt-6 space-y-lg">
+<main class="max-w-md mx-auto px-container-padding pt-8 space-y-lg">
 <!-- Greeting & Profile -->
 <section class="space-y-sm">
 <div class="flex items-end justify-between">
@@ -375,13 +398,13 @@
 <span class="font-label-md text-label-md text-on-surface-variant" data-i18n="home.greeting">Good morning,</span>
 <h2 class="font-display-lg text-display-lg text-on-surface" id="parentName" data-i18n="home.loading">Loading...</h2>
 </div>
-<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm text-white shrink-0" style="background:linear-gradient(135deg,#9b7cff,#7056f4);box-shadow:0 6px 16px rgba(112,86,244,.26)">
+<div class="home-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm text-primary shrink-0">
 <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">wb_sunny</span>
 <span data-i18n="home.today">Today</span>
 </div>
 </div>
 <!-- Baby Profile Card -->
-<div class="baby-glass-card bg-surface-container-low p-4 rounded-[28px] soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
+<div class="baby-glass-card home-pressable bg-surface-container-low p-4 rounded-[28px] soft-shadow cursor-pointer" id="babyProfileCard" data-screen-target="baby_profiles" role="button" tabindex="0" aria-label="Open baby profiles">
 <div class="flex items-center gap-4 relative z-10">
 <div class="shrink-0 rounded-full p-[3px] shadow-sm" style="background:linear-gradient(135deg,#9b7cff,#ff9ec7)">
 <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
@@ -392,7 +415,7 @@
 <h3 class="font-headline-md text-headline-md text-on-surface truncate" id="babyName">No baby profile yet</h3>
 <p class="font-label-md text-label-md text-on-surface-variant truncate" id="babyAge">Create a baby profile, or wait for an invitation</p>
 </div>
-<button aria-label="Baby profile menu" class="shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm backdrop-blur active:scale-95 transition-transform" id="babyProfileMenuButton" type="button">
+<button aria-label="Baby profile menu" class="home-pressable shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm active:scale-95" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
 </button>
 </div>
@@ -403,28 +426,28 @@
 </div>
 <!-- Empty state CTAs (no baby profile) -->
 <div class="hidden space-y-3" id="noBabyCta">
-<button class="h-14 w-full rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center gap-2 soft-shadow active:scale-95 transition-transform" data-screen-target="add_baby_profile" type="button">
+<button class="home-pressable h-14 w-full rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center gap-2 soft-shadow active:scale-95" data-screen-target="add_baby_profile" type="button">
 <span class="material-symbols-outlined">add</span>
 <span data-i18n="home.createBaby">Create baby profile</span>
 </button>
-<button class="h-14 w-full rounded-full bg-primary-container text-on-primary-container font-headline-md text-headline-md flex items-center justify-center gap-2 active:scale-95 transition-transform" data-screen-target="accept_invite" type="button">
+<button class="home-pressable h-14 w-full rounded-full bg-primary-container text-on-primary-container font-headline-md text-headline-md flex items-center justify-center gap-2 active:scale-95" data-screen-target="accept_invite" type="button">
 <span class="material-symbols-outlined">mail</span>
 <span data-i18n="home.acceptInvite">Accept invitation</span>
 </button>
 </div>
-<div class="rounded-[24px] bg-white/75 p-4 soft-shadow border border-white/70 cursor-pointer dark:bg-white/10 dark:border-white/10" id="activeStatusCard" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Log a feed">
+<div class="home-section-card home-pressable rounded-[28px] bg-white/75 p-4 soft-shadow border border-white/70 cursor-pointer dark:bg-white/10 dark:border-white/10" id="activeStatusCard" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Log a feed">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-full bg-[#ffe3ec] text-[#d6336c] flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant</span>
 </div>
 <div class="min-w-0 flex-1">
 <p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusLabel">Next feed</p>
-<p class="font-headline-md text-headline-md text-on-surface" id="activeStatusTitle">—</p>
+<p class="font-headline-md text-headline-md text-on-surface" id="activeStatusTitle">...</p>
 <p class="font-label-sm text-label-sm text-on-surface-variant" id="activeStatusDetail">Tap to log a feed</p>
 </div>
 <span class="material-symbols-outlined text-primary shrink-0">chevron_right</span>
 </div>
-<div class="h-1.5 rounded-full bg-surface-container mt-3 overflow-hidden dark:bg-white/10"><div class="h-full rounded-full transition-all" id="feedProgressBar" style="width:0%;background:#7056f4"></div></div>
+<div class="h-1.5 rounded-full bg-surface-container mt-3 overflow-hidden dark:bg-white/10"><div class="h-full rounded-full transition-[width,background-color] duration-300 ease-[cubic-bezier(.23,1,.32,1)]" id="feedProgressBar" style="width:0%;background:#83533c"></div></div>
 </div>
 </section>
 <!-- Status Grid -->
@@ -434,7 +457,7 @@
 <h3 class="font-headline-md text-headline-md text-on-surface">Today at a glance</h3>
 <p class="font-label-sm text-label-sm text-on-surface-variant">Live care status for the current baby.</p>
 </div>
-<span class="h-8 px-3 rounded-full bg-white/65 text-primary font-label-sm text-label-sm flex items-center dark:bg-white/10">Live</span>
+<span class="home-pill h-8 px-3 rounded-full text-primary font-label-sm text-label-sm flex items-center dark:bg-white/10">Live</span>
 </div>
 <div class="grid grid-cols-2 gap-gutter">
 <!-- Feed -->
@@ -482,7 +505,7 @@
 <h3 class="font-headline-md text-headline-md text-on-surface">Quick log</h3>
 <p class="font-label-sm text-label-sm text-on-surface-variant">One tap for the next thing you need.</p>
 </div>
-<button class="home-pressable h-9 px-3 rounded-full bg-surface-container text-primary font-label-sm text-label-sm" data-screen-target="quick_log" type="button">All</button>
+<button class="home-pressable home-pill h-9 px-3 rounded-full bg-surface-container text-primary font-label-sm text-label-sm" data-screen-target="quick_log" type="button">All</button>
 </div>
 <div class="flex justify-between items-center">
 <div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
@@ -519,7 +542,7 @@
 </section>
 <!-- Vaccinations Card -->
 <section id="reminderSection">
-<div class="rounded-[24px] p-4 soft-shadow relative overflow-hidden cursor-pointer active:scale-[0.99] transition-transform" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" data-screen-target="vaccinations" role="button" tabindex="0" aria-label="Open vaccinations">
+<div class="home-pressable rounded-[28px] p-4 soft-shadow relative overflow-hidden cursor-pointer active:scale-[0.99]" style="background:linear-gradient(150deg,#83533c,#b8795f)" data-screen-target="vaccinations" role="button" tabindex="0" aria-label="Open vaccinations">
 <div class="absolute right-[-10px] top-[-10px] opacity-15 rotate-12"><span class="material-symbols-outlined text-[110px] text-white">vaccines</span></div>
 <div class="flex items-center justify-between gap-2 mb-3 relative z-10">
 <div class="flex items-center gap-2">
@@ -528,16 +551,16 @@
 </div>
 <span class="material-symbols-outlined text-white/70 text-[20px]">chevron_right</span>
 </div>
-<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="vaccHeadline">Loading schedule…</p>
+<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="vaccHeadline">Loading schedule...</p>
 <div class="relative z-10">
-<div class="h-2 w-full rounded-full bg-white/25 overflow-hidden"><div id="vaccHomeBar" class="h-full rounded-full bg-white transition-all" style="width:0%"></div></div>
+<div class="h-2 w-full rounded-full bg-white/25 overflow-hidden"><div id="vaccHomeBar" class="h-full rounded-full bg-white transition-[width] duration-300 ease-[cubic-bezier(.23,1,.32,1)]" style="width:0%"></div></div>
 <p class="text-white/80 text-[11px] mt-1.5" id="vaccHomeSub"></p>
 </div>
 </div>
 </section>
 <!-- Daily Summary -->
 <section id="dailySummarySection">
-<div class="bg-surface-container-low p-4 rounded-[24px] soft-shadow border border-white/60 cursor-pointer dark:border-white/10" data-screen-target="daily_summary" role="button" tabindex="0" aria-label="Open today's care summary">
+<div class="home-section-card home-pressable bg-surface-container-low p-4 rounded-[28px] soft-shadow border border-white/60 cursor-pointer dark:border-white/10" data-screen-target="daily_summary" role="button" tabindex="0" aria-label="Open today's care summary">
 <div class="flex items-center justify-between gap-3">
 <div class="flex items-center gap-3 min-w-0">
 <div class="w-12 h-12 rounded-full bg-tertiary-container text-tertiary flex items-center justify-center shrink-0">
@@ -545,7 +568,7 @@
 </div>
 <div class="min-w-0">
 <p class="font-label-sm text-label-sm text-primary uppercase" data-i18n="home.familyHandoff">Family handoff</p>
-<h3 class="font-headline-md text-headline-md text-on-surface truncate" data-i18n="home.careSummaryTitle">Today’s Care Summary</h3>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate" data-i18n="home.careSummaryTitle">Today's Care Summary</h3>
 <p class="font-body-md text-body-md text-on-surface-variant truncate" data-i18n="home.careSummarySub">Copy or share a calm update.</p>
 </div>
 </div>
@@ -555,7 +578,7 @@
 </section>
 <!-- Mama Care (compact) -->
 <section id="mamaCareSection">
-<div class="rounded-[20px] border border-[#ffd9e2] bg-[#fff5f8] p-3 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40 flex items-center gap-3" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
+<div class="home-section-card home-pressable rounded-[24px] border border-[#ffd9e2] bg-[#fff5f8] p-3 soft-shadow cursor-pointer dark:bg-[#2d2023] dark:border-[#ff9fba]/40 flex items-center gap-3" id="mamaCareCard" data-screen-target="mama_care" role="button" tabindex="0" aria-label="Open Mama Care">
 <div class="w-10 h-10 rounded-full bg-[#ffe0e8] text-[#fb7185] flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
 </div>
@@ -564,7 +587,7 @@
 <h3 class="font-headline-md text-headline-md text-on-surface" data-i18n="home.mamaCare">Mama Care</h3>
 <span class="material-symbols-outlined text-primary text-[20px]">chevron_right</span>
 </div>
-<p class="font-label-sm text-label-sm text-on-surface-variant truncate"><span id="mamaMoodPreview" data-i18n="home.notChecked">Not checked</span> · <span data-i18n="home.rest">Rest</span> <span id="mamaRestPreview" data-i18n="home.notLogged">Not logged</span> · <span data-i18n="home.meds">Meds</span> <span id="mamaMedsPreview">0/0</span></p>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate"><span id="mamaMoodPreview" data-i18n="home.notChecked">Not checked</span> / <span data-i18n="home.rest">Rest</span> <span id="mamaRestPreview" data-i18n="home.notLogged">Not logged</span> / <span data-i18n="home.meds">Meds</span> <span id="mamaMedsPreview">0/0</span></p>
 </div>
 </div>
 </section>
@@ -613,7 +636,7 @@
 </section>
 </main>
 <div class="fixed inset-0 z-[90] hidden items-end justify-center bg-black/25 px-5 pb-6" id="babyProfileMenu">
-<div class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-3">
+<div class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-[0_22px_54px_rgba(75,50,39,.18)] border border-white/60 space-y-3">
 <div class="flex items-start justify-between gap-3">
 <div>
 <p class="font-label-sm text-label-sm text-primary uppercase tracking-wider" data-i18n="home.babyProfile">Baby profile</p>
@@ -639,24 +662,24 @@
 </div>
 </div>
 <!-- Bottom Navigation Bar -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" data-screen-target="home_dashboard" href="#">
+<nav class="home-bottom-nav fixed z-50 flex justify-around items-center px-2 py-2 bg-white/88 backdrop-blur-md">
+<a class="home-pressable flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" data-screen-target="home_dashboard" href="#">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="quick_log" href="#">
+<a class="home-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container p-2 rounded-xl" data-screen-target="quick_log" href="#">
 <span class="material-symbols-outlined">add_circle</span>
 <span class="font-label-sm text-label-sm">Log</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="calendar" href="#">
+<a class="home-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container p-2 rounded-xl" data-screen-target="calendar" href="#">
 <span class="material-symbols-outlined">calendar_month</span>
 <span class="font-label-sm text-label-sm">Calendar</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="milestones" href="#">
+<a class="home-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container p-2 rounded-xl" data-screen-target="milestones" href="#">
 <span class="material-symbols-outlined">auto_awesome</span>
 <span class="font-label-sm text-label-sm">Milestones</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="assistant" href="#">
+<a class="home-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container p-2 rounded-xl" data-screen-target="assistant" href="#">
 <span class="material-symbols-outlined">smart_toy</span>
 <span class="font-label-sm text-label-sm">Assistant</span>
 </a>
@@ -1028,11 +1051,11 @@
 
             if (s.overdue > 0) {
                 const nd = V.nextDue(plan.nip);
-                headlineEl.textContent = `${s.overdue} vaccine${s.overdue === 1 ? "" : "s"} overdue${nd ? ` — ${nd.vaccine} needs catching up.` : "."}`;
+                headlineEl.textContent = `${s.overdue} vaccine${s.overdue === 1 ? "" : "s"} overdue${nd ? ` - ${nd.vaccine} needs catching up.` : "."}`;
             } else {
                 const nd = V.nextDue(plan.nip);
                 headlineEl.textContent = nd
-                    ? `Next: ${nd.vaccine}${nd.dose ? ` (${nd.dose})` : ""} — due ${formatVaccDate(nd.dueDate)}.`
+                    ? `Next: ${nd.vaccine}${nd.dose ? ` (${nd.dose})` : ""} - due ${formatVaccDate(nd.dueDate)}.`
                     : "All NIP vaccines done. 🎉";
             }
         }
@@ -1238,7 +1261,7 @@
             const badge = event.type === "sleep" ? (event.nap ? t("home.nap") : style.badge) : style.badge;
             const canDelete = permissions.canAddLogs && event.id;
             const deleteButton = canDelete
-                ? `<button class="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error/10 transition-colors" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete log"><span class="material-symbols-outlined text-[16px]">delete</span></button>`
+                ? `<button class="home-pressable absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error/10" data-del-id="${event.id}" data-del-type="${event.type}" type="button" aria-label="Delete log"><span class="material-symbols-outlined text-[16px]">delete</span></button>`
                 : "";
             return timelineCard({
                 accent: style.accent,
