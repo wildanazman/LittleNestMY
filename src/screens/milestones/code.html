@@ -114,7 +114,81 @@
         }
     </script>
 <style>
-        body { font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.milestone-premium {
+            background:
+                linear-gradient(135deg, rgba(255, 219, 204, 0.44), transparent 34%),
+                linear-gradient(220deg, rgba(202, 236, 196, 0.22), transparent 38%),
+                linear-gradient(180deg, #fffaf6 0%, #fbf9f4 48%, #f3eee8 100%);
+        }
+        body.milestone-premium::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(27, 28, 25, 0.026) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(27, 28, 25, 0.018) 1px, transparent 1px);
+            background-size: 28px 28px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.44), transparent 70%);
+        }
+        .milestone-topbar {
+            top: max(10px, env(safe-area-inset-top));
+            width: calc(100% - 28px);
+            max-width: 520px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.78);
+            border-radius: 999px;
+            box-shadow: 0 16px 42px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255,255,255,.86);
+        }
+        .milestone-stage {
+            position: relative;
+            isolation: isolate;
+        }
+        .premium-shell {
+            border: 1px solid rgba(86, 59, 49, 0.07);
+            background: rgba(255,255,255,.46);
+            box-shadow: 0 20px 54px rgba(75, 50, 39, 0.08);
+        }
+        .premium-core {
+            border: 1px solid rgba(255,255,255,.78);
+            background: rgba(255,255,255,.82);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
+        }
+        .premium-field {
+            border: 1px solid rgba(86, 59, 49, 0.08) !important;
+            background: rgba(255, 250, 246, 0.9) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.76);
+            transition: box-shadow 180ms cubic-bezier(.23,1,.32,1), border-color 180ms ease, background-color 180ms ease;
+        }
+        .premium-field:focus {
+            border-color: rgba(131, 83, 60, 0.3) !important;
+            box-shadow: 0 0 0 4px rgba(131, 83, 60, 0.12), inset 0 1px 0 rgba(255,255,255,.86) !important;
+        }
+        .premium-button {
+            transition: transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 180ms ease, background-color 180ms ease;
+        }
+        .premium-button:active { transform: scale(.97); }
+        .milestone-bottom-nav {
+            width: calc(100% - 28px);
+            max-width: 520px;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: max(10px, env(safe-area-inset-bottom));
+            border: 1px solid rgba(255,255,255,.78);
+            border-radius: 28px;
+            box-shadow: 0 18px 44px rgba(75,50,39,.12), inset 0 1px 0 rgba(255,255,255,.86);
+        }
+        @media (hover:hover) and (pointer:fine) {
+            .premium-button:hover,
+            .milestone-card:hover,
+            .recap-card:hover {
+                transform: translateY(-2px);
+            }
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
@@ -127,12 +201,12 @@
             margin: 0 auto;
         }
         .milestone-card {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            transition: transform 420ms cubic-bezier(.23,1,.32,1), box-shadow 240ms ease;
         }
         .milestone-card:active { transform: scale(0.985); }
         .glass-tag {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.66);
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 10px 24px rgba(40,28,21,.1);
         }
         .recap-strip, .chip-row {
             display: flex;
@@ -155,23 +229,31 @@
         .modal-safe-bottom {
             bottom: calc(env(safe-area-inset-bottom) + 1.5rem) !important;
         }
+        @media (prefers-reduced-motion: reduce) {
+            .milestone-premium *,
+            .milestone-premium *::before,
+            .milestone-premium *::after {
+                animation-duration: 1ms !important;
+                transition-duration: 1ms !important;
+            }
+        }
     </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-background text-on-surface min-h-screen pb-32">
+<body class="milestone-premium bg-background text-on-surface min-h-screen pb-32">
 <!-- Top App Bar -->
-<header class="sticky top-0 z-40 bg-[#FFF7F1]/90 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full dark:bg-[#181514]/90">
+<header class="milestone-topbar sticky z-40 bg-[#FFF7F1]/88 backdrop-blur-md px-3 h-14 flex justify-between items-center dark:bg-[#181514]/90">
 <div class="flex items-center gap-2">
-<button aria-label="Back to home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95" id="milestonesBackButton" type="button">
+<button aria-label="Back to home" class="premium-button w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container active:scale-95" id="milestonesBackButton" type="button">
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Milestones &amp; Memories</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Milestones</h1>
 </div>
 <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary-container">
 <img alt="Baby Avatar" class="w-full h-full object-cover" src="/icons/placeholder.svg"/>
 </div>
 </header>
-<main class="px-container-padding pt-6 max-w-5xl mx-auto">
+<main class="milestone-stage px-container-padding pt-8 max-w-5xl mx-auto">
 <!-- Loading Skeleton -->
 <section class="space-y-5 max-w-[520px] mx-auto animate-pulse" id="milestonesLoading">
 <div class="space-y-2">
@@ -193,10 +275,12 @@
 </section>
 <div class="hidden" id="milestonesContent">
 <!-- Dreamy Intro Header -->
-<section class="mb-7 max-w-[520px] mx-auto">
-<p class="font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-1" id="memoryKicker">Memory book</p>
-<h2 class="font-display-lg text-display-lg text-on-surface leading-[1.05]" id="memoryHeroTitle">Little moments, kept forever</h2>
+<section class="mb-7 max-w-[520px] mx-auto premium-shell rounded-[34px] p-1.5">
+<div class="premium-core rounded-[28px] p-5">
+<p class="inline-flex rounded-full bg-primary/10 px-3 py-1 font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-3" id="memoryKicker">Memory book</p>
+<h2 class="font-display-lg text-display-lg text-on-surface leading-[1.02]" id="memoryHeroTitle">Little moments, kept forever</h2>
 <p class="font-body-md text-body-md text-on-surface-variant mt-2" id="memoryHeroSub">Every tiny first, gathered into one warm keepsake.</p>
+</div>
 </section>
 <!-- Monthly Recap -->
 <section class="mb-6 max-w-[520px] mx-auto hidden" id="recapSection">
@@ -213,7 +297,8 @@
 <!-- Memory Feed -->
 <div class="memory-feed pb-10" id="milestoneGrid"></div>
 <!-- Add Milestone Panel -->
-<section class="mb-10 max-w-[520px] mx-auto bg-surface-container-low rounded-[32px] p-5 shadow-[0_8px_30px_rgba(255,191,163,0.12)]" id="addMilestonePanel">
+<section class="mb-10 max-w-[520px] mx-auto premium-shell rounded-[34px] p-1.5" id="addMilestonePanel">
+<div class="premium-core rounded-[28px] p-5">
 <div class="flex items-center justify-between gap-4 mb-4">
 <div>
 <h3 class="font-headline-md text-headline-md text-on-surface">Add a memory</h3>
@@ -226,7 +311,7 @@
 <div class="grid md:grid-cols-2 gap-gutter">
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Milestone type</span>
-<select class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="milestoneType">
+<select class="premium-field w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="milestoneType">
 <option>First smile</option>
 <option>First laugh</option>
 <option>First bath</option>
@@ -239,24 +324,24 @@
 </label>
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Date</span>
-<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="milestoneDate" type="date"/>
+<input class="premium-field w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="milestoneDate" type="date"/>
 </label>
 </div>
 <label class="block space-y-xs mt-gutter hidden" id="customMilestoneWrapper">
 <span class="font-label-md text-label-md text-on-surface-variant">Custom milestone title</span>
-<input class="w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="customMilestoneTitle" placeholder="First time calling Mama" type="text"/>
+<input class="premium-field w-full h-12 bg-surface-container-lowest border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="customMilestoneTitle" placeholder="First time calling Mama" type="text"/>
 </label>
 <label class="block space-y-xs mt-gutter">
 <span class="font-label-md text-label-md text-on-surface-variant">Note</span>
-<textarea class="w-full min-h-[96px] bg-surface-container-lowest border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="milestoneNote" placeholder="What made this moment special?"></textarea>
+<textarea class="premium-field w-full min-h-[96px] bg-surface-container-lowest border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="milestoneNote" placeholder="What made this moment special?"></textarea>
 </label>
 <div class="mt-gutter grid grid-cols-2 gap-3">
-<label class="rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer active:scale-[0.98] transition-transform">
+<label class="premium-button rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center cursor-pointer active:scale-[0.98]">
 <span class="material-symbols-outlined text-primary">add_photo_alternate</span>
 <span class="font-label-sm text-label-sm text-on-surface" id="milestonePhotoLabel">Add photo</span>
 <input class="hidden" id="milestonePhotoInput" accept="image/*" type="file"/>
 </label>
-<button class="rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center active:scale-[0.98] transition-transform" id="recordVideoButton" type="button">
+<button class="premium-button rounded-[20px] border border-dashed border-outline-variant bg-surface-container-lowest p-4 flex flex-col items-center justify-center gap-1.5 text-center active:scale-[0.98]" id="recordVideoButton" type="button">
 <span class="material-symbols-outlined text-primary">videocam</span>
 <span class="font-label-sm text-label-sm text-on-surface" id="milestoneVideoLabel">Record 5s video</span>
 </button>
@@ -264,20 +349,22 @@
 <div class="hidden mt-3 rounded-[20px] overflow-hidden bg-surface-container-lowest" id="mediaPreview">
 <img class="w-full h-48 object-cover hidden" id="previewImage" alt="Preview"/>
 <video class="w-full h-48 object-cover hidden" id="previewVideo" muted controls playsinline></video>
-<button class="w-full h-10 text-label-md text-error font-medium flex items-center justify-center gap-1 active:scale-95 transition-transform" id="clearMediaButton" type="button">
+<button class="premium-button w-full h-10 text-label-md text-error font-medium flex items-center justify-center gap-1 active:scale-95" id="clearMediaButton" type="button">
 <span class="material-symbols-outlined text-[18px]">close</span> Remove
 </button>
 </div>
 <p class="font-label-sm text-label-sm text-on-surface-variant mt-2 px-1">Photos and short clips sync to your account, so they're on your other devices too.</p>
 <input class="hidden" id="milestoneVideoInput" accept="video/*" capture="user" type="file"/>
 <p class="font-label-md text-label-md text-tertiary mt-sm hidden" id="milestoneFeedback" aria-live="polite">Saved.</p>
-<button class="mt-gutter w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg shadow-primary/20 active:scale-95 transition-transform" id="saveMilestoneButton" type="button">
+<button class="premium-button mt-gutter w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-[0_14px_30px_rgba(131,83,60,.18)] active:scale-95" id="saveMilestoneButton" type="button">
 Save Milestone
 </button>
+</div>
 </section>
-<!-- Developmental milestones (CDC, age-aware) — bottom of page -->
+<!-- Developmental milestones (CDC, age-aware) - bottom of page -->
 <section class="mb-12 max-w-[520px] mx-auto hidden" id="cdcSection">
-<div class="rounded-[32px] bg-gradient-to-br from-[#f3eeff] to-[#fff0f6] p-5 shadow-[0_10px_30px_rgba(124,92,255,0.12)] dark:from-[#241b3a] dark:to-[#2d2033]">
+<div class="premium-shell rounded-[34px] p-1.5">
+<div class="premium-core rounded-[28px] p-5 dark:bg-[#241b3a]">
 <div class="flex items-center gap-3 mb-4">
 <div class="w-11 h-11 rounded-2xl bg-white/70 text-primary flex items-center justify-center shrink-0 dark:bg-white/10"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">flag</span></div>
 <div class="min-w-0 flex-1">
@@ -287,7 +374,8 @@ Save Milestone
 <span class="shrink-0 inline-flex items-center h-8 px-3 rounded-full bg-primary text-on-primary font-label-sm text-label-sm" id="cdcAgeBadge"></span>
 </div>
 <div id="cdcBody"></div>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace — a gentle CDC guide, not a checklist to worry over. Tap one you've noticed and it joins the memory book.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-3 leading-relaxed">Every baby grows at their own pace - a gentle CDC guide, not a checklist to worry over. Tap one you've noticed and it joins the memory book.</p>
+</div>
 </div>
 </section>
 </div>
@@ -334,7 +422,7 @@ Save Milestone
 </div>
 </div>
 <!-- Bottom Navigation Bar (Mandatory Shell) -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
+<nav class="milestone-bottom-nav fixed z-50 flex justify-around items-center px-2 py-2 bg-white/88 backdrop-blur-md">
 <button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-transform active:scale-90 duration-150" data-screen-target="home_dashboard" type="button">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm-mobile">Home</span>
@@ -389,11 +477,13 @@ Save Milestone
         if (!selectedBaby || !selectedBabyId) {
             const main = document.querySelector("main");
             if (main) main.innerHTML = `
-                <section class="max-w-[520px] mx-auto rounded-[30px] bg-surface-container-low p-8 text-center shadow-[0_12px_34px_rgba(124,92,255,0.1)] mt-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-primary mx-auto flex items-center justify-center mb-4"><span class="material-symbols-outlined text-[42px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>
-                    <h3 class="font-headline-md text-headline-md text-on-surface mb-1">No memory book yet</h3>
-                    <p class="font-body-md text-body-md text-on-surface-variant mb-5">Add a baby profile to start capturing milestones and memories.</p>
-                    <button class="h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" id="milestonesAddBaby" type="button">Create baby profile</button>
+                <section class="max-w-[520px] mx-auto premium-shell rounded-[34px] p-1.5 mt-6">
+                    <div class="premium-core rounded-[28px] p-8 text-center">
+                        <div class="w-20 h-20 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center mb-4"><span class="material-symbols-outlined text-[42px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>
+                        <h3 class="font-headline-md text-headline-md text-on-surface mb-1">No memory book yet</h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-5">Add a baby profile to start capturing milestones and memories.</p>
+                        <button class="premium-button h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95" id="milestonesAddBaby" type="button">Create baby profile</button>
+                    </div>
                 </section>`;
             document.getElementById("milestonesAddBaby")?.addEventListener("click", () => goToScreen("add_baby_profile"));
             await new Promise(() => {});
@@ -862,14 +952,14 @@ Save Milestone
                 const hit = achievedFor(it);
                 if (hit) {
                     return `
-                        <button data-cdc-open="${hit.id}" type="button" class="w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99] transition-all">
+                        <button data-cdc-open="${hit.id}" type="button" class="premium-button w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99]">
                             <span class="shrink-0 w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check</span></span>
                             <span class="flex-1 font-body-md text-body-md text-on-surface">${escapeHtml(it)}</span>
                             <span class="font-label-sm text-label-sm text-primary whitespace-nowrap">${dateLabelOf(hit)}</span>
                         </button>`;
                 }
                 return `
-                    <button data-cdc-mark="${escapeHtml(it)}" type="button" class="w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl group hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99] transition-all">
+                    <button data-cdc-mark="${escapeHtml(it)}" type="button" class="premium-button w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl group hover:bg-white/60 dark:hover:bg-white/5 active:scale-[0.99]">
                         <span class="shrink-0 w-7 h-7 rounded-full border-2 border-outline-variant group-hover:border-primary flex items-center justify-center text-outline-variant group-hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">add</span></span>
                         <span class="flex-1 font-body-md text-body-md ${upcoming ? "text-on-surface-variant" : "text-on-surface"}">${escapeHtml(it)}</span>
                         <span class="font-label-sm text-label-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Mark</span>
@@ -877,7 +967,7 @@ Save Milestone
             }).join("");
             const header = upcoming
                 ? `<div class="flex items-center gap-2 mb-2 px-2"><span class="material-symbols-outlined text-[18px] text-on-surface-variant">schedule</span><p class="font-label-md text-label-md text-on-surface-variant">Coming up · by ${group.age} months</p></div>`
-                : `<div class="mb-2 px-2"><div class="flex items-center justify-between mb-1.5"><p class="font-label-md text-label-md text-on-surface">Around ${group.age} months</p><span class="font-label-sm text-label-sm text-primary">${done}/${total} noticed</span></div><div class="h-1.5 rounded-full bg-white/60 dark:bg-white/10 overflow-hidden"><div class="h-full rounded-full bg-primary transition-all" style="width:${pct}%"></div></div></div>`;
+                : `<div class="mb-2 px-2"><div class="flex items-center justify-between mb-1.5"><p class="font-label-md text-label-md text-on-surface">Around ${group.age} months</p><span class="font-label-sm text-label-sm text-primary">${done}/${total} noticed</span></div><div class="h-1.5 rounded-full bg-white/60 dark:bg-white/10 overflow-hidden"><div class="h-full rounded-full bg-primary transition-[width] duration-700 ease-[cubic-bezier(.23,1,.32,1)]" style="width:${pct}%"></div></div></div>`;
             return `
                 <div class="rounded-[24px] bg-white/70 dark:bg-white/5 p-3 mb-3 ${upcoming ? "opacity-90" : ""}">
                     ${header}
@@ -943,7 +1033,7 @@ Save Milestone
             chipRow.innerHTML = CATEGORIES.map((c) => {
                 const active = c.key === activeCategory;
                 return `
-                    <button class="shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-full font-label-md text-label-md transition-colors ${active ? "bg-primary text-on-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant"}" data-chip="${c.key}" type="button">
+                    <button class="premium-button shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-full font-label-md text-label-md ${active ? "bg-primary text-on-primary shadow-[0_10px_22px_rgba(131,83,60,.16)]" : "bg-white/70 text-on-surface-variant ring-1 ring-black/[.04]"}" data-chip="${c.key}" type="button">
                         <span class="material-symbols-outlined text-[18px]">${c.icon}</span>${c.label}
                     </button>`;
             }).join("");
@@ -970,13 +1060,13 @@ Save Milestone
                 const photos = items.filter((m) => m.photoUrl).length;
                 const cover = items.find((m) => m.photoUrl)?.photoUrl;
                 return `
-                    <button class="recap-card shrink-0 w-[180px] text-left rounded-[24px] overflow-hidden shadow-[0_12px_34px_rgba(124,92,255,0.12)] relative" data-recap="${items[0].id}" type="button">
+                    <button class="recap-card premium-button shrink-0 w-[184px] text-left rounded-[28px] overflow-hidden shadow-[0_16px_38px_rgba(75,50,39,0.1)] ring-1 ring-white/80 relative" data-recap="${items[0].id}" type="button">
                         <div class="relative h-[120px] bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
                             ${cover ? renderMedia(cover, "w-full h-full object-cover") : `<div class="w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                             <p class="absolute bottom-2 left-3 right-3 text-white font-headline-md text-headline-md leading-tight">${label}</p>
                         </div>
-                        <div class="bg-surface-container-lowest px-3 py-2.5">
+                        <div class="bg-white/90 px-3 py-2.5">
                             <p class="font-label-sm text-label-sm text-on-surface-variant">${items.length} ${items.length === 1 ? "memory" : "memories"} · ${photos} photo${photos === 1 ? "" : "s"}</p>
                         </div>
                     </button>`;
@@ -1041,7 +1131,7 @@ Save Milestone
             const cat = CATEGORIES.find((c) => c.key === memoryCategory(m)) || CATEGORIES[CATEGORIES.length - 1];
             const notePreview = m.notes ? escapeHtml(m.notes) : "A small moment worth keeping close.";
             return `
-                <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[30px] overflow-hidden shadow-[0_18px_50px_rgba(124,92,255,0.14)] cursor-pointer">
+                <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[34px] overflow-hidden shadow-[0_22px_54px_rgba(75,50,39,0.14)] ring-1 ring-white/80 cursor-pointer">
                     <div class="relative aspect-[4/5] w-full bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
                         ${m.photoUrl ? renderMedia(m.photoUrl, "w-full h-full object-cover") : renderCardArt(cat)}
                         <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/10"></div>
@@ -1101,7 +1191,7 @@ Save Milestone
             cards.forEach((card, index) => {
                 card.style.opacity = "0";
                 card.style.transform = "translateY(26px)";
-                card.style.transition = `all 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s`;
+                card.style.transition = `opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s`;
                 observer.observe(card);
             });
         }
