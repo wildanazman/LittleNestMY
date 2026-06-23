@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>Mama Care - LittleNest MY</title>
+<title>Breast Pumping - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -125,7 +125,7 @@ tailwind.config = {
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32">
-<section class="max-w-md mx-auto px-5 pt-5 pb-32 space-y-5" id="mamaLoadingState" aria-label="Loading Mama Care">
+<section class="max-w-md mx-auto px-5 pt-5 pb-32 space-y-5" id="mamaLoadingState" aria-label="Loading Breast Pumping">
   <div class="h-14 flex items-center justify-between">
     <div class="mama-skeleton h-10 w-36 rounded-full"></div>
     <div class="mama-skeleton h-10 w-10 rounded-full"></div>
@@ -142,10 +142,10 @@ tailwind.config = {
 <div class="hidden" id="mamaContent">
 <header class="mama-topbar sticky z-40 px-3 h-14 flex items-center justify-between backdrop-blur-md">
   <div class="flex items-center gap-2 min-w-0">
-  <button class="mama-action w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 shrink-0" id="backToBaby" type="button" aria-label="Back to baby dashboard">
+  <button class="mama-action w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 shrink-0" id="backToBaby" type="button" aria-label="Back to Mama Care">
     <span class="material-symbols-outlined text-[20px]">arrow_back</span>
   </button>
-  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Mama Care</h1>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Breast Pumping</h1>
   </div>
   <button class="mama-action w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95" data-screen-target="settings" type="button" aria-label="Open settings">
     <span class="material-symbols-outlined">settings</span>
@@ -154,47 +154,47 @@ tailwind.config = {
 
 <main class="max-w-md mx-auto px-5 pt-7 flex flex-col gap-5" id="mamaApp">
   <section class="order-1 mama-card mama-hero rounded-[30px] p-5 space-y-3">
-    <p class="inline-flex rounded-full bg-white/70 px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
-    <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Care for baby. Care for mama too.</h1>
-    <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.</p>
+    <p class="inline-flex rounded-full bg-white/70 px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
+    <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Pump, store, and use milk with less thinking.</h1>
+    <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">Start with Log pump after a session, then Add milk if you stored it. LittleNest calculates expiry and suggests the oldest milk first.</p>
   </section>
 
   <p class="order-2 hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
   <section class="order-3 mama-card rounded-[30px] p-4 soft-shadow space-y-3">
     <div>
-      <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Quick Log</p>
-      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">Add what happened now</h2>
+      <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Start here</p>
+      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">One-tap pumping actions</h2>
     </div>
-    <div class="grid grid-cols-3 gap-2">
-      <button class="mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
+    <div class="grid grid-cols-2 gap-2">
+      <button class="hidden mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
         <span class="material-symbols-outlined">favorite</span>
         <span class="text-[12px]">Check-in</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickPumpButton" type="button">
+      <button class="mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[88px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
         <span class="material-symbols-outlined">water_drop</span>
-        <span class="text-[12px]">Pump</span>
+        <span class="text-[14px]">Log pump</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMilkButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[88px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMilkButton" type="button">
         <span class="material-symbols-outlined">inventory_2</span>
-        <span class="text-[12px]">Milk</span>
+        <span class="text-[14px]">Add milk</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMedButton" type="button">
+      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMedButton" type="button">
         <span class="material-symbols-outlined">pill</span>
         <span class="text-[12px]">Meds</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickTaskButton" type="button">
+      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickTaskButton" type="button">
         <span class="material-symbols-outlined">volunteer_activism</span>
         <span class="text-[12px]">Help</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickNoteButton" type="button">
+      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickNoteButton" type="button">
         <span class="material-symbols-outlined">edit_note</span>
         <span class="text-[12px]">Note</span>
       </button>
     </div>
   </section>
 
-  <section class="order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
+  <section class="hidden order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Today's Care Plan</p>
@@ -208,42 +208,29 @@ tailwind.config = {
     <div class="mama-card-inner rounded-2xl p-3" id="nextMamaAction"></div>
   </section>
 
-  <section class="order-6 mama-card rounded-[30px] p-5 soft-shadow space-y-4 cursor-pointer" data-screen-target="breast_pumping" role="button" tabindex="0" aria-label="Open Breast Pumping">
+  <section class="order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="pumpingModule">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
-        <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pumping has its own page</h2>
-        <p class="text-[14px] leading-5 text-on-surface-variant">Log pump sessions, manage stored milk, check expiry, and plan work pumping without crowding Mama Care.</p>
-      </div>
-      <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined">water_drop</span>
-      </span>
-    </div>
-    <div class="grid grid-cols-3 gap-2">
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[11px] font-bold text-on-surface-variant">Today</p>
-        <p class="text-[18px] font-extrabold text-on-surface" id="pumpEntryToday">0 ml</p>
-      </div>
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[11px] font-bold text-on-surface-variant">Stored</p>
-        <p class="text-[18px] font-extrabold text-on-surface" id="pumpEntryStorage">0 ml</p>
-      </div>
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[11px] font-bold text-on-surface-variant">Next</p>
-        <p class="text-[18px] font-extrabold text-on-surface" id="pumpEntryNext">Set</p>
-      </div>
-    </div>
-    <button class="mama-action h-12 rounded-2xl bg-primary text-on-primary font-extrabold w-full active:scale-95" data-screen-target="breast_pumping" type="button">Open Breast Pumping</button>
-  </section>
-
-  <section class="hidden order-6 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="pumpingModule">
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
-        <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pumping & milk</h2>
-        <p class="text-[14px] leading-5 text-on-surface-variant">Fast logging for sessions, stored milk, expiry, and work planning.</p>
+        <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pumping dashboard</h2>
+        <p class="text-[14px] leading-5 text-on-surface-variant">Use Schedule for reminders, Storage for FIFO milk, and Insights for trends.</p>
       </div>
       <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold shrink-0" id="addPumpSessionButton" type="button">Log</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2">
+      <div class="rounded-2xl bg-primary-container/80 p-3">
+        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 1</p>
+        <p class="text-[13px] leading-4 font-bold text-on-surface">Log pump after a session.</p>
+      </div>
+      <div class="rounded-2xl bg-white/70 p-3">
+        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 2</p>
+        <p class="text-[13px] leading-4 font-bold text-on-surface">Add milk when stored.</p>
+      </div>
+      <div class="rounded-2xl bg-white/70 p-3">
+        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 3</p>
+        <p class="text-[13px] leading-4 font-bold text-on-surface">Use oldest milk first.</p>
+      </div>
     </div>
 
     <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
@@ -315,7 +302,7 @@ tailwind.config = {
     </details>
   </section>
 
-  <section class="order-5 mama-card rounded-[30px] p-5 soft-shadow">
+  <section class="hidden order-5 mama-card rounded-[30px] p-5 soft-shadow">
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container">Today's check-in</h2>
@@ -347,7 +334,7 @@ tailwind.config = {
     </div>
   </section>
 
-  <section class="order-7 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
+  <section class="hidden order-7 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Family Help</p>
@@ -365,7 +352,7 @@ tailwind.config = {
     <div class="space-y-3" id="supportTaskList"></div>
   </section>
 
-  <section class="order-8 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
+  <section class="hidden order-8 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Medication</h2>
@@ -376,7 +363,7 @@ tailwind.config = {
     <div class="space-y-3" id="medicationList"></div>
   </section>
 
-  <section class="order-9 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
+  <section class="hidden order-9 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Appointments</h2>
@@ -387,7 +374,7 @@ tailwind.config = {
     <div class="space-y-3" id="appointmentList"></div>
   </section>
 
-  <section class="order-10 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
+  <section class="hidden order-10 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Notes</h2>
@@ -398,7 +385,7 @@ tailwind.config = {
     <div class="space-y-3" id="recoveryNoteList"></div>
   </section>
 
-  <section class="order-11 rounded-[30px] bg-[#fff1f1] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
+  <section class="hidden order-11 rounded-[30px] bg-[#fff1f1] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
     <div class="flex items-start gap-3">
       <span class="material-symbols-outlined text-error mt-1">info</span>
       <p class="text-[16px] leading-7 text-error">For tracking and family support only. Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
@@ -410,7 +397,7 @@ tailwind.config = {
   <div class="mx-auto w-16 h-16 rounded-2xl bg-primary-container text-primary flex items-center justify-center">
     <span class="material-symbols-outlined text-[34px]">favorite</span>
   </div>
-  <h1 class="text-[24px] leading-8 font-extrabold text-on-surface">Create a baby profile first to use Mama Care.</h1>
+  <h1 class="text-[24px] leading-8 font-extrabold text-on-surface">Create a baby profile first to use Breast Pumping.</h1>
   <button class="mama-action h-12 rounded-2xl bg-primary px-6 text-on-primary font-extrabold" id="noBabyBackButton" type="button">Back to Baby Dashboard</button>
 </main>
 
@@ -418,7 +405,7 @@ tailwind.config = {
   <div class="w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[30px] bg-surface-container-lowest p-5 soft-shadow dark:bg-[#2d2425]">
     <div class="flex items-start justify-between gap-3 mb-4">
       <div>
-        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="modalTitle">Add record</h2>
       </div>
       <button class="mama-action w-10 h-10 rounded-2xl bg-surface-container text-primary flex items-center justify-center" id="closeModalButton" type="button" aria-label="Close">
@@ -431,7 +418,7 @@ tailwind.config = {
 
 <nav class="mama-bottom-nav fixed z-50 bg-white/88 backdrop-blur-md px-2 py-2 flex justify-around items-center">
   <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="home_dashboard" type="button"><span class="material-symbols-outlined">home</span><span class="text-[12px] font-bold">Home</span></button>
-  <button class="mama-action flex flex-col items-center justify-center bg-primary-container text-primary rounded-2xl px-3 py-1" type="button"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">self_care</span><span class="text-[12px] font-bold">Mama</span></button>
+  <button class="mama-action flex flex-col items-center justify-center bg-primary-container text-primary rounded-2xl px-3 py-1" type="button"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">water_drop</span><span class="text-[12px] font-bold">Pumping</span></button>
   <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="calendar" type="button"><span class="material-symbols-outlined">calendar_month</span><span class="text-[12px] font-bold">Calendar</span></button>
   <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="milestones" type="button"><span class="material-symbols-outlined">auto_awesome</span><span class="text-[12px] font-bold">Milestones</span></button>
   <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="assistant" type="button"><span class="material-symbols-outlined">smart_toy</span><span class="text-[12px] font-bold">Assistant</span></button>
@@ -483,8 +470,7 @@ if (!(await isLoggedIn())) {
 }
 
 document.getElementById("backToBaby").addEventListener("click", () => {
-  if (window.history.length > 1) window.history.back();
-  else goToScreen("home_dashboard");
+  goToScreen("mama_care");
 });
 document.getElementById("noBabyBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
 document.getElementById("closeModalButton").addEventListener("click", closeModal);
@@ -504,8 +490,8 @@ document.getElementById("generatePumpScheduleButton").addEventListener("click", 
 document.getElementById("addPumpPartButton").addEventListener("click", () => openPumpPartForm());
 document.getElementById("workPlannerButton").addEventListener("click", () => openWorkPlannerForm());
 document.getElementById("quickCheckinButton").addEventListener("click", () => openCheckinForm());
-document.getElementById("quickPumpButton").addEventListener("click", () => goToScreen("breast_pumping"));
-document.getElementById("quickMilkButton").addEventListener("click", () => goToScreen("breast_pumping"));
+document.getElementById("quickPumpButton").addEventListener("click", () => openPumpSessionForm());
+document.getElementById("quickMilkButton").addEventListener("click", () => openMilkStorageForm());
 document.getElementById("quickMedButton").addEventListener("click", () => openMedicationForm());
 document.getElementById("quickTaskButton").addEventListener("click", () => openTaskForm());
 document.getElementById("quickNoteButton").addEventListener("click", () => openNoteForm());
@@ -527,7 +513,7 @@ async function bootstrap() {
   permissions = await getBabyPermissions(selectedBabyId);
   document.getElementById("roleHint").textContent = permissions.role === "viewer"
     ? "You have view-only access for this baby."
-    : "For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.";
+    : "Start with Log pump after a session, then Add milk if you stored it. LittleNest calculates expiry and suggests the oldest milk first.";
   if (!permissions.canAddLogs) {
     document.querySelectorAll(".mama-action").forEach((button) => {
       button.classList.add("opacity-60");
@@ -607,9 +593,6 @@ function renderPumpingModule() {
   const activeStorage = pumpingData.storage.filter((entry) => Number(entry.remainingMl ?? entry.quantityMl) > 0);
   const storedMl = sum(activeStorage, (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
   const next = getNextPumpSession();
-  document.getElementById("pumpEntryToday").textContent = `${Math.round(totalToday)} ml`;
-  document.getElementById("pumpEntryStorage").textContent = formatMilk(storedMl);
-  document.getElementById("pumpEntryNext").textContent = next ? formatClock(next.schedule.pumpTime) : "Set";
   document.getElementById("nextPumpCountdown").textContent = next ? formatCountdown(next.date) : "No schedule";
   document.getElementById("nextPumpTime").textContent = next ? `Scheduled for ${formatClock(next.schedule.pumpTime)}` : "Generate or add pump times.";
   document.getElementById("pumpTodayMl").textContent = `${Math.round(totalToday)} ml`;
