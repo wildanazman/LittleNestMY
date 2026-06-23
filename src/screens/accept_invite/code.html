@@ -12,6 +12,7 @@
 <link rel="manifest" href="/manifest.json"/>
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/auth-polish.css?v=20260623"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Care Circle Invite - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -44,7 +45,7 @@ tailwind.config = {
 <style>.soft-shadow{box-shadow:0 18px 45px rgba(124,92,255,.14)}</style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-surface text-on-surface font-body min-h-screen">
+<body class="auth-polish bg-surface text-on-surface font-body min-h-screen">
 <main class="min-h-screen px-6 py-8 max-w-md mx-auto flex flex-col justify-center">
 <section class="rounded-[32px] bg-surface-container-lowest p-6 soft-shadow border border-white/70 space-y-5 dark:bg-[#181514] dark:border-white/10">
 <!-- Warm hero -->
@@ -54,7 +55,7 @@ tailwind.config = {
 <span class="material-symbols-outlined text-[44px] text-[#7056f4]" id="babyAvatarFallback" style="font-variation-settings:'FILL' 1;">diversity_1</span>
 </div>
 <p class="text-[12px] font-extrabold uppercase tracking-[0.16em] text-[#7056f4]/80">Care Circle invite</p>
-<h1 class="text-[22px] leading-tight font-extrabold text-[#241b3a] mt-1" id="inviteHeadline">You're invited 💜</h1>
+<h1 class="text-[22px] leading-tight font-extrabold text-[#241b3a] mt-1" id="inviteHeadline">You're invited</h1>
 <p class="text-sm text-[#5b4f72] mt-1" id="inviteSubline">Checking your invitation...</p>
 <div class="mt-3 flex items-center justify-center gap-2">
 <span class="hidden px-3 py-1 rounded-full bg-white/85 text-[#7056f4] text-[13px] font-extrabold" id="inviteRoleBadge"></span>
@@ -132,7 +133,7 @@ tailwind.config = {
         setTimeout(() => window.location.href = screenUrl("home_dashboard"), 900);
         return;
       }
-      headline.textContent = "You're invited to a Care Circle 💜";
+      headline.textContent = "You're invited to a Care Circle";
       subline.textContent = "Join this baby's Care Circle on LittleNest MY.";
     }
 
@@ -161,7 +162,7 @@ tailwind.config = {
 
   function renderPreview(p) {
     const baby = p.babyName || "this baby";
-    headline.textContent = `You're invited to join ${baby}'s Care Circle 💜`;
+    headline.textContent = `You're invited to join ${baby}'s Care Circle`;
     subline.textContent = p.inviterName ? `${p.inviterName} would love your help.` : "Someone would love your help caring for the little one.";
     if (p.role) {
       roleBadge.textContent = roleLabels[p.role] || "Member";
@@ -184,7 +185,7 @@ tailwind.config = {
       setSelectedBabyIdRemote(result.babyId);
       clearPendingInviteToken();
       await loadBabyProfilesRemote(babyProfile).catch(() => null);
-      subline.textContent = "Welcome to the Care Circle 💜";
+      subline.textContent = "Welcome to the Care Circle";
       if (cameFromSupabaseInvite || result.passwordSetupRecommended) {
         const session = await getAuthSession();
         markNeedsPasswordSetup(session?.user?.email || "");
