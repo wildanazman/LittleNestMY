@@ -160,6 +160,22 @@
           background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
           pointer-events: none;
         }
+        .home-panel {
+          background: rgba(255, 255, 255, 0.62);
+          border: 1px solid rgba(255, 255, 255, 0.74);
+          box-shadow: 0 12px 34px rgba(103, 78, 87, 0.08);
+        }
+        .home-pressable {
+          transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, box-shadow 180ms ease;
+        }
+        .home-pressable:active {
+          transform: scale(0.97);
+        }
+        @media (hover: hover) and (pointer: fine) {
+          .home-pressable:hover {
+            transform: translateY(-1px);
+          }
+        }
         #homeContent header:not(nav),
         #homeContent header button,
         #babyProfileMenuButton,
@@ -248,6 +264,11 @@
           background: rgba(32, 42, 61, 0.62) !important;
           border-color: rgba(132, 204, 255, 0.16);
           box-shadow: 0 18px 44px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        :root.dark .home-panel {
+          background: rgba(255, 255, 255, 0.06);
+          border-color: rgba(255, 255, 255, 0.08);
+          box-shadow: 0 12px 34px rgba(0, 0, 0, 0.20);
         }
         :root.dark #homeContent header:not(nav) {
           background: linear-gradient(180deg, #101a2e, #0d1628) !important;
@@ -407,9 +428,17 @@
 </div>
 </section>
 <!-- Status Grid -->
-<section class="grid grid-cols-2 gap-gutter" id="statusGridSection">
+<section class="space-y-3" id="statusGridSection">
+<div class="flex items-center justify-between px-1">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Today at a glance</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Live care status for the current baby.</p>
+</div>
+<span class="h-8 px-3 rounded-full bg-white/65 text-primary font-label-sm text-label-sm flex items-center dark:bg-white/10">Live</span>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
 <!-- Feed -->
-<div class="dashboard-stat-card bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
+<div class="dashboard-stat-card home-pressable bg-[#FFF7ED] p-4 rounded-[24px] space-y-2 cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="dashboard-stat-label flex items-center gap-2 text-on-primary-container">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">restaurant</span>
 <span class="font-label-sm text-label-sm" data-i18n="home.lastFeed">Last Feed</span>
@@ -418,7 +447,7 @@
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastFeedDetail"></span>
 </div>
 <!-- Sleep -->
-<div class="dashboard-stat-card bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
+<div class="dashboard-stat-card home-pressable bg-[#EFF6FF] p-4 rounded-[24px] space-y-2 cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#1E40AF]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bedtime</span>
 <span class="font-label-sm text-label-sm" data-i18n="home.todaySleep">Today Sleep</span>
@@ -427,7 +456,7 @@
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="todaySleepDetail"></span>
 </div>
 <!-- Diaper -->
-<div class="dashboard-stat-card bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
+<div class="dashboard-stat-card home-pressable bg-[#F0FDF4] p-4 rounded-[24px] space-y-2 cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#166534]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
 <span class="font-label-sm text-label-sm" data-i18n="home.diaper">Diaper</span>
@@ -436,7 +465,7 @@
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="lastDiaperDetail"></span>
 </div>
 <!-- Appointment (replaces Growth card; growth now on the baby card) -->
-<div class="dashboard-stat-card bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 hover:scale-[1.02] transition-transform cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
+<div class="dashboard-stat-card home-pressable bg-[#EEE8FF] p-4 rounded-[24px] space-y-2 cursor-pointer" data-screen-target="calendar" role="button" tabindex="0" aria-label="Open appointments">
 <div class="dashboard-stat-label flex items-center gap-2 text-[#6f4df2]">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">event</span>
 <span class="font-label-sm text-label-sm" id="nextAppointmentLabel">Next Appointment</span>
@@ -444,42 +473,43 @@
 <p class="dashboard-stat-value font-headline-md text-headline-md text-on-surface whitespace-nowrap truncate" id="nextAppointmentSummary">No upcoming</p>
 <span class="dashboard-stat-detail font-label-sm text-label-sm text-on-surface-variant" id="nextAppointmentRelative">Tap to add</span>
 </div>
+</div>
 </section>
 <!-- Quick Actions -->
-<section class="space-y-3" id="quickActionsSection">
+<section class="home-panel rounded-[28px] p-4 space-y-3" id="quickActionsSection">
 <div class="flex items-center justify-between px-1">
 <div>
 <h3 class="font-headline-md text-headline-md text-on-surface">Quick log</h3>
 <p class="font-label-sm text-label-sm text-on-surface-variant">One tap for the next thing you need.</p>
 </div>
-<button class="h-9 px-3 rounded-full bg-surface-container text-primary font-label-sm text-label-sm active:scale-95 transition-transform" data-screen-target="quick_log" type="button">All</button>
+<button class="home-pressable h-9 px-3 rounded-full bg-surface-container text-primary font-label-sm text-label-sm" data-screen-target="quick_log" type="button">All</button>
 </div>
-<div class="flex justify-between items-center px-2">
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
+<div class="flex justify-between items-center">
+<div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">restaurant</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.feed">Feed</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
+<div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="sleep_log" role="button" tabindex="0" aria-label="Open sleep log">
 <div class="w-14 h-14 rounded-full bg-[#E0F2FE] flex items-center justify-center text-[#0369A1] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">bedtime</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.sleep">Sleep</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
+<div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="diaper_log" role="button" tabindex="0" aria-label="Open diaper log">
 <div class="w-14 h-14 rounded-full bg-[#DCFCE7] flex items-center justify-center text-[#15803D] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">baby_changing_station</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.diaper">Diaper</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
+<div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="health_records" role="button" tabindex="0" aria-label="Open health records">
 <div class="w-14 h-14 rounded-full bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">heart_plus</span>
 </div>
 <span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="home.health">Health</span>
 </div>
-<div class="flex flex-col items-center gap-2 group cursor-pointer" data-open-note-log="true" role="button" tabindex="0" aria-label="Open note log">
+<div class="home-pressable flex flex-col items-center gap-2 group cursor-pointer" data-open-note-log="true" role="button" tabindex="0" aria-label="Open note log">
 <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-secondary group-active:scale-90 transition-transform shadow-sm">
 <span class="material-symbols-outlined">edit_note</span>
 </div>
