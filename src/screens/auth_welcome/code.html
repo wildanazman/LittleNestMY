@@ -17,6 +17,7 @@
 <title>Welcome - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
 tailwind.config = {
@@ -53,6 +54,20 @@ tailwind.config = {
 <style>
 html, body { height: 100%; overflow: hidden; }
 .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.12); }
+.font-jakarta { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
+/* Cinematic staggered entrance with spring-out easing (no flat/linear motion). */
+@keyframes wlc-reveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes wlc-pop { from { opacity: 0; transform: scale(0.86); } to { opacity: 1; transform: scale(1); } }
+@keyframes wlc-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@media (prefers-reduced-motion: no-preference) {
+  .wlc-reveal { opacity: 0; animation: wlc-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: var(--d, 0ms); }
+  .wlc-pop { opacity: 0; animation: wlc-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; animation-delay: var(--d, 0ms); }
+  .wlc-float { animation: wlc-float 5.5s ease-in-out infinite; }
+  .wlc-float-2 { animation: wlc-float 6.5s ease-in-out infinite; animation-delay: .8s; }
+  .cta-sheen { position: relative; overflow: hidden; }
+  .cta-sheen::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.4) 50%, transparent 68%); transform: translateX(-130%); }
+  .cta-sheen:active::after { transform: translateX(130%); transition: transform .55s ease; }
+}
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -65,15 +80,15 @@ html, body { height: 100%; overflow: hidden; }
 <div class="absolute bottom-6 right-0 w-48 h-48 rounded-full blur-3xl" style="background:rgba(132,204,255,0.20)"></div>
 </div>
 
-<div class="relative flex items-center gap-2.5 shrink-0 mb-3">
+<div class="relative flex items-center gap-2.5 shrink-0 mb-3 wlc-reveal" style="--d:0ms">
 <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-white" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 8px 20px rgba(112,86,244,.34)">
 <span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1;">crib</span>
 </div>
-<span class="text-sm font-extrabold tracking-tight" style="color:#7056f4">LittleNest MY</span>
+<span class="font-jakarta text-sm font-extrabold" style="color:#7056f4">LittleNest MY</span>
 </div>
 
 <!-- hero -->
-<div class="relative flex-1 min-h-0 rounded-[34px] overflow-hidden mb-5" style="background:linear-gradient(160deg,#efe7ff 0%,#ffe7f1 54%,#e6f4ff 100%)">
+<div class="relative flex-1 min-h-0 rounded-[34px] overflow-hidden mb-5 wlc-pop" style="--d:80ms;background:linear-gradient(160deg,#efe7ff 0%,#ffe7f1 54%,#e6f4ff 100%)">
 <div class="absolute inset-0 flex items-center justify-center">
 <div class="relative">
 <div class="absolute inset-0 rounded-full blur-2xl" style="background:rgba(155,124,255,.42);transform:scale(1.45)"></div>
@@ -82,14 +97,14 @@ html, body { height: 100%; overflow: hidden; }
 </div>
 </div>
 </div>
-<div class="absolute top-6 left-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#ff8fb0;font-variation-settings:'FILL' 1;">nutrition</span></div>
-<div class="absolute bottom-8 right-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#7c5cff;font-variation-settings:'FILL' 1;">bedtime</span></div>
-<div class="absolute top-1/2 right-9 w-9 h-9 rounded-xl bg-white/75 flex items-center justify-center" style="box-shadow:0 6px 16px rgba(112,86,244,.14)"><span class="material-symbols-outlined text-[18px]" style="color:#5bb36a;font-variation-settings:'FILL' 1;">eco</span></div>
+<div class="wlc-float absolute top-6 left-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#ff8fb0;font-variation-settings:'FILL' 1;">nutrition</span></div>
+<div class="wlc-float-2 absolute bottom-8 right-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#7c5cff;font-variation-settings:'FILL' 1;">bedtime</span></div>
+<div class="wlc-float absolute top-1/2 right-9 w-9 h-9 rounded-xl bg-white/75 flex items-center justify-center" style="box-shadow:0 6px 16px rgba(112,86,244,.14)"><span class="material-symbols-outlined text-[18px]" style="color:#5bb36a;font-variation-settings:'FILL' 1;">eco</span></div>
 </div>
 
 <!-- copy -->
-<div class="relative space-y-2 shrink-0">
-<h1 class="text-[clamp(26px,7.2vw,35px)] leading-[1.06] font-extrabold tracking-tight text-on-surface">Track the little things.<br><span style="color:#7056f4">Keep the big moments.</span></h1>
+<div class="relative space-y-2 shrink-0 wlc-reveal" style="--d:200ms">
+<h1 class="font-jakarta text-[clamp(27px,7.4vw,36px)] leading-[1.05] font-extrabold text-on-surface">Track the little things.<br><span style="color:#7056f4">Keep the big moments.</span></h1>
 <p class="text-[14px] leading-5 text-on-surface-variant">A calm companion for your baby's feeds, sleep, milestones &amp; memories.</p>
 <div class="flex flex-wrap gap-2 pt-1">
 <span class="px-3 py-1 rounded-full text-[12px] font-bold" style="background:rgba(112,86,244,.10);color:#5b46c9">Feeding</span>
@@ -100,8 +115,8 @@ html, body { height: 100%; overflow: hidden; }
 </div>
 
 <!-- actions -->
-<div class="relative space-y-2.5 pt-4 shrink-0">
-<button class="w-full h-13 min-h-[52px] rounded-full text-white font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="login" type="button" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 14px 30px rgba(112,86,244,.34)">Log In</button>
+<div class="relative space-y-2.5 pt-4 shrink-0 wlc-reveal" style="--d:320ms">
+<button class="cta-sheen w-full h-13 min-h-[52px] rounded-full text-white font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="login" type="button" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 14px 30px rgba(112,86,244,.34)">Log In</button>
 <button class="w-full h-13 min-h-[52px] rounded-full font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="signup" type="button" style="background:rgba(112,86,244,.12);color:#5b46c9">Create Account</button>
 <button class="w-full h-13 min-h-[52px] rounded-full bg-surface-container text-on-surface-variant font-bold text-base active:scale-[0.98] transition-transform" id="guestButton" type="button">Continue as Guest</button>
 <p class="text-center text-xs leading-4 text-on-surface-variant">Guest data is saved only on this device.</p>
