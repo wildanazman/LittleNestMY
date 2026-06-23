@@ -446,7 +446,14 @@
 </div>
 </section>
 <!-- Quick Actions -->
-<section id="quickActionsSection">
+<section class="space-y-3" id="quickActionsSection">
+<div class="flex items-center justify-between px-1">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Quick log</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">One tap for the next thing you need.</p>
+</div>
+<button class="h-9 px-3 rounded-full bg-surface-container text-primary font-label-sm text-label-sm active:scale-95 transition-transform" data-screen-target="quick_log" type="button">All</button>
+</div>
 <div class="flex justify-between items-center px-2">
 <div class="flex flex-col items-center gap-2 group cursor-pointer" data-screen-target="feeding_log" role="button" tabindex="0" aria-label="Open feeding log">
 <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container group-active:scale-90 transition-transform shadow-sm">
@@ -603,23 +610,23 @@
 </div>
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" data-screen-target="home_dashboard" href="#">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="quick_log" href="#">
 <span class="material-symbols-outlined">add_circle</span>
 <span class="font-label-sm text-label-sm">Log</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="calendar" href="#">
 <span class="material-symbols-outlined">calendar_month</span>
 <span class="font-label-sm text-label-sm">Calendar</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="milestones" href="#">
 <span class="material-symbols-outlined">auto_awesome</span>
 <span class="font-label-sm text-label-sm">Milestones</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" data-screen-target="assistant" href="#">
 <span class="material-symbols-outlined">smart_toy</span>
 <span class="font-label-sm text-label-sm">Assistant</span>
 </a>

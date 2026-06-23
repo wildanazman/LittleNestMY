@@ -208,7 +208,7 @@
 <!-- Header Section -->
 <header class="flex justify-between items-center px-container-padding h-14 mt-2">
 <div class="flex items-center gap-xs">
-<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<button class="p-2 text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 duration-200" data-screen-target="home_dashboard" type="button" aria-label="Close quick log">
 <span class="material-symbols-outlined text-[28px]">close</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-on-surface">LittleNest MY</h1>
@@ -308,27 +308,27 @@
 <!-- Bottom Navigation Bar (Shell Component) -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container rounded-t-xl shadow-lg">
 <!-- Home -->
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" data-screen-target="home_dashboard" href="#">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-label-sm-mobile">Home</span>
 </a>
 <!-- Log (Active) -->
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" href="#">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90 transition-transform duration-150" data-screen-target="quick_log" href="#">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
 <span class="font-label-sm text-label-sm-mobile">Log</span>
 </a>
 <!-- Calendar -->
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" data-screen-target="calendar" href="#">
 <span class="material-symbols-outlined">calendar_month</span>
 <span class="font-label-sm text-label-sm-mobile">Calendar</span>
 </a>
 <!-- Milestones -->
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" data-screen-target="milestones" href="#">
 <span class="material-symbols-outlined">auto_awesome</span>
 <span class="font-label-sm text-label-sm-mobile">Milestones</span>
 </a>
 <!-- Assistant -->
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" href="#">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant transition-colors hover:bg-secondary-container px-4 py-1" data-screen-target="assistant" href="#">
 <span class="material-symbols-outlined">smart_toy</span>
 <span class="font-label-sm text-label-sm-mobile">Assistant</span>
 </a>
