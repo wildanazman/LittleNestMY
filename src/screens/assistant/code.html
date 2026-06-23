@@ -16,6 +16,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>LittleNest MY - Insights</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
@@ -37,6 +38,9 @@
 </script>
 <style>
   body { font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+  /* Premium display font on headings (cohesive with the welcome screen). */
+  h1, h2, h3, #summaryTitle, .font-display { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
+  .tnum { font-variant-numeric: tabular-nums; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 45px rgba(131,83,60,.12); }
   .rise { animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both; }
@@ -484,7 +488,7 @@
     const row = (icon, label, sub) => `<div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-white/90">${icon}</span><span class="font-label-md text-label-md text-white/90 flex-1">${label}</span><span class="font-label-md text-label-md font-bold text-white">${sub}</span></div>`;
     document.getElementById("wellnessCard").innerHTML = `
       <p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/70">${name} wellness score</p>
-      <div class="flex items-end gap-2 mt-1 mb-3"><span class="text-[44px] leading-none font-extrabold">${total}</span><span class="text-white/70 font-headline-md mb-1">/100 · ${B.wellnessLabel(total)}</span></div>
+      <div class="flex items-end gap-2 mt-1 mb-3"><span class="font-display tnum text-[46px] leading-none font-extrabold">${total}</span><span class="text-white/70 font-headline-md mb-1">/100 · ${B.wellnessLabel(total)}</span></div>
       <div class="space-y-1.5">
         ${row("restaurant", "Feeding", dF.label)}
         ${row("bedtime", "Sleep", dS.label)}
@@ -496,10 +500,14 @@
 
   function benchRow({ icon, chipBg, chipFg, label, value, rangeText, status }) {
     const c = toneStyle[status.tone], bg = toneBg[status.tone];
-    return `<div class="rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3">
-      <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:${chipBg};color:${chipFg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${icon}</span></span>
-      <div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">${label}: <span class="font-extrabold">${value}</span></p><p class="font-label-sm text-label-sm text-on-surface-variant">Recommended ${rangeText}</p></div>
-      <span class="px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap" style="background:${bg};color:${c}">${status.short}</span>
+    return `<div class="rounded-[20px] bg-surface-container-lowest border border-black/[0.04] p-4 flex items-center gap-3.5" style="box-shadow:0 6px 18px rgba(112,86,244,.06)">
+      <span class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style="background:${chipBg};color:${chipFg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${icon}</span></span>
+      <div class="min-w-0 flex-1">
+        <p class="text-[13px] leading-tight text-on-surface-variant">${label}</p>
+        <p class="text-[17px] leading-snug font-extrabold text-on-surface tnum">${value}</p>
+        <p class="text-[12px] leading-tight text-on-surface-variant/80">Rec. ${rangeText}</p>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold whitespace-nowrap shrink-0" style="background:${bg};color:${c}"><span class="w-1.5 h-1.5 rounded-full" style="background:${c}"></span>${status.short}</span>
     </div>`;
   }
 
