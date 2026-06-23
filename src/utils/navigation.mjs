@@ -286,6 +286,7 @@ function mountGlobalSkeleton() {
 
 guardAuthenticatedRoutes();
 setupBottomNavigation();
+installSharedHeaderStyles();
 normalizePageHeaders();
 bindHeaderProfileButtons();
 setupPendingInviteBar();
@@ -506,15 +507,18 @@ function normalizePageHeaders(root = document) {
   if (["auth_welcome", "login", "signup", "accept_invite", "set_password"].includes(screenId)) return;
 
   root.querySelectorAll("header").forEach((header) => {
-    header.className = "sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full";
+    header.className = "ln-app-header sticky z-40 flex justify-between items-center px-3 h-14";
     header.style.position = "sticky";
-    header.style.top = "0";
+    header.style.top = "max(10px, env(safe-area-inset-top))";
     header.style.height = "56px";
     header.style.minHeight = "56px";
+    header.style.width = "calc(100% - 28px)";
+    header.style.maxWidth = "448px";
+    header.style.margin = "10px auto 0";
 
     const title = header.querySelector("h1");
     if (title) {
-      title.className = "font-headline-lg-mobile text-headline-lg-mobile text-primary truncate";
+      title.className = "ln-app-header-title font-headline-lg-mobile text-headline-lg-mobile text-primary truncate";
     }
 
     const backButton = findHeaderBackButton(header);
@@ -530,9 +534,9 @@ function normalizePageHeaders(root = document) {
 
     if (backButton) {
       ensureBackButtonIcon(backButton);
-      backButton.className = "w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0";
+      backButton.className = "ln-header-action w-10 h-10 flex items-center justify-center rounded-full transition-colors active:scale-95 text-primary shrink-0";
       backButton.querySelector(".material-symbols-outlined")?.classList.add("text-primary");
-      backButton.setAttribute("aria-label", "Back to home");
+      backButton.setAttribute("aria-label", "Back");
       backButton.dataset.headerBackHomeBound = "true";
       backButton.addEventListener("click", (event) => {
         const explicit = backButton.getAttribute("data-back-to");
@@ -574,7 +578,7 @@ function bindHeaderProfileButtons(root = document) {
     target.setAttribute("role", target.tagName === "BUTTON" ? "button" : "button");
     target.setAttribute("tabindex", target.getAttribute("tabindex") || "0");
     target.setAttribute("aria-label", target.getAttribute("aria-label") || "Open settings");
-    target.className = "w-8 h-8 rounded-full bg-secondary-container overflow-hidden flex items-center justify-center active:scale-95 transition-transform cursor-pointer border-2 border-primary-container shrink-0";
+    target.className = "ln-header-action w-10 h-10 rounded-full overflow-hidden flex items-center justify-center active:scale-95 transition-transform cursor-pointer shrink-0";
     if (target.dataset.createdHeaderProfile === "true") target.classList.add("ml-auto");
     const image = ensureHeaderProfileImage(target);
     image.className = "w-full h-full object-cover";
@@ -717,6 +721,49 @@ function isSameLocation(url) {
   } catch {
     return false;
   }
+}
+
+function installSharedHeaderStyles() {
+  if (document.getElementById("littleNestSharedHeaderStyles")) return;
+  const style = document.createElement("style");
+  style.id = "littleNestSharedHeaderStyles";
+  style.textContent = `
+    .ln-app-header {
+      border-radius: 999px !important;
+      border: 1px solid rgba(255,255,255,.78) !important;
+      background: rgba(255,250,246,.90) !important;
+      box-shadow: 0 18px 48px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.92) !important;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+    .ln-app-header-title {
+      color: var(--ln-primary, #83533c) !important;
+      letter-spacing: 0 !important;
+      font-weight: 800 !important;
+    }
+    .ln-header-action {
+      background: rgba(255,255,255,.58) !important;
+      border: 1px solid rgba(255,255,255,.72) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 10px 28px rgba(131,83,60,.10) !important;
+      color: var(--ln-primary, #83533c) !important;
+    }
+    @media (hover:hover) and (pointer:fine) {
+      .ln-header-action:hover { transform: translateY(-1px); }
+    }
+    .ln-header-action:active { transform: scale(.96); }
+    html.dark .ln-app-header {
+      background: rgba(34,31,29,.88) !important;
+      border-color: rgba(255,255,255,.12) !important;
+      box-shadow: 0 18px 48px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10) !important;
+    }
+    html.dark .ln-header-action {
+      background: rgba(255,255,255,.08) !important;
+      border-color: rgba(255,255,255,.12) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 10px 28px rgba(0,0,0,.20) !important;
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 function hasUsefulBackEntry() {
