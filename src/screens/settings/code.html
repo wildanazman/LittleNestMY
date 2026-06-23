@@ -523,7 +523,7 @@
             setLanguage,
             t
         } = await import(`${moduleBase}utils/i18n.mjs`);
-        const { bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
         const { getParentProfile, initialsForName, refreshParentProfileFromSupabase, saveParentProfile, syncParentProfileToSupabase } = await import(`${moduleBase}utils/profile.mjs`);
@@ -562,13 +562,7 @@
         renderNotifToggles();
         renderPlanLabel();
 
-        document.getElementById("settingsBackButton")?.addEventListener("click", () => {
-            if (window.history.length > 1) {
-                window.history.back();
-                return;
-            }
-            window.location.href = screenUrl("home_dashboard");
-        });
+        document.getElementById("settingsBackButton")?.addEventListener("click", () => goBackOrTo("home_dashboard"));
 
         document.getElementById("logoutButton")?.addEventListener("click", async () => {
             try {

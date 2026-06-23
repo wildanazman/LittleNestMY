@@ -538,7 +538,7 @@ function normalizePageHeaders(root = document) {
         const explicit = backButton.getAttribute("data-back-to");
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (window.history.length > 1) {
+        if (hasUsefulBackEntry()) {
           window.history.back();
           return;
         }
@@ -717,6 +717,28 @@ function isSameLocation(url) {
   } catch {
     return false;
   }
+}
+
+function hasUsefulBackEntry() {
+  if (window.location.hash) return false;
+  if (window.history.length <= 1) return false;
+  if (!document.referrer) return false;
+
+  try {
+    const previous = new URL(document.referrer);
+    const current = new URL(window.location.href);
+    if (previous.origin !== current.origin) return false;
+    return routeIdentity(previous) !== routeIdentity(current);
+  } catch {
+    return false;
+  }
+}
+
+function routeIdentity(url) {
+  return url.pathname
+    .replace(/\/code\.html$/i, "/")
+    .replace(/\/+$/g, "")
+    || "/";
 }
 
 function findOrCreateHeaderProfileTarget(header) {
