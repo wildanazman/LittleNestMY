@@ -465,6 +465,7 @@ let selectedBabyId = "";
 let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
 let mamaData = emptyMamaData();
 let pumpingData = emptyPumpingData();
+let nextPumpTimerId = null;
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
@@ -549,6 +550,7 @@ function showMamaContent() {
   document.getElementById("mamaLoadingState")?.classList.add("hidden");
   document.getElementById("noBabyState")?.classList.add("hidden");
   document.getElementById("mamaContent")?.classList.remove("hidden");
+  startNextPumpTimer();
 }
 
 function renderMamaCarePlan() {
@@ -594,9 +596,7 @@ function renderPumpingModule() {
   const longest = Math.max(0, ...sessionsToday.map((session) => Number(session.durationMinutes || 0)));
   const activeStorage = pumpingData.storage.filter((entry) => Number(entry.remainingMl ?? entry.quantityMl) > 0);
   const storedMl = sum(activeStorage, (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
-  const next = getNextPumpSession();
-  document.getElementById("nextPumpCountdown").textContent = next ? formatCountdown(next.date) : "No schedule";
-  document.getElementById("nextPumpTime").textContent = next ? `Scheduled for ${formatClock(next.schedule.pumpTime)}` : "Generate or add pump times.";
+  updateNextPumpDisplay();
   document.getElementById("pumpTodayMl").textContent = `${Math.round(totalToday)} ml`;
   document.getElementById("pumpTodaySessions").textContent = String(sessionsToday.length);
   document.getElementById("pumpAverageMl").textContent = `${sessionsToday.length ? Math.round(totalToday / sessionsToday.length) : 0} ml`;
@@ -691,15 +691,18 @@ function renderPumpSchedules(sessionsToday) {
       <p class="text-[13px] font-bold text-on-surface-variant">${sessionsToday.length}/${schedules.length} completed today</p>
     </div>
     ${schedules.map((schedule) => {
-      const done = sessionsToday.some((session) => minutesBetweenTime(schedule.pumpTime, session.startedAt) <= 75);
+      const skipped = (schedule.skippedDates || []).includes(today);
+      const done = !skipped && sessionsToday.some((session) => minutesBetweenTime(schedule.pumpTime, session.startedAt) <= 75);
       return `
         <article class="rounded-[22px] bg-surface-container-low p-3 flex items-center justify-between gap-3">
           <div>
             <p class="text-[18px] font-extrabold text-on-surface">${formatClock(schedule.pumpTime)}</p>
-            <p class="text-[13px] text-on-surface-variant">${escapeHtml(schedule.label || (done ? "Completed" : "Scheduled"))}</p>
+            <p class="text-[13px] text-on-surface-variant">${escapeHtml(schedule.label || (skipped ? "Skipped today" : done ? "Completed" : "Scheduled"))}</p>
           </div>
-          <div class="flex gap-2">
-            ${done ? `<span class="status-chip bg-tertiary-container text-primary">Done</span>` : permissions.canAddLogs ? `<button class="h-9 rounded-full bg-primary px-3 text-on-primary font-bold" data-action="pump-complete" data-id="${schedule.id}" type="button">Done</button>` : ""}
+          <div class="flex flex-wrap justify-end gap-2">
+            ${skipped ? `<span class="status-chip bg-error-container text-error">Skipped</span>` : done ? `<span class="status-chip bg-tertiary-container text-primary">Done</span>` : permissions.canAddLogs ? `<button class="h-9 rounded-full bg-primary px-3 text-on-primary font-bold" data-action="pump-complete" data-id="${schedule.id}" type="button">Done</button>` : ""}
+            ${permissions.canAddLogs && !done ? `<button class="h-9 rounded-full bg-white/80 px-3 text-on-surface-variant font-bold" data-action="${skipped ? "pump-schedule-unskip" : "pump-schedule-skip"}" data-id="${schedule.id}" type="button">${skipped ? "Undo" : "Skip"}</button>` : ""}
+            ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-primary-container px-3 text-primary font-bold" data-action="pump-schedule-edit" data-id="${schedule.id}" type="button">Edit</button>` : ""}
             ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-surface-container px-3 text-on-surface-variant font-bold" data-action="pump-schedule-delete" data-id="${schedule.id}" type="button">Delete</button>` : ""}
           </div>
         </article>
@@ -911,6 +914,9 @@ document.body.addEventListener("click", async (event) => {
     if (action === "appointment-delete") await deleteMamaAppointment(id);
     if (action === "note-delete") await deleteMamaRecoveryNote(id);
     if (action === "pump-complete") await quickCompletePumpSchedule(id);
+    if (action === "pump-schedule-edit") return openPumpScheduleForm(pumpingData.schedules.find((item) => item.id === id));
+    if (action === "pump-schedule-skip") await skipPumpScheduleToday(id);
+    if (action === "pump-schedule-unskip") await unskipPumpScheduleToday(id);
     if (action === "pump-schedule-delete") await deletePumpSchedule(id);
     if (action === "pump-session-delete") await deletePumpSession(id);
     if (action === "milk-edit") return openMilkStorageForm(pumpingData.storage.find((item) => item.id === id));
@@ -1204,11 +1210,15 @@ function openWorkPlannerForm() {
 async function openUseMilkForm(id) {
   const entry = pumpingData.storage.find((item) => item.id === id);
   if (!entry) return;
+  const remaining = Number(entry.remainingMl ?? entry.quantityMl);
   openModal("Use Stored Milk", `
     <p class="rounded-2xl bg-surface-container-low p-3 text-[14px] font-bold text-on-surface">${escapeHtml(entry.label || entry.containerType)} has ${Math.round(entry.remainingMl ?? entry.quantityMl)} ml remaining.</p>
-    ${numberField("usedMl", "Used milk (ml)", Math.min(120, Number(entry.remainingMl ?? entry.quantityMl)), 1, 999, "1")}
+    ${numberField("usedMl", "Used milk (ml)", Math.min(120, remaining), 1, Math.max(1, remaining), "1")}
     ${submitButton("Update Inventory")}
   `, async (form) => {
+    const usedMl = Number(form.usedMl.value || 0);
+    if (usedMl <= 0) throw new Error("Enter the amount of milk used.");
+    if (usedMl > remaining) throw new Error(`Only ${Math.round(remaining)} ml remains in this container.`);
     await useMilkStorage(id, form.usedMl.value);
   });
 }
@@ -1229,6 +1239,22 @@ async function quickCompletePumpSchedule(id) {
     pumpUsed: "",
     notes: "Completed from schedule"
   });
+}
+
+async function skipPumpScheduleToday(id) {
+  const schedule = pumpingData.schedules.find((item) => item.id === id);
+  if (!schedule) return;
+  const skippedDates = [...new Set([...(schedule.skippedDates || []), today])];
+  await savePumpSchedule({ ...schedule, skippedDates });
+  showFeedback(`${formatClock(schedule.pumpTime)} pump skipped for today.`);
+}
+
+async function unskipPumpScheduleToday(id) {
+  const schedule = pumpingData.schedules.find((item) => item.id === id);
+  if (!schedule) return;
+  const skippedDates = (schedule.skippedDates || []).filter((date) => date !== today);
+  await savePumpSchedule({ ...schedule, skippedDates });
+  showFeedback(`${formatClock(schedule.pumpTime)} pump restored.`);
 }
 
 async function snoozeNextPump() {
@@ -1503,13 +1529,32 @@ function showFeedback(message, persistent = false) {
   if (!persistent) setTimeout(() => feedback.classList.add("hidden"), 2500);
 }
 
+function startNextPumpTimer() {
+  if (nextPumpTimerId) return;
+  updateNextPumpDisplay();
+  nextPumpTimerId = setInterval(updateNextPumpDisplay, 1000);
+}
+
+function updateNextPumpDisplay() {
+  const countdown = document.getElementById("nextPumpCountdown");
+  const nextTime = document.getElementById("nextPumpTime");
+  if (!countdown || !nextTime) return;
+  const next = getNextPumpSession();
+  countdown.textContent = next ? formatCountdown(next.date) : "No schedule";
+  nextTime.textContent = next ? `Scheduled for ${formatClock(next.schedule.pumpTime)}` : "Generate or add pump times.";
+}
+
 function getNextPumpSession() {
   const schedules = pumpingData.schedules.filter((item) => item.active !== false).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
   if (!schedules.length) return null;
   const now = new Date();
-  const candidates = schedules.map((schedule) => ({ schedule, date: setDateTimeFromTime(now, schedule.pumpTime) }));
-  candidates.forEach((item) => {
-    if (item.date <= now) item.date.setDate(item.date.getDate() + 1);
+  const candidates = schedules.map((schedule) => {
+    const date = setDateTimeFromTime(now, schedule.pumpTime);
+    for (let i = 0; i < 8; i += 1) {
+      if (date > now && !(schedule.skippedDates || []).includes(localDate(date))) break;
+      date.setDate(date.getDate() + 1);
+    }
+    return { schedule, date };
   });
   return candidates.sort((a, b) => a.date - b.date)[0];
 }
