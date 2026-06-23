@@ -57,29 +57,53 @@ html, body { height: 100%; overflow: hidden; }
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface font-body">
-<main class="h-[100dvh] overflow-hidden max-w-md mx-auto flex flex-col px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-<div class="flex items-center justify-between shrink-0 mb-3">
-<div class="w-11 h-11 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center soft-shadow">
-<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">crib</span>
+<main class="relative h-[100dvh] overflow-hidden max-w-md mx-auto flex flex-col px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+<!-- soft ambient blobs -->
+<div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
+<div class="absolute -top-20 -right-12 w-60 h-60 rounded-full blur-3xl" style="background:rgba(155,124,255,0.28)"></div>
+<div class="absolute top-1/3 -left-16 w-52 h-52 rounded-full blur-3xl" style="background:rgba(255,159,200,0.22)"></div>
+<div class="absolute bottom-6 right-0 w-48 h-48 rounded-full blur-3xl" style="background:rgba(132,204,255,0.20)"></div>
 </div>
-<span class="text-sm font-bold text-primary">LittleNest MY</span>
+
+<div class="relative flex items-center gap-2.5 shrink-0 mb-3">
+<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-white" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 8px 20px rgba(112,86,244,.34)">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings:'FILL' 1;">crib</span>
 </div>
-<div class="rounded-[32px] bg-surface-container-lowest soft-shadow p-5 border border-white/70 flex-1 min-h-0 flex flex-col">
-<div class="flex-1 min-h-0 rounded-[28px] bg-gradient-to-br from-primary-container via-surface-container-low to-tertiary-container flex items-center justify-center mb-4">
-<div class="w-[clamp(72px,22vw,112px)] aspect-square rounded-full bg-white/70 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary text-[clamp(40px,12vw,64px)]" style="font-variation-settings:'FILL' 1;">family_restroom</span>
+<span class="text-sm font-extrabold tracking-tight" style="color:#7056f4">LittleNest MY</span>
+</div>
+
+<!-- hero -->
+<div class="relative flex-1 min-h-0 rounded-[34px] overflow-hidden mb-5" style="background:linear-gradient(160deg,#efe7ff 0%,#ffe7f1 54%,#e6f4ff 100%)">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative">
+<div class="absolute inset-0 rounded-full blur-2xl" style="background:rgba(155,124,255,.42);transform:scale(1.45)"></div>
+<div class="relative w-[clamp(96px,27vw,138px)] aspect-square rounded-full bg-white/85 flex items-center justify-center" style="box-shadow:0 18px 50px rgba(112,86,244,.28), inset 0 2px 0 rgba(255,255,255,.9)">
+<span class="material-symbols-outlined text-[clamp(48px,14vw,70px)]" style="font-variation-settings:'FILL' 1;color:#7056f4">family_restroom</span>
 </div>
 </div>
-<div class="space-y-2 shrink-0">
-<h1 class="text-[clamp(26px,7vw,34px)] leading-tight font-extrabold text-primary">LittleNest MY</h1>
-<p class="text-[clamp(16px,4.4vw,20px)] leading-snug font-bold text-on-surface">Track the little things. Remember the big moments.</p>
-<p class="text-sm leading-5 text-on-surface-variant">A calm parenting companion for your baby's routines, milestones, and memories.</p>
+</div>
+<div class="absolute top-6 left-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#ff8fb0;font-variation-settings:'FILL' 1;">nutrition</span></div>
+<div class="absolute bottom-8 right-6 w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center" style="box-shadow:0 8px 20px rgba(112,86,244,.16)"><span class="material-symbols-outlined text-[20px]" style="color:#7c5cff;font-variation-settings:'FILL' 1;">bedtime</span></div>
+<div class="absolute top-1/2 right-9 w-9 h-9 rounded-xl bg-white/75 flex items-center justify-center" style="box-shadow:0 6px 16px rgba(112,86,244,.14)"><span class="material-symbols-outlined text-[18px]" style="color:#5bb36a;font-variation-settings:'FILL' 1;">eco</span></div>
+</div>
+
+<!-- copy -->
+<div class="relative space-y-2 shrink-0">
+<h1 class="text-[clamp(26px,7.2vw,35px)] leading-[1.06] font-extrabold tracking-tight text-on-surface">Track the little things.<br><span style="color:#7056f4">Keep the big moments.</span></h1>
+<p class="text-[14px] leading-5 text-on-surface-variant">A calm companion for your baby's feeds, sleep, milestones &amp; memories.</p>
+<div class="flex flex-wrap gap-2 pt-1">
+<span class="px-3 py-1 rounded-full text-[12px] font-bold" style="background:rgba(112,86,244,.10);color:#5b46c9">Feeding</span>
+<span class="px-3 py-1 rounded-full text-[12px] font-bold" style="background:rgba(255,143,176,.16);color:#c2548a">Sleep</span>
+<span class="px-3 py-1 rounded-full text-[12px] font-bold" style="background:rgba(91,179,106,.16);color:#3f8a4e">Milestones</span>
+<span class="px-3 py-1 rounded-full text-[12px] font-bold" style="background:rgba(91,165,255,.16);color:#3f74c2">Vaccines</span>
 </div>
 </div>
-<div class="space-y-2.5 pt-4 shrink-0">
-<button class="w-full h-13 min-h-[52px] rounded-full bg-primary text-on-primary font-bold text-base active:scale-[0.98] transition-transform soft-shadow" data-screen-target="login" type="button">Log In</button>
-<button class="w-full h-13 min-h-[52px] rounded-full bg-primary-container text-on-primary-container font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="signup" type="button">Create Account</button>
-<button class="w-full h-13 min-h-[52px] rounded-full bg-surface-container text-primary font-bold text-base active:scale-[0.98] transition-transform" id="guestButton" type="button">Continue as Guest</button>
+
+<!-- actions -->
+<div class="relative space-y-2.5 pt-4 shrink-0">
+<button class="w-full h-13 min-h-[52px] rounded-full text-white font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="login" type="button" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 14px 30px rgba(112,86,244,.34)">Log In</button>
+<button class="w-full h-13 min-h-[52px] rounded-full font-bold text-base active:scale-[0.98] transition-transform" data-screen-target="signup" type="button" style="background:rgba(112,86,244,.12);color:#5b46c9">Create Account</button>
+<button class="w-full h-13 min-h-[52px] rounded-full bg-surface-container text-on-surface-variant font-bold text-base active:scale-[0.98] transition-transform" id="guestButton" type="button">Continue as Guest</button>
 <p class="text-center text-xs leading-4 text-on-surface-variant">Guest data is saved only on this device.</p>
 </div>
 </main>
