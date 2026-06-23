@@ -401,7 +401,10 @@ if (!(await isLoggedIn())) {
   await new Promise(() => {});
 }
 
-document.getElementById("backToBaby").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("backToBaby").addEventListener("click", () => {
+  if (window.history.length > 1) window.history.back();
+  else goToScreen("home_dashboard");
+});
 document.getElementById("noBabyBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
 document.getElementById("closeModalButton").addEventListener("click", closeModal);
 document.getElementById("mamaModal").addEventListener("click", (event) => {
