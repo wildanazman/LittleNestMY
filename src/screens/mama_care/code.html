@@ -509,6 +509,13 @@ document.getElementById("quickMilkButton").addEventListener("click", () => goToS
 document.getElementById("quickMedButton").addEventListener("click", () => openMedicationForm());
 document.getElementById("quickTaskButton").addEventListener("click", () => openTaskForm());
 document.getElementById("quickNoteButton").addEventListener("click", () => openNoteForm());
+document.querySelectorAll("[data-action='task-template']").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handleActionButton(button);
+  });
+});
 
 await bootstrap();
 bindPrototypeActions();
@@ -906,15 +913,25 @@ function renderRecoveryNotes() {
 document.body.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-action]");
   if (!button) return;
+  await handleActionButton(button);
+});
+
+async function handleActionButton(button) {
   if (!canWrite()) return;
+  if (button.disabled) return;
+  const previousText = button.textContent;
   button.disabled = true;
+  button.classList.add("opacity-70");
   try {
     const { action, id } = button.dataset;
     if (action === "task-edit") return openTaskForm(mamaData.supportTasks.find((item) => item.id === id));
     if (action === "med-edit") return openMedicationForm(mamaData.medications.find((item) => item.id === id));
     if (action === "appointment-edit") return openAppointmentForm(mamaData.appointments.find((item) => item.id === id));
     if (action === "note-edit") return openNoteForm(mamaData.recoveryNotes.find((item) => item.id === id));
-    if (action === "task-template") await createSupportTaskTemplate(button.dataset.template);
+    if (action === "task-template") {
+      button.textContent = "Adding...";
+      await createSupportTaskTemplate(button.dataset.template);
+    }
     if (action === "task-done") await updateMamaSupportTaskStatus(id, "done");
     if (action === "task-skip") await updateMamaSupportTaskStatus(id, "skipped");
     if (action === "task-reset") await updateMamaSupportTaskStatus(id, "pending");
@@ -940,8 +957,10 @@ document.body.addEventListener("click", async (event) => {
     showFeedback(error.message || "Could not update Mama Care.", true);
   } finally {
     button.disabled = false;
+    button.classList.remove("opacity-70");
+    if (button.dataset.action === "task-template") button.textContent = previousText;
   }
-});
+}
 
 function openCheckinForm() {
   if (!canWrite()) return;
