@@ -19,7 +19,6 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -119,12 +118,93 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
         }
+        body.calendar-premium {
+            background:
+                radial-gradient(circle at 18% 6%, rgba(255, 219, 204, .54), transparent 28%),
+                radial-gradient(circle at 88% 20%, rgba(181, 214, 175, .24), transparent 34%),
+                linear-gradient(180deg, #fffaf6 0%, #fbf9f4 48%, #f3eee8 100%);
+            -webkit-tap-highlight-color: transparent;
+        }
+        body.calendar-premium::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(27, 28, 25, .024) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(27, 28, 25, .018) 1px, transparent 1px);
+            background-size: 28px 28px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.42), transparent 68%);
+        }
+        .calendar-stage {
+            position: relative;
+            isolation: isolate;
+        }
+        .calendar-topbar {
+            top: max(10px, env(safe-area-inset-top));
+            width: calc(100% - 28px);
+            max-width: 520px;
+            margin: 0 auto;
+            border: 1px solid rgba(255,255,255,.78);
+            border-radius: 999px;
+            box-shadow: 0 16px 42px rgba(75, 50, 39, .08), inset 0 1px 0 rgba(255,255,255,.86);
+        }
         .soft-shadow {
-            box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12);
+            box-shadow: 0 18px 44px rgba(75, 50, 39, .08), inset 0 1px 0 rgba(255,255,255,.82);
         }
         .active-day {
             background-color: #ffbfa3;
             color: #7a4b36;
+        }
+        .calendar-card {
+            border: 1px solid rgba(255,255,255,.78);
+            background: rgba(255,255,255,.84);
+        }
+        .calendar-field {
+            border: 1px solid rgba(86, 59, 49, .08) !important;
+            background: rgba(255,250,246,.9) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.76);
+            transition: box-shadow 180ms cubic-bezier(.23,1,.32,1), border-color 180ms ease, background-color 180ms ease;
+        }
+        .calendar-field:focus {
+            border-color: rgba(131, 83, 60, .3) !important;
+            box-shadow: 0 0 0 4px rgba(131, 83, 60, .12), inset 0 1px 0 rgba(255,255,255,.86) !important;
+        }
+        .pressable {
+            transition: transform 150ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+        }
+        .pressable:active {
+            transform: scale(.97);
+        }
+        .calendar-day {
+            transition: transform 140ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, color 180ms ease;
+        }
+        .calendar-day:active {
+            transform: scale(.94);
+        }
+        .calendar-bottom-nav {
+            width: calc(100% - 28px);
+            max-width: 520px;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: max(10px, env(safe-area-inset-bottom));
+            border: 1px solid rgba(255,255,255,.78);
+            border-radius: 28px;
+            box-shadow: 0 18px 44px rgba(75,50,39,.12), inset 0 1px 0 rgba(255,255,255,.86);
+        }
+        @media (hover:hover) and (pointer:fine) {
+            .pressable:hover,
+            .event-card:hover {
+                transform: translateY(-1px);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .calendar-premium *,
+            .calendar-premium *::before,
+            .calendar-premium *::after {
+                animation-duration: 1ms !important;
+                transition-duration: 1ms !important;
+            }
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -137,18 +217,18 @@
   </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-background text-on-surface min-h-screen pb-32">
+<body class="calendar-premium bg-background text-on-surface min-h-screen pb-32">
 <!-- Top App Bar -->
-<header class="docked full-width top-0 z-50 bg-surface dark:bg-surface-dim flex justify-between items-center w-full px-container-padding h-14">
+<header class="calendar-topbar sticky z-50 bg-[#FFF7F1]/88 backdrop-blur-md dark:bg-surface-dim flex justify-between items-center px-3 h-14">
 <div class="flex items-center gap-2">
-<button aria-label="Back to home" class="material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" data-icon="arrow_back" id="calendarBackButton" type="button">arrow_back</button>
+<button aria-label="Back to home" class="pressable material-symbols-outlined text-primary dark:text-primary-fixed-dim hover:opacity-80 active:scale-95" data-icon="arrow_back" id="calendarBackButton" type="button">arrow_back</button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary dark:text-primary-fixed-dim">Appointment</h1>
 </div>
 <div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
 <img alt="Baby Profile Avatar" class="w-full h-full object-cover" src="/icons/placeholder.svg"/>
 </div>
 </header>
-<main class="px-container-padding pt-6 space-y-lg">
+<main class="calendar-stage px-container-padding pt-8 space-y-lg max-w-[760px] mx-auto">
 <!-- Month Selector & Navigation -->
 <div class="flex justify-between items-center">
 <div class="space-y-1">
@@ -156,31 +236,31 @@
 <p class="font-label-md text-label-md text-on-surface-variant" id="todaySubtitle">Today is Friday, 13th</p>
 </div>
 <div class="flex gap-sm">
-<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors" id="previousMonthButton" type="button">
+<button class="pressable w-10 h-10 flex items-center justify-center rounded-full bg-white/70 hover:bg-surface-container-high" id="previousMonthButton" type="button">
 <span class="material-symbols-outlined">chevron_left</span>
 </button>
-<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors" id="nextMonthButton" type="button">
+<button class="pressable w-10 h-10 flex items-center justify-center rounded-full bg-white/70 hover:bg-surface-container-high" id="nextMonthButton" type="button">
 <span class="material-symbols-outlined">chevron_right</span>
 </button>
 </div>
 </div>
 <!-- Add Event Panel -->
-<section class="bg-surface-container-lowest rounded-[24px] p-4 soft-shadow space-y-sm" id="addEventPanel">
+<section class="calendar-card bg-surface-container-lowest rounded-[28px] p-4 soft-shadow space-y-sm" id="addEventPanel">
 <div class="flex items-center justify-between gap-4">
 <div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Add event</h3>
-<p class="font-label-md text-label-md text-on-surface-variant">Local reminder only. No Google Calendar yet.</p>
+<h3 class="font-headline-md text-headline-md text-on-surface">Add appointment</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Save clinic visits, vaccines, daycare notes, and family reminders.</p>
 </div>
 <span class="material-symbols-outlined text-primary text-[32px]">event_available</span>
 </div>
 <div class="grid md:grid-cols-2 gap-gutter">
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Title</span>
-<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTitleInput" placeholder="Klinik Kesihatan appointment"/>
+<input class="calendar-field w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTitleInput" placeholder="Klinik Kesihatan appointment"/>
 </label>
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Category</span>
-<select class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventCategoryInput">
+<select class="calendar-field w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventCategoryInput">
 <option value="health">Health</option>
 <option value="vaccine">Vaccine</option>
 <option value="clinic">Clinic</option>
@@ -193,15 +273,15 @@
 </label>
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Date</span>
-<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventDateInput" type="date"/>
+<input class="calendar-field w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventDateInput" type="date"/>
 </label>
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Time</span>
-<input class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTimeInput" type="time"/>
+<input class="calendar-field w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventTimeInput" type="time"/>
 </label>
 <label class="space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Reminder</span>
-<select class="w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventReminderInput">
+<select class="calendar-field w-full h-12 bg-surface-container-low border-none rounded-xl px-4 font-body-md text-body-md text-on-surface" id="eventReminderInput">
 <option value="0">At time of event</option>
 <option value="15">15 minutes before</option>
 <option value="60">1 hour before</option>
@@ -211,18 +291,18 @@
 </div>
 <label class="block space-y-xs">
 <span class="font-label-md text-label-md text-on-surface-variant">Notes</span>
-<textarea class="w-full min-h-[80px] bg-surface-container-low border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="eventNotesInput" placeholder="Bring appointment card, milk, diapers..."></textarea>
+<textarea class="calendar-field w-full min-h-[80px] bg-surface-container-low border-none rounded-xl p-4 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none" id="eventNotesInput" placeholder="Bring appointment card, milk, diapers..."></textarea>
 </label>
 <p class="font-label-md text-label-md text-tertiary hidden" id="eventFeedback" aria-live="polite">Saved.</p>
-<button class="w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-lg active:scale-95 transition-transform" id="saveEventButton" type="button">Save Event</button>
+<button class="pressable w-full md:w-auto h-12 px-6 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-[0_14px_30px_rgba(131,83,60,.18)] active:scale-95" id="saveEventButton" type="button">Save Appointment</button>
 </section>
 <!-- View Toggle -->
-<div class="flex p-1 bg-surface-container rounded-full">
-<button class="flex-1 h-10 rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm" id="monthViewButton" type="button">Monthly</button>
-<button class="flex-1 h-10 rounded-full text-on-surface-variant font-label-md text-label-md" id="upcomingViewButton" type="button">Upcoming</button>
+<div class="calendar-card flex p-1 bg-white/70 rounded-full soft-shadow">
+<button class="pressable flex-1 h-10 rounded-full bg-surface-container-lowest text-primary font-label-md text-label-md shadow-sm" id="monthViewButton" type="button">Monthly</button>
+<button class="pressable flex-1 h-10 rounded-full text-on-surface-variant font-label-md text-label-md" id="upcomingViewButton" type="button">Upcoming</button>
 </div>
 <!-- Monthly Calendar View -->
-<section class="bg-surface-container-lowest rounded-[24px] p-base soft-shadow" id="monthView">
+<section class="calendar-card bg-surface-container-lowest rounded-[28px] p-base soft-shadow" id="monthView">
 <div class="calendar-grid text-center mb-base">
 <div class="font-label-sm text-label-sm text-outline p-2">S</div>
 <div class="font-label-sm text-label-sm text-outline p-2">M</div>
@@ -300,12 +380,12 @@
 <!-- Upcoming Events -->
 <section class="space-y-md">
 <div class="flex justify-between items-center">
-<h3 class="font-headline-md text-headline-md text-on-surface">Upcoming Events</h3>
-<button class="text-primary font-label-md" id="seeAllEventsButton" type="button">See All</button>
+<h3 class="font-headline-md text-headline-md text-on-surface">Upcoming appointments</h3>
+<button class="pressable text-primary font-label-md" id="seeAllEventsButton" type="button">See All</button>
 </div>
 <div class="space-y-sm" id="upcomingEventsList">
 <!-- Event 1 -->
-<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="event-card pressable flex gap-md bg-surface-bright p-sm rounded-[26px] soft-shadow border border-white/80 active:scale-[0.98]">
 <div class="w-14 h-14 rounded-2xl bg-primary-container flex flex-col items-center justify-center shrink-0">
 <span class="font-label-sm text-on-primary-container leading-none mb-1">SEP</span>
 <span class="font-headline-md text-on-primary-container leading-none">18</span>
@@ -323,7 +403,7 @@
 </div>
 </div>
 <!-- Event 2 -->
-<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="event-card pressable flex gap-md bg-surface-bright p-sm rounded-[26px] soft-shadow border border-white/80 active:scale-[0.98]">
 <div class="w-14 h-14 rounded-2xl bg-tertiary-container flex flex-col items-center justify-center shrink-0">
 <span class="font-label-sm text-on-tertiary-container leading-none mb-1">SEP</span>
 <span class="font-headline-md text-on-tertiary-container leading-none">20</span>
@@ -341,7 +421,7 @@
 </div>
 </div>
 <!-- Event 3 -->
-<div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+<div class="event-card pressable flex gap-md bg-surface-bright p-sm rounded-[26px] soft-shadow border border-white/80 active:scale-[0.98]">
 <div class="w-14 h-14 rounded-2xl bg-primary-fixed-dim flex flex-col items-center justify-center shrink-0">
 <span class="font-label-sm text-on-primary-fixed-variant leading-none mb-1">SEP</span>
 <span class="font-headline-md text-on-primary-fixed-variant leading-none">22</span>
@@ -362,31 +442,31 @@
 </section>
 <!-- Large Action Button -->
 <div class="py-md">
-<button class="w-full h-14 bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform" id="addEventJumpButton" type="button">
+<button class="pressable w-full h-14 bg-primary text-on-primary rounded-full font-headline-md flex items-center justify-center gap-2 shadow-[0_14px_30px_rgba(131,83,60,.18)] active:scale-95" id="addEventJumpButton" type="button">
 <span class="material-symbols-outlined">add</span>
-                Add Event
+                Add Appointment
             </button>
 </div>
 </main>
 <!-- Bottom Navigation Shell -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" data-screen-target="home_dashboard" href="#">
+<nav class="calendar-bottom-nav fixed z-50 flex justify-around items-center px-2 py-2 bg-white/88 dark:bg-surface-container-highest backdrop-blur-md">
+<a class="pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="home_dashboard" href="#">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm-mobile">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" data-screen-target="quick_log" href="#">
+<a class="pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="quick_log" href="#">
 <span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
 <span class="font-label-sm text-label-sm-mobile">Log</span>
 </a>
-<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" data-screen-target="calendar" href="#">
+<a class="pressable flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-dim text-on-primary-container dark:text-on-primary-fixed rounded-full px-4 py-1 active:scale-90" data-screen-target="calendar" href="#">
 <span class="material-symbols-outlined" data-icon="calendar_month" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
 <span class="font-label-sm text-label-sm-mobile">Appointment</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" data-screen-target="milestones" href="#">
+<a class="pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="milestones" href="#">
 <span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
 <span class="font-label-sm text-label-sm-mobile">Milestones</span>
 </a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full px-4 py-1" data-screen-target="assistant" href="#">
+<a class="pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-secondary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="assistant" href="#">
 <span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
 <span class="font-label-sm text-label-sm-mobile">Assistant</span>
 </a>
@@ -483,7 +563,7 @@
                 const isCurrentMonth = date.getMonth() === month;
                 const isToday = isSameDay(date, today);
                 const classes = [
-                    "h-12 flex flex-col items-center justify-center font-body-md relative rounded-xl",
+                    "calendar-day h-12 flex flex-col items-center justify-center font-body-md relative rounded-xl",
                     isCurrentMonth ? "text-on-surface" : "text-outline-variant",
                     isToday ? "active-day shadow-sm" : ""
                 ].join(" ");
@@ -515,7 +595,7 @@
 
             upcomingEventsList.innerHTML = events.length
         ? events.map(renderEventCard).join("")
-                : `<div class="bg-surface-bright p-6 rounded-[24px] soft-shadow border border-primary-container/30 text-center space-y-3">
+                : `<div class="calendar-card bg-surface-bright p-6 rounded-[28px] soft-shadow border border-primary-container/30 text-center space-y-3">
                     <div class="w-16 h-16 rounded-full bg-secondary-container text-secondary mx-auto flex items-center justify-center">
                         <span class="material-symbols-outlined text-[34px]">calendar_month</span>
                     </div>
@@ -531,7 +611,7 @@
             const date = new Date(event.startsAt);
             const tag = tagForCategory(event.type);
             return `
-                <div class="flex gap-md bg-surface-bright p-sm rounded-[24px] soft-shadow border border-surface-container-low transition-transform active:scale-[0.98]">
+                <div class="event-card pressable flex gap-md bg-surface-bright p-sm rounded-[26px] soft-shadow border border-white/80 active:scale-[0.98]">
                     <div class="w-14 h-14 rounded-2xl ${tag.dateBg} flex flex-col items-center justify-center shrink-0">
                         <span class="font-label-sm leading-none mb-1">${date.toLocaleDateString("en-MY", { month: "short" }).toUpperCase()}</span>
                         <span class="font-headline-md leading-none">${date.getDate()}</span>
@@ -540,8 +620,8 @@
                         <div class="flex justify-between items-start gap-2">
                             <h4 class="font-headline-md text-label-md text-on-surface truncate">${escapeHtml(event.title)}</h4>
                             <div class="flex gap-2 shrink-0">
-                                <button class="text-label-sm text-primary" data-edit-event="${event.id}" type="button">Edit</button>
-                                <button class="text-label-sm text-error" data-delete-event="${event.id}" type="button">Delete</button>
+                                <button class="pressable text-label-sm text-primary px-2 py-1 rounded-full bg-primary/5" data-edit-event="${event.id}" type="button">Edit</button>
+                                <button class="pressable text-label-sm text-error px-2 py-1 rounded-full bg-error/5" data-delete-event="${event.id}" type="button">Delete</button>
                             </div>
                         </div>
                         <div class="flex items-center gap-xs text-on-surface-variant font-body-md text-label-sm">
@@ -569,7 +649,7 @@
                     eventTimeInput.value = `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
                     eventReminderInput.value = String(event.reminderMinutesBefore ?? 60);
                     eventNotesInput.value = event.notes || "";
-                    saveEventButton.textContent = "Update Event";
+                    saveEventButton.textContent = "Update Appointment";
                     document.getElementById("addEventPanel").scrollIntoView({ behavior: "smooth", block: "start" });
                 });
             });
@@ -640,9 +720,9 @@
             eventTitleInput.value = "";
             eventNotesInput.value = "";
             editingEventId = "";
-            saveEventButton.textContent = "Save Event";
+            saveEventButton.textContent = "Save Appointment";
             render();
-            showFeedback("Event saved.");
+            showFeedback("Appointment saved.");
         }
 
         function changeMonth(delta) {
