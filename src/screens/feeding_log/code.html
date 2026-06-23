@@ -189,8 +189,11 @@
             -moz-appearance: textfield;
             appearance: textfield;
         }
+        .amount-display-input {
+            font-size: 72px !important;
+        }
         .amount-display-input.amount-display-input--volume {
-            font-size: 72px;
+            font-size: 72px !important;
         }
         .hide-scrollbar {
             scrollbar-width: none;
@@ -336,7 +339,7 @@
 <div class="flex items-center justify-between gap-3">
 <button class="amount-stepper-button bg-surface-container-highest text-primary" id="decreaseAmountButton" type="button" aria-label="Decrease amount">-</button>
 <div class="flex items-end justify-center min-w-0 flex-1">
-<input class="amount-display-input w-full max-w-[150px] bg-transparent border-0 p-0 text-center text-[55px] leading-none font-extrabold text-primary focus:ring-0" id="amountInput" min="0" placeholder="120" type="number" inputmode="numeric"/>
+<input class="amount-display-input w-full max-w-[150px] bg-transparent border-0 p-0 text-center text-[72px] leading-none font-extrabold text-primary focus:ring-0" id="amountInput" min="0" placeholder="120" type="number" inputmode="numeric"/>
 <span class="pb-2 ml-1 font-headline-md text-headline-md text-on-surface-variant" id="amountUnit">ml</span>
 </div>
 <button class="amount-stepper-button bg-primary-container text-primary" id="increaseAmountButton" type="button" aria-label="Increase amount">+</button>
