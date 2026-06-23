@@ -24,19 +24,19 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        primary: "#d81b60",
+        primary: "#9f4960",
         "on-primary": "#ffffff",
-        "primary-container": "#fce4ec",
+        "primary-container": "#f7e8ed",
         "on-primary-container": "#4a041c",
-        surface: "#fffafa",
-        "surface-container": "#fff1f5",
+        surface: "#fffaf8",
+        "surface-container": "#f8eef1",
         "surface-container-low": "#fffbfb",
         "surface-container-lowest": "#ffffff",
-        "surface-container-highest": "#f8dfe7",
+        "surface-container-highest": "#efe0e4",
         "on-surface": "#26191c",
         "on-surface-variant": "#63424a",
-        tertiary: "#ec407a",
-        "tertiary-container": "#f8bbd0",
+        tertiary: "#7c6f59",
+        "tertiary-container": "#eee7d8",
         error: "#b71c1c",
         "error-container": "#ffebee"
       },
@@ -46,28 +46,81 @@ tailwind.config = {
 };
 </script>
 <style>
-  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+  body {
+    min-height: max(884px, 100dvh);
+    font-family: "Nunito Sans", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    background:
+      radial-gradient(circle at 16% 6%, rgba(247, 232, 237, .72), transparent 30%),
+      radial-gradient(circle at 86% 18%, rgba(238, 231, 216, .44), transparent 34%),
+      linear-gradient(180deg, #fffaf8 0%, #fbf7f4 52%, #f5eee9 100%);
+  }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .soft-shadow { box-shadow: 0 10px 28px rgba(90, 55, 70, 0.07); }
-  .mama-card { background: rgba(255,255,255,.94); border: 1px solid rgba(38,25,28,.08); }
-  .mama-action { transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, box-shadow 180ms ease; }
+  .soft-shadow { box-shadow: 0 18px 44px rgba(82, 54, 44, 0.08), inset 0 1px 0 rgba(255,255,255,.82); }
+  .mama-topbar {
+    top: max(10px, env(safe-area-inset-top));
+    width: calc(100% - 28px);
+    max-width: 448px;
+    margin: 0 auto;
+    border: 1px solid rgba(255,255,255,.78);
+    border-radius: 999px;
+    background: rgba(255,250,248,.9);
+    box-shadow: 0 16px 42px rgba(82,54,44,.08), inset 0 1px 0 rgba(255,255,255,.86);
+  }
+  .mama-card {
+    background: rgba(255,255,255,.86);
+    border: 1px solid rgba(255,255,255,.78);
+    box-shadow: 0 18px 44px rgba(82,54,44,.08), inset 0 1px 0 rgba(255,255,255,.82);
+  }
+  .mama-card-inner {
+    border: 1px solid rgba(38,25,28,.06);
+    background: rgba(255,255,255,.68);
+  }
+  .mama-action { transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, color 180ms ease, box-shadow 180ms ease; }
   .mama-action:active { transform: scale(.97); }
   @media (hover: hover) and (pointer: fine) {
     .mama-action:hover { transform: translateY(-1px); }
   }
-  .mama-input { width: 100%; min-height: 48px; border-radius: 18px; border: 1px solid rgba(216,27,96,.12); background: #fffafa; padding: 0 14px; color: #26191c; font-size: 16px; }
+  .mama-input { width: 100%; min-height: 48px; border-radius: 16px; border: 1px solid rgba(159,73,96,.14); background: #fffaf8; padding: 0 14px; color: #26191c; font-size: 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.78); }
+  .mama-input:focus { outline: none; border-color: rgba(159,73,96,.38); box-shadow: 0 0 0 4px rgba(159,73,96,.12), inset 0 1px 0 rgba(255,255,255,.86); }
   textarea.mama-input { min-height: 96px; padding-top: 12px; }
   .status-chip { border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
-  .mama-skeleton { border-radius: 26px; background: linear-gradient(90deg, rgba(252,228,236,.75), rgba(255,255,255,.92), rgba(252,228,236,.75)); background-size: 200% 100%; animation: mamaSkeletonPulse 1.4s ease-in-out infinite; }
+  .mama-hero {
+    background: linear-gradient(145deg, rgba(255,250,248,.94), rgba(247,232,237,.74));
+  }
+  .mama-stat {
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.74);
+  }
+  .mama-bottom-nav {
+    width: calc(100% - 28px);
+    max-width: 448px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: max(10px, env(safe-area-inset-bottom));
+    border: 1px solid rgba(255,255,255,.78);
+    border-radius: 28px;
+    box-shadow: 0 18px 44px rgba(82,54,44,.12), inset 0 1px 0 rgba(255,255,255,.86);
+  }
+  .mama-skeleton { border-radius: 26px; background: linear-gradient(90deg, rgba(252,228,236,.75), rgba(255,255,255,.92), rgba(252,228,236,.75)); background-size: 200% 100%; animation: mamaSkeletonPulse 1.4s cubic-bezier(.23,1,.32,1) infinite; }
   @keyframes mamaSkeletonPulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   :root.dark body { background: #1f1a1a; color: #fff7ed; }
   :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
+  :root.dark .mama-topbar, :root.dark .mama-bottom-nav { background: rgba(45,36,37,.92); border-color: rgba(255,255,255,.10); }
+  :root.dark .mama-card-inner, :root.dark .mama-stat { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); }
   :root.dark .mama-input { background: #1f1a1a; color: #fff7ed; border-color: rgba(255,255,255,.12); -webkit-text-fill-color: #fff7ed; }
   :root.dark .mama-input::placeholder { color: rgba(255,247,237,.55); -webkit-text-fill-color: rgba(255,247,237,.55); }
   :root.dark .mama-skeleton { background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08)); background-size: 200% 100%; }
   :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="time"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.35); }
+  @media (prefers-reduced-motion: reduce) {
+    .mama-action,
+    .mama-skeleton {
+      animation-duration: 1ms !important;
+      transition-duration: 1ms !important;
+    }
+  }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -87,28 +140,28 @@ tailwind.config = {
   <div class="mama-skeleton h-32 w-full"></div>
 </section>
 <div class="hidden" id="mamaContent">
-<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur px-5 h-16 flex items-center justify-between shadow-[0_4px_20px_rgba(216,27,96,0.06)]">
+<header class="mama-topbar sticky z-40 px-3 h-14 flex items-center justify-between backdrop-blur-md">
   <div class="flex items-center gap-2 min-w-0">
-  <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform shrink-0" id="backToBaby" type="button" aria-label="Back to baby dashboard">
+  <button class="mama-action w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 shrink-0" id="backToBaby" type="button" aria-label="Back to baby dashboard">
     <span class="material-symbols-outlined text-[20px]">arrow_back</span>
   </button>
   <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Mama Care</h1>
   </div>
-  <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" data-screen-target="settings" type="button" aria-label="Open settings">
+  <button class="mama-action w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95" data-screen-target="settings" type="button" aria-label="Open settings">
     <span class="material-symbols-outlined">settings</span>
   </button>
 </header>
 
-<main class="max-w-md mx-auto px-5 pt-5 flex flex-col gap-5" id="mamaApp">
-  <section class="order-1 space-y-2">
-    <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
+<main class="max-w-md mx-auto px-5 pt-7 flex flex-col gap-5" id="mamaApp">
+  <section class="order-1 mama-card mama-hero rounded-[30px] p-5 space-y-3">
+    <p class="inline-flex rounded-full bg-white/70 px-3 py-1 text-[12px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
     <h1 class="text-[30px] leading-9 font-extrabold text-on-surface">Care for baby. Care for mama too.</h1>
     <p class="text-[16px] leading-6 text-on-surface-variant" id="roleHint">For tracking and family support only. Contact Klinik Kesihatan or doctor for medical concerns.</p>
   </section>
 
   <p class="order-2 hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
-  <section class="order-3 mama-card rounded-[26px] p-4 soft-shadow space-y-3">
+  <section class="order-3 mama-card rounded-[30px] p-4 soft-shadow space-y-3">
     <div>
       <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Quick Log</p>
       <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">Add what happened now</h2>
@@ -118,30 +171,30 @@ tailwind.config = {
         <span class="material-symbols-outlined">favorite</span>
         <span class="text-[12px]">Check-in</span>
       </button>
-      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickPumpButton" type="button">
         <span class="material-symbols-outlined">water_drop</span>
         <span class="text-[12px]">Pump</span>
       </button>
-      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMilkButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMilkButton" type="button">
         <span class="material-symbols-outlined">inventory_2</span>
         <span class="text-[12px]">Milk</span>
       </button>
-      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMedButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMedButton" type="button">
         <span class="material-symbols-outlined">pill</span>
         <span class="text-[12px]">Meds</span>
       </button>
-      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickTaskButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickTaskButton" type="button">
         <span class="material-symbols-outlined">volunteer_activism</span>
         <span class="text-[12px]">Help</span>
       </button>
-      <button class="mama-action rounded-2xl bg-surface-container text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickNoteButton" type="button">
+      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickNoteButton" type="button">
         <span class="material-symbols-outlined">edit_note</span>
         <span class="text-[12px]">Note</span>
       </button>
     </div>
   </section>
 
-  <section class="order-4 mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
+  <section class="order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Today's Care Plan</p>
@@ -152,10 +205,10 @@ tailwind.config = {
     </div>
     <div class="hidden rounded-2xl bg-error-container p-3 text-error font-bold" id="carePlanAlert"></div>
     <div class="grid grid-cols-3 gap-2" id="carePlanGoals"></div>
-    <div class="rounded-2xl bg-surface-container-low p-3" id="nextMamaAction"></div>
+    <div class="mama-card-inner rounded-2xl p-3" id="nextMamaAction"></div>
   </section>
 
-  <section class="order-10 mama-card rounded-[26px] p-5 soft-shadow space-y-4" id="pumpingModule">
+  <section class="order-6 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="pumpingModule">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
@@ -165,37 +218,37 @@ tailwind.config = {
       <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold shrink-0" id="addPumpSessionButton" type="button">Log</button>
     </div>
 
-    <div class="rounded-[24px] bg-[#fff3e8] border border-[#ffd9ba] p-4 dark:bg-white/5 dark:border-white/10">
+    <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
       <div class="flex items-center justify-between gap-3">
         <div>
           <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#a14f20] dark:text-primary">Next Pump Session</p>
           <p class="text-[28px] leading-8 font-extrabold text-on-surface" id="nextPumpCountdown">No schedule</p>
           <p class="text-[14px] text-on-surface-variant" id="nextPumpTime">Generate or add pump times.</p>
         </div>
-        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-[#a14f20] font-extrabold dark:bg-white/10 dark:text-primary" data-action="pump-snooze" type="button">Snooze</button>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-primary font-extrabold dark:bg-white/10 dark:text-primary" data-action="pump-snooze" type="button">Snooze</button>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3">
-      <div class="rounded-2xl bg-surface-container-low p-3">
+      <div class="mama-stat rounded-2xl p-3">
         <p class="text-[12px] font-bold text-on-surface-variant">Today's Output</p>
         <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodayMl">0 ml</p>
       </div>
-      <div class="rounded-2xl bg-surface-container-low p-3">
+      <div class="mama-stat rounded-2xl p-3">
         <p class="text-[12px] font-bold text-on-surface-variant">Sessions</p>
         <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodaySessions">0</p>
       </div>
-      <div class="rounded-2xl bg-surface-container-low p-3">
+      <div class="mama-stat rounded-2xl p-3">
         <p class="text-[12px] font-bold text-on-surface-variant">Average</p>
         <p class="text-[22px] font-extrabold text-on-surface" id="pumpAverageMl">0 ml</p>
       </div>
-      <div class="rounded-2xl bg-surface-container-low p-3">
+      <div class="mama-stat rounded-2xl p-3">
         <p class="text-[12px] font-bold text-on-surface-variant">Longest</p>
         <p class="text-[22px] font-extrabold text-on-surface" id="pumpLongest">0m</p>
       </div>
     </div>
 
-    <div class="rounded-[24px] bg-[#eefbf7] border border-[#c8efe2] p-4 dark:bg-white/5 dark:border-white/10">
+    <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
       <div class="flex items-center justify-between gap-3">
         <div>
           <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857]">Storage Summary</p>
@@ -209,24 +262,24 @@ tailwind.config = {
     </div>
 
     <div class="space-y-3" id="pumpAlertList"></div>
-    <details class="rounded-[24px] bg-surface-container-low p-4" open>
+    <details class="mama-card-inner rounded-[24px] p-4" open>
       <summary class="cursor-pointer list-none flex items-center justify-between gap-3">
         <span class="font-extrabold text-on-surface">Schedule</span>
         <span class="material-symbols-outlined text-primary">expand_more</span>
       </summary>
       <div class="mt-3 flex gap-2 overflow-x-auto pb-1">
         <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold shrink-0" id="generatePumpScheduleButton" type="button">Smart schedule</button>
-        <button class="mama-action h-10 rounded-full bg-white px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="addPumpScheduleButton" type="button">Add time</button>
-        <button class="mama-action h-10 rounded-full bg-white px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="workPlannerButton" type="button">Work plan</button>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="addPumpScheduleButton" type="button">Add time</button>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-on-surface-variant font-extrabold shrink-0 dark:bg-white/10" id="workPlannerButton" type="button">Work plan</button>
       </div>
       <div class="mt-3 space-y-3" id="pumpScheduleList"></div>
     </details>
-    <details class="rounded-[24px] bg-surface-container-low p-4">
+    <details class="mama-card-inner rounded-[24px] p-4">
       <summary class="cursor-pointer list-none flex items-center justify-between gap-3">
         <span class="font-extrabold text-on-surface">Insights & maintenance</span>
         <span class="material-symbols-outlined text-primary">expand_more</span>
       </summary>
-      <div class="mt-3 rounded-[20px] bg-white p-4 space-y-3 dark:bg-white/10" id="pumpAnalyticsPanel"></div>
+      <div class="mt-3 rounded-[20px] bg-white/70 p-4 space-y-3 dark:bg-white/10" id="pumpAnalyticsPanel"></div>
       <div class="mt-3">
         <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold" id="addPumpPartButton" type="button">Update maintenance</button>
       </div>
@@ -234,31 +287,31 @@ tailwind.config = {
     </details>
   </section>
 
-  <section class="order-5 rounded-[28px] bg-primary-container p-5 soft-shadow">
+  <section class="order-5 mama-card rounded-[30px] p-5 soft-shadow">
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-primary-container">Today's check-in</h2>
         <p class="text-[15px] leading-6 text-on-primary-container/80" id="checkinSubtitle">No check-in yet.</p>
       </div>
-      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary text-[13px] font-extrabold active:scale-95 transition-transform" id="addCheckinButton" type="button">Add</button>
+      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary text-[13px] font-extrabold active:scale-95" id="addCheckinButton" type="button">Add</button>
     </div>
     <div class="grid grid-cols-2 gap-3 mt-4">
-      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+      <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
         <span class="material-symbols-outlined text-primary">sentiment_satisfied</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Mood</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="moodValue">Not checked</p>
       </div>
-      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+      <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
         <span class="material-symbols-outlined text-primary">healing</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Pain</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="painValue">Not logged</p>
       </div>
-      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+      <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
         <span class="material-symbols-outlined text-primary">bedtime</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Rest</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="restValue">Not logged</p>
       </div>
-      <div class="rounded-2xl bg-white/65 p-3 text-center dark:bg-white/10">
+      <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
         <span class="material-symbols-outlined text-primary">pill</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Meds</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="medsValue">0/0</p>
@@ -266,7 +319,7 @@ tailwind.config = {
     </div>
   </section>
 
-  <section class="order-6 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-7 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-start justify-between gap-3">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Family Help</p>
@@ -284,7 +337,7 @@ tailwind.config = {
     <div class="space-y-3" id="supportTaskList"></div>
   </section>
 
-  <section class="order-7 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-8 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Medication</h2>
@@ -295,7 +348,7 @@ tailwind.config = {
     <div class="space-y-3" id="medicationList"></div>
   </section>
 
-  <section class="order-8 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-9 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Appointments</h2>
@@ -306,7 +359,7 @@ tailwind.config = {
     <div class="space-y-3" id="appointmentList"></div>
   </section>
 
-  <section class="order-9 mama-card rounded-[26px] p-5 soft-shadow space-y-4">
+  <section class="order-10 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Notes</h2>
@@ -317,7 +370,7 @@ tailwind.config = {
     <div class="space-y-3" id="recoveryNoteList"></div>
   </section>
 
-  <section class="order-11 rounded-[26px] bg-[#ffe5e5] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
+  <section class="order-11 rounded-[30px] bg-[#fff1f1] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
     <div class="flex items-start gap-3">
       <span class="material-symbols-outlined text-error mt-1">info</span>
       <p class="text-[16px] leading-7 text-error">For tracking and family support only. Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
@@ -326,21 +379,21 @@ tailwind.config = {
 </main>
 
 <main class="hidden max-w-md mx-auto px-5 pt-8 text-center space-y-4" id="noBabyState">
-  <div class="mx-auto w-16 h-16 rounded-full bg-primary-container text-primary flex items-center justify-center">
+  <div class="mx-auto w-16 h-16 rounded-2xl bg-primary-container text-primary flex items-center justify-center">
     <span class="material-symbols-outlined text-[34px]">favorite</span>
   </div>
   <h1 class="text-[24px] leading-8 font-extrabold text-on-surface">Create a baby profile first to use Mama Care.</h1>
-  <button class="h-12 rounded-full bg-primary px-6 text-on-primary font-extrabold" id="noBabyBackButton" type="button">Back to Baby Dashboard</button>
+  <button class="mama-action h-12 rounded-2xl bg-primary px-6 text-on-primary font-extrabold" id="noBabyBackButton" type="button">Back to Baby Dashboard</button>
 </main>
 
 <div class="fixed inset-0 z-[120] hidden items-end justify-center bg-black/35 px-4 pb-4" id="mamaModal">
-  <div class="w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[28px] bg-surface-container-lowest p-5 soft-shadow dark:bg-[#2d2425]">
+  <div class="w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-[30px] bg-surface-container-lowest p-5 soft-shadow dark:bg-[#2d2425]">
     <div class="flex items-start justify-between gap-3 mb-4">
       <div>
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Mama Care</p>
         <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="modalTitle">Add record</h2>
       </div>
-      <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center" id="closeModalButton" type="button" aria-label="Close">
+      <button class="mama-action w-10 h-10 rounded-2xl bg-surface-container text-primary flex items-center justify-center" id="closeModalButton" type="button" aria-label="Close">
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
@@ -348,12 +401,12 @@ tailwind.config = {
   </div>
 </div>
 
-<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-highest shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl px-2 pb-4 pt-2 flex justify-around items-center">
-  <button data-screen-target="home_dashboard"><span class="material-symbols-outlined">home</span><span>Home</span></button>
-  <button class="bg-primary-container text-primary"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">self_care</span><span>Mama Care</span></button>
-  <button data-screen-target="calendar"><span class="material-symbols-outlined">calendar_month</span><span>Calendar</span></button>
-  <button data-screen-target="milestones"><span class="material-symbols-outlined">auto_awesome</span><span>Milestones</span></button>
-  <button data-screen-target="assistant"><span class="material-symbols-outlined">smart_toy</span><span>Assistant</span></button>
+<nav class="mama-bottom-nav fixed z-50 bg-white/88 backdrop-blur-md px-2 py-2 flex justify-around items-center">
+  <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="home_dashboard" type="button"><span class="material-symbols-outlined">home</span><span class="text-[12px] font-bold">Home</span></button>
+  <button class="mama-action flex flex-col items-center justify-center bg-primary-container text-primary rounded-2xl px-3 py-1" type="button"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">self_care</span><span class="text-[12px] font-bold">Mama</span></button>
+  <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="calendar" type="button"><span class="material-symbols-outlined">calendar_month</span><span class="text-[12px] font-bold">Calendar</span></button>
+  <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="milestones" type="button"><span class="material-symbols-outlined">auto_awesome</span><span class="text-[12px] font-bold">Milestones</span></button>
+  <button class="mama-action flex flex-col items-center justify-center text-on-surface-variant rounded-xl p-2" data-screen-target="assistant" type="button"><span class="material-symbols-outlined">smart_toy</span><span class="text-[12px] font-bold">Assistant</span></button>
 </nav>
 </div>
 
@@ -1255,7 +1308,7 @@ function textareaField(name, label, value = "", placeholder = "") {
 }
 
 function submitButton(label) {
-  return `<button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" type="submit">${label}</button>`;
+  return `<button class="mama-action w-full h-12 rounded-2xl bg-primary text-on-primary font-extrabold active:scale-95" type="submit">${label}</button>`;
 }
 
 function todayItems(items, getDate) {
