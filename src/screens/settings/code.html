@@ -115,17 +115,106 @@
     </script>
 <style>
         body {
-            background-color: #fbf9f4;
+            background:
+              radial-gradient(circle at 8% -8%, rgba(255,191,163,.45), transparent 34%),
+              radial-gradient(circle at 96% 6%, rgba(181,214,175,.34), transparent 32%),
+              linear-gradient(180deg, #fffaf6 0%, #fbf9f4 48%, #f3efe8 100%);
             font-family: 'Nunito Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .soft-shadow {box-shadow:0 18px 45px rgba(131,83,60,.12)}
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            opacity: .42;
+            background-image:
+              linear-gradient(rgba(131,83,60,.035) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(131,83,60,.028) 1px, transparent 1px);
+            background-size: 34px 34px;
+            mask-image: linear-gradient(to bottom, #000 0%, transparent 82%);
+        }
+        .soft-shadow {box-shadow:0 22px 62px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.82)}
+        header {
+            top: max(10px, env(safe-area-inset-top));
+            width: calc(100% - 28px);
+            max-width: 448px;
+            margin: 0 auto;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.76);
+            background: rgba(255,250,246,.88) !important;
+            box-shadow: 0 18px 48px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.92);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        main > section > p {
+            letter-spacing: .14em;
+            color: rgba(81,68,62,.62);
+        }
+        main > section > div:not(.text-center),
+        #parentProfileForm {
+            border: 1px solid rgba(255,255,255,.76) !important;
+            background: rgba(255,255,255,.78) !important;
+            box-shadow: 0 22px 62px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .list-item-hover {
+            transition: transform 180ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, box-shadow 180ms ease;
+        }
+        @media (hover:hover) and (pointer:fine) {
+            .list-item-hover:hover {
+                transform: translateY(-1px);
+                background-color: rgba(255,250,246,.82);
+                box-shadow: inset 0 0 0 1px rgba(131,83,60,.06);
+            }
+            button:hover {
+                transform: translateY(-1px);
+            }
+        }
         .list-item-hover:active {
-            transform: scale(0.98);
+            transform: scale(0.985);
             background-color: #f5f3ee;
+        }
+        button {
+            transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, color 180ms ease;
+        }
+        button:active { transform: scale(.97); }
+        .language-option,
+        .theme-option {
+            min-height: 44px;
+            border-radius: 16px;
+        }
+        input {
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+        }
+        nav.fixed {
+            width: calc(100% - 28px) !important;
+            max-width: 448px;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%);
+            bottom: max(10px, env(safe-area-inset-bottom)) !important;
+            border-radius: 28px !important;
+            border: 1px solid rgba(255,255,255,.78);
+            background: rgba(255,255,255,.88) !important;
+            box-shadow: 0 18px 48px rgba(80,54,42,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+        #parentProfileModal {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: 1ms !important;
+                animation-duration: 1ms !important;
+            }
         }
     </style>
 <style>
@@ -137,7 +226,7 @@
 </head>
 <body class="bg-background text-on-surface antialiased overflow-x-hidden">
 <!-- Top Navigation Bar -->
-<header class="bg-surface sticky top-0 z-40 flex justify-between items-center w-full px-container-padding h-14">
+<header class="bg-surface sticky z-40 flex justify-between items-center px-3 h-14 mt-2">
 <div class="flex items-center gap-4">
 <button aria-label="Back to home" class="hover:opacity-80 transition-opacity flex items-center justify-center p-2 rounded-full active:scale-95 transition-transform duration-200" id="settingsBackButton" type="button">
 <span class="material-symbols-outlined text-primary text-[24px]">arrow_back</span>
@@ -149,24 +238,28 @@
 <span class="font-headline-md text-headline-md text-primary" id="topParentInitials">P</span>
 </div>
 </header>
-<main class="max-w-md mx-auto px-container-padding pb-32 pt-6">
+<main class="max-w-md mx-auto px-container-padding pb-32 pt-7">
 <!-- User Profile Header Section -->
 <section class="mb-lg">
-<div class="relative overflow-hidden rounded-[28px] bg-surface-container-lowest p-5 soft-shadow border border-white/70">
+<div class="relative overflow-hidden rounded-[32px] bg-surface-container-lowest p-2 soft-shadow border border-white/70">
 <div class="absolute -top-10 -right-8 w-32 h-32 rounded-full bg-primary-container/40 blur-2xl pointer-events-none"></div>
+<div class="absolute -bottom-12 -left-10 w-36 h-36 rounded-full bg-tertiary-container/30 blur-2xl pointer-events-none"></div>
+<div class="relative rounded-[26px] bg-white/62 p-4 border border-white/70">
 <div class="relative flex items-center gap-4">
 <div class="relative shrink-0">
-<div class="w-[72px] h-[72px] rounded-full overflow-hidden border-4 border-white soft-shadow">
+<div class="w-[76px] h-[76px] rounded-[26px] overflow-hidden border-4 border-white soft-shadow">
 <img alt="Parent Portrait" class="w-full h-full object-cover hidden" id="parentPhoto"/>
 <div class="w-full h-full bg-primary-container text-primary flex items-center justify-center font-headline-md text-headline-md" id="parentInitials">P</div>
 </div>
-<button class="absolute -bottom-1 -right-1 w-8 h-8 grid place-items-center bg-primary text-on-primary rounded-full shadow-md ring-2 ring-white active:scale-95 transition-transform" id="editParentProfileButton" type="button" aria-label="Edit parent profile">
+<button class="absolute -bottom-1 -right-1 w-9 h-9 grid place-items-center bg-primary text-on-primary rounded-full ring-2 ring-white active:scale-95 transition-transform" id="editParentProfileButton" type="button" aria-label="Edit parent profile">
 <span class="material-symbols-outlined text-[16px]">edit</span>
 </button>
 </div>
 <div class="min-w-0 flex-1">
+<p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary/70">Parent profile</p>
 <h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Loading...</h2>
 <p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">Loading...</p>
+</div>
 </div>
 </div>
 </div>
@@ -368,17 +461,17 @@
 </section>
 <div class="text-center mt-md opacity-30 select-none">
 <p class="font-label-sm text-label-sm">LittleNest MY Version 2.4.0 (102)</p>
-<p class="font-label-sm text-label-sm mt-1">Made with ♥ for parents</p>
+<p class="font-label-sm text-label-sm mt-1">Made for parents</p>
 </div>
 </main>
 <div class="fixed inset-0 z-[100] hidden items-end justify-center bg-black/25 px-5 pb-6" id="parentProfileModal">
-<form class="w-full max-w-md rounded-[24px] bg-surface-container-lowest p-5 shadow-2xl border border-white/60 space-y-4" id="parentProfileForm">
+<form class="w-full max-w-md rounded-[30px] bg-surface-container-lowest p-5 border border-white/60 space-y-4" id="parentProfileForm">
 <div class="flex items-start justify-between gap-3">
 <div>
 <p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Parent profile</p>
 <h2 class="font-headline-md text-headline-md text-on-surface">Update your details</h2>
 </div>
-<button aria-label="Close parent profile" class="w-9 h-9 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center" id="closeParentProfileButton" type="button">
+<button aria-label="Close parent profile" class="w-10 h-10 rounded-2xl bg-surface-container text-on-surface-variant flex items-center justify-center" id="closeParentProfileButton" type="button">
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
@@ -395,7 +488,7 @@
 <input class="mt-2 w-full rounded-2xl bg-surface-container px-4 py-3 text-label-md" id="parentPhotoInput" accept="image/*" type="file"/>
 </label>
 <p class="hidden text-label-md text-error" id="parentProfileError" aria-live="polite"></p>
-<button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" type="submit">Save profile</button>
+<button class="w-full h-12 rounded-2xl bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" type="submit">Save profile</button>
 </form>
 </div>
 <!-- Bottom Navigation Bar - Hidden for transactional sub-page according to rules, but kept for context if this is a top-level settings -->
