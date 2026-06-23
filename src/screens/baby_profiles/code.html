@@ -50,40 +50,108 @@
   };
 </script>
 <style>
-  body { background-color: #fbf9f4; font-family: 'Nunito Sans', sans-serif; -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); }
+  body {
+    background:
+      radial-gradient(circle at 12% -8%, rgba(255,191,163,.46), transparent 34%),
+      radial-gradient(circle at 92% 8%, rgba(181,214,175,.32), transparent 33%),
+      linear-gradient(180deg, #fffaf6 0%, #fbf9f4 48%, #f2eee7 100%);
+    font-family: 'Nunito Sans', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    min-height: max(884px, 100dvh);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .38;
+    background-image:
+      linear-gradient(rgba(131,83,60,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(131,83,60,.028) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .soft-shadow { box-shadow: 0 4px 20px rgba(255, 191, 163, 0.12); }
+  .soft-shadow { box-shadow: 0 22px 62px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.86); }
+  .glass-shell {
+    border: 1px solid rgba(255,255,255,.76);
+    background: rgba(255,255,255,.78);
+    box-shadow: 0 22px 62px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .baby-action {
+    transition: transform 170ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, box-shadow 180ms ease;
+  }
+  .baby-action:active { transform: scale(.975); }
+  @media (hover:hover) and (pointer:fine) {
+    .baby-action:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 1px rgba(131,83,60,.06); }
+  }
+  header {
+    top: max(10px, env(safe-area-inset-top));
+    width: calc(100% - 28px);
+    max-width: 448px;
+    margin: 0 auto;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.78);
+    background: rgba(255,250,246,.90) !important;
+    box-shadow: 0 18px 48px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  nav.fixed {
+    width: calc(100% - 28px) !important;
+    max-width: 448px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    border-radius: 28px !important;
+    border: 1px solid rgba(255,255,255,.78);
+    background: rgba(255,255,255,.88) !important;
+    box-shadow: 0 18px 48px rgba(80,54,42,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+  }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32">
-<header class="bg-surface sticky top-0 z-40 flex items-center justify-between w-full px-5 h-14">
+<header class="bg-surface sticky z-40 flex items-center justify-between px-3 h-14 mt-2">
   <div class="flex items-center gap-3">
-    <button aria-label="Back to settings" class="w-10 h-10 rounded-full flex items-center justify-center text-primary active:scale-95 transition-transform" id="backButton" type="button">
+    <button aria-label="Back to settings" class="baby-action w-10 h-10 rounded-full flex items-center justify-center text-primary active:scale-95 transition-transform" id="backButton" type="button">
       <span class="material-symbols-outlined">arrow_back</span>
     </button>
     <h1 class="font-headline-lg text-[24px] leading-8 font-bold text-primary">Baby Profiles</h1>
   </div>
 </header>
 
-<main class="max-w-md mx-auto px-5 pt-5 space-y-5">
-  <section class="bg-surface-container-low rounded-[24px] p-4 soft-shadow">
-    <div class="flex items-start gap-3">
-      <div class="w-11 h-11 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<main class="max-w-md mx-auto px-5 pt-7 space-y-5">
+  <section class="glass-shell rounded-[32px] p-2">
+    <div class="relative overflow-hidden rounded-[26px] bg-white/62 p-4 border border-white/70">
+      <div class="absolute -top-10 -right-8 w-32 h-32 rounded-full bg-primary-container/40 blur-2xl pointer-events-none"></div>
+      <div class="relative flex items-start gap-3">
+      <div class="w-12 h-12 rounded-[18px] bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 soft-shadow">
         <span class="material-symbols-outlined">child_care</span>
       </div>
       <div>
+        <p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary/70">Baby profiles</p>
         <h2 class="font-headline-md text-[20px] leading-7 font-bold">Manage your little ones</h2>
         <p class="font-body-md text-[15px] leading-6 text-on-surface-variant">View, edit, add, and switch baby profiles without losing existing logs.</p>
       </div>
     </div>
+    </div>
   </section>
 
-  <p class="hidden rounded-2xl bg-tertiary-container text-on-tertiary-container p-3 font-label-md text-[14px]" id="feedback" aria-live="polite"></p>
+  <p class="hidden rounded-[22px] bg-tertiary-container text-on-tertiary-container p-3 font-label-md text-[14px] soft-shadow" id="feedback" aria-live="polite"></p>
 
   <section class="space-y-3" id="profilesList"></section>
 
-  <button class="w-full h-14 rounded-full bg-primary text-on-primary font-headline-md text-[18px] font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform" id="addBabyButton" type="button">
+  <button class="baby-action w-full h-14 rounded-[22px] bg-primary text-on-primary font-headline-md text-[18px] font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform soft-shadow" id="addBabyButton" type="button">
     <span class="material-symbols-outlined">add</span>
     Add New Baby
   </button>
@@ -190,30 +258,35 @@
     const photo = profile.photoUrl || "/icons/placeholder.svg";
 
     return `
-      <article class="bg-surface-container-lowest rounded-[24px] p-4 soft-shadow border ${isSelected ? "border-primary-container" : "border-transparent"} space-y-4">
+      <article class="glass-shell rounded-[32px] p-2 ${isSelected ? "ring-2 ring-primary-container/70" : ""} space-y-0">
+        <div class="rounded-[26px] bg-white/64 border border-white/70 p-4 space-y-4">
         <div class="flex gap-4">
-          <div class="w-16 h-16 rounded-full overflow-hidden bg-surface-container shrink-0 border-4 border-white">
+          <div class="w-[72px] h-[72px] rounded-[24px] overflow-hidden bg-surface-container shrink-0 border-4 border-white soft-shadow">
             <img class="w-full h-full object-cover" src="${escapeHtml(photo)}" alt="${escapeHtml(profile.name)} profile photo"/>
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
               <h2 class="font-headline-md text-[20px] leading-7 font-bold truncate">${escapeHtml(profile.name)}</h2>
-              ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2 py-0.5 text-[11px] font-bold">Current baby</span>' : ""}
+              ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1 text-[11px] font-extrabold">Current</span>' : ""}
             </div>
             <p class="font-body-md text-[15px] text-on-surface-variant">${age}</p>
             <p class="font-label-sm text-[12px] text-outline">Born ${dob}</p>
           </div>
         </div>
-        <button class="w-full rounded-2xl bg-surface-container-low p-3 text-left" data-growth-baby="${escapeHtml(profile.id)}" type="button">
-          <p class="font-label-sm text-[12px] text-on-surface-variant">Latest growth</p>
-          <p class="font-label-md text-[14px] text-on-surface">${escapeHtml(latestGrowth)}</p>
+        <button class="baby-action w-full rounded-[22px] bg-surface-container-low/80 p-3 text-left border border-white/60 flex items-center justify-between gap-3" data-growth-baby="${escapeHtml(profile.id)}" type="button">
+          <span>
+            <p class="font-label-sm text-[12px] text-on-surface-variant">Latest growth</p>
+            <p class="font-label-md text-[14px] text-on-surface">${escapeHtml(latestGrowth)}</p>
+          </span>
+          <span class="material-symbols-outlined text-primary">monitoring</span>
         </button>
         <div class="grid ${isSelected || !canManageBaby ? "grid-cols-1" : "grid-cols-2"} gap-2">
-          ${canManageBaby ? `<button class="h-11 rounded-full bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit Profile</button>` : `<p class="h-11 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
-          ${isSelected ? "" : `<button class="h-11 rounded-full bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch to this baby</button>`}
+          ${canManageBaby ? `<button class="baby-action h-11 rounded-[18px] bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit profile</button>` : `<p class="h-11 rounded-[18px] bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
+          ${isSelected ? "" : `<button class="baby-action h-11 rounded-[18px] bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch baby</button>`}
         </div>
-        ${canManageBaby && totalProfiles > 1 ? `<button class="w-full h-10 rounded-full bg-[#ffe0e1] text-[#b3261e] dark:bg-red-500/20 dark:text-red-200 font-label-md text-[13px] font-extrabold active:scale-95 transition-transform" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete Baby Profile</button>` : ""}
-        ${isSelected && totalProfiles < 2 ? '<button class="w-full h-10 rounded-full bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch Baby</button>' : ""}
+        ${canManageBaby && totalProfiles > 1 ? `<button class="baby-action w-full h-10 rounded-[18px] bg-[#ffe0e1] text-[#b3261e] dark:bg-red-500/20 dark:text-red-200 font-label-md text-[13px] font-extrabold active:scale-95 transition-transform" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete profile</button>` : ""}
+        ${isSelected && totalProfiles < 2 ? '<button class="baby-action w-full h-10 rounded-[18px] bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch baby</button>' : ""}
+        </div>
       </article>
     `;
   }
@@ -239,8 +312,8 @@
 
   function renderEmptyState() {
     return `
-      <div class="bg-surface-container-lowest rounded-[24px] p-6 soft-shadow text-center space-y-3">
-        <div class="w-16 h-16 rounded-full bg-primary-container/40 text-primary mx-auto flex items-center justify-center">
+      <div class="glass-shell rounded-[32px] p-6 text-center space-y-3">
+        <div class="w-16 h-16 rounded-[22px] bg-primary-container/50 text-primary mx-auto flex items-center justify-center soft-shadow">
           <span class="material-symbols-outlined text-[34px]">child_care</span>
         </div>
         <p class="font-headline-md text-[20px] font-bold">No baby profile yet</p>
@@ -251,8 +324,8 @@
 
   function renderLoadingState() {
     return `
-      <div class="bg-surface-container-lowest rounded-[24px] p-6 soft-shadow text-center space-y-3">
-        <div class="w-16 h-16 rounded-full bg-primary-container/40 text-primary mx-auto flex items-center justify-center">
+      <div class="glass-shell rounded-[32px] p-6 text-center space-y-3">
+        <div class="w-16 h-16 rounded-[22px] bg-primary-container/50 text-primary mx-auto flex items-center justify-center soft-shadow">
           <span class="material-symbols-outlined text-[34px] animate-pulse">sync</span>
         </div>
         <p class="font-headline-md text-[20px] font-bold">Loading baby profiles...</p>
