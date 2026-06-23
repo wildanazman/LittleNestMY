@@ -189,6 +189,9 @@
             -moz-appearance: textfield;
             appearance: textfield;
         }
+        .amount-display-input.amount-display-input--volume {
+            font-size: 64px;
+        }
         .hide-scrollbar {
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -662,6 +665,7 @@
             formulaBrandField.classList.toggle("hidden", state.feedingType !== "formula");
             amountUnit.textContent = state.feedingType === "solid" ? "g" : "ml";
             amountInput.placeholder = state.feedingType === "solid" ? "45" : "120";
+            amountInput.classList.toggle("amount-display-input--volume", ["bottle", "formula"].includes(state.feedingType));
             durationInput.placeholder = state.feedingType === "breast" ? "15" : "10";
             document.getElementById("amountPresets")?.classList.toggle("hidden", !usesAmount);
             document.querySelectorAll("[data-amount-preset]").forEach((button) => {
