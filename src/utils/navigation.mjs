@@ -347,7 +347,7 @@ function normalizeNavItem(item, key, isActive) {
   }
 
   item.className = [
-    "flex flex-col items-center justify-center rounded-full transition-all active:scale-90 duration-150",
+    "flex flex-col items-center justify-center rounded-full transition-[transform,background-color,color] active:scale-90 duration-150 ease-out",
     "h-[58px] px-2 py-1 min-w-0",
     isActive
       ? "bg-primary-container text-on-primary-container"
@@ -362,7 +362,7 @@ function normalizeNavItem(item, key, isActive) {
   item.style.order = ({ home: 1, calendar: 2, log: 3, milestones: 4, assistant: 5 }[key] || 9);
 
   if (key === "log") {
-    item.className = "flex flex-col items-center justify-center rounded-full transition-all active:scale-90 duration-150 text-white";
+    item.className = "flex flex-col items-center justify-center rounded-full transition-[transform,background-color,color] active:scale-90 duration-150 ease-out text-white";
     item.style.flex = "0 0 64px";
     item.style.width = "64px";
     item.style.maxWidth = "64px";

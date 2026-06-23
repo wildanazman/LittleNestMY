@@ -123,22 +123,39 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        :root {
+            --ln-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        }
         .active-pill {
             transform: translateX(0);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 180ms var(--ln-ease-out);
         }
         input:focus, textarea:focus {
             outline: none;
             box-shadow: 0 0 0 4px rgba(255, 191, 163, 0.3);
         }
         .custom-shadow {
-            box-shadow: 0 8px 30px rgba(255, 191, 163, 0.12);
+            box-shadow: 0 10px 28px rgba(103, 78, 87, 0.07);
         }
         .feeding-type-tile {
             min-width: 108px;
             min-height: 102px;
             border: 2px solid transparent;
             box-shadow: 0 12px 26px rgba(216, 201, 194, 0.056);
+            transition: transform 150ms var(--ln-ease-out), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+        }
+        .feeding-type-tile:active,
+        .feeding-pressable:active {
+            transform: scale(0.97);
+        }
+        .feeding-pressable {
+            transition: transform 150ms var(--ln-ease-out), background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .feeding-pressable:hover,
+            .feeding-type-tile:hover {
+                transform: translateY(-1px);
+            }
         }
         .feeding-type-tile.is-active {
             background: #ffbfa3;
@@ -155,7 +172,7 @@
             justify-content: center;
             font-size: 25px;
             line-height: 1;
-            transition: transform 120ms ease, opacity 120ms ease;
+            transition: transform 150ms var(--ln-ease-out), opacity 150ms ease;
         }
         .amount-stepper-button:active {
             transform: scale(0.96);
@@ -177,6 +194,9 @@
             -ms-overflow-style: none;
         }
         .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        #feedingHistoryList[data-loading="true"] > * {
             display: none;
         }
         :root.dark .feeding-type-tile.is-active {
@@ -245,6 +265,19 @@
         :root.dark input::placeholder {
             color: #7e8ca6 !important;
         }
+        @media (prefers-reduced-motion: reduce) {
+            .active-pill,
+            .feeding-type-tile,
+            .feeding-pressable,
+            .amount-stepper-button {
+                transition-duration: 1ms !important;
+            }
+            .feeding-type-tile:active,
+            .feeding-pressable:active,
+            .amount-stepper-button:active {
+                transform: none !important;
+            }
+        }
     </style>
 <style>
     body {
@@ -257,7 +290,7 @@
 <!-- Top App Bar -->
 <header class="bg-surface sticky top-0 z-50 flex justify-between items-center w-full px-container-padding h-14">
 <div class="flex items-center gap-4">
-<button aria-label="Back to quick log" class="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200" id="feedingBackButton" type="button">
+<button aria-label="Back to quick log" class="feeding-pressable text-primary" id="feedingBackButton" type="button">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h1 class="font-headline-md text-headline-md text-primary">Log Feeding</h1>
@@ -272,19 +305,19 @@
 <h2 class="font-label-md text-label-md text-on-surface-variant px-1 uppercase tracking-wide">Feeding Type</h2>
 <div class="-mx-container-padding px-container-padding overflow-x-auto pb-2 hide-scrollbar">
 <div class="flex gap-gutter min-w-max">
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="breast" type="button" aria-label="Breast feeding">
+<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="breast" type="button" aria-label="Breast feeding">
 <span class="material-symbols-outlined text-[36px]">child_care</span>
 <span class="font-body-lg text-body-lg">Breast</span>
 </button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="bottle" type="button" aria-label="Bottle feeding">
+<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="bottle" type="button" aria-label="Bottle feeding">
 <span class="material-symbols-outlined text-[36px]">local_drink</span>
 <span class="font-body-lg text-body-lg">Bottle</span>
 </button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="formula" type="button" aria-label="Formula feeding">
+<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="formula" type="button" aria-label="Formula feeding">
 <span class="material-symbols-outlined text-[36px]">blender</span>
 <span class="font-body-lg text-body-lg">Formula</span>
 </button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant active:scale-[0.98] transition-all" data-feeding-type="solid" type="button" aria-label="Solid feeding">
+<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="solid" type="button" aria-label="Solid feeding">
 <span class="material-symbols-outlined text-[36px]">restaurant</span>
 <span class="font-body-lg text-body-lg">Solid</span>
 </button>
@@ -359,7 +392,7 @@
 
 <!-- Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="saveFeedback" aria-live="polite">Saved.</p>
-<button class="w-full h-20 bg-primary text-on-primary font-headline-md text-[24px] leading-8 font-extrabold rounded-full custom-shadow active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-2" id="saveFeedingButton" type="button">
+<button class="feeding-pressable w-full h-20 bg-primary text-on-primary font-headline-md text-[24px] leading-8 font-extrabold rounded-full custom-shadow flex items-center justify-center gap-2" id="saveFeedingButton" type="button">
 <span class="material-symbols-outlined">check_circle</span>
             Save Log
         </button>
@@ -380,9 +413,9 @@
 <h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wide">Recent Feeds</h3>
 <button class="font-label-md text-label-md text-primary" id="feedingSeeAllButton" type="button">View All</button>
 </div>
-<div class="space-y-sm" id="feedingHistoryList">
+<div class="space-y-sm" id="feedingHistoryList" data-loading="true">
 <!-- Card 1 -->
-<div class="bg-surface-container-lowest p-4 rounded-3xl custom-shadow flex items-center justify-between group transition-all">
+<div class="bg-surface-container-lowest p-4 rounded-3xl custom-shadow flex items-center justify-between group">
 <div class="flex items-center gap-4">
 <div class="w-12 h-12 rounded-2xl bg-primary-container/30 flex items-center justify-center text-primary">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">baby_changing_station</span>
@@ -431,23 +464,23 @@
 </main>
 <!-- Bottom Navigation Bar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-6 pt-2 bg-surface-container rounded-t-xl shadow-lg">
-<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl">
+<button class="feeding-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="home_dashboard" type="button">
 <span class="material-symbols-outlined">home</span>
 <span class="font-label-sm text-[10px]">Home</span>
 </button>
-<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-2 scale-90 transition-transform duration-150">
+<button class="feeding-pressable flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-2" type="button" aria-current="page">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
 <span class="font-label-sm text-[10px]">Log</span>
 </button>
-<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl">
+<button class="feeding-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="calendar" type="button">
 <span class="material-symbols-outlined">calendar_month</span>
 <span class="font-label-sm text-[10px]">Calendar</span>
 </button>
-<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl">
+<button class="feeding-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="milestones" type="button">
 <span class="material-symbols-outlined">auto_awesome</span>
 <span class="font-label-sm text-[10px]">Milestones</span>
 </button>
-<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl">
+<button class="feeding-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="assistant" type="button">
 <span class="material-symbols-outlined">smart_toy</span>
 <span class="font-label-sm text-[10px]">Assistant</span>
 </button>
@@ -707,6 +740,7 @@
         }
 
         function renderHistory() {
+            historyList.dataset.loading = "false";
             const logs = dedupeFeedingLogs(feedingLogItems)
                 .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
                 .slice(0, 5);
@@ -743,7 +777,7 @@
                             : "Logged";
 
             return `
-                <div class="bg-surface-container-lowest p-4 rounded-3xl custom-shadow flex items-center justify-between group transition-all">
+                <div class="feeding-pressable bg-surface-container-lowest p-4 rounded-3xl custom-shadow flex items-center justify-between group">
                     <div class="flex items-center gap-4 min-w-0">
                         <div class="w-12 h-12 rounded-2xl ${iconTone(log.type)} flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">${iconForType(log.type)}</span>

@@ -125,12 +125,15 @@
             white-space: nowrap;
             direction: ltr;
         }
+        :root {
+            --ln-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        }
         .segmented-control-active {
             transform: translateX(var(--tw-translate-x));
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 180ms var(--ln-ease-out);
         }
         .soft-shadow {
-            box-shadow: 0 8px 32px rgba(255, 191, 163, 0.12);
+            box-shadow: 0 10px 28px rgba(103, 78, 87, 0.07);
         }
         .inner-glow-primary {
             box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
@@ -146,6 +149,19 @@
             border-color: #83533c;
             background: #ffdbcc;
             color: #673c27;
+        }
+        .diaper-choice,
+        .diaper-pressable {
+            transition: transform 150ms var(--ln-ease-out), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+        }
+        .diaper-choice:active,
+        .diaper-pressable:active {
+            transform: scale(0.97);
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .diaper-pressable:hover {
+                transform: translateY(-1px);
+            }
         }
         html.dark .diaper-option-active {
             border-color: #ffbfa3;
@@ -185,7 +201,7 @@
             border-radius: 9999px;
             background: #d6c2bb;
             position: relative;
-            transition: background 0.2s ease;
+            transition: background-color 180ms ease;
             flex-shrink: 0;
         }
         .ln-switch::after {
@@ -198,7 +214,7 @@
             border-radius: 9999px;
             background: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.18);
-            transition: transform 0.2s ease;
+            transition: transform 180ms var(--ln-ease-out);
         }
         .rash-toggle[aria-pressed="true"] {
             border-color: #ba1a1a !important;
@@ -230,6 +246,19 @@
             font-weight: 700;
         }
         html.dark .brand-pill { background: rgba(255,191,163,0.14); color: #ffd6cc; }
+        @media (prefers-reduced-motion: reduce) {
+            .segmented-control-active,
+            .diaper-choice,
+            .diaper-pressable,
+            .ln-switch,
+            .ln-switch::after {
+                transition-duration: 1ms !important;
+            }
+            .diaper-choice:active,
+            .diaper-pressable:active {
+                transform: none !important;
+            }
+        }
     </style>
 <style>
     body {
@@ -241,7 +270,7 @@
 <body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col">
 <!-- TopAppBar -->
 <header class="docked full-width top-0 bg-surface flex justify-between items-center w-full px-container-padding h-14 z-40">
-<button aria-label="Back to quick log" class="text-primary hover:opacity-80 transition-opacity flex items-center justify-center p-2 active:scale-95 transition-transform duration-200" id="diaperBackButton" type="button">
+<button aria-label="Back to quick log" class="diaper-pressable text-primary flex items-center justify-center p-2" id="diaperBackButton" type="button">
 <span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
 </button>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Diaper Change</h1>
@@ -261,7 +290,7 @@
 <h3 class="font-label-md text-label-md text-on-surface-variant px-1">Change Type</h3>
 <div class="relative bg-surface-container-high p-1 rounded-full flex items-center h-12 shadow-inner">
 <!-- Sliding Active Indicator -->
-<div class="absolute h-10 w-[32%] bg-surface-container-lowest rounded-full soft-shadow transition-all duration-300 ease-out left-1" id="segment-indicator"></div>
+<div class="segmented-control-active absolute h-10 w-[32%] bg-surface-container-lowest rounded-full soft-shadow left-1" id="segment-indicator"></div>
 <button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface" data-diaper-type="pee" type="button">Pee</button>
 <button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="poop" type="button">Poop</button>
 <button class="relative z-10 flex-1 text-center font-label-md text-label-md transition-colors duration-200 text-on-surface-variant" data-diaper-type="mixed" type="button">Mixed</button>
@@ -392,7 +421,7 @@
 <input class="diaper-input hidden w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-3 py-3 font-label-md text-label-md focus:ring-2 focus:ring-primary-container" id="diaperBrandOtherInput" placeholder="Type diaper brand" type="text" autocomplete="off"/>
 <input type="hidden" id="diaperBrandInput"/>
 </label>
-<button type="button" id="rashToggle" aria-pressed="false" class="rash-toggle w-full flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2.5 transition-colors active:scale-[0.99]">
+<button type="button" id="rashToggle" aria-pressed="false" class="rash-toggle diaper-pressable w-full flex items-center justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2.5">
 <span class="flex items-center gap-2 text-left">
 <span class="material-symbols-outlined text-[20px] text-error">healing</span>
 <span class="min-w-0">
@@ -416,11 +445,11 @@
 <h3 class="font-label-md text-label-md text-on-surface-variant">Notes</h3>
 <span class="font-label-sm text-label-sm text-outline">Optional</span>
 </div>
-<textarea class="diaper-input w-full h-32 bg-surface-container-low border border-transparent rounded-[16px] p-md font-body-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container focus:ring-opacity-50 transition-all resize-none" id="diaperNotesInput" placeholder="Any observations? (e.g. rash, amount...)"></textarea>
+<textarea class="diaper-input w-full h-32 bg-surface-container-low border border-transparent rounded-[16px] p-md font-body-md text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary-container focus:ring-opacity-50 resize-none" id="diaperNotesInput" placeholder="Any observations? (e.g. rash, amount...)"></textarea>
 </section>
 <!-- Large Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="diaperSaveFeedback" aria-live="polite">Saved.</p>
-<button class="w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full soft-shadow active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
+<button class="diaper-pressable w-full h-14 bg-primary text-on-primary font-headline-md text-headline-md rounded-full soft-shadow flex items-center justify-center gap-base mt-md" id="saveDiaperButton" type="button">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
                 Log Change
             </button>
@@ -436,26 +465,26 @@
 </main>
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container shadow-[0_-4px_12px_rgba(255,191,163,0.15)] rounded-t-xl">
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+<button class="diaper-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="home_dashboard" type="button">
 <span class="material-symbols-outlined" data-icon="home">home</span>
 <span class="font-label-sm text-label-sm">Home</span>
-</a>
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-150" href="#">
+</button>
+<button class="diaper-pressable flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" type="button" aria-current="page">
 <span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
 <span class="font-label-sm text-label-sm">Log</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+</button>
+<button class="diaper-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="calendar" type="button">
 <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
 <span class="font-label-sm text-label-sm">Calendar</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+</button>
+<button class="diaper-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="milestones" type="button">
 <span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
 <span class="font-label-sm text-label-sm">Milestones</span>
-</a>
-<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container transition-colors p-2 rounded-xl" href="#">
+</button>
+<button class="diaper-pressable flex flex-col items-center justify-center text-on-secondary-fixed-variant p-2 rounded-xl" data-screen-target="assistant" type="button">
 <span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
 <span class="font-label-sm text-label-sm">Assistant</span>
-</a>
+</button>
 </nav>
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
