@@ -563,6 +563,10 @@
         renderPlanLabel();
 
         document.getElementById("settingsBackButton")?.addEventListener("click", () => {
+            if (window.history.length > 1) {
+                window.history.back();
+                return;
+            }
             window.location.href = screenUrl("home_dashboard");
         });
 
@@ -667,6 +671,11 @@
                     const label = id.charAt(0).toUpperCase() + id.slice(1);
                     const prefs = getNotifPrefs();
                     const newVal = !prefs[id];
+                    const next = { ...prefs, [id]: newVal };
+
+                    setNotifPrefs(next);
+                    setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, newVal);
+                    showNotifFeedback(newVal ? `${label} reminders on.` : `${label} reminders off.`);
 
                     if (newVal) {
                         // Turning a reminder ON: request permission + subscribe push
@@ -674,20 +683,15 @@
                         // permission as its first step.
                         if (isPushConfigured()) {
                             const res = await enablePush();
-                            if (!res.ok) { showNotifFeedback(pushFailMessage(res.reason)); return; }
+                            if (!res.ok) { showNotifFeedback(`${label} reminders saved. ${pushFailMessage(res.reason)}`); return; }
                         } else {
                             // No push provider configured — foreground reminders only.
                             const reason = pushUnavailableReason();
-                            if (reason === "needs-install") { showNotifFeedback("Add LittleNest to your Home Screen first, then turn on reminders."); return; }
+                            if (reason === "needs-install") { showNotifFeedback(`${label} reminders saved. Add LittleNest to your Home Screen for device alerts.`); return; }
                             const perm = await requestNotifPermission();
-                            if (perm === "denied") { showNotifFeedback("Allow notifications in your browser settings."); return; }
+                            if (perm === "denied") { showNotifFeedback(`${label} reminders saved. Allow notifications in your browser settings for alerts.`); return; }
                         }
                     }
-
-                    const next = { ...getNotifPrefs(), [id]: newVal };
-                    setNotifPrefs(next);
-                    setToggleState(`${id}NotifToggle`, `${id}NotifKnob`, newVal);
-                    showNotifFeedback(newVal ? `${label} reminders on.` : `${label} reminders off.`);
 
                     // All reminders off → drop the push subscription.
                     if (!Object.values(getNotifPrefs()).some(Boolean) && isPushSupported()) {
