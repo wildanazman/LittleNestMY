@@ -285,7 +285,7 @@
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { supabase } = await import(`${moduleBase}utils/supabaseClient.mjs`);
         const { loadCareCircleRemote, removeFamilyInviteRemote, sendFamilyInviteRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
-        const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getParentProfile, initialsForName } = await import(`${moduleBase}utils/profile.mjs`);
 
         const familyMembersList = document.getElementById("familyMembersList");
@@ -329,7 +329,7 @@
         document.getElementById("careCircleTitle").textContent = `${babyName}'s Care Circle`;
         if (selectedBaby?.photoUrl) { previewAvatar.src = selectedBaby.photoUrl; previewAvatar.classList.remove("hidden"); previewAvatarFallback.classList.add("hidden"); }
 
-        backButton.addEventListener("click", () => goToScreen("settings"));
+        backButton.addEventListener("click", () => goBackOrTo("settings"));
         inviteFamilyButton.addEventListener("click", openSheet);
         sheetClose.addEventListener("click", closeSheet);
         inviteSheet.querySelector("[data-sheet-overlay]").addEventListener("click", closeSheet);

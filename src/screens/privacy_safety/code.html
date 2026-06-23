@@ -179,10 +179,10 @@ tailwind.config = {
 
 <script type="module">
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getAuthSession, isGuestMode, isLoggedIn, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
 
-document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("settings"));
 document.getElementById("refreshDataBtn").addEventListener("click", renderDataOverview);
 document.getElementById("exportBtn").addEventListener("click", exportData);
 document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importInput").click());

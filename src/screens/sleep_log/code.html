@@ -356,7 +356,7 @@
         } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteSleepLogRemote, loadCoreLogsRemote, saveSleepLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const idle = document.getElementById("idle-state");
@@ -397,7 +397,7 @@
 
         startButton.addEventListener("click", startSleep);
         wakeButton.addEventListener("click", wakeUp);
-        backButton.addEventListener("click", () => goToScreen("quick_log"));
+        backButton.addEventListener("click", () => goBackOrTo("quick_log"));
         viewStatsButton.addEventListener("click", () => goToScreen("weekly_insights"));
         document.getElementById("sleepPatternLink")?.addEventListener("click", () => goToScreen("sleep_pattern"));
         toggleManualButton.addEventListener("click", () => {

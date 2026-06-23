@@ -117,9 +117,9 @@ const { formatDuration, formatTime, isSameLocalDay } = await import(`${moduleBas
 const { getLogsForBaby, getPersistedSleepLogs } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
-document.getElementById("backButton").addEventListener("click", () => goToScreen("sleep_log"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("sleep_log"));
 let sleepLogItems = [];
 let periodDays = 7;
 const chartSvg = document.getElementById("sleepChart");

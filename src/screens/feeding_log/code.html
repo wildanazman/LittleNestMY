@@ -498,7 +498,7 @@
         const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = { feedingType: "bottle", isSaving: false, brand: "" };
@@ -536,7 +536,7 @@
         });
 
         saveButton.addEventListener("click", saveEntry);
-        backButton.addEventListener("click", () => goToScreen("quick_log"));
+        backButton.addEventListener("click", () => goBackOrTo("quick_log"));
         seeAllButton.addEventListener("click", () => goToScreen("feeding_history"));
         document.getElementById("decreaseAmountButton")?.addEventListener("click", () => adjustAmount(-10));
         document.getElementById("increaseAmountButton")?.addEventListener("click", () => adjustAmount(10));

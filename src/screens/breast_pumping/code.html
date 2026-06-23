@@ -430,7 +430,7 @@ const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
-const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 const {
   deleteMamaAppointment,
@@ -473,9 +473,9 @@ if (!(await isLoggedIn())) {
 }
 
 document.getElementById("backToBaby").addEventListener("click", () => {
-  goToScreen("mama_care");
+  goBackOrTo("mama_care");
 });
-document.getElementById("noBabyBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("noBabyBackButton").addEventListener("click", () => goBackOrTo("home_dashboard"));
 document.getElementById("closeModalButton").addEventListener("click", closeModal);
 document.getElementById("mamaModal").addEventListener("click", (event) => {
   if (event.target.id === "mamaModal") closeModal();

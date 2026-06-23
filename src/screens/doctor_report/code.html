@@ -189,7 +189,7 @@ const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.m
 const { getPersistedGrowthRecords, getPersistedMilestones, getLogsForBaby } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
 const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
-const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
 const now = new Date();
@@ -201,7 +201,7 @@ if (!(await isLoggedIn())) {
   await new Promise(() => {});
 }
 
-document.getElementById("backButton").addEventListener("click", () => goToScreen("growth_tracker"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("growth_tracker"));
 document.getElementById("printButton").addEventListener("click", printReport);
 document.getElementById("exportButton").addEventListener("click", showExportSheet);
 document.getElementById("shareButton").addEventListener("click", printReport);

@@ -229,7 +229,7 @@ tailwind.config = {
 
 <script type="module">
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getAuthSession, isGuestMode, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
 const { requireSupabaseClient, isSupabaseConfigured } = await import(`${moduleBase}utils/supabaseClient.mjs`);
@@ -239,7 +239,7 @@ if (!(await isLoggedIn())) {
   await new Promise(() => {});
 }
 
-document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("settings"));
 document.getElementById("subscribeBtn").addEventListener("click", subscribe);
 
 await renderPlanStatus();

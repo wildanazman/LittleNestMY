@@ -134,7 +134,7 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { deleteGrowthRecordRemote, loadGrowthRecordsRemote, saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
-const { goToScreen, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goToScreen, goBackOrTo, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { whoMedian } = await import(`${moduleBase}utils/benchmarks.mjs`);
 const babyState = await loadBabyProfilesRemote(babyProfile);
 const selectedBabyId = babyState.selectedBabyId;
@@ -151,7 +151,7 @@ const tabs = [
   ["bmi", "BMI-for-age"]
 ];
 let activeTab = "weight";
-document.getElementById("backButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("home_dashboard"));
 document.getElementById("viewGrowthReportButton")?.addEventListener("click", () => goToScreen("doctor_report"));
 document.getElementById("dateInput").value = new Date().toISOString().slice(0, 10);
 document.getElementById("babyName").textContent = selectedBaby.name;

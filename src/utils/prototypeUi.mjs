@@ -11,6 +11,14 @@ export function goToScreen(screenId) {
   navigateWithTransition(screenUrl(screenId));
 }
 
+export function goBackOrTo(fallbackScreenId = "home_dashboard") {
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+  goToScreen(fallbackScreenId);
+}
+
 export function navigateWithTransition(url) {
   if (!url) return;
   if (isSameLocation(url)) return;

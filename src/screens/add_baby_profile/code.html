@@ -306,7 +306,7 @@
             loadBabyProfilesRemote,
             updateBabyProfileRemote
         } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-        const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getBabyPermissions, redirectViewOnly, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
@@ -421,9 +421,7 @@
             }
         });
 
-        document.getElementById("babyProfileBackButton").addEventListener("click", () => {
-            window.location.href = screenUrl("baby_profiles");
-        });
+        document.getElementById("babyProfileBackButton").addEventListener("click", () => goBackOrTo("baby_profiles"));
 
         async function setupMode() {
             const babyState = await loadBabyProfilesRemote(mockBabyProfile);

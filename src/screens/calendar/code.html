@@ -479,7 +479,7 @@
         const { babyProfile, calendarEvents: mockCalendarEvents } = await import(`${moduleBase}data/mockData.mjs`);
         const { deleteLocalReminder, getLogsForBaby, getPersistedCalendarEvents, saveLocalReminder } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { deleteCalendarEventRemote, loadCalendarEventsRemote, saveCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
         const { saveReminderRemote, deleteReminderRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
 
@@ -520,7 +520,7 @@
         monthViewButton.addEventListener("click", () => setView("month"));
         upcomingViewButton.addEventListener("click", () => setView("upcoming"));
         seeAllEventsButton.addEventListener("click", () => setView("upcoming"));
-        backButton.addEventListener("click", () => goToScreen("home_dashboard"));
+        backButton.addEventListener("click", () => goBackOrTo("home_dashboard"));
 
         loadCalendarEventsRemote(selectedBabyId, mockCalendarEvents).catch((error) => {
             showFeedback(error?.message || "Could not sync calendar events. Showing local data.");

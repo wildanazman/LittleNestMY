@@ -493,7 +493,7 @@
         const { getLogsForBaby, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteDiaperLogRemote, loadCoreLogsRemote, saveDiaperLogRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-        const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
         const state = {
@@ -605,7 +605,7 @@
         });
 
         saveButton.addEventListener("click", saveDiaperLog);
-        backButton.addEventListener("click", () => goToScreen("quick_log"));
+        backButton.addEventListener("click", () => goBackOrTo("quick_log"));
         setDefaultDateTime();
         updateSegment(0);
         updateChoiceSelection();

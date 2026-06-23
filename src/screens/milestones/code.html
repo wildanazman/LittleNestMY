@@ -451,7 +451,7 @@ Save Milestone
         const { calculateBabyAgeShort } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const { getLogsForBaby, getPersistedMilestones } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-        const { goToScreen, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { goToScreen, goBackOrTo, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { compressVideoBlob } = await import(`${moduleBase}utils/videoCompress.mjs`);
         const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
@@ -783,7 +783,7 @@ Save Milestone
         }
 
         saveButton.addEventListener("click", saveMilestone);
-        backButton.addEventListener("click", () => goToScreen("home_dashboard"));
+        backButton.addEventListener("click", () => goBackOrTo("home_dashboard"));
 
         // New memory-book UI elements
         const recapSection = document.getElementById("recapSection");

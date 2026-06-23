@@ -290,7 +290,7 @@ const { babyProfile, feedingLogs: mockFeedingLogs } = await import(`${moduleBase
 const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { deleteFeedingLogRemote, loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { formatDuration, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
 
 const state = { typeFilter: "all", dateFilter: "", searchFilter: "" };
@@ -308,7 +308,7 @@ const filterDateInput = document.getElementById("filterDateInput");
 const filterSearchInput = document.getElementById("filterSearchInput");
 const backButton = document.getElementById("historyBackButton");
 
-backButton.addEventListener("click", () => goToScreen("quick_log"));
+backButton.addEventListener("click", () => goBackOrTo("quick_log"));
 filterDateInput.addEventListener("change", () => { state.dateFilter = filterDateInput.value; renderFeedList(); });
 filterSearchInput.addEventListener("input", () => { state.searchFilter = filterSearchInput.value; renderFeedList(); });
 

@@ -116,12 +116,12 @@ tailwind.config = {
   const { loadVaccinationRecordsRemote, saveVaccinationRecordRemote, deleteVaccinationRecordRemote } = await import(`${moduleBase}utils/vaccinationsRemote.mjs`);
   const { buildVaccinationPlan, groupByAge, summarise, nextDue } = await import(`${moduleBase}utils/vaccinations.mjs`);
   const { getBabyPermissions } = await import(`${moduleBase}utils/permissions.mjs`);
+  const { goBackOrTo, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
-  const screenUrl = (id) => window.location.protocol === "file:" ? `../${id}/code.html` : `/${id}/`;
   const regionKey = "littlenest:vaccRegion";
 
-  document.getElementById("vaccBack").addEventListener("click", () => { window.location.href = screenUrl("home_dashboard"); });
-  document.getElementById("vaccAddBaby").addEventListener("click", () => { window.location.href = screenUrl("add_baby_profile"); });
+  document.getElementById("vaccBack").addEventListener("click", () => goBackOrTo("home_dashboard"));
+  document.getElementById("vaccAddBaby").addEventListener("click", () => goToScreen("add_baby_profile"));
 
   const babyState = await loadBabyProfilesRemote(babyProfile);
   const selectedBabyId = babyState.selectedBabyId;

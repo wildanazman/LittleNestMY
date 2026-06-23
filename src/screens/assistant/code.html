@@ -153,7 +153,7 @@
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
   const {
@@ -162,7 +162,7 @@
   } = await import(`${moduleBase}utils/localState.mjs`);
   const B = await import(`${moduleBase}utils/benchmarks.mjs`);
 
-  document.getElementById("assistantBackButton").addEventListener("click", () => goToScreen("home_dashboard"));
+  document.getElementById("assistantBackButton").addEventListener("click", () => goBackOrTo("home_dashboard"));
   document.getElementById("fullWeeklyInsightsButton")?.addEventListener("click", () => goToScreen("weekly_insights"));
 
   const babyState = await loadBabyProfilesRemote(babyProfile);

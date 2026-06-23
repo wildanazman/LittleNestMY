@@ -174,13 +174,13 @@
     getPersistedGrowthRecords
   } = await import(`${moduleBase}utils/localState.mjs`);
   const { deleteBabyProfileRemote, loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
   const profilesList = document.getElementById("profilesList");
   const feedback = document.getElementById("feedback");
 
-  document.getElementById("backButton").addEventListener("click", () => goToScreen("settings"));
+  document.getElementById("backButton").addEventListener("click", () => goBackOrTo("settings"));
   document.getElementById("addBabyButton").addEventListener("click", async () => {
     const babyState = await loadBabyProfilesRemote(mockBabyProfile);
     const permissions = await getBabyPermissions(babyState.selectedBabyId);

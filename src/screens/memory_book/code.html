@@ -190,10 +190,9 @@
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
-  const screenUrl = (id) => window.location.protocol === "file:" ? `../${id}/code.html` : `/${id}/`;
-
-  document.getElementById("memBack").addEventListener("click", () => { window.location.href = screenUrl("home_dashboard"); });
-  const goAdd = () => { window.location.href = screenUrl("milestones"); };
+  const { goBackOrTo, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  document.getElementById("memBack").addEventListener("click", () => goBackOrTo("home_dashboard"));
+  const goAdd = () => goToScreen("milestones");
   document.getElementById("memAddTop").addEventListener("click", goAdd);
 
   const babyState = await loadBabyProfilesRemote(babyProfile);

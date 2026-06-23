@@ -536,16 +536,14 @@ function normalizePageHeaders(root = document) {
       backButton.dataset.headerBackHomeBound = "true";
       backButton.addEventListener("click", (event) => {
         const explicit = backButton.getAttribute("data-back-to");
-        if (explicit) {
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          navigateWithTransition(window.location.protocol === "file:" ? `../${explicit}/code.html` : `/${explicit}/`);
-          return;
-        }
         event.preventDefault();
         event.stopImmediatePropagation();
         if (window.history.length > 1) {
           window.history.back();
+          return;
+        }
+        if (explicit) {
+          navigateWithTransition(window.location.protocol === "file:" ? `../${explicit}/code.html` : `/${explicit}/`);
           return;
         }
         navigateWithTransition(window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/");

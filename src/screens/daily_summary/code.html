@@ -118,7 +118,7 @@ const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.m
 const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
 const { calculateBabyAge, formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
-const { bindPrototypeActions, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
 let shareText = "";
@@ -129,7 +129,7 @@ if (!(await isLoggedIn())) {
   await new Promise(() => {});
 }
 
-document.getElementById("backButton").addEventListener("click", () => goToScreen("home_dashboard"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("home_dashboard"));
 document.getElementById("copyButton").addEventListener("click", copySummary);
 document.getElementById("whatsappButton").addEventListener("click", shareWhatsApp);
 document.getElementById("weeklyInsightsButton").addEventListener("click", () => goToScreen("weekly_insights"));

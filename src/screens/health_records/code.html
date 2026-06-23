@@ -196,7 +196,7 @@ const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { deleteHealthNoteRemote, loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
-const { goToScreen, bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+const { goToScreen, goBackOrTo, bindPrototypeActions, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 
 const babyState = await loadBabyProfilesRemote(babyProfile);
@@ -261,7 +261,7 @@ function renderQuickSymptoms() {
     });
   });
 }
-document.getElementById("backButton").addEventListener("click", () => goToScreen("quick_log"));
+document.getElementById("backButton").addEventListener("click", () => goBackOrTo("quick_log"));
 setDefaultDateTime();
 bindPrototypeActions();
 if (!permissions.canAddLogs) {
