@@ -195,6 +195,106 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
         }
+        :root.dark body {
+            background:
+              radial-gradient(circle at 12% -8%, rgba(34,211,238,.14), transparent 34%),
+              radial-gradient(circle at 92% 8%, rgba(124,92,255,.14), transparent 34%),
+              linear-gradient(180deg, #101a2e 0%, #0b1528 48%, #07111f 100%) fixed !important;
+            color: #eef6ff !important;
+        }
+        :root.dark body::before {
+            opacity: .20;
+            background-image:
+              linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+        }
+        :root.dark header {
+            background: rgba(13,22,40,.92) !important;
+            border-color: rgba(132,204,255,.16) !important;
+            box-shadow: 0 18px 48px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+        :root.dark #babyProfileForm {
+            background: rgba(18,27,45,.84) !important;
+            border-color: rgba(132,204,255,.16) !important;
+            box-shadow: 0 24px 58px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+        :root.dark .inline-flex.bg-white\/70 {
+            background: rgba(34,211,238,.14) !important;
+            color: #22d3ee !important;
+            border: 1px solid rgba(34,211,238,.20);
+        }
+        :root.dark #formTitle,
+        :root.dark #formSubtitle,
+        :root.dark label,
+        :root.dark .font-label-md,
+        :root.dark .text-on-surface,
+        :root.dark .text-on-surface-variant {
+            color: #eef6ff !important;
+        }
+        :root.dark #formSubtitle,
+        :root.dark label,
+        :root.dark .text-on-surface-variant {
+            color: #a8b5ca !important;
+        }
+        :root.dark #babyName,
+        :root.dark #dob {
+            background: rgba(7,17,31,.78) !important;
+            color: #eef6ff !important;
+            -webkit-text-fill-color: #eef6ff !important;
+            border: 1px solid rgba(132,204,255,.18) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+        }
+        :root.dark #babyName::placeholder {
+            color: rgba(168,181,202,.72) !important;
+            -webkit-text-fill-color: rgba(168,181,202,.72) !important;
+        }
+        :root.dark input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(1.45) saturate(.8) !important;
+        }
+        :root.dark .gender-btn,
+        :root.dark .feeding-btn {
+            background: rgba(18,27,45,.92) !important;
+            color: #eef6ff !important;
+            border-color: rgba(132,204,255,.14) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.20) !important;
+        }
+        :root.dark .gender-btn .material-symbols-outlined,
+        :root.dark .feeding-btn .material-symbols-outlined,
+        :root.dark #avatarPlaceholder {
+            color: #22d3ee !important;
+        }
+        :root.dark .radio-tile-active {
+            background: rgba(34,211,238,.20) !important;
+            color: #22d3ee !important;
+            border-color: rgba(34,211,238,.46) !important;
+            box-shadow: 0 16px 34px rgba(34,211,238,.14), inset 0 1px 0 rgba(255,255,255,.08) !important;
+        }
+        :root.dark .radio-tile-active *,
+        :root.dark .radio-tile-active .material-symbols-outlined {
+            color: #22d3ee !important;
+        }
+        :root.dark .bg-secondary-container,
+        :root.dark .bg-\[\#FFF7ED\]\/90 {
+            background: rgba(18,27,45,.88) !important;
+            color: #eef6ff !important;
+        }
+        :root.dark .border-white,
+        :root.dark .ring-white {
+            border-color: rgba(132,204,255,.18) !important;
+            --tw-ring-color: rgba(132,204,255,.18) !important;
+        }
+        :root.dark .shadow-soft {
+            box-shadow: 0 18px 44px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+        :root.dark #saveFeedback {
+            color: #9af0bc !important;
+        }
+        :root.dark #saveBabyButton.bg-tertiary-container,
+        :root.dark #saveBabyButton.text-on-tertiary-container {
+            background: rgba(154,240,188,.16) !important;
+            color: #9af0bc !important;
+            border: 1px solid rgba(154,240,188,.24);
+        }
     </style>
 <style>
     body {
