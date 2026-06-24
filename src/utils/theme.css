@@ -1090,3 +1090,179 @@ main > article,
   border-color: rgba(255, 255, 255, 0.10) !important;
   box-shadow: none !important;
 }
+
+/* =====================================================================
+   Premium dark-mode hardening for older feature pages.
+   Covers baby profiles, milestones, edit baby profile, sleep, Mama Care,
+   breast pumping, and health records without touching their JS contracts.
+   ===================================================================== */
+:root.dark body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.10), transparent 28rem),
+    radial-gradient(circle at 92% 8%, rgba(124, 92, 255, 0.10), transparent 30rem),
+    linear-gradient(180deg, #101a2e 0%, #0b1528 44%, #07111f 100%) fixed !important;
+}
+
+:root.dark body::before {
+  opacity: 0.18 !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px) !important;
+}
+
+:root.dark .glass-shell,
+:root.dark .premium-shell,
+:root.dark .premium-core,
+:root.dark .mama-card,
+:root.dark .mama-card-inner,
+:root.dark .mama-stat,
+:root.dark .home-section-card,
+:root.dark #entrySection,
+:root.dark #quickSymptomSection,
+:root.dark #profilesList article,
+:root.dark #profilesList > *,
+:root.dark #historyList > *,
+:root.dark #timelineList > *,
+:root.dark #storageList > *,
+:root.dark #pumpSessionList > *,
+:root.dark #maintenanceList > *,
+:root.dark #medicationList > *,
+:root.dark #supportTaskList > *,
+:root.dark #breastPumpingInventory,
+:root.dark [class*="bg-white/"],
+:root.dark [class*="bg-white\/"],
+:root.dark [class*="bg-surface-container-low"],
+:root.dark [class*="bg-surface-container-high"] {
+  background: rgba(18, 27, 45, 0.82) !important;
+  border-color: rgba(132, 204, 255, 0.14) !important;
+  color: #eef6ff !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+:root.dark .mama-topbar,
+:root.dark .mama-bottom-nav,
+:root.dark .milestone-topbar,
+:root.dark .milestone-bottom-nav,
+:root.dark .ln-app-header,
+:root.dark header.bg-\[\#FFF7F1\]\/88 {
+  background: rgba(13, 22, 40, 0.92) !important;
+  border-color: rgba(132, 204, 255, 0.16) !important;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+}
+
+:root.dark .mama-hero,
+:root.dark #sleep-hero,
+:root.dark body.milestone-premium,
+:root.dark .baby-glass-card,
+:root.dark [style*="linear-gradient(165deg"],
+:root.dark [style*="linear-gradient(145deg"],
+:root.dark [style*="linear-gradient(155deg"],
+:root.dark [style*="linear-gradient(160deg"],
+:root.dark [style*="background:linear-gradient"] {
+  background:
+    linear-gradient(145deg, rgba(18, 27, 45, 0.94), rgba(17, 34, 54, 0.86)) !important;
+  border-color: rgba(132, 204, 255, 0.15) !important;
+  color: #eef6ff !important;
+}
+
+:root.dark .mama-hero *,
+:root.dark #sleep-hero *,
+:root.dark .baby-glass-card *,
+:root.dark .glass-shell *,
+:root.dark .premium-shell *,
+:root.dark .premium-core *,
+:root.dark [style*="background:linear-gradient"] * {
+  color: inherit;
+}
+
+:root.dark input,
+:root.dark textarea,
+:root.dark select,
+:root.dark .premium-field,
+:root.dark .mama-input {
+  background: rgba(7, 17, 31, 0.76) !important;
+  color: #eef6ff !important;
+  -webkit-text-fill-color: #eef6ff !important;
+  border-color: rgba(132, 204, 255, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+:root.dark input::placeholder,
+:root.dark textarea::placeholder,
+:root.dark .mama-input::placeholder,
+:root.dark .premium-field::placeholder {
+  color: rgba(168, 181, 202, 0.72) !important;
+  -webkit-text-fill-color: rgba(168, 181, 202, 0.72) !important;
+}
+
+:root.dark input[type="date"]::-webkit-calendar-picker-indicator,
+:root.dark input[type="time"]::-webkit-calendar-picker-indicator,
+:root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.45) saturate(0.8) !important;
+}
+
+:root.dark .text-\[\#241b3a\],
+:root.dark .text-\[\#5b4f72\],
+:root.dark .text-\[\#4a041c\],
+:root.dark .text-\[\#26191c\],
+:root.dark .text-\[\#1f1714\],
+:root.dark .text-\[\#6d5ae0\],
+:root.dark .text-\[\#7056f4\],
+:root.dark .text-\[\#9f4960\],
+:root.dark .text-\[\#63424a\],
+:root.dark .text-\[\#7a4b36\],
+:root.dark .text-\[\#321304\] {
+  color: #eef6ff !important;
+}
+
+:root.dark .text-\[\#0369A1\],
+:root.dark .text-\[\#075985\],
+:root.dark .text-\[\#1F6C9F\],
+:root.dark .text-\[\#1E40AF\] {
+  color: #93d8ff !important;
+}
+
+:root.dark .text-\[\#15803D\],
+:root.dark .text-\[\#166534\],
+:root.dark .text-\[\#346538\] {
+  color: #9af0bc !important;
+}
+
+:root.dark .text-\[\#7E22CE\],
+:root.dark .text-\[\#581C87\],
+:root.dark .text-\[\#6B21A8\] {
+  color: #d8b4fe !important;
+}
+
+:root.dark .bg-\[\#fff5f8\],
+:root.dark .bg-\[\#FFF7F1\],
+:root.dark .bg-\[\#ffe0e8\],
+:root.dark .bg-\[\#fffaf8\],
+:root.dark .bg-\[\#efe9ff\],
+:root.dark .bg-\[\#e7ecff\],
+:root.dark .bg-\[\#f3e9ff\],
+:root.dark .bg-\[\#eee8ff\],
+:root.dark .bg-\[\#e8f1ff\],
+:root.dark .bg-\[\#e5fbf2\],
+:root.dark .bg-\[\#fff3da\],
+:root.dark .bg-\[\#ffe8ef\] {
+  background-color: rgba(34, 211, 238, 0.12) !important;
+  color: #eef6ff !important;
+}
+
+:root.dark .status-chip,
+:root.dark .glass-tag,
+:root.dark [class*="rounded-full"][class*="bg-white"],
+:root.dark [class*="rounded-full"][class*="bg-primary-container"] {
+  background: rgba(34, 211, 238, 0.14) !important;
+  color: #22d3ee !important;
+  border-color: rgba(34, 211, 238, 0.22) !important;
+}
+
+:root.dark .sleep-glow {
+  box-shadow: 0 0 52px rgba(34, 211, 238, 0.22) !important;
+}
+
+:root.dark .timeline-line::before {
+  border-left-color: rgba(132, 204, 255, 0.24) !important;
+}
