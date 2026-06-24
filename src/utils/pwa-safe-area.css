@@ -3,14 +3,28 @@
   color-scheme: light;
 }
 
+:root.dark {
+  background: #0b1222;
+  color-scheme: dark;
+}
+
 html {
   min-height: 100%;
+  background: #fbf9f4;
+}
+
+html.dark {
+  background: #0b1222;
 }
 
 html.ln-capacitor-native {
   --ln-native-top-inset: max(44px, env(safe-area-inset-top));
   --ln-native-nav-bottom: 24px;
   background: var(--ln-bg, #fbf9f4);
+}
+
+html.dark.ln-capacitor-native {
+  background: var(--ln-bg, #0b1222);
 }
 
 html.ln-capacitor-native::before {
@@ -25,6 +39,10 @@ html.ln-capacitor-native::before {
   pointer-events: none;
 }
 
+html.dark.ln-capacitor-native::before {
+  background: var(--ln-bg, #0b1222);
+}
+
 body {
   min-height: 100dvh;
   padding-left: env(safe-area-inset-left);
@@ -34,11 +52,20 @@ body {
   overscroll-behavior-y: none;
 }
 
+:root.dark body,
+html.dark body {
+  background: var(--ln-bg, #0b1222);
+}
+
 html.ln-capacitor-native body {
   padding-top: var(--ln-native-top-inset);
   background: var(--ln-bg, #fbf9f4);
   overscroll-behavior-y: none;
   -webkit-overflow-scrolling: touch;
+}
+
+html.dark.ln-capacitor-native body {
+  background: var(--ln-bg, #0b1222);
 }
 
 html.ln-capacitor-native header.sticky.top-0 {
