@@ -208,7 +208,7 @@ tailwind.config = {
       <span class="material-symbols-outlined text-primary text-[30px]">favorite</span>
     </div>
     <div class="hidden rounded-2xl bg-error-container p-3 text-error font-bold" id="carePlanAlert"></div>
-    <div class="grid grid-cols-3 gap-2" id="carePlanGoals"></div>
+    <div id="carePlanGoals"></div>
     <div class="mama-card-inner rounded-2xl p-3" id="nextMamaAction"></div>
   </section>
 
@@ -603,11 +603,11 @@ function renderMamaCarePlan() {
     alert.textContent = "";
   }
 
-  document.getElementById("carePlanGoals").innerHTML = [
-    careGoal("water_drop", "Water", checkin?.waterCups ? `${checkin.waterCups}/8` : "0/8", Number(checkin?.waterCups || 0) >= 8),
-    careGoal("restaurant", "Meals", checkin?.mealsCount ? `${checkin.mealsCount}/3` : "0/3", Number(checkin?.mealsCount || 0) >= 3),
-    careGoal("bedtime", "Rest", checkin?.sleepHours ? `${checkin.sleepHours}h` : "0h", Number(checkin?.sleepHours || 0) >= 5)
-  ].join("");
+  document.getElementById("carePlanGoals").innerHTML = careRings({
+    water: { value: Number(checkin?.waterCups || 0), goal: 8 },
+    meals: { value: Number(checkin?.mealsCount || 0), goal: 3 },
+    rest: { value: Number(checkin?.sleepHours || 0), goal: 5 }
+  });
 
   document.getElementById("nextMamaAction").innerHTML = nextMamaAction({ checkin, nextMed, pendingTask, nextAppt });
 }
@@ -1475,6 +1475,43 @@ function careGoal(icon, label, value, done) {
       <p class="text-[16px] font-extrabold">${value}</p>
     </div>
   `;
+}
+
+// Apple-style concentric activity rings for the daily care goals.
+function careRings({ water, meals, rest }) {
+  const RINGS = [
+    { key: "water", label: "Water", color: "#22c3e6", icon: "water_drop", r: 52, unit: "cups", ...water },
+    { key: "meals", label: "Meals", color: "#ff6b9d", icon: "restaurant", r: 39, unit: "meals", ...meals },
+    { key: "rest", label: "Rest", color: "#9b7cff", icon: "bedtime", r: 26, unit: "h", ...rest }
+  ];
+  const ringSvg = RINGS.map((g) => {
+    const c = 2 * Math.PI * g.r;
+    const frac = Math.max(0, Math.min(1, g.goal ? g.value / g.goal : 0));
+    const off = c * (1 - frac);
+    return `
+      <circle cx="60" cy="60" r="${g.r}" fill="none" stroke="${g.color}" stroke-opacity="0.15" stroke-width="10"/>
+      <circle cx="60" cy="60" r="${g.r}" fill="none" stroke="${g.color}" stroke-width="10" stroke-linecap="round"
+        stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"
+        transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .9s cubic-bezier(0.22,1,0.36,1)"/>`;
+  }).join("");
+  const legend = RINGS.map((g) => {
+    const done = g.goal && g.value >= g.goal;
+    const display = g.unit === "h" ? `${g.value}h` : `${g.value}/${g.goal}`;
+    return `
+      <div class="flex items-center gap-2.5">
+        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${g.color}"></span>
+        <span class="material-symbols-outlined text-[18px] shrink-0" style="color:${g.color}">${g.icon}</span>
+        <span class="flex-1 text-[14px] font-semibold text-on-surface">${g.label}</span>
+        <span class="text-[15px] font-extrabold tabular-nums ${done ? "" : "text-on-surface"}" style="${done ? `color:${g.color}` : ""}">${display}</span>
+      </div>`;
+  }).join("");
+  return `
+    <div class="flex items-center gap-5">
+      <div class="relative shrink-0" style="width:120px;height:120px">
+        <svg viewBox="0 0 120 120" width="120" height="120">${ringSvg}</svg>
+      </div>
+      <div class="flex-1 min-w-0 space-y-2.5">${legend}</div>
+    </div>`;
 }
 
 function nextMamaAction({ checkin, nextMed, pendingTask, nextAppt }) {
