@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+
 :root {
   color-scheme: light;
   --ln-bg:
@@ -41,6 +43,23 @@
   --ln-purple: #22d3ee;
   --ln-purple-soft: #0f2236;
   --ln-dark-gradient: linear-gradient(180deg, #101a2e 0%, #0d1628 46%, #08101f 100%);
+}
+
+/* ---- Global design layer (applies to every screen via theme.css) ---- */
+/* Premium display font on headings + the heading font-utilities Tailwind
+   generates per screen (class beats a bare h1 rule, so target both). */
+h1, h2, h3,
+[class*="font-display"], [class*="font-headline"], [class*="font-title"] {
+  font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif !important;
+  letter-spacing: -0.02em;
+}
+/* Aligned, even data figures across the app. */
+body { font-variant-numeric: tabular-nums; }
+/* Keyboard focus ring (was missing app-wide — accessibility). */
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--ln-primary, #7c5cff);
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
