@@ -219,10 +219,38 @@
         .recap-strip::-webkit-scrollbar, .chip-row::-webkit-scrollbar { display: none; }
         .recap-strip, .chip-row { scrollbar-width: none; }
         .recap-card { scroll-snap-align: start; }
-        .story-fade { animation: storyFade 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
-        @keyframes storyFade { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
-        .story-rise { animation: storyRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
-        @keyframes storyRise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+        #storyModal:not(.hidden) > .absolute {
+            animation: storyScrimIn 180ms cubic-bezier(.23,1,.32,1) both;
+        }
+        #storyModal.story-closing > .absolute {
+            animation: storyScrimOut 140ms cubic-bezier(.23,1,.32,1) both;
+        }
+        .story-fade {
+            animation: storyOpen 240ms cubic-bezier(.23,1,.32,1) both;
+            transform-origin: center;
+            will-change: transform, opacity;
+        }
+        .story-rise {
+            animation: storyDetailIn 220ms cubic-bezier(.23,1,.32,1) 45ms both;
+            will-change: transform, opacity;
+        }
+        #storyModal.story-closing .story-fade {
+            animation: storyClose 150ms cubic-bezier(.23,1,.32,1) both;
+        }
+        @keyframes storyScrimIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes storyScrimOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes storyOpen {
+            from { opacity: 0; transform: translateY(10px) scale(.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes storyDetailIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes storyClose {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(6px) scale(.99); }
+        }
         .modal-safe-top {
             top: calc(env(safe-area-inset-top) + 1rem) !important;
         }
@@ -235,6 +263,18 @@
             .milestone-premium *::after {
                 animation-duration: 1ms !important;
                 transition-duration: 1ms !important;
+            }
+            .story-fade,
+            .story-rise,
+            #storyModal:not(.hidden) > .absolute,
+            #storyModal.story-closing > .absolute {
+                animation-name: storyFadeReduced !important;
+                animation-duration: 160ms !important;
+                transform: none !important;
+            }
+            @keyframes storyFadeReduced {
+                from { opacity: 0; transform: none; }
+                to { opacity: 1; transform: none; }
             }
         }
     </style>
@@ -1199,6 +1239,7 @@ Save Milestone
         function openStory(id) {
             storyOrder = visibleMemories().map((m) => m.id);
             storyIndex = Math.max(0, storyOrder.indexOf(id));
+            storyModal.classList.remove("story-closing");
             storyModal.classList.remove("hidden");
             renderStory();
         }
@@ -1210,8 +1251,13 @@ Save Milestone
         }
 
         function closeStory() {
-            storyModal.classList.add("hidden");
-            storyBody.innerHTML = "";
+            if (storyModal.classList.contains("hidden") || storyModal.classList.contains("story-closing")) return;
+            storyModal.classList.add("story-closing");
+            window.setTimeout(() => {
+                storyModal.classList.add("hidden");
+                storyModal.classList.remove("story-closing");
+                storyBody.innerHTML = "";
+            }, 150);
         }
 
         function renderStory() {
