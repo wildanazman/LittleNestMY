@@ -75,7 +75,12 @@ tailwind.config = {
 </div>
 <div class="space-y-2">
 <label class="font-bold text-sm text-on-surface" for="password">Password</label>
-<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 text-on-surface placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary" id="password" placeholder="Your password" type="password"/>
+<div class="relative">
+<input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 pr-14 text-on-surface placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary" id="password" placeholder="Your password" type="password" autocomplete="current-password"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 text-primary flex items-center justify-center active:scale-95" id="togglePasswordButton" type="button" aria-label="Show password" aria-pressed="false">
+<span class="material-symbols-outlined text-[20px]" id="togglePasswordIcon">visibility</span>
+</button>
+</div>
 </div>
 <div class="flex items-center justify-between gap-3">
 <label class="flex items-center gap-2 text-sm text-on-surface-variant">
@@ -112,6 +117,18 @@ Continue with Google
   const form = document.getElementById("loginForm");
   const error = document.getElementById("loginError");
   const submitButton = form.querySelector('button[type="submit"]');
+  const passwordInput = document.getElementById("password");
+  const togglePasswordButton = document.getElementById("togglePasswordButton");
+  const togglePasswordIcon = document.getElementById("togglePasswordIcon");
+
+  togglePasswordButton.addEventListener("click", () => {
+    const shouldShow = passwordInput.type === "password";
+    passwordInput.type = shouldShow ? "text" : "password";
+    togglePasswordButton.setAttribute("aria-label", shouldShow ? "Hide password" : "Show password");
+    togglePasswordButton.setAttribute("aria-pressed", String(shouldShow));
+    togglePasswordIcon.textContent = shouldShow ? "visibility_off" : "visibility";
+    passwordInput.focus({ preventScroll: true });
+  });
 
   if (!hasSupabaseConfig()) {
     error.textContent = getAuthConfigMessage();
