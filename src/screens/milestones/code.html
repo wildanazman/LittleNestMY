@@ -119,10 +119,13 @@
             -webkit-tap-highlight-color: transparent;
         }
         body.milestone-premium {
+            color-scheme: light dark;
+            min-height: 100dvh;
             background:
-                linear-gradient(135deg, rgba(255, 219, 204, 0.44), transparent 34%),
-                linear-gradient(220deg, rgba(202, 236, 196, 0.22), transparent 38%),
-                linear-gradient(180deg, #fffaf6 0%, #fbf9f4 48%, #f3eee8 100%);
+                radial-gradient(120% 72% at 50% -12%, rgba(255, 206, 187, 0.58) 0%, rgba(255, 244, 238, 0.34) 42%, transparent 70%),
+                radial-gradient(92% 64% at 8% 18%, rgba(236, 214, 255, 0.34) 0%, transparent 58%),
+                radial-gradient(86% 58% at 95% 28%, rgba(194, 226, 217, 0.32) 0%, transparent 56%),
+                linear-gradient(180deg, #fffaf6 0%, #fbf6ef 48%, #f0e9df 100%);
         }
         body.milestone-premium::before {
             content: "";
@@ -130,10 +133,22 @@
             inset: 0;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(27, 28, 25, 0.026) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(27, 28, 25, 0.018) 1px, transparent 1px);
-            background-size: 28px 28px;
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,.44), transparent 70%);
+                linear-gradient(rgba(66, 45, 36, 0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(66, 45, 36, 0.015) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.32), transparent 76%);
+        }
+        body.milestone-premium::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .28;
+            background-image:
+                repeating-linear-gradient(0deg, rgba(255,255,255,.14) 0 1px, transparent 1px 4px),
+                repeating-linear-gradient(90deg, rgba(60,40,32,.04) 0 1px, transparent 1px 6px);
+            mix-blend-mode: soft-light;
         }
         .milestone-topbar {
             top: max(10px, env(safe-area-inset-top));
@@ -142,22 +157,54 @@
             margin: 0 auto;
             border: 1px solid rgba(255, 255, 255, 0.78);
             border-radius: 999px;
-            box-shadow: 0 16px 42px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255,255,255,.86);
+            box-shadow: 0 18px 44px rgba(112, 78, 62, 0.12), inset 0 1px 0 rgba(255,255,255,.86);
         }
         .milestone-stage {
             position: relative;
             isolation: isolate;
+            z-index: 1;
+        }
+        .milestone-stage::before {
+            content: "";
+            position: absolute;
+            inset: 24px 10px auto;
+            height: 260px;
+            z-index: -1;
+            pointer-events: none;
+            background: linear-gradient(135deg, rgba(255,255,255,.45), rgba(255,191,163,.18) 44%, rgba(191,227,245,.14));
+            border-radius: 44px;
+            filter: blur(22px);
+            transform: rotate(-2deg);
         }
         .premium-shell {
-            border: 1px solid rgba(86, 59, 49, 0.07);
-            background: rgba(255,255,255,.46);
-            box-shadow: 0 20px 54px rgba(75, 50, 39, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            background: linear-gradient(145deg, rgba(255,255,255,.72), rgba(255,244,237,.46));
+            box-shadow: 0 24px 70px rgba(112, 78, 62, 0.10), inset 0 1px 0 rgba(255,255,255,.82);
         }
         .premium-core {
-            border: 1px solid rgba(255,255,255,.78);
-            background: rgba(255,255,255,.82);
+            border: 1px solid rgba(255,255,255,.82);
+            background: rgba(255,255,255,.76);
             box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
         }
+        .dream-hero {
+            position: relative;
+            overflow: hidden;
+        }
+        .dream-hero::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            pointer-events: none;
+            background:
+                linear-gradient(120deg, rgba(255,255,255,.78), transparent 36%),
+                radial-gradient(80% 70% at 88% 0%, rgba(247,184,157,.28), transparent 62%);
+        }
+        .dream-hero > * { position: relative; }
+        .dream-title {
+            text-wrap: balance;
+            letter-spacing: -0.03em;
+        }
+        .dream-copy { text-wrap: pretty; }
         .premium-field {
             border: 1px solid rgba(86, 59, 49, 0.08) !important;
             background: rgba(255, 250, 246, 0.9) !important;
@@ -196,14 +243,44 @@
         .memory-feed {
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 26px;
             max-width: 520px;
             margin: 0 auto;
         }
         .milestone-card {
-            transition: transform 420ms cubic-bezier(.23,1,.32,1), box-shadow 240ms ease;
+            padding: 6px;
+            border: 1px solid rgba(255,255,255,.78);
+            background: linear-gradient(145deg, rgba(255,255,255,.68), rgba(255,242,235,.42));
+            box-shadow: 0 26px 70px rgba(105, 73, 58, 0.14), inset 0 1px 0 rgba(255,255,255,.86);
+            transition: transform 420ms cubic-bezier(.23,1,.32,1), box-shadow 320ms cubic-bezier(.23,1,.32,1), background-color 320ms ease;
         }
         .milestone-card:active { transform: scale(0.985); }
+        .memory-card-core {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.72);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+        }
+        .memory-card-core::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(110deg, rgba(255,255,255,.26), transparent 30%, transparent 68%, rgba(255,255,255,.14));
+            opacity: .9;
+        }
+        .memory-media {
+            transition: transform 900ms cubic-bezier(.23,1,.32,1), filter 700ms cubic-bezier(.23,1,.32,1);
+        }
+        .milestone-card:hover .memory-media {
+            transform: scale(1.035);
+            filter: saturate(1.04) contrast(1.02);
+        }
+        .memory-card-art {
+            background:
+                radial-gradient(70% 60% at 50% 35%, rgba(255,255,255,.62), transparent 58%),
+                linear-gradient(135deg, #f0e6ff 0%, #fff0f4 48%, #e5f7f2 100%);
+        }
         .glass-tag {
             background: rgba(255, 255, 255, 0.82);
             box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 10px 24px rgba(40,28,21,.1);
@@ -218,7 +295,23 @@
         }
         .recap-strip::-webkit-scrollbar, .chip-row::-webkit-scrollbar { display: none; }
         .recap-strip, .chip-row { scrollbar-width: none; }
-        .recap-card { scroll-snap-align: start; }
+        .recap-card {
+            scroll-snap-align: start;
+            border: 1px solid rgba(255,255,255,.78);
+            background: rgba(255,255,255,.62);
+            box-shadow: 0 18px 48px rgba(112,78,62,.11), inset 0 1px 0 rgba(255,255,255,.78);
+        }
+        .dream-chip {
+            border: 1px solid rgba(255,255,255,.68);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+        }
+        .dream-empty {
+            border: 1px solid rgba(255,255,255,.76);
+            background:
+                linear-gradient(145deg, rgba(255,255,255,.78), rgba(255,244,238,.58)),
+                radial-gradient(80% 90% at 50% 0%, rgba(247,184,157,.22), transparent 68%);
+            box-shadow: 0 22px 62px rgba(112,78,62,.11), inset 0 1px 0 rgba(255,255,255,.84);
+        }
         #storyModal:not(.hidden) > .absolute {
             animation: storyScrimIn 180ms cubic-bezier(.23,1,.32,1) both;
         }
@@ -277,6 +370,19 @@
                 to { opacity: 1; transform: none; }
             }
         }
+        .dark body.milestone-premium,
+        body.milestone-premium.dark {
+            background:
+                radial-gradient(110% 72% at 50% -10%, rgba(126, 84, 71, 0.34) 0%, transparent 70%),
+                radial-gradient(92% 64% at 8% 18%, rgba(88, 70, 116, 0.24) 0%, transparent 58%),
+                linear-gradient(180deg, #171312 0%, #120f0e 55%, #0d0b0a 100%);
+        }
+        .dark .premium-shell { background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.035)); border-color: rgba(255,255,255,.12); }
+        .dark .premium-core { background: rgba(28,22,20,.82); border-color: rgba(255,255,255,.10); }
+        .dark .milestone-card { background: linear-gradient(145deg, rgba(255,255,255,.10), rgba(255,255,255,.035)); border-color: rgba(255,255,255,.12); box-shadow: 0 26px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.10); }
+        .dark .recap-card,
+        .dark .dream-chip,
+        .dark .dream-empty { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.11); }
     </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -316,10 +422,10 @@
 <div class="hidden" id="milestonesContent">
 <!-- Dreamy Intro Header -->
 <section class="mb-7 max-w-[520px] mx-auto premium-shell rounded-[34px] p-1.5">
-<div class="premium-core rounded-[28px] p-5">
+<div class="premium-core dream-hero rounded-[28px] p-5">
 <p class="inline-flex rounded-full bg-primary/10 px-3 py-1 font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary/80 mb-3" id="memoryKicker">Memory book</p>
-<h2 class="font-display-lg text-display-lg text-on-surface leading-[1.02]" id="memoryHeroTitle">Little moments, kept forever</h2>
-<p class="font-body-md text-body-md text-on-surface-variant mt-2" id="memoryHeroSub">Every tiny first, gathered into one warm keepsake.</p>
+<h2 class="dream-title font-display-lg text-display-lg text-on-surface leading-[1.02]" id="memoryHeroTitle">Little moments, kept forever</h2>
+<p class="dream-copy font-body-md text-body-md text-on-surface-variant mt-2" id="memoryHeroSub">Every tiny first, gathered into one warm keepsake.</p>
 </div>
 </section>
 <!-- Monthly Recap -->
@@ -1073,7 +1179,7 @@ Save Milestone
             chipRow.innerHTML = CATEGORIES.map((c) => {
                 const active = c.key === activeCategory;
                 return `
-                    <button class="premium-button shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-full font-label-md text-label-md ${active ? "bg-primary text-on-primary shadow-[0_10px_22px_rgba(131,83,60,.16)]" : "bg-white/70 text-on-surface-variant ring-1 ring-black/[.04]"}" data-chip="${c.key}" type="button">
+                    <button class="premium-button dream-chip shrink-0 inline-flex items-center gap-1.5 h-10 px-4 rounded-full font-label-md text-label-md ${active ? "bg-primary text-on-primary shadow-[0_12px_26px_rgba(131,83,60,.20)]" : "bg-white/62 text-on-surface-variant"}" data-chip="${c.key}" type="button">
                         <span class="material-symbols-outlined text-[18px]">${c.icon}</span>${c.label}
                     </button>`;
             }).join("");
@@ -1100,13 +1206,13 @@ Save Milestone
                 const photos = items.filter((m) => m.photoUrl).length;
                 const cover = items.find((m) => m.photoUrl)?.photoUrl;
                 return `
-                    <button class="recap-card premium-button shrink-0 w-[184px] text-left rounded-[28px] overflow-hidden shadow-[0_16px_38px_rgba(75,50,39,0.1)] ring-1 ring-white/80 relative" data-recap="${items[0].id}" type="button">
-                        <div class="relative h-[120px] bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
-                            ${cover ? renderMedia(cover, "w-full h-full object-cover") : `<div class="w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
+                    <button class="recap-card premium-button shrink-0 w-[188px] text-left rounded-[30px] overflow-hidden relative p-1" data-recap="${items[0].id}" type="button">
+                        <div class="relative h-[124px] rounded-[24px] overflow-hidden bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
+                            ${cover ? renderMedia(cover, "memory-media w-full h-full object-cover") : `<div class="memory-card-art w-full h-full flex items-center justify-center text-primary/70"><span class="material-symbols-outlined text-[40px]" style="font-variation-settings:'FILL' 1;">photo_album</span></div>`}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent"></div>
                             <p class="absolute bottom-2 left-3 right-3 text-white font-headline-md text-headline-md leading-tight">${label}</p>
                         </div>
-                        <div class="bg-white/90 px-3 py-2.5">
+                        <div class="px-3 py-2.5">
                             <p class="font-label-sm text-label-sm text-on-surface-variant">${items.length} ${items.length === 1 ? "memory" : "memories"} · ${photos} photo${photos === 1 ? "" : "s"}</p>
                         </div>
                     </button>`;
@@ -1171,10 +1277,10 @@ Save Milestone
             const cat = CATEGORIES.find((c) => c.key === memoryCategory(m)) || CATEGORIES[CATEGORIES.length - 1];
             const notePreview = m.notes ? escapeHtml(m.notes) : "A small moment worth keeping close.";
             return `
-                <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[34px] overflow-hidden shadow-[0_22px_54px_rgba(75,50,39,0.14)] ring-1 ring-white/80 cursor-pointer">
-                    <div class="relative aspect-[4/5] w-full bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
-                        ${m.photoUrl ? renderMedia(m.photoUrl, "w-full h-full object-cover") : renderCardArt(cat)}
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-black/10"></div>
+                <div data-open-story="${m.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(m.title)} memory" class="milestone-card group relative block w-full text-left rounded-[36px] cursor-pointer">
+                    <div class="memory-card-core relative aspect-[4/5] w-full rounded-[30px] bg-gradient-to-br from-[#efe7ff] via-[#ffeef4] to-[#e6f6ff]">
+                        ${m.photoUrl ? renderMedia(m.photoUrl, "memory-media w-full h-full object-cover") : renderCardArt(cat)}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/10"></div>
                         <div class="absolute top-4 left-4 glass-tag px-3 py-1 rounded-full">
                             <span class="font-label-sm text-label-sm text-primary uppercase tracking-wide">${ageOf(m)}</span>
                         </div>
@@ -1190,8 +1296,8 @@ Save Milestone
                             <span class="inline-flex items-center gap-1 rounded-full bg-white/85 px-2.5 py-0.5 mb-2 text-primary font-label-sm text-label-sm">
                                 <span class="material-symbols-outlined text-[15px]">${cat.icon}</span>${cat.label}
                             </span>
-                            <h3 class="font-display-lg text-display-lg text-white leading-[1.08] drop-shadow-sm">${escapeHtml(m.title)}</h3>
-                            <p class="font-body-md text-body-md text-white/85 mt-1 line-clamp-2">${dateLabelOf(m)} · ${notePreview}</p>
+                            <h3 class="dream-title font-display-lg text-display-lg text-white leading-[1.08] drop-shadow-sm">${escapeHtml(m.title)}</h3>
+                            <p class="dream-copy font-body-md text-body-md text-white/86 mt-1 line-clamp-2">${dateLabelOf(m)} · ${notePreview}</p>
                         </div>
                     </div>
                 </div>
@@ -1199,7 +1305,7 @@ Save Milestone
         }
 
         function renderCardArt(cat) {
-            return `<div class="w-full h-full flex items-center justify-center text-primary/55"><span class="material-symbols-outlined text-[72px]" style="font-variation-settings:'FILL' 1;">${cat.icon}</span></div>`;
+            return `<div class="memory-card-art w-full h-full flex items-center justify-center text-primary/55"><span class="material-symbols-outlined text-[72px]" style="font-variation-settings:'FILL' 1;">${cat.icon}</span></div>`;
         }
 
         function renderEmptyMemories() {
@@ -1207,12 +1313,12 @@ Save Milestone
                 ? { title: "Your keepsake starts here", body: "Tiny moments count too. Add the first memory when it feels right." }
                 : { title: "No memories here yet", body: "Capture this kind of moment and it will live here forever." };
             return `
-                <div class="rounded-[30px] bg-surface-container-low p-8 text-center shadow-[0_12px_34px_rgba(124,92,255,0.1)]">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-primary mx-auto flex items-center justify-center mb-4">
+                <div class="dream-empty rounded-[34px] p-8 text-center">
+                    <div class="w-20 h-20 rounded-[28px] bg-gradient-to-br from-[#efe7ff] to-[#ffeef4] text-primary mx-auto flex items-center justify-center mb-4 shadow-[inset_0_1px_0_rgba(255,255,255,.8)]">
                         <span class="material-symbols-outlined text-[42px]" style="font-variation-settings:'FILL' 1;">photo_album</span>
                     </div>
-                    <h3 class="font-headline-md text-headline-md text-on-surface mb-1">${msg.title}</h3>
-                    <p class="font-body-md text-body-md text-on-surface-variant">${msg.body}</p>
+                    <h3 class="dream-title font-headline-md text-headline-md text-on-surface mb-1">${msg.title}</h3>
+                    <p class="dream-copy font-body-md text-body-md text-on-surface-variant">${msg.body}</p>
                 </div>
             `;
         }
