@@ -4,6 +4,7 @@ import { markKickedFlag, verifyDeviceSession, watchDeviceSession } from "./devic
 import { isAdminEmail } from "./admin.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
+import { goBackOrTo } from "./prototypeUi.mjs";
 
 // Screens that already paint their own inline loading skeleton — the shared
 // global skeleton would double up, so it is suppressed there.
@@ -539,21 +540,43 @@ function normalizePageHeaders(root = document) {
       backButton.setAttribute("aria-label", "Back");
       backButton.dataset.headerBackHomeBound = "true";
       backButton.addEventListener("click", (event) => {
-        const explicit = backButton.getAttribute("data-back-to");
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (hasUsefulBackEntry()) {
-          window.history.back();
-          return;
-        }
-        if (explicit) {
-          navigateWithTransition(window.location.protocol === "file:" ? `../${explicit}/code.html` : `/${explicit}/`);
-          return;
-        }
-        navigateWithTransition(window.location.protocol === "file:" ? "../home_dashboard/code.html" : "/home_dashboard/");
+        goBackOrTo(backButton.getAttribute("data-back-to") || defaultBackTargetForScreen(screenId));
       }, true);
     }
   });
+}
+
+function defaultBackTargetForScreen(screenId) {
+  const defaults = {
+    mama_care: "home_dashboard",
+    breast_pumping: "mama_care",
+    feeding_log: "quick_log",
+    feeding_history: "quick_log",
+    sleep_log: "quick_log",
+    sleep_pattern: "sleep_log",
+    diaper_log: "quick_log",
+    diaper_detail: "diaper_log",
+    health_records: "quick_log",
+    daily_summary: "home_dashboard",
+    weekly_insights: "daily_summary",
+    calendar: "home_dashboard",
+    growth_tracker: "home_dashboard",
+    doctor_report: "growth_tracker",
+    milestones: "home_dashboard",
+    memory_book: "milestones",
+    vaccinations: "home_dashboard",
+    assistant: "home_dashboard",
+    settings: "home_dashboard",
+    subscription: "settings",
+    privacy_safety: "settings",
+    family_sharing: "settings",
+    mommy_guide: "settings",
+    baby_profiles: "settings",
+    add_baby_profile: "baby_profiles"
+  };
+  return defaults[screenId] || "home_dashboard";
 }
 
 function ensureBackButtonIcon(backButton) {
@@ -764,28 +787,6 @@ function installSharedHeaderStyles() {
     }
   `;
   document.head.appendChild(style);
-}
-
-function hasUsefulBackEntry() {
-  if (window.location.hash) return false;
-  if (window.history.length <= 1) return false;
-  if (!document.referrer) return false;
-
-  try {
-    const previous = new URL(document.referrer);
-    const current = new URL(window.location.href);
-    if (previous.origin !== current.origin) return false;
-    return routeIdentity(previous) !== routeIdentity(current);
-  } catch {
-    return false;
-  }
-}
-
-function routeIdentity(url) {
-  return url.pathname
-    .replace(/\/code\.html$/i, "/")
-    .replace(/\/+$/g, "")
-    || "/";
 }
 
 function findOrCreateHeaderProfileTarget(header) {

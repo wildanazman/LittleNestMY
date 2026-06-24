@@ -1,3 +1,20 @@
+import { screens } from "../data/screens.mjs";
+
+const NAV_STACK_KEY = "littlenest:navStack";
+const MAX_NAV_STACK = 24;
+const VALID_SCREEN_IDS = new Set(screens.map((screen) => screen.id));
+const NON_APP_BACK_SCREEN_IDS = new Set([
+  "auth_welcome",
+  "login",
+  "signup",
+  "accept_invite",
+  "set_password",
+  "verify_pending",
+  "onboarding",
+  "privacy_policy",
+  "terms"
+]);
+
 export function screenUrl(screenId) {
   if (window.LittleNestCompat?.screenUrl) {
     return window.LittleNestCompat.screenUrl(screenId);
@@ -12,24 +29,44 @@ export function goToScreen(screenId) {
 }
 
 export function goBackOrTo(fallbackScreenId = "home_dashboard") {
+  const previousScreenId = takePreviousAppScreen();
+  if (previousScreenId) {
+    navigateToScreen(previousScreenId, { replace: true });
+    return;
+  }
+
   if (hasUsefulBackEntry()) {
     window.history.back();
     return;
   }
-  goToScreen(fallbackScreenId);
+
+  navigateToScreen(validScreenOrDefault(fallbackScreenId), { replace: true });
 }
 
-export function navigateWithTransition(url) {
+export function navigateWithTransition(url, options = {}) {
+  navigateToUrl(url, options);
+}
+
+function navigateToScreen(screenId, options = {}) {
+  navigateToUrl(screenUrl(validScreenOrDefault(screenId)), options);
+}
+
+function navigateToUrl(url, { replace = false } = {}) {
   if (!url) return;
   if (isSameLocation(url)) return;
+  const applyNavigation = () => {
+    if (replace) {
+      window.location.replace(url);
+    } else {
+      window.location.href = url;
+    }
+  };
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    window.location.href = url;
+    applyNavigation();
     return;
   }
   document.documentElement.classList.add("ln-page-exit");
-  window.setTimeout(() => {
-    window.location.href = url;
-  }, 120);
+  window.setTimeout(applyNavigation, 120);
 }
 
 export function showUndoToast(message, onUndo, { duration = 5000 } = {}) {
@@ -186,6 +223,7 @@ export function bindBottomNavigationFallback(root = document) {
 }
 
 bindBottomNavigationFallback();
+rememberCurrentScreenVisit();
 
 function getNavLabel(item) {
   const labelElement = item.querySelector("span:last-child");
@@ -239,7 +277,9 @@ function getCurrentScreenId() {
   const path = window.location.pathname.replaceAll("\\", "/");
   const fileMatch = path.match(/\/src\/screens\/([^/]+)\/code\.html$/);
   if (fileMatch) return fileMatch[1];
-  return path.split("/").filter(Boolean)[0] || "home_dashboard";
+  const parts = path.split("/").filter(Boolean);
+  const indexMatch = parts.length >= 2 && parts[1].toLowerCase() === "index.html" ? parts[0] : "";
+  return indexMatch || parts[0] || "home_dashboard";
 }
 
 function isSameLocation(url) {
@@ -260,10 +300,72 @@ function hasUsefulBackEntry() {
     const previous = new URL(document.referrer);
     const current = new URL(window.location.href);
     if (previous.origin !== current.origin) return false;
-    return routeIdentity(previous) !== routeIdentity(current);
+    const previousScreenId = screenIdFromUrl(previous);
+    const currentScreenId = screenIdFromUrl(current);
+    if (!isTrackableAppScreen(previousScreenId)) return false;
+    return previousScreenId !== currentScreenId && routeIdentity(previous) !== routeIdentity(current);
   } catch {
     return false;
   }
+}
+
+function rememberCurrentScreenVisit() {
+  const currentScreenId = getCurrentScreenId();
+  if (!isTrackableAppScreen(currentScreenId)) return;
+  const stack = readNavStack().filter((screenId) => isTrackableAppScreen(screenId));
+  if (stack[stack.length - 1] !== currentScreenId) {
+    stack.push(currentScreenId);
+  }
+  writeNavStack(stack.slice(-MAX_NAV_STACK));
+}
+
+function takePreviousAppScreen() {
+  const currentScreenId = getCurrentScreenId();
+  const stack = readNavStack().filter((screenId) => isTrackableAppScreen(screenId));
+
+  while (stack.length && stack[stack.length - 1] === currentScreenId) {
+    stack.pop();
+  }
+
+  const previousScreenId = stack.pop();
+  writeNavStack(stack);
+
+  if (!isTrackableAppScreen(previousScreenId) || previousScreenId === currentScreenId) return "";
+  return previousScreenId;
+}
+
+function readNavStack() {
+  try {
+    const parsed = JSON.parse(window.sessionStorage.getItem(NAV_STACK_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((value) => typeof value === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeNavStack(stack) {
+  try {
+    window.sessionStorage.setItem(NAV_STACK_KEY, JSON.stringify(stack));
+  } catch {
+    // Some restricted WebViews can deny storage; fallback navigation still works.
+  }
+}
+
+function screenIdFromUrl(url) {
+  const path = url.pathname.replaceAll("\\", "/");
+  const fileMatch = path.match(/\/src\/screens\/([^/]+)\/code\.html$/);
+  if (fileMatch) return fileMatch[1];
+  const parts = path.split("/").filter(Boolean);
+  if (parts.length >= 2 && parts[1].toLowerCase() === "index.html") return parts[0];
+  return parts[0] || "";
+}
+
+function isTrackableAppScreen(screenId) {
+  return VALID_SCREEN_IDS.has(screenId) && !NON_APP_BACK_SCREEN_IDS.has(screenId);
+}
+
+function validScreenOrDefault(screenId, defaultScreenId = "home_dashboard") {
+  return VALID_SCREEN_IDS.has(screenId) ? screenId : defaultScreenId;
 }
 
 function routeIdentity(url) {
