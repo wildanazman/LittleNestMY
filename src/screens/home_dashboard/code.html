@@ -117,53 +117,100 @@
 <style>
         body {
           font-family: 'Nunito Sans', sans-serif;
-          background:
-            radial-gradient(circle at 16% 8%, rgba(255, 219, 204, 0.48), transparent 32%),
-            radial-gradient(circle at 88% 14%, rgba(181, 214, 175, 0.20), transparent 34%),
-            radial-gradient(circle at 50% 84%, rgba(255, 231, 235, 0.22), transparent 42%),
-            linear-gradient(180deg, #fffaf6 0%, #fbf9f4 50%, #f3eee8 100%);
+          background: #fbf8f2;
         }
         :root.dark body {
+          background: #07111f !important;
+        }
+        .home-premium-bg {
+          position: relative;
+          isolation: isolate;
           background:
-            radial-gradient(circle at 18% 8%, rgba(34, 211, 238, 0.16), transparent 34%),
-            radial-gradient(circle at 88% 18%, rgba(59, 130, 246, 0.12), transparent 32%),
-            linear-gradient(180deg, #101a2e 0%, #0d1628 48%, #08101f 100%) !important;
+            linear-gradient(180deg, #fffdf9 0%, #fbf8f2 42%, #f4efe7 100%) !important;
+        }
+        .home-premium-bg::before,
+        .home-premium-bg::after {
+          content: "";
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .home-premium-bg::before {
+          background:
+            linear-gradient(118deg, rgba(255, 255, 255, 0.86) 0 21%, transparent 21% 100%),
+            linear-gradient(132deg, transparent 0 36%, rgba(238, 232, 255, 0.62) 36% 51%, transparent 51% 100%),
+            linear-gradient(151deg, transparent 0 57%, rgba(255, 226, 214, 0.72) 57% 71%, transparent 71% 100%),
+            linear-gradient(26deg, transparent 0 64%, rgba(217, 240, 229, 0.52) 64% 82%, transparent 82% 100%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0));
+          background-attachment: fixed;
+        }
+        .home-premium-bg::after {
+          opacity: 0.34;
+          background-image:
+            repeating-linear-gradient(90deg, rgba(107, 74, 55, 0.035) 0 1px, transparent 1px 7px),
+            repeating-linear-gradient(0deg, rgba(107, 74, 55, 0.025) 0 1px, transparent 1px 9px);
+          mask-image: linear-gradient(180deg, rgba(0,0,0,.82), rgba(0,0,0,.42));
+        }
+        #homeLoadingState,
+        #homeErrorState,
+        #homeContent {
+          position: relative;
+          z-index: 1;
+        }
+        :root.dark .home-premium-bg {
+          background:
+            linear-gradient(180deg, #101a2e 0%, #0b1528 44%, #07111f 100%) !important;
+        }
+        :root.dark .home-premium-bg::before {
+          background:
+            linear-gradient(118deg, rgba(255, 255, 255, 0.055) 0 23%, transparent 23% 100%),
+            linear-gradient(132deg, transparent 0 35%, rgba(34, 211, 238, 0.12) 35% 49%, transparent 49% 100%),
+            linear-gradient(151deg, transparent 0 58%, rgba(124, 92, 255, 0.12) 58% 72%, transparent 72% 100%),
+            linear-gradient(25deg, transparent 0 64%, rgba(147, 197, 253, 0.08) 64% 83%, transparent 83% 100%),
+            linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent);
+        }
+        :root.dark .home-premium-bg::after {
+          opacity: 0.20;
+          background-image:
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 8px),
+            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 10px);
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78); }
         .timeline-line { background: linear-gradient(to bottom, rgba(124,92,255,0.28), rgba(124,92,255,0.12)); }
         .home-skeleton-block {
           border-radius: 24px;
-          background: linear-gradient(90deg, rgba(239,238,233,.72), rgba(255,255,255,.86), rgba(239,238,233,.72));
+          background: linear-gradient(96deg, rgba(247, 239, 229, .74), rgba(255,255,255,.92), rgba(238, 232, 255, .64));
           background-size: 200% 100%;
-          animation: homeSkeletonPulse 1.4s ease-in-out infinite;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.68), 0 14px 32px rgba(75, 50, 39, 0.06);
+          animation: homeSkeletonPulse 1.55s cubic-bezier(.32,.72,0,1) infinite;
         }
         :root.dark .home-skeleton-block {
           background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08));
           background-size: 200% 100%;
         }
         .baby-glass-card {
-          background: linear-gradient(135deg, #fff5ee 0%, #fff9f4 48%, #eff8ef 100%) !important;
+          background:
+            linear-gradient(145deg, rgba(255,255,255,.90), rgba(255,248,244,.74) 54%, rgba(238,232,255,.62)) !important;
           border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 20px 46px rgba(75, 50, 39, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+          box-shadow: 0 24px 56px rgba(76, 52, 141, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.88);
           position: relative;
           overflow: hidden;
         }
         .baby-glass-card::after {
           content: "";
           position: absolute;
-          top: -40%;
-          right: -10%;
-          width: 160px;
-          height: 160px;
-          border-radius: 9999px;
-          background: radial-gradient(circle, rgba(255,255,255,0.55), rgba(255,255,255,0));
+          inset: 0;
+          background:
+            linear-gradient(118deg, rgba(255,255,255,.74) 0 24%, transparent 24% 100%),
+            linear-gradient(150deg, transparent 0 62%, rgba(255, 158, 192, .18) 62% 100%);
           pointer-events: none;
         }
         .home-panel {
-          background: rgba(255, 255, 255, 0.76);
-          border: 1px solid rgba(255, 255, 255, 0.74);
-          box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+          background: rgba(255, 255, 255, 0.82);
+          border: 1px solid rgba(255, 255, 255, 0.82);
+          box-shadow: 0 18px 42px rgba(76, 52, 141, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.82);
         }
         .home-pressable {
           transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, box-shadow 180ms ease;
@@ -194,9 +241,9 @@
           max-width: 448px;
           margin: 0 auto;
           border-radius: 999px;
-          background: rgba(255, 248, 243, 0.88) !important;
+          background: rgba(255, 252, 248, 0.90) !important;
           border: 1px solid rgba(255, 255, 255, 0.78);
-          box-shadow: 0 16px 42px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.86);
+          box-shadow: 0 18px 46px rgba(76, 52, 141, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.88);
         }
         #homeContent header button,
         #babyProfileMenuButton {
@@ -225,7 +272,7 @@
           backdrop-filter: none !important;
           -webkit-backdrop-filter: none !important;
           border-radius: 28px !important;
-          box-shadow: 0 12px 28px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+          box-shadow: 0 16px 34px rgba(76, 52, 141, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.76) !important;
         }
         [data-screen-target="mama_care"][role="button"] {
           background: rgba(255, 231, 235, 0.62) !important;
@@ -317,9 +364,9 @@
           box-shadow: 0 18px 44px rgba(75, 50, 39, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.86);
         }
         .home-section-card {
-          background: rgba(255, 255, 255, 0.80) !important;
-          border: 1px solid rgba(255, 255, 255, 0.74) !important;
-          box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
+          background: rgba(255, 255, 255, 0.84) !important;
+          border: 1px solid rgba(255, 255, 255, 0.80) !important;
+          box-shadow: 0 18px 42px rgba(76, 52, 141, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.82) !important;
         }
         .home-pill {
           background: rgba(255, 255, 255, 0.72) !important;
@@ -338,7 +385,7 @@
   </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-background text-on-background min-h-screen pb-32">
+<body class="home-premium-bg bg-background text-on-background min-h-screen pb-32">
 <section class="max-w-md mx-auto px-container-padding pt-4 pb-32 space-y-lg" id="homeLoadingState" aria-label="Loading dashboard">
 <div class="flex items-center justify-between h-14">
 <div class="home-skeleton-block h-8 w-36 rounded-xl"></div>
