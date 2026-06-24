@@ -17,6 +17,7 @@
 <title>Mama Care - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -49,12 +50,15 @@ tailwind.config = {
   body {
     min-height: max(884px, 100dvh);
     font-family: "Nunito Sans", sans-serif;
+    font-variant-numeric: tabular-nums;
     -webkit-tap-highlight-color: transparent;
     background:
       radial-gradient(circle at 16% 6%, rgba(247, 232, 237, .72), transparent 30%),
       radial-gradient(circle at 86% 18%, rgba(238, 231, 216, .44), transparent 34%),
       linear-gradient(180deg, #fffaf8 0%, #fbf7f4 52%, #f5eee9 100%);
   }
+  /* Premium display font on headings (cohesive with the rest of the app). */
+  h1, h2, h3 { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 44px rgba(82, 54, 44, 0.08), inset 0 1px 0 rgba(255,255,255,.82); }
   .mama-topbar {
