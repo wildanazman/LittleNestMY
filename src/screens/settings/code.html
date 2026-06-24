@@ -392,6 +392,7 @@
 </div>
 <button class="relative w-12 h-7 shrink-0 rounded-full transition-colors focus:outline-none" id="vaccineNotifToggle" type="button" role="switch" aria-label="Toggle vaccine reminders"><span class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform duration-200" id="vaccineNotifKnob"></span></button>
 </div>
+<button class="mt-1 w-full h-10 rounded-full bg-surface-container text-primary font-label-md text-label-md active:scale-[0.98] transition-transform hidden" id="testNotifButton" type="button">Send test notification</button>
 <p class="min-h-4 text-[11px] font-label-sm text-tertiary px-1" id="notifFeedback"></p>
 </div>
 <div class="h-px bg-surface-variant/40 mx-[18px]"></div>
@@ -561,6 +562,28 @@
         renderPasswordReminder();
         renderNotifToggles();
         renderPlanLabel();
+
+        // "Send test notification" — confirms Web Push works on this device.
+        (function setupTestNotif() {
+          const btn = document.getElementById("testNotifButton");
+          if (!btn) return;
+          if (isPushSupported() && isPushConfigured()) btn.classList.remove("hidden");
+          btn.addEventListener("click", async () => {
+            const old = btn.textContent;
+            btn.disabled = true; btn.textContent = "Sending...";
+            try {
+              const session = await getAuthSession();
+              if (!session?.access_token) { showNotifFeedback("Please log in first."); return; }
+              const r = await fetch("/api/push-test", { method: "POST", headers: { Authorization: `Bearer ${session.access_token}` } });
+              const d = await r.json().catch(() => ({}));
+              showNotifFeedback(d.sent ? "Test sent — check your notifications." : (d.note || d.error || "Could not send test."));
+            } catch {
+              showNotifFeedback("Could not send test notification.");
+            } finally {
+              btn.disabled = false; btn.textContent = old;
+            }
+          });
+        })();
 
         document.getElementById("settingsBackButton")?.addEventListener("click", () => goBackOrTo("home_dashboard"));
 
