@@ -44,7 +44,7 @@ tailwind.config = {
   }
 };
 </script>
-<style>.soft-shadow{box-shadow:0 18px 45px rgba(131,83,60,.12)} input{font-size:16px}</style>
+<style>.soft-shadow{box-shadow:0 18px 45px rgba(131,83,60,.12)} input{font-size:16px}.password-peek-button{transform:translateY(-50%)!important}.password-peek-button:hover,.password-peek-button:active{transform:translateY(-50%)!important}</style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
 <body class="auth-polish bg-surface text-on-surface font-body min-h-screen">
@@ -77,7 +77,7 @@ tailwind.config = {
 <label class="font-bold text-sm text-on-surface" for="password">Password</label>
 <div class="relative">
 <input class="w-full h-14 rounded-2xl border-0 bg-surface-container px-4 pr-14 text-on-surface placeholder:text-on-surface-variant/60 focus:ring-2 focus:ring-primary" id="password" placeholder="Your password" type="password" autocomplete="current-password"/>
-<button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/70 text-primary flex items-center justify-center active:scale-95" id="togglePasswordButton" type="button" aria-label="Hold to show password" aria-pressed="false">
+<button class="password-peek-button absolute right-2 top-1/2 w-10 h-10 rounded-full bg-white/70 text-primary flex items-center justify-center" id="togglePasswordButton" type="button" aria-label="Hold to show password" aria-pressed="false">
 <span class="material-symbols-outlined text-[20px]" id="togglePasswordIcon">visibility</span>
 </button>
 </div>
