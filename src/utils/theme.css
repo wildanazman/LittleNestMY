@@ -2,6 +2,7 @@
 
 :root {
   color-scheme: light;
+  font-variant-numeric: tabular-nums;
   --ln-bg:
     radial-gradient(circle at 12% 8%, rgba(226, 211, 255, 0.24), transparent 30%),
     radial-gradient(circle at 88% 10%, rgba(207, 237, 255, 0.28), transparent 32%),
@@ -52,11 +53,12 @@ h1, h2, h3,
 [class*="font-display"], [class*="font-headline"], [class*="font-title"] {
   font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif !important;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 /* Aligned, even data figures across the app. */
-body { font-variant-numeric: tabular-nums; }
+body { font-variant-numeric: inherit; }
 /* Keyboard focus ring (was missing app-wide — accessibility). */
-:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+:where(a, button, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
   outline: 2px solid var(--ln-primary, #7c5cff);
   outline-offset: 2px;
   border-radius: 10px;
