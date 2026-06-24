@@ -14,6 +14,7 @@
 <link rel="manifest" href="/manifest.json"/>
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/auth-polish.css?v=20260624"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
 <title>Welcome to LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -148,10 +149,10 @@
   </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="flex flex-col min-h-screen text-on-surface">
+<body class="auth-polish flex flex-col min-h-screen text-on-surface">
 <!-- Language Selector Header -->
 <header class="w-full px-container-padding pt-8 flex justify-end items-center z-10">
-<div class="segmented-control-bg p-1 rounded-full flex relative w-48 h-10 items-center">
+<div class="auth-glass p-1 rounded-full flex relative w-48 h-10 items-center">
 <div class="active-pill absolute h-8 w-[calc(50%-4px)] bg-white rounded-full shadow-sm left-1" id="language-pill"></div>
 <button class="relative z-10 flex-1 font-label-md text-label-md text-primary text-center" onclick="toggleLanguage('en')">English</button>
 <button class="relative z-10 flex-1 font-label-md text-label-md text-on-surface-variant text-center" onclick="toggleLanguage('ms')">Melayu</button>
@@ -159,10 +160,10 @@
 </header>
 <main class="flex-1 flex flex-col items-center justify-center px-container-padding max-w-md mx-auto text-center pb-xl">
 <!-- Illustration Container -->
-<div class="relative w-full aspect-square max-w-[320px] mb-lg floating-element">
+<div class="auth-panel relative w-full aspect-square max-w-[320px] mb-lg floating-element">
 <!-- Background organic blob -->
 <div class="absolute inset-0 bg-primary-container/20 rounded-[40%] filter blur-2xl opacity-60 scale-110"></div>
-<img alt="Warm illustration of a mother holding a baby" class="w-full h-full object-contain relative z-10 drop-shadow-xl rounded-full" data-alt="A warm and high-end digital illustration of a gentle mother cradling her newborn baby in a soft embrace. The style is modern minimalism with tactile softness, featuring organic lines and a palette of warm creams, soft peach, and sage green. The lighting is ethereal and diffused, creating a calm, digital sanctuary atmosphere. The illustration is centered against a clean, breathable background that evokes security and deep parental love." src="/icons/placeholder.svg"/>
+<img alt="Warm illustration of a mother holding a baby" class="auth-panel-core w-full h-full object-contain relative z-10 drop-shadow-xl rounded-[30px]" data-alt="A warm and high-end digital illustration of a gentle mother cradling her newborn baby in a soft embrace. The style is modern minimalism with tactile softness, featuring organic lines and a palette of warm creams, soft peach, and sage green. The lighting is ethereal and diffused, creating a calm, digital sanctuary atmosphere. The illustration is centered against a clean, breathable background that evokes security and deep parental love." src="/icons/placeholder.svg"/>
 <!-- Small floating accent icons -->
 <div class="absolute -top-4 -right-4 bg-tertiary-container/30 p-3 rounded-full backdrop-blur-sm">
 <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">favorite</span>
@@ -182,7 +183,7 @@
 </div>
 <!-- Action Button -->
 <div class="w-full mt-xl space-y-md">
-<button class="w-full h-14 bg-primary text-white font-headline-md text-headline-md rounded-full flex items-center justify-center glow-button active:scale-95 transition-transform duration-200">
+<button class="w-full h-14 bg-primary text-white font-headline-md text-headline-md rounded-full flex items-center justify-center glow-button active:scale-95 transition-transform duration-200" data-screen-target="auth_welcome" type="button">
                 Get Started
             </button>
 <p class="font-label-sm text-label-sm text-outline px-4">
@@ -241,6 +242,11 @@
             }, 100);
         });
     </script>
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { bindPrototypeActions } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  bindPrototypeActions();
+</script>
 <script type="module">
   if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
     navigator.serviceWorker.register("/service-worker.js").catch(() => {});
