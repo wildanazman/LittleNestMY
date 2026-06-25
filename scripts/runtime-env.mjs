@@ -15,7 +15,9 @@ export async function loadRuntimeEnv() {
     VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || publicEnv.VITE_SUPABASE_URL || "",
     VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || publicEnv.VITE_SUPABASE_ANON_KEY || "",
     // Public VAPID key for Web Push (safe to expose). Private key stays server-side.
-    VITE_VAPID_PUBLIC_KEY: process.env.VITE_VAPID_PUBLIC_KEY || publicEnv.VITE_VAPID_PUBLIC_KEY || ""
+    VITE_VAPID_PUBLIC_KEY: process.env.VITE_VAPID_PUBLIC_KEY || publicEnv.VITE_VAPID_PUBLIC_KEY || "",
+    // Public Sentry DSN (safe to expose) — enables error monitoring when set.
+    VITE_SENTRY_DSN: process.env.VITE_SENTRY_DSN || publicEnv.VITE_SENTRY_DSN || ""
   };
 
   mkdirSync(dirname(outputPath), { recursive: true });

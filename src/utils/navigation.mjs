@@ -2,6 +2,7 @@ import { applyTranslations, getLanguage, t } from "./i18n.mjs";
 import { getAuthSession, isEmailVerified, isGuestMode, isLoggedIn, logoutLocalUser } from "./localAuth.mjs";
 import { markKickedFlag, verifyDeviceSession, watchDeviceSession } from "./deviceSession.mjs";
 import { isAdminEmail } from "./admin.mjs";
+import { initErrorMonitor } from "./errorMonitor.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
 import { goBackOrTo } from "./prototypeUi.mjs";
@@ -285,6 +286,7 @@ function mountGlobalSkeleton() {
   setTimeout(hide, 3500);
 }
 
+initErrorMonitor();
 guardAuthenticatedRoutes();
 setupBottomNavigation();
 installSharedHeaderStyles();
