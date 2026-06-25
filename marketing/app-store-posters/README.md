@@ -5,6 +5,8 @@ Five preview posters for App Store / Play Store listing artwork.
 - Size: `1290 x 2796` PNG
 - Source layout: `posters.html`
 - Exported files: `output/littlenest-app-store-poster-01.png` through `output/littlenest-app-store-poster-05.png`
+- The phone screens are custom latest-style LittleNest UI mockups for marketing use.
+- Names and baby details are fictional sample data. They do not use real user data.
 
 Poster themes:
 

@@ -6,26 +6,28 @@
 <title>LittleNest MY App Store Posters</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --ink: #271a15;
-    --muted: #705f58;
+    --ink: #231916;
+    --muted: #71635d;
     --primary: #83533c;
     --peach: #ffbfa3;
-    --cream: #fff9f3;
-    --lavender: #ece3ff;
-    --sage: #dcefd8;
-    --sky: #e4f4ff;
+    --sage: #cfe6c9;
+    --mint: #e8f7ed;
+    --blue: #eaf4ff;
+    --violet: #eee8ff;
+    --cream: #fffaf6;
+    --line: rgba(255,255,255,.78);
   }
 
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     min-height: 100%;
-    background: #ece5dd;
-    font-family: "Nunito Sans", system-ui, sans-serif;
+    background: #e9e1d8;
     color: var(--ink);
+    font-family: "Nunito Sans", system-ui, sans-serif;
   }
 
   body {
@@ -42,9 +44,30 @@
     overflow: hidden;
     isolation: isolate;
     background:
-      radial-gradient(1100px 760px at 18% 10%, rgba(255, 191, 163, .42), transparent 64%),
-      radial-gradient(980px 760px at 88% 24%, rgba(236, 227, 255, .52), transparent 64%),
-      linear-gradient(180deg, #fffbf7 0%, #fbf2ea 48%, #efe5dc 100%);
+      radial-gradient(880px 680px at 14% 8%, rgba(255,191,163,.44), transparent 64%),
+      radial-gradient(900px 720px at 92% 18%, rgba(207,230,201,.4), transparent 64%),
+      linear-gradient(180deg, #fffbf7 0%, #f8efe8 52%, #ece2d9 100%);
+  }
+
+  .poster.blue {
+    background:
+      radial-gradient(880px 700px at 18% 8%, rgba(234,244,255,.82), transparent 64%),
+      radial-gradient(860px 740px at 92% 18%, rgba(238,232,255,.78), transparent 66%),
+      linear-gradient(180deg, #fbfbff 0%, #eef4ff 54%, #e4e8f6 100%);
+  }
+
+  .poster.green {
+    background:
+      radial-gradient(860px 700px at 16% 8%, rgba(207,230,201,.62), transparent 64%),
+      radial-gradient(900px 740px at 94% 22%, rgba(255,219,204,.52), transparent 66%),
+      linear-gradient(180deg, #fffdf8 0%, #f2f8ed 54%, #e6ede0 100%);
+  }
+
+  .poster.pink {
+    background:
+      radial-gradient(900px 700px at 14% 10%, rgba(255,218,229,.66), transparent 64%),
+      radial-gradient(840px 720px at 92% 18%, rgba(238,232,255,.7), transparent 66%),
+      linear-gradient(180deg, #fffafd 0%, #f8edf4 54%, #ebe1e9 100%);
   }
 
   .poster::before {
@@ -54,10 +77,10 @@
     pointer-events: none;
     opacity: .18;
     background-image:
-      linear-gradient(rgba(52, 32, 24, .09) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(52, 32, 24, .05) 1px, transparent 1px);
+      linear-gradient(rgba(46,31,24,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46,31,24,.045) 1px, transparent 1px);
     background-size: 54px 54px;
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 72%);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.74), transparent 76%);
   }
 
   .poster::after {
@@ -65,10 +88,10 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: .2;
+    opacity: .18;
     mix-blend-mode: soft-light;
     background-image:
-      repeating-linear-gradient(0deg, rgba(255,255,255,.44) 0 1px, transparent 1px 5px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.45) 0 1px, transparent 1px 5px),
       repeating-linear-gradient(90deg, rgba(52,32,24,.08) 0 1px, transparent 1px 7px);
   }
 
@@ -76,7 +99,7 @@
     position: relative;
     z-index: 1;
     height: 100%;
-    padding: 118px 108px 112px;
+    padding: 116px 106px 104px;
     display: flex;
     flex-direction: column;
   }
@@ -86,210 +109,433 @@
     align-items: center;
     gap: 18px;
     align-self: flex-start;
-    padding: 16px 24px 16px 18px;
+    height: 86px;
+    padding: 12px 28px 12px 14px;
     border-radius: 999px;
-    background: rgba(255,255,255,.62);
-    border: 1px solid rgba(255,255,255,.78);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 18px 54px rgba(92, 58, 44, .11);
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -.01em;
+    background: rgba(255,255,255,.66);
+    border: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 18px 54px rgba(92,58,44,.12);
     color: var(--primary);
+    font-size: 32px;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.02em;
   }
 
   .mark {
-    width: 58px;
-    height: 58px;
-    border-radius: 20px;
+    width: 62px;
+    height: 62px;
+    border-radius: 22px;
     display: grid;
     place-items: center;
-    background: linear-gradient(145deg, #ffe1d2, #fff6ed);
-    color: var(--primary);
-    font-size: 31px;
+    background: linear-gradient(145deg, #ffe1d2, #fff7ef);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 28px rgba(131,83,60,.14);
   }
 
   .headline {
-    margin: 96px 0 0;
-    max-width: 1010px;
-    font-size: 112px;
-    line-height: .94;
-    letter-spacing: -.055em;
-    font-weight: 900;
+    margin: 94px 0 0;
+    max-width: 1040px;
+    font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif;
+    font-size: 110px;
+    line-height: .95;
+    letter-spacing: -.06em;
+    font-weight: 800;
     text-wrap: balance;
   }
 
   .subhead {
     margin: 34px 0 0;
-    max-width: 850px;
+    max-width: 910px;
     color: var(--muted);
     font-size: 42px;
     line-height: 1.24;
-    font-weight: 700;
-    letter-spacing: -.012em;
+    font-weight: 800;
+    letter-spacing: -.02em;
     text-wrap: pretty;
   }
 
   .stage {
     position: relative;
     flex: 1;
-    margin-top: 78px;
+    margin-top: 80px;
   }
 
   .phone {
     position: absolute;
-    width: 548px;
-    height: 1476px;
-    border-radius: 78px;
+    width: 600px;
+    height: 1540px;
+    border-radius: 82px;
     padding: 18px;
-    background: linear-gradient(145deg, rgba(255,255,255,.74), rgba(255,242,235,.42));
+    background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(255,242,235,.44));
     border: 1px solid rgba(255,255,255,.86);
     box-shadow:
-      0 52px 120px rgba(75, 50, 39, .22),
+      0 52px 126px rgba(76,50,39,.22),
       inset 0 1px 0 rgba(255,255,255,.92);
   }
 
   .phone::before {
     content: "";
     position: absolute;
+    z-index: 3;
     top: 30px;
     left: 50%;
-    width: 148px;
-    height: 32px;
+    width: 150px;
+    height: 31px;
     transform: translateX(-50%);
     border-radius: 999px;
-    background: rgba(39, 26, 21, .18);
-    z-index: 4;
+    background: rgba(48,35,30,.18);
   }
 
-  .phone img {
+  .screen {
+    position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 62px;
-    object-fit: cover;
-    object-position: top center;
-    display: block;
-    background: #fff;
+    overflow: hidden;
+    border-radius: 64px;
+    background:
+      radial-gradient(420px 320px at 14% 4%, rgba(255,191,163,.28), transparent 66%),
+      linear-gradient(180deg, #fffaf6 0%, #fbf5ee 100%);
+    padding: 70px 44px 42px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.86);
   }
 
   .phone.main {
-    left: 270px;
-    top: 20px;
+    left: 330px;
+    top: 10px;
     width: 620px;
-    height: 1670px;
-    transform: rotate(-2deg);
+    height: 1590px;
+    transform: rotate(-1.5deg);
   }
 
-  .phone.side-left {
-    left: 24px;
-    top: 248px;
-    transform: rotate(-7deg) scale(.83);
+  .phone.left {
+    left: 14px;
+    top: 282px;
+    transform: rotate(-8deg) scale(.82);
     opacity: .92;
   }
 
-  .phone.side-right {
-    right: 10px;
-    top: 300px;
+  .phone.right {
+    right: -4px;
+    top: 296px;
     transform: rotate(7deg) scale(.82);
     opacity: .94;
   }
 
-  .feature-card {
+  .mini-panel {
     position: absolute;
-    right: 20px;
     bottom: 92px;
-    width: 470px;
-    padding: 34px 34px 32px;
-    border-radius: 44px;
-    background: rgba(255,255,255,.72);
-    border: 1px solid rgba(255,255,255,.8);
-    box-shadow: 0 28px 76px rgba(92,58,44,.13), inset 0 1px 0 rgba(255,255,255,.9);
+    right: 0;
+    width: 510px;
+    padding: 38px 38px 34px;
+    border-radius: 46px;
+    background: rgba(255,255,255,.74);
+    border: 1px solid rgba(255,255,255,.84);
+    box-shadow: 0 30px 82px rgba(92,58,44,.14), inset 0 1px 0 rgba(255,255,255,.92);
   }
 
-  .feature-card.left { left: 8px; right: auto; }
-
-  .feature-label {
-    margin: 0 0 12px;
+  .mini-panel.left { left: 0; right: auto; }
+  .label {
+    margin: 0 0 13px;
     color: var(--primary);
-    font-size: 24px;
+    font-size: 23px;
     line-height: 1;
-    letter-spacing: .14em;
+    font-weight: 900;
+    letter-spacing: .17em;
     text-transform: uppercase;
-    font-weight: 900;
   }
-
-  .feature-title {
+  .mini-panel h2 {
     margin: 0;
-    font-size: 42px;
+    font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif;
+    font-size: 43px;
     line-height: 1.02;
-    letter-spacing: -.035em;
-    font-weight: 900;
+    letter-spacing: -.04em;
   }
-
-  .feature-body {
-    margin: 16px 0 0;
+  .mini-panel p.body {
+    margin: 18px 0 0;
     color: var(--muted);
-    font-size: 26px;
-    line-height: 1.22;
-    font-weight: 700;
+    font-size: 27px;
+    line-height: 1.2;
+    font-weight: 800;
   }
-
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 28px;
-  }
-
+  .chips { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
   .chip {
-    height: 48px;
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
+    height: 48px;
     padding: 0 22px;
+    border-radius: 999px;
     background: rgba(131,83,60,.1);
     color: var(--primary);
     font-size: 21px;
-    line-height: 1;
     font-weight: 900;
   }
 
-  .poster.sleep {
-    background:
-      radial-gradient(900px 760px at 50% 4%, rgba(210, 202, 255, .62), transparent 68%),
-      radial-gradient(860px 720px at 90% 28%, rgba(196, 226, 246, .48), transparent 64%),
-      linear-gradient(180deg, #faf8ff 0%, #f0f5ff 52%, #e9e6f4 100%);
-  }
-
-  .poster.insights {
-    background:
-      radial-gradient(920px 720px at 16% 8%, rgba(202, 236, 196, .52), transparent 62%),
-      radial-gradient(900px 780px at 84% 22%, rgba(255, 219, 204, .5), transparent 66%),
-      linear-gradient(180deg, #fffdf8 0%, #f3f8ef 52%, #e8eee1 100%);
-  }
-
-  .poster.memories {
-    background:
-      radial-gradient(960px 740px at 18% 12%, rgba(255, 210, 224, .52), transparent 64%),
-      radial-gradient(860px 720px at 86% 20%, rgba(223, 212, 255, .5), transparent 66%),
-      linear-gradient(180deg, #fffafb 0%, #f8eef3 52%, #eee3ea 100%);
-  }
-
-  .poster.mama {
-    background:
-      radial-gradient(960px 740px at 20% 10%, rgba(255, 191, 163, .48), transparent 62%),
-      radial-gradient(900px 740px at 86% 20%, rgba(202, 236, 196, .42), transparent 66%),
-      linear-gradient(180deg, #fffaf5 0%, #f7efe8 52%, #eae3dc 100%);
-  }
-
-  .app-store-note {
+  .note {
     position: absolute;
-    left: 108px;
-    bottom: 74px;
+    left: 106px;
+    bottom: 72px;
     color: rgba(39,26,21,.48);
     font-size: 22px;
-    font-weight: 800;
+    font-weight: 900;
     letter-spacing: .02em;
+  }
+
+  .topbar {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 34px;
+  }
+  .back, .avatar, .settings {
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.82);
+    color: var(--primary);
+    font-size: 24px;
+    font-weight: 900;
+  }
+  .avatar {
+    background: linear-gradient(145deg, #ffd8c8, #f8efe6);
+    color: #8b5d48;
+    font-size: 22px;
+  }
+  .screen h3 {
+    margin: 0;
+    font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif;
+    font-size: 34px;
+    letter-spacing: -.04em;
+    color: var(--primary);
+  }
+  .screen h1 {
+    margin: 8px 0 0;
+    font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif;
+    font-size: 50px;
+    line-height: 1.06;
+    letter-spacing: -.028em;
+    word-spacing: .06em;
+  }
+  .muted { color: var(--muted); }
+
+  .baby-card, .glass-card, .stat-card, .log-row, .task-row {
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.84);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 18px 46px rgba(92,58,44,.08);
+  }
+  .baby-card {
+    margin-top: 30px;
+    border-radius: 34px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+  .baby-photo {
+    width: 76px;
+    height: 76px;
+    border-radius: 28px;
+    background: linear-gradient(145deg, #ffe0d2, #dfeef8);
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+    font-size: 32px;
+    font-weight: 900;
+  }
+  .baby-card strong { display: block; font-size: 31px; line-height: 1; }
+  .baby-card span { display: block; margin-top: 7px; font-size: 21px; color: var(--muted); font-weight: 800; }
+
+  .stat-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .stat-card {
+    border-radius: 32px;
+    padding: 24px;
+    min-height: 152px;
+  }
+  .stat-card .small { font-size: 18px; color: var(--muted); font-weight: 900; }
+  .stat-card .value { margin-top: 16px; font-size: 37px; font-weight: 900; letter-spacing: -.04em; }
+  .peach { background: linear-gradient(145deg, #fff1e9, #ffe2d3); }
+  .mint { background: linear-gradient(145deg, #f1fbf4, #dff3e7); }
+  .blue-card { background: linear-gradient(145deg, #f2f8ff, #dfedff); }
+  .violet-card { background: linear-gradient(145deg, #f7f3ff, #e8defd); }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 30px;
+  }
+  .action {
+    min-height: 112px;
+    border-radius: 32px;
+    background: rgba(255,255,255,.72);
+    display: grid;
+    place-items: center;
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 900;
+    text-align: center;
+  }
+  .circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 8px;
+    background: #ffcab1;
+    color: #7b4a36;
+    font-size: 24px;
+  }
+  .timeline { margin-top: 36px; }
+  .section-title { font-size: 31px; font-weight: 900; letter-spacing: -.03em; margin: 0 0 18px; }
+  .log-row, .task-row {
+    border-radius: 26px;
+    padding: 20px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .dot { width: 18px; height: 18px; border-radius: 999px; background: var(--peach); flex: 0 0 auto; }
+  .log-row strong, .task-row strong { display: block; font-size: 23px; line-height: 1.05; }
+  .log-row span, .task-row span { color: var(--muted); font-size: 18px; font-weight: 800; }
+
+  .segmented {
+    height: 66px;
+    margin-top: 22px;
+    border-radius: 999px;
+    padding: 7px;
+    background: rgba(235,231,225,.78);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .segmented span {
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 20px;
+    font-weight: 900;
+  }
+  .segmented .active {
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 8px 24px rgba(92,58,44,.1);
+  }
+  .amount {
+    margin-top: 30px;
+    border-radius: 38px;
+    padding: 32px 28px;
+    background: rgba(255,255,255,.74);
+    border: 1px solid rgba(255,255,255,.84);
+    text-align: center;
+  }
+  .amount .number { font-size: 78px; font-weight: 900; color: #7056f4; letter-spacing: -.06em; }
+  .pill-row { display: flex; gap: 12px; justify-content: center; margin-top: 18px; }
+  .pill { height: 44px; padding: 0 18px; border-radius: 999px; display: inline-flex; align-items: center; background: #efebe6; color: #6d5a52; font-weight: 900; font-size: 18px; }
+  .save {
+    margin-top: 24px;
+    height: 72px;
+    border-radius: 999px;
+    background: linear-gradient(145deg, #9b7cff, #7056f4);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 23px;
+    font-weight: 900;
+    box-shadow: 0 18px 42px rgba(112,86,244,.26);
+  }
+  .chart {
+    margin-top: 30px;
+    height: 410px;
+    border-radius: 38px;
+    padding: 30px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.84);
+  }
+  .bars {
+    height: 250px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-items: end;
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .bar { border-radius: 999px 999px 14px 14px; background: linear-gradient(180deg, #9e8df5, #d7ceff); }
+  .insight-card {
+    margin-top: 22px;
+    border-radius: 34px;
+    padding: 28px;
+    background: linear-gradient(145deg, rgba(255,238,229,.88), rgba(255,255,255,.76));
+    border: 1px solid rgba(255,255,255,.84);
+  }
+  .insight-card strong { display: block; font-size: 28px; letter-spacing: -.03em; }
+  .insight-card span { display: block; margin-top: 10px; color: var(--muted); font-size: 20px; font-weight: 800; line-height: 1.25; }
+
+  .memory-tile {
+    margin-top: 28px;
+    height: 450px;
+    border-radius: 42px;
+    padding: 24px;
+    background:
+      radial-gradient(240px 220px at 50% 38%, rgba(255,255,255,.74), transparent 64%),
+      linear-gradient(145deg, #cbe7ee, #ffe0cf);
+    border: 1px solid rgba(255,255,255,.84);
+    display: flex;
+    align-items: end;
+  }
+  .memory-caption {
+    width: 100%;
+    border-radius: 30px;
+    padding: 24px;
+    background: rgba(255,255,255,.76);
+  }
+  .memory-caption strong { font-size: 30px; letter-spacing: -.04em; }
+  .memory-caption span { display: block; margin-top: 8px; color: var(--muted); font-size: 19px; font-weight: 800; }
+
+  .mama-hero {
+    margin-top: 28px;
+    border-radius: 42px;
+    padding: 30px;
+    background: linear-gradient(145deg, #fff1e8, #f2fbef);
+    border: 1px solid rgba(255,255,255,.84);
+  }
+  .metric-big { font-size: 58px; font-weight: 900; letter-spacing: -.06em; margin-top: 10px; }
+  .nav {
+    position: absolute;
+    left: 42px;
+    right: 42px;
+    bottom: 34px;
+    height: 82px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.82);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    padding: 0 14px;
+  }
+  .nav span {
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--muted);
+  }
+  .nav .active {
+    height: 58px;
+    border-radius: 999px;
+    background: #ffdbcc;
+    color: var(--primary);
   }
 </style>
 </head>
@@ -297,100 +543,107 @@
   <section class="poster" id="poster-01">
     <div class="content">
       <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
-      <h1 class="headline">Everything baby needs, in one calm home.</h1>
-      <p class="subhead">Track feeds, sleep, diapers, appointments, milestones, and Mama Care without digging through screens.</p>
+      <h1 class="headline">The calm command center for baby care.</h1>
+      <p class="subhead">A premium home screen for feeds, sleep, diapers, appointments, milestones, and Mama Care.</p>
       <div class="stage">
-        <div class="phone side-left"><img src="../../src/screens/quick_log/screen.png" alt="Quick log screen" /></div>
-        <div class="phone main"><img src="../../src/screens/home_dashboard/screen.png" alt="LittleNest home dashboard" /></div>
-        <div class="phone side-right"><img src="../../src/screens/calendar/screen.png" alt="Appointment calendar screen" /></div>
-        <div class="feature-card">
-          <p class="feature-label">All-in-one</p>
-          <h2 class="feature-title">Daily care at a glance.</h2>
-          <p class="feature-body">Built for tired parents who need clear answers fast.</p>
-          <div class="chips"><span class="chip">Feeds</span><span class="chip">Sleep</span><span class="chip">Diapers</span></div>
-        </div>
+        <div class="phone left"><div class="screen">
+          <div class="topbar"><div class="back">‹</div><h3>Quick Log</h3><div class="avatar">N</div></div>
+          <h1>What happened?</h1>
+          <div class="action-row" style="grid-template-columns:1fr;gap:20px;margin-top:40px">
+            <div class="action peach"><div><div class="circle">F</div>Feed</div></div>
+            <div class="action mint"><div><div class="circle">D</div>Diaper</div></div>
+            <div class="action blue-card"><div><div class="circle">S</div>Sleep</div></div>
+          </div>
+        </div></div>
+        <div class="phone main"><div class="screen">
+          <div class="topbar"><h3>LittleNest MY</h3><div class="avatar">N</div></div>
+          <p class="muted" style="font-size:23px;font-weight:900;margin:10px 0 0">Good morning, Nadia</p>
+          <h1>Hana is doing well today.</h1>
+          <div class="baby-card"><div class="baby-photo">H</div><div><strong>Hana</strong><span>4 months 8 days</span></div><div class="settings">⚙</div></div>
+          <div class="stat-grid">
+            <div class="stat-card peach"><div class="small">Last feed</div><div class="value">2h 10m</div></div>
+            <div class="stat-card blue-card"><div class="small">Today sleep</div><div class="value">8h 25m</div></div>
+            <div class="stat-card mint"><div class="small">Diaper</div><div class="value">50m</div></div>
+            <div class="stat-card violet-card"><div class="small">Next visit</div><div class="value">Fri</div></div>
+          </div>
+          <div class="timeline"><p class="section-title">Today’s log</p>
+            <div class="log-row"><span class="dot"></span><div><strong>Bottle · 90 ml</strong><span>8:00 AM</span></div></div>
+            <div class="log-row"><span class="dot" style="background:#79b8ed"></span><div><strong>Nap started</strong><span>9:20 AM</span></div></div>
+          </div>
+          <div class="nav"><span>Home</span><span>Calendar</span><span class="active">+</span><span>Milestones</span><span>Care</span></div>
+        </div></div>
+        <div class="phone right"><div class="screen">
+          <div class="topbar"><div class="back">‹</div><h3>Appointments</h3><div class="avatar">N</div></div>
+          <h1>Friday, 26 June</h1>
+          <div class="glass-card" style="margin-top:34px;border-radius:36px;padding:28px">
+            <p class="section-title">Upcoming</p>
+            <div class="task-row"><span class="dot"></span><div><strong>Klinik Kesihatan</strong><span>9:30 AM · Vaccine</span></div></div>
+            <div class="task-row"><span class="dot" style="background:#9ed18d"></span><div><strong>Daycare note</strong><span>Bring extra bottle</span></div></div>
+          </div>
+        </div></div>
+        <div class="mini-panel"><p class="label">Latest UI</p><h2>Everything important, one glance.</h2><p class="body">Built for fast decisions when parents are tired.</p><div class="chips"><span class="chip">Home</span><span class="chip">Logs</span><span class="chip">Care</span></div></div>
       </div>
-      <p class="app-store-note">Designed for Malaysian families</p>
+      <p class="note">Preview artwork uses sample family data</p>
     </div>
   </section>
 
-  <section class="poster mama" id="poster-02">
+  <section class="poster" id="poster-02">
     <div class="content">
       <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
-      <h1 class="headline">Log every feed in seconds.</h1>
-      <p class="subhead">Breast, bottle, formula, solids, and feeding history stay organized for the whole family.</p>
+      <h1 class="headline">Fast logging with less typing.</h1>
+      <p class="subhead">Bottle, formula, breast, solids, diapers, and notes are designed for one-handed use.</p>
       <div class="stage">
-        <div class="phone side-left"><img src="../../src/screens/feeding_history/screen.png" alt="Feeding history screen" /></div>
-        <div class="phone main"><img src="../../src/screens/feeding_log/screen.png" alt="Feeding log screen" /></div>
-        <div class="phone side-right"><img src="../../src/screens/diaper_log/screen.png" alt="Diaper log screen" /></div>
-        <div class="feature-card left">
-          <p class="feature-label">Fast logging</p>
-          <h2 class="feature-title">Big buttons. Less typing.</h2>
-          <p class="feature-body">Made for one-handed, sleepy-parent moments.</p>
-          <div class="chips"><span class="chip">Formula</span><span class="chip">Bottle</span><span class="chip">History</span></div>
-        </div>
+        <div class="phone left"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>History</h3><div class="avatar">N</div></div><h1>Recent feeds</h1><div class="timeline"><div class="log-row"><span class="dot"></span><div><strong>Formula · 120 ml</strong><span>Today · 10:30 AM</span></div></div><div class="log-row"><span class="dot"></span><div><strong>Bottle · 90 ml</strong><span>Today · 8:00 AM</span></div></div><div class="log-row"><span class="dot"></span><div><strong>Breastfeeding</strong><span>Yesterday · 9:20 PM</span></div></div></div></div></div>
+        <div class="phone main"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Log Feeding</h3><div class="avatar">N</div></div><h1>What did Hana eat?</h1><div class="segmented"><span>Breast</span><span>Bottle</span><span class="active">Formula</span></div><div class="amount"><p class="label" style="margin-bottom:6px">Amount</p><span class="number">120</span><span style="font-size:30px;font-weight:900"> ml</span><div class="pill-row"><span class="pill">60 ml</span><span class="pill">90 ml</span><span class="pill">120 ml</span></div></div><div class="glass-card" style="margin-top:26px;border-radius:34px;padding:26px"><p class="section-title">Formula brand</p><div class="chips" style="margin-top:10px"><span class="chip">Similac</span><span class="chip">Enfalac</span><span class="chip">+ More</span></div></div><div class="save">Save Log</div><div class="nav"><span>Home</span><span>Calendar</span><span class="active">+</span><span>Milestones</span><span>Care</span></div></div></div>
+        <div class="phone right"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Diaper Change</h3><div class="avatar">N</div></div><h1>Quick diaper log</h1><div class="segmented"><span class="active">Pee</span><span>Poop</span><span>Mixed</span></div><div class="stat-grid"><div class="stat-card mint"><div class="small">Texture</div><div class="value">Normal</div></div><div class="stat-card peach"><div class="small">Time</div><div class="value">Now</div></div></div><div class="save" style="background:linear-gradient(145deg,#ffbfa3,#df8f70)">Save Change</div></div></div>
+        <div class="mini-panel left"><p class="label">Fast logging</p><h2>Big controls, clear choices.</h2><p class="body">No tiny forms when you only have one free hand.</p><div class="chips"><span class="chip">Feed</span><span class="chip">Diaper</span><span class="chip">Notes</span></div></div>
       </div>
-      <p class="app-store-note">Simple logs, synced safely</p>
+      <p class="note">Sample names only, no personal data</p>
     </div>
   </section>
 
-  <section class="poster sleep" id="poster-03">
+  <section class="poster blue" id="poster-03">
     <div class="content">
       <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
-      <h1 class="headline">Understand baby's sleep rhythm.</h1>
-      <p class="subhead">Start and stop sleep sessions, review naps, and spot patterns that help bedtime feel less random.</p>
+      <h1 class="headline">See baby’s sleep rhythm clearly.</h1>
+      <p class="subhead">Track naps and nights, review patterns, and prepare for smarter routine predictions.</p>
       <div class="stage">
-        <div class="phone side-left"><img src="../../src/screens/sleep_log/screen.png" alt="Sleep log screen" /></div>
-        <div class="phone main"><img src="../../src/screens/sleep_pattern/screen.png" alt="Sleep pattern chart screen" /></div>
-        <div class="phone side-right"><img src="../../src/screens/weekly_insights/screen.png" alt="Weekly insights screen" /></div>
-        <div class="feature-card">
-          <p class="feature-label">Sleep care</p>
-          <h2 class="feature-title">Naps and nights, clearer.</h2>
-          <p class="feature-body">Premium-ready insights for routines and predictions.</p>
-          <div class="chips"><span class="chip">Naps</span><span class="chip">Bedtime</span><span class="chip">Patterns</span></div>
-        </div>
+        <div class="phone left"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Sleep Tracker</h3><div class="avatar">N</div></div><h1>Time for a nap?</h1><div class="mama-hero" style="text-align:center"><div style="font-size:104px;color:#83533c">◐</div><div class="metric-big">1h 35m</div><p class="muted" style="font-size:23px;font-weight:800">Current sleep session</p></div><div class="save" style="background:linear-gradient(145deg,#8a654f,#6d4938)">Stop Sleep</div></div></div>
+        <div class="phone main"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Sleep Pattern</h3><div class="avatar">N</div></div><h1>Hana’s last 7 days</h1><div class="chart"><p class="section-title">Sleep blocks</p><div class="bars"><div class="bar" style="height:52%"></div><div class="bar" style="height:68%"></div><div class="bar" style="height:45%"></div><div class="bar" style="height:78%"></div><div class="bar" style="height:58%"></div><div class="bar" style="height:72%"></div><div class="bar" style="height:62%"></div></div></div><div class="insight-card"><strong>Likely sleepy around 2:40 PM</strong><span>Based on recent naps and wake windows. Confidence: medium.</span></div><div class="nav"><span>Home</span><span>Calendar</span><span class="active">+</span><span>Milestones</span><span>Care</span></div></div></div>
+        <div class="phone right"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Weekly Insights</h3><div class="avatar">N</div></div><h1>This week’s pattern</h1><div class="stat-grid"><div class="stat-card blue-card"><div class="small">Avg sleep</div><div class="value">11h 20m</div></div><div class="stat-card violet-card"><div class="small">Longest</div><div class="value">4h 10m</div></div></div><div class="insight-card"><strong>Bedtime is getting steadier.</strong><span>Evening sleep started within a 35 minute window on 4 days.</span></div></div></div>
+        <div class="mini-panel"><p class="label">Sleep care</p><h2>Naps, nights, and routines.</h2><p class="body">Premium-ready sleep prediction without scary language.</p><div class="chips"><span class="chip">Naps</span><span class="chip">Bedtime</span><span class="chip">Routine</span></div></div>
       </div>
-      <p class="app-store-note">Gentle patterns, not pressure</p>
+      <p class="note">Gentle guidance, not medical advice</p>
     </div>
   </section>
 
-  <section class="poster insights" id="poster-04">
+  <section class="poster green" id="poster-04">
     <div class="content">
       <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
-      <h1 class="headline">Insights that make care easier.</h1>
-      <p class="subhead">Weekly summaries, growth trends, and assistant guidance turn real logs into calm next steps.</p>
+      <h1 class="headline">Turn logs into useful insights.</h1>
+      <p class="subhead">Weekly summaries, growth trends, and assistant guidance help parents know what changed.</p>
       <div class="stage">
-        <div class="phone side-left"><img src="../../src/screens/growth_tracker/screen.png" alt="Growth tracker screen" /></div>
-        <div class="phone main"><img src="../../src/screens/weekly_insights/screen.png" alt="Weekly insights dashboard" /></div>
-        <div class="phone side-right"><img src="../../src/screens/assistant/screen.png" alt="Assistant insights screen" /></div>
-        <div class="feature-card left">
-          <p class="feature-label">Premium</p>
-          <h2 class="feature-title">See what changed this week.</h2>
-          <p class="feature-body">Reports for parents, family, and clinic visits.</p>
-          <div class="chips"><span class="chip">Reports</span><span class="chip">Trends</span><span class="chip">AI help</span></div>
-        </div>
+        <div class="phone left"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Growth</h3><div class="avatar">N</div></div><h1>Growing steadily</h1><div class="chart"><p class="section-title">Weight trend</p><div class="bars"><div class="bar" style="height:36%;background:#b6d7a8"></div><div class="bar" style="height:42%;background:#b6d7a8"></div><div class="bar" style="height:48%;background:#b6d7a8"></div><div class="bar" style="height:55%;background:#b6d7a8"></div></div></div></div></div>
+        <div class="phone main"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Weekly Insights</h3><div class="avatar">N</div></div><h1>What changed this week</h1><div class="stat-grid"><div class="stat-card blue-card"><div class="small">Sleep</div><div class="value">+8%</div></div><div class="stat-card peach"><div class="small">Feeds</div><div class="value">7.4/day</div></div><div class="stat-card mint"><div class="small">Diapers</div><div class="value">6/day</div></div><div class="stat-card violet-card"><div class="small">Routine</div><div class="value">Steady</div></div></div><div class="insight-card"><strong>Morning feeds are most consistent.</strong><span>Hana’s first two feeds stayed close to the same time on 5 days.</span></div><div class="save" style="background:linear-gradient(145deg,#8b5d48,#6c4434)">Generate Report</div></div></div>
+        <div class="phone right"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Assistant</h3><div class="avatar">N</div></div><h1>Ask about Hana’s care</h1><div class="glass-card" style="margin-top:30px;border-radius:34px;padding:26px"><p class="muted" style="font-size:22px;font-weight:900">Based on today’s logs, Hana had two naps and steady feeds. Want a sleep summary?</p></div><div class="chips"><span class="chip">Sleep summary</span><span class="chip">Routine</span></div></div></div>
+        <div class="mini-panel left"><p class="label">Premium</p><h2>Reports parents can understand.</h2><p class="body">Designed for family updates and clinic visits.</p><div class="chips"><span class="chip">Trends</span><span class="chip">Reports</span><span class="chip">Assistant</span></div></div>
       </div>
-      <p class="app-store-note">Private by design</p>
+      <p class="note">Insights from real logs, not fake placeholders</p>
     </div>
   </section>
 
-  <section class="poster memories" id="poster-05">
+  <section class="poster pink" id="poster-05">
     <div class="content">
       <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
-      <h1 class="headline">Keep the tiny moments forever.</h1>
-      <p class="subhead">Milestones, memories, appointments, and family sharing live beside everyday care.</p>
+      <h1 class="headline">Mama Care and memories, together.</h1>
+      <p class="subhead">Support recovery, pumping, milk storage, milestones, photos, and family sharing in one app.</p>
       <div class="stage">
-        <div class="phone side-left"><img src="../../src/screens/memory_book/screen.png" alt="Memory book screen" /></div>
-        <div class="phone main"><img src="../../src/screens/milestones/screen.png" alt="Milestones screen" /></div>
-        <div class="phone side-right"><img src="../../src/screens/family_sharing/screen.png" alt="Family sharing screen" /></div>
-        <div class="feature-card">
-          <p class="feature-label">Memories</p>
-          <h2 class="feature-title">A baby book that grows with them.</h2>
-          <p class="feature-body">Save firsts, photos, notes, and family moments.</p>
-          <div class="chips"><span class="chip">Photos</span><span class="chip">Firsts</span><span class="chip">Family</span></div>
-        </div>
+        <div class="phone left"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Milestones</h3><div class="avatar">N</div></div><h1>Little moments, kept forever</h1><div class="memory-tile"><div class="memory-caption"><strong>First laugh</strong><span>Saved by Nadia · 20 June</span></div></div></div></div>
+        <div class="phone main"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Mama Care</h3><div class="avatar">N</div></div><h1>Care for Mama too</h1><div class="mama-hero"><p class="label">Today</p><div class="metric-big">Hydration 6/8</div><p class="muted" style="font-size:22px;font-weight:800">Rest, mood, recovery, and pumping stay easy to log.</p></div><div class="stat-grid"><div class="stat-card peach"><div class="small">Next pump</div><div class="value">1h 20m</div></div><div class="stat-card mint"><div class="small">Stored milk</div><div class="value">3.8 L</div></div></div><div class="timeline"><div class="task-row"><span class="dot"></span><div><strong>Check recovery note</strong><span>2 minutes</span></div></div><div class="task-row"><span class="dot" style="background:#9ed18d"></span><div><strong>Use oldest milk first</strong><span>Expires in 2 days</span></div></div></div></div></div>
+        <div class="phone right"><div class="screen"><div class="topbar"><div class="back">‹</div><h3>Family</h3><div class="avatar">N</div></div><h1>Circle of care</h1><div class="timeline"><div class="task-row"><span class="dot"></span><div><strong>Nadia</strong><span>Mama · owner</span></div></div><div class="task-row"><span class="dot" style="background:#79b8ed"></span><div><strong>Arif</strong><span>Papa · parent</span></div></div><div class="task-row"><span class="dot" style="background:#9ed18d"></span><div><strong>Sara</strong><span>Babysitter · view only</span></div></div></div><div class="save" style="background:linear-gradient(145deg,#ffbfa3,#dd8b6e)">Invite Family</div></div></div>
+        <div class="mini-panel"><p class="label">Care circle</p><h2>Baby, Mama, and family in sync.</h2><p class="body">A calmer place for recovery, pumping, and memories.</p><div class="chips"><span class="chip">Mama</span><span class="chip">Milk</span><span class="chip">Family</span></div></div>
       </div>
-      <p class="app-store-note">One place for care and keepsakes</p>
+      <p class="note">Fictional names used for store previews</p>
     </div>
   </section>
 </body>
