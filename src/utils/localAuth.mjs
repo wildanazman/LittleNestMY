@@ -59,6 +59,30 @@ export async function getCurrentUser() {
   return session?.user || null;
 }
 
+// Like getAuthSession, but proactively refreshes the access token when it is
+// expired or about to expire. Use this before authenticated API requests so a
+// stale cached token can't cause a server "Auth session missing" rejection
+// (e.g. after the app sat idle). Falls back to the existing session on failure.
+export async function getFreshAuthSession() {
+  const session = await getAuthSession();
+  if (!session) return null;
+
+  const expiresAtMs = session.expires_at ? session.expires_at * 1000 : 0;
+  const expiringSoon = !expiresAtMs || expiresAtMs - Date.now() < 60_000;
+  if (!expiringSoon) return session;
+
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (!error && data?.session) {
+      cachedSession = data.session;
+      return cachedSession;
+    }
+  } catch (error) {
+    console.warn("Unable to refresh Supabase session.", error);
+  }
+  return session;
+}
+
 export async function loginLocalUser({ email, password }) {
   clearGuestMode();
   const client = requireSupabaseClient();

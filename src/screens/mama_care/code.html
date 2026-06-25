@@ -89,6 +89,11 @@ tailwind.config = {
   .mama-input:focus { outline: none; border-color: rgba(159,73,96,.38); box-shadow: 0 0 0 4px rgba(159,73,96,.12), inset 0 1px 0 rgba(255,255,255,.86); }
   textarea.mama-input { min-height: 96px; padding-top: 12px; }
   .status-chip { border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
+  .mama-collapse-toggle { cursor: pointer; }
+  .mama-chevron { transition: transform .22s cubic-bezier(.23,1,.32,1); }
+  .mama-collapsible.is-collapsed .mama-chevron { transform: rotate(-90deg); }
+  .mama-collapsible.is-collapsed .mama-collapse-body { display: none; }
+  .mama-collapsible.is-collapsed { padding-top: 18px; padding-bottom: 18px; }
   .mama-hero {
     background: linear-gradient(145deg, rgba(255,250,248,.94), rgba(247,232,237,.74));
   }
@@ -351,55 +356,69 @@ tailwind.config = {
     </div>
   </section>
 
-  <section class="order-7 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
+  <section class="order-7 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-start justify-between gap-3">
-      <div>
-        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Family Help</p>
-        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Support checklist</h2>
-        <p class="text-[14px] leading-5 text-on-surface-variant">Small practical tasks for whoever is helping Mama today.</p>
+      <button class="mama-collapse-toggle flex flex-1 items-start gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant mt-1">expand_more</span>
+        <span>
+          <span class="block text-[12px] font-extrabold uppercase tracking-wide text-primary">Family Help</span>
+          <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Support checklist</span>
+          <span class="block text-[14px] leading-5 text-on-surface-variant" id="supportTaskSummary">No support tasks yet.</span>
+        </span>
+      </button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" id="addTaskButton" type="button">Add</button>
+    </div>
+    <div class="mama-collapse-body space-y-4">
+      <div class="flex gap-2 overflow-x-auto pb-1">
+        <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="water" type="button">Water</button>
+        <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="meal" type="button">Meal</button>
+        <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="rest" type="button">Rest block</button>
+        <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="chores" type="button">Chores</button>
       </div>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addTaskButton" type="button">Add</button>
+      <div class="space-y-3" id="supportTaskList"></div>
     </div>
-    <div class="flex gap-2 overflow-x-auto pb-1">
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="water" type="button">Water</button>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="meal" type="button">Meal</button>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="rest" type="button">Rest block</button>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" data-action="task-template" data-template="chores" type="button">Chores</button>
-    </div>
-    <div class="space-y-3" id="supportTaskList"></div>
   </section>
 
-  <section class="order-8 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Medication</h2>
-        <p class="text-[14px] text-on-surface-variant" id="medicationSummary">No medication logged yet.</p>
-      </div>
-      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold" id="addMedicationButton" type="button">Add</button>
+  <section class="order-8 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
+    <div class="flex items-center justify-between gap-3">
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+        <span>
+          <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Medication</span>
+          <span class="block text-[14px] text-on-surface-variant" id="medicationSummary">No medication logged yet.</span>
+        </span>
+      </button>
+      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold shrink-0" id="addMedicationButton" type="button">Add</button>
     </div>
-    <div class="space-y-3" id="medicationList"></div>
+    <div class="mama-collapse-body space-y-3" id="medicationList"></div>
   </section>
 
-  <section class="order-9 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Appointments</h2>
-        <p class="text-[14px] text-on-surface-variant" id="appointmentSummary">No appointments yet.</p>
-      </div>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addAppointmentButton" type="button">Add</button>
+  <section class="order-9 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
+    <div class="flex items-center justify-between gap-3">
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+        <span>
+          <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Appointments</span>
+          <span class="block text-[14px] text-on-surface-variant" id="appointmentSummary">No appointments yet.</span>
+        </span>
+      </button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" id="addAppointmentButton" type="button">Add</button>
     </div>
-    <div class="space-y-3" id="appointmentList"></div>
+    <div class="mama-collapse-body space-y-3" id="appointmentList"></div>
   </section>
 
-  <section class="order-10 mama-card rounded-[30px] p-5 soft-shadow space-y-4">
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Notes</h2>
-        <p class="text-[14px] text-on-surface-variant">Private notes for recovery changes and reminders.</p>
-      </div>
-      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold" id="addNoteButton" type="button">Add</button>
+  <section class="order-10 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
+    <div class="flex items-center justify-between gap-3">
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+        <span>
+          <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Notes</span>
+          <span class="block text-[14px] text-on-surface-variant" id="recoveryNoteSummary">Private notes for recovery changes and reminders.</span>
+        </span>
+      </button>
+      <button class="mama-action h-10 rounded-full bg-primary-container px-3 text-primary font-extrabold shrink-0" id="addNoteButton" type="button">Add</button>
     </div>
-    <div class="space-y-3" id="recoveryNoteList"></div>
+    <div class="mama-collapse-body space-y-3" id="recoveryNoteList"></div>
   </section>
 
   <section class="order-11 rounded-[30px] bg-[#fff1f1] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
@@ -522,6 +541,16 @@ document.querySelectorAll("[data-action='task-template']").forEach((button) => {
   });
 });
 
+// Wire the collapsible section toggles before the (awaited) bootstrap — these are
+// static elements, so tap-to-expand must work even if data load is slow/offline.
+document.querySelectorAll("[data-collapse-toggle]").forEach((toggle) => {
+  toggle.addEventListener("click", () => {
+    const section = toggle.closest(".mama-collapsible");
+    const collapsed = section.classList.toggle("is-collapsed");
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+  });
+});
+
 await bootstrap();
 bindPrototypeActions();
 
@@ -567,6 +596,23 @@ function renderAll() {
   renderMedications();
   renderAppointments();
   renderRecoveryNotes();
+  syncCollapsibles();
+}
+
+let collapsiblesAutoExpanded = false;
+function syncCollapsibles() {
+  // First render only: auto-expand a section that already has content, so nothing
+  // meaningful is hidden; empty sections stay collapsed to keep the page calm.
+  if (collapsiblesAutoExpanded) return;
+  collapsiblesAutoExpanded = true;
+  ["supportTaskList", "medicationList", "appointmentList", "recoveryNoteList"].forEach((id) => {
+    const listEl = document.getElementById(id);
+    const section = listEl?.closest(".mama-collapsible");
+    if (section && listEl && !listEl.querySelector(".mama-empty")) {
+      section.classList.remove("is-collapsed");
+      section.querySelector("[data-collapse-toggle]")?.setAttribute("aria-expanded", "true");
+    }
+  });
 }
 
 function showMamaContent() {
@@ -815,6 +861,8 @@ function renderCheckin() {
 
 function renderSupportTasks() {
   const tasks = mamaData.supportTasks.filter((task) => task.taskDate === today);
+  const done = tasks.filter((task) => task.status === "done").length;
+  document.getElementById("supportTaskSummary").textContent = tasks.length ? `${done}/${tasks.length} done today` : "No support tasks yet.";
   const list = document.getElementById("supportTaskList");
   if (!tasks.length) {
     list.innerHTML = emptyState("volunteer_activism", "No support tasks yet.", "Add water, meals, rest, or other gentle support tasks.");
@@ -896,7 +944,9 @@ function renderAppointments() {
 
 function renderRecoveryNotes() {
   const list = document.getElementById("recoveryNoteList");
-  if (!mamaData.recoveryNotes.length) {
+  const noteCount = mamaData.recoveryNotes.length;
+  document.getElementById("recoveryNoteSummary").textContent = noteCount ? `${noteCount} note${noteCount > 1 ? "s" : ""} saved` : "Private notes for recovery changes and reminders.";
+  if (!noteCount) {
     list.innerHTML = emptyState("edit_note", "No recovery notes yet.", "Add a note about wound care, comfort, mood, or reminders.");
     return;
   }
@@ -1342,7 +1392,7 @@ function editButton(kind, id) {
 
 function emptyState(icon, title, detail) {
   return `
-    <div class="rounded-[22px] bg-surface-container-low p-5 text-center border border-primary-container/30">
+    <div class="mama-empty rounded-[22px] bg-surface-container-low p-5 text-center border border-primary-container/30">
       <span class="material-symbols-outlined text-primary text-[32px]">${icon}</span>
       <p class="mt-1 font-extrabold text-on-surface">${title}</p>
       <p class="text-[14px] leading-5 text-on-surface-variant">${detail}</p>

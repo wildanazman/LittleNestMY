@@ -525,7 +525,7 @@
             t
         } = await import(`${moduleBase}utils/i18n.mjs`);
         const { bindPrototypeActions, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-        const { getAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
+        const { getAuthSession, getFreshAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
         const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
         const { getParentProfile, initialsForName, refreshParentProfileFromSupabase, saveParentProfile, syncParentProfileToSupabase } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
@@ -572,7 +572,7 @@
             const old = btn.textContent;
             btn.disabled = true; btn.textContent = "Sending...";
             try {
-              const session = await getAuthSession();
+              const session = await getFreshAuthSession();
               if (!session?.access_token) { showNotifFeedback("Please log in first."); return; }
               const r = await fetch("/api/push-test", { method: "POST", headers: { Authorization: `Bearer ${session.access_token}` } });
               const d = await r.json().catch(() => ({}));
