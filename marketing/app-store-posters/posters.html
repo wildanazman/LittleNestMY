@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LittleNest MY App Store Posters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #271a15;
+    --muted: #705f58;
+    --primary: #83533c;
+    --peach: #ffbfa3;
+    --cream: #fff9f3;
+    --lavender: #ece3ff;
+    --sage: #dcefd8;
+    --sky: #e4f4ff;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: #ece5dd;
+    font-family: "Nunito Sans", system-ui, sans-serif;
+    color: var(--ink);
+  }
+
+  body {
+    display: grid;
+    grid-template-columns: repeat(5, 1290px);
+    gap: 48px;
+    padding: 48px;
+  }
+
+  .poster {
+    position: relative;
+    width: 1290px;
+    height: 2796px;
+    overflow: hidden;
+    isolation: isolate;
+    background:
+      radial-gradient(1100px 760px at 18% 10%, rgba(255, 191, 163, .42), transparent 64%),
+      radial-gradient(980px 760px at 88% 24%, rgba(236, 227, 255, .52), transparent 64%),
+      linear-gradient(180deg, #fffbf7 0%, #fbf2ea 48%, #efe5dc 100%);
+  }
+
+  .poster::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .18;
+    background-image:
+      linear-gradient(rgba(52, 32, 24, .09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(52, 32, 24, .05) 1px, transparent 1px);
+    background-size: 54px 54px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 72%);
+  }
+
+  .poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .2;
+    mix-blend-mode: soft-light;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.44) 0 1px, transparent 1px 5px),
+      repeating-linear-gradient(90deg, rgba(52,32,24,.08) 0 1px, transparent 1px 7px);
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    padding: 118px 108px 112px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    align-self: flex-start;
+    padding: 16px 24px 16px 18px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.62);
+    border: 1px solid rgba(255,255,255,.78);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 18px 54px rgba(92, 58, 44, .11);
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -.01em;
+    color: var(--primary);
+  }
+
+  .mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, #ffe1d2, #fff6ed);
+    color: var(--primary);
+    font-size: 31px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 12px 28px rgba(131,83,60,.14);
+  }
+
+  .headline {
+    margin: 96px 0 0;
+    max-width: 1010px;
+    font-size: 112px;
+    line-height: .94;
+    letter-spacing: -.055em;
+    font-weight: 900;
+    text-wrap: balance;
+  }
+
+  .subhead {
+    margin: 34px 0 0;
+    max-width: 850px;
+    color: var(--muted);
+    font-size: 42px;
+    line-height: 1.24;
+    font-weight: 700;
+    letter-spacing: -.012em;
+    text-wrap: pretty;
+  }
+
+  .stage {
+    position: relative;
+    flex: 1;
+    margin-top: 78px;
+  }
+
+  .phone {
+    position: absolute;
+    width: 548px;
+    height: 1476px;
+    border-radius: 78px;
+    padding: 18px;
+    background: linear-gradient(145deg, rgba(255,255,255,.74), rgba(255,242,235,.42));
+    border: 1px solid rgba(255,255,255,.86);
+    box-shadow:
+      0 52px 120px rgba(75, 50, 39, .22),
+      inset 0 1px 0 rgba(255,255,255,.92);
+  }
+
+  .phone::before {
+    content: "";
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    width: 148px;
+    height: 32px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgba(39, 26, 21, .18);
+    z-index: 4;
+  }
+
+  .phone img {
+    width: 100%;
+    height: 100%;
+    border-radius: 62px;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    background: #fff;
+  }
+
+  .phone.main {
+    left: 270px;
+    top: 20px;
+    width: 620px;
+    height: 1670px;
+    transform: rotate(-2deg);
+  }
+
+  .phone.side-left {
+    left: 24px;
+    top: 248px;
+    transform: rotate(-7deg) scale(.83);
+    opacity: .92;
+  }
+
+  .phone.side-right {
+    right: 10px;
+    top: 300px;
+    transform: rotate(7deg) scale(.82);
+    opacity: .94;
+  }
+
+  .feature-card {
+    position: absolute;
+    right: 20px;
+    bottom: 92px;
+    width: 470px;
+    padding: 34px 34px 32px;
+    border-radius: 44px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.8);
+    box-shadow: 0 28px 76px rgba(92,58,44,.13), inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .feature-card.left { left: 8px; right: auto; }
+
+  .feature-label {
+    margin: 0 0 12px;
+    color: var(--primary);
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-weight: 900;
+  }
+
+  .feature-title {
+    margin: 0;
+    font-size: 42px;
+    line-height: 1.02;
+    letter-spacing: -.035em;
+    font-weight: 900;
+  }
+
+  .feature-body {
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 26px;
+    line-height: 1.22;
+    font-weight: 700;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .chip {
+    height: 48px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0 22px;
+    background: rgba(131,83,60,.1);
+    color: var(--primary);
+    font-size: 21px;
+    line-height: 1;
+    font-weight: 900;
+  }
+
+  .poster.sleep {
+    background:
+      radial-gradient(900px 760px at 50% 4%, rgba(210, 202, 255, .62), transparent 68%),
+      radial-gradient(860px 720px at 90% 28%, rgba(196, 226, 246, .48), transparent 64%),
+      linear-gradient(180deg, #faf8ff 0%, #f0f5ff 52%, #e9e6f4 100%);
+  }
+
+  .poster.insights {
+    background:
+      radial-gradient(920px 720px at 16% 8%, rgba(202, 236, 196, .52), transparent 62%),
+      radial-gradient(900px 780px at 84% 22%, rgba(255, 219, 204, .5), transparent 66%),
+      linear-gradient(180deg, #fffdf8 0%, #f3f8ef 52%, #e8eee1 100%);
+  }
+
+  .poster.memories {
+    background:
+      radial-gradient(960px 740px at 18% 12%, rgba(255, 210, 224, .52), transparent 64%),
+      radial-gradient(860px 720px at 86% 20%, rgba(223, 212, 255, .5), transparent 66%),
+      linear-gradient(180deg, #fffafb 0%, #f8eef3 52%, #eee3ea 100%);
+  }
+
+  .poster.mama {
+    background:
+      radial-gradient(960px 740px at 20% 10%, rgba(255, 191, 163, .48), transparent 62%),
+      radial-gradient(900px 740px at 86% 20%, rgba(202, 236, 196, .42), transparent 66%),
+      linear-gradient(180deg, #fffaf5 0%, #f7efe8 52%, #eae3dc 100%);
+  }
+
+  .app-store-note {
+    position: absolute;
+    left: 108px;
+    bottom: 74px;
+    color: rgba(39,26,21,.48);
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: .02em;
+  }
+</style>
+</head>
+<body>
+  <section class="poster" id="poster-01">
+    <div class="content">
+      <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
+      <h1 class="headline">Everything baby needs, in one calm home.</h1>
+      <p class="subhead">Track feeds, sleep, diapers, appointments, milestones, and Mama Care without digging through screens.</p>
+      <div class="stage">
+        <div class="phone side-left"><img src="../../src/screens/quick_log/screen.png" alt="Quick log screen" /></div>
+        <div class="phone main"><img src="../../src/screens/home_dashboard/screen.png" alt="LittleNest home dashboard" /></div>
+        <div class="phone side-right"><img src="../../src/screens/calendar/screen.png" alt="Appointment calendar screen" /></div>
+        <div class="feature-card">
+          <p class="feature-label">All-in-one</p>
+          <h2 class="feature-title">Daily care at a glance.</h2>
+          <p class="feature-body">Built for tired parents who need clear answers fast.</p>
+          <div class="chips"><span class="chip">Feeds</span><span class="chip">Sleep</span><span class="chip">Diapers</span></div>
+        </div>
+      </div>
+      <p class="app-store-note">Designed for Malaysian families</p>
+    </div>
+  </section>
+
+  <section class="poster mama" id="poster-02">
+    <div class="content">
+      <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
+      <h1 class="headline">Log every feed in seconds.</h1>
+      <p class="subhead">Breast, bottle, formula, solids, and feeding history stay organized for the whole family.</p>
+      <div class="stage">
+        <div class="phone side-left"><img src="../../src/screens/feeding_history/screen.png" alt="Feeding history screen" /></div>
+        <div class="phone main"><img src="../../src/screens/feeding_log/screen.png" alt="Feeding log screen" /></div>
+        <div class="phone side-right"><img src="../../src/screens/diaper_log/screen.png" alt="Diaper log screen" /></div>
+        <div class="feature-card left">
+          <p class="feature-label">Fast logging</p>
+          <h2 class="feature-title">Big buttons. Less typing.</h2>
+          <p class="feature-body">Made for one-handed, sleepy-parent moments.</p>
+          <div class="chips"><span class="chip">Formula</span><span class="chip">Bottle</span><span class="chip">History</span></div>
+        </div>
+      </div>
+      <p class="app-store-note">Simple logs, synced safely</p>
+    </div>
+  </section>
+
+  <section class="poster sleep" id="poster-03">
+    <div class="content">
+      <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
+      <h1 class="headline">Understand baby's sleep rhythm.</h1>
+      <p class="subhead">Start and stop sleep sessions, review naps, and spot patterns that help bedtime feel less random.</p>
+      <div class="stage">
+        <div class="phone side-left"><img src="../../src/screens/sleep_log/screen.png" alt="Sleep log screen" /></div>
+        <div class="phone main"><img src="../../src/screens/sleep_pattern/screen.png" alt="Sleep pattern chart screen" /></div>
+        <div class="phone side-right"><img src="../../src/screens/weekly_insights/screen.png" alt="Weekly insights screen" /></div>
+        <div class="feature-card">
+          <p class="feature-label">Sleep care</p>
+          <h2 class="feature-title">Naps and nights, clearer.</h2>
+          <p class="feature-body">Premium-ready insights for routines and predictions.</p>
+          <div class="chips"><span class="chip">Naps</span><span class="chip">Bedtime</span><span class="chip">Patterns</span></div>
+        </div>
+      </div>
+      <p class="app-store-note">Gentle patterns, not pressure</p>
+    </div>
+  </section>
+
+  <section class="poster insights" id="poster-04">
+    <div class="content">
+      <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
+      <h1 class="headline">Insights that make care easier.</h1>
+      <p class="subhead">Weekly summaries, growth trends, and assistant guidance turn real logs into calm next steps.</p>
+      <div class="stage">
+        <div class="phone side-left"><img src="../../src/screens/growth_tracker/screen.png" alt="Growth tracker screen" /></div>
+        <div class="phone main"><img src="../../src/screens/weekly_insights/screen.png" alt="Weekly insights dashboard" /></div>
+        <div class="phone side-right"><img src="../../src/screens/assistant/screen.png" alt="Assistant insights screen" /></div>
+        <div class="feature-card left">
+          <p class="feature-label">Premium</p>
+          <h2 class="feature-title">See what changed this week.</h2>
+          <p class="feature-body">Reports for parents, family, and clinic visits.</p>
+          <div class="chips"><span class="chip">Reports</span><span class="chip">Trends</span><span class="chip">AI help</span></div>
+        </div>
+      </div>
+      <p class="app-store-note">Private by design</p>
+    </div>
+  </section>
+
+  <section class="poster memories" id="poster-05">
+    <div class="content">
+      <div class="brand"><span class="mark">LN</span>LittleNest MY</div>
+      <h1 class="headline">Keep the tiny moments forever.</h1>
+      <p class="subhead">Milestones, memories, appointments, and family sharing live beside everyday care.</p>
+      <div class="stage">
+        <div class="phone side-left"><img src="../../src/screens/memory_book/screen.png" alt="Memory book screen" /></div>
+        <div class="phone main"><img src="../../src/screens/milestones/screen.png" alt="Milestones screen" /></div>
+        <div class="phone side-right"><img src="../../src/screens/family_sharing/screen.png" alt="Family sharing screen" /></div>
+        <div class="feature-card">
+          <p class="feature-label">Memories</p>
+          <h2 class="feature-title">A baby book that grows with them.</h2>
+          <p class="feature-body">Save firsts, photos, notes, and family moments.</p>
+          <div class="chips"><span class="chip">Photos</span><span class="chip">Firsts</span><span class="chip">Family</span></div>
+        </div>
+      </div>
+      <p class="app-store-note">One place for care and keepsakes</p>
+    </div>
+  </section>
+</body>
+</html>
