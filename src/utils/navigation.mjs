@@ -295,6 +295,44 @@ setupPullToRefresh();
 setupMotionReady();
 setupOfflineIndicator();
 setupModalNavGuard();
+enhanceAccessibility();
+
+// App-wide accessibility net: give icon-only controls an accessible name and
+// ensure every <img> has an alt (descriptive from data-alt, else decorative).
+// Runs after screen-specific labels so it only fills gaps, never overrides.
+const ICON_LABELS = {
+  arrow_back: "Back", arrow_back_ios: "Back", chevron_left: "Back", close: "Close",
+  add: "Add", add_circle: "Add", more_vert: "More options", more_horiz: "More options",
+  edit: "Edit", delete: "Delete", settings: "Settings", search: "Search",
+  check: "Confirm", check_circle: "Confirm", done: "Done", share: "Share", ios_share: "Share",
+  refresh: "Refresh", chevron_right: "Open", play_arrow: "Play", pause: "Pause",
+  mic: "Record", photo_camera: "Take photo", videocam: "Record video",
+  visibility: "Show", visibility_off: "Hide", favorite: "Favourite", close_fullscreen: "Close"
+};
+function humanizeIcon(s) {
+  const key = String(s).trim();
+  return ICON_LABELS[key] || key.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+function enhanceAccessibility(root = document) {
+  try {
+    root.querySelectorAll("button, a[role='button'], [role='button']").forEach((el) => {
+      if (el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") || el.getAttribute("title")) return;
+      const icon = el.querySelector(".material-symbols-outlined");
+      if (!icon) return;
+      const ligature = (icon.dataset.icon || icon.textContent || "").trim();
+      if (!ligature) return;
+      const visibleText = (el.textContent || "").replace(ligature, "").trim();
+      if (visibleText) return; // already has a real text label
+      el.setAttribute("aria-label", humanizeIcon(ligature));
+    });
+    root.querySelectorAll("img:not([alt]), img[alt='']").forEach((img) => {
+      const desc = img.getAttribute("data-alt");
+      img.setAttribute("alt", desc ? desc.slice(0, 140) : "");
+    });
+  } catch {
+    // Accessibility enhancement is best-effort; never block the page.
+  }
+}
 
 // Auth session caches asynchronously; once ready, re-render header avatars so
 // the uploaded profile photo (stored under the user-scoped key) is shown.
