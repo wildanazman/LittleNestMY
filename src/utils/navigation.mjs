@@ -781,7 +781,7 @@ function installSharedHeaderStyles() {
       position: absolute !important;
       left: 62px !important;
       right: 62px !important;
-      top: 50% !important;
+      top: calc(50% + 1px) !important;
       z-index: 4 !important;
       transform: translateY(-50%) !important;
       width: auto !important;
@@ -793,8 +793,8 @@ function installSharedHeaderStyles() {
       letter-spacing: 0 !important;
       font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif !important;
       font-size: 1.18rem !important;
-      line-height: 1.08 !important;
-      font-weight: 850 !important;
+      line-height: 1.28 !important;
+      font-weight: 800 !important;
     }
     .ln-header-action {
       position: relative;
