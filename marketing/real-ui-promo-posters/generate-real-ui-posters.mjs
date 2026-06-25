@@ -70,6 +70,7 @@ const screenShots = [
   { id: "baby_profiles", route: "/baby_profiles/", waitFor: "body" }
 ];
 
+await fs.rm(outputDir, { recursive: true, force: true });
 await fs.mkdir(captureDir, { recursive: true });
 
 const browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "msedge", headless: true });
