@@ -117,18 +117,17 @@
 <style>
         body {
           font-family: 'Nunito Sans', sans-serif;
-          background: #fbf8f2;
+          background: #fbf7f0;
         }
         :root.dark body {
           background: #07111f !important;
         }
-        /* Premium home backdrop: a soft aurora colour-mesh + film grain + sheen
-           and edge vignette, all viewport-locked (fixed pseudo-elements) so it
-           stays put while content scrolls. Light = warm cream; dark = deep ink. */
+        /* Premium home backdrop: pearl paper base, soft color bloom, and fine
+           grain locked to the viewport so scroll never smears the atmosphere. */
         .home-premium-bg {
           position: relative;
           isolation: isolate;
-          background: #fbf8f2 !important;
+          background: #fbf7f0 !important;
         }
         .home-premium-bg::before,
         .home-premium-bg::after {
@@ -141,20 +140,20 @@
         /* Layer 1 — aurora mesh + top sheen (light). */
         .home-premium-bg::before {
           background:
-            radial-gradient(900px 680px at 4% -6%, rgba(255,164,132,0.66), transparent 58%),
-            radial-gradient(860px 720px at 100% -2%, rgba(255,202,142,0.60), transparent 60%),
-            radial-gradient(840px 760px at 50% 24%, rgba(208,190,255,0.52), transparent 62%),
-            radial-gradient(980px 840px at 94% 86%, rgba(158,222,184,0.56), transparent 64%),
-            radial-gradient(900px 800px at -2% 102%, rgba(255,178,206,0.54), transparent 64%),
-            linear-gradient(166deg, #fff5ec 0%, #fbecda 52%, #f2e4d5 100%);
+            radial-gradient(860px 620px at 4% -8%, rgba(255, 198, 176, 0.46), transparent 62%),
+            radial-gradient(820px 620px at 102% -4%, rgba(196, 230, 242, 0.42), transparent 64%),
+            radial-gradient(720px 600px at 62% 24%, rgba(231, 222, 255, 0.34), transparent 68%),
+            radial-gradient(820px 700px at 96% 86%, rgba(210, 237, 219, 0.34), transparent 68%),
+            radial-gradient(640px 560px at -6% 92%, rgba(255, 225, 232, 0.32), transparent 68%),
+            linear-gradient(172deg, #fffaf6 0%, #fbf6ee 48%, #f1ebe3 100%);
         }
         /* Layer 2 — fine film grain + soft edge vignette (light). */
         .home-premium-bg::after {
           background-image:
-            radial-gradient(140% 115% at 50% 36%, transparent 62%, rgba(86,57,42,0.08) 100%),
+            radial-gradient(140% 118% at 50% 34%, transparent 64%, rgba(86, 57, 42, 0.07) 100%),
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
           background-size: auto, 180px 180px;
-          opacity: 0.32;
+          opacity: 0.22;
           mix-blend-mode: multiply;
         }
         #homeLoadingState,
