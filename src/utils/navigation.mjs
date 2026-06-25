@@ -520,6 +520,7 @@ function normalizePageHeaders(root = document) {
     const title = header.querySelector("h1");
     if (title) {
       title.className = "ln-app-header-title font-headline-lg-mobile text-headline-lg-mobile text-primary truncate";
+      title.dataset.appHeaderTitle = "true";
     }
 
     const backButton = findHeaderBackButton(header);
@@ -752,23 +753,55 @@ function installSharedHeaderStyles() {
   style.id = "littleNestSharedHeaderStyles";
   style.textContent = `
     .ln-app-header {
+      position: sticky !important;
       border-radius: 999px !important;
-      border: 1px solid rgba(255,255,255,.78) !important;
-      background: rgba(255,250,246,.90) !important;
-      box-shadow: 0 18px 48px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.92) !important;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,.82) !important;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,246,239,.68)) !important;
+      box-shadow: 0 18px 54px rgba(92,58,44,.12), inset 0 1px 0 rgba(255,255,255,.92) !important;
+      backdrop-filter: blur(20px) saturate(1.18);
+      -webkit-backdrop-filter: blur(20px) saturate(1.18);
       overflow: hidden;
+      isolation: isolate;
+    }
+    .ln-app-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(120px 70px at 18% 0%, rgba(255,191,163,.18), transparent 70%),
+        radial-gradient(130px 80px at 88% 0%, rgba(207,230,201,.18), transparent 72%);
+    }
+    .ln-app-header > * {
+      z-index: 2;
     }
     .ln-app-header-title {
+      position: absolute !important;
+      left: 62px !important;
+      right: 62px !important;
+      top: 50% !important;
+      z-index: 4 !important;
+      transform: translateY(-50%) !important;
+      width: auto !important;
+      max-width: none !important;
+      margin: 0 !important;
+      text-align: center !important;
+      pointer-events: none !important;
       color: var(--ln-primary, #83533c) !important;
       letter-spacing: 0 !important;
-      font-weight: 800 !important;
+      font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif !important;
+      font-size: 1.18rem !important;
+      line-height: 1.08 !important;
+      font-weight: 850 !important;
     }
     .ln-header-action {
-      background: rgba(255,255,255,.58) !important;
-      border: 1px solid rgba(255,255,255,.72) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 10px 28px rgba(131,83,60,.10) !important;
+      position: relative;
+      z-index: 3;
+      background: rgba(255,255,255,.68) !important;
+      border: 1px solid rgba(255,255,255,.78) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.86), 0 10px 28px rgba(131,83,60,.12) !important;
       color: var(--ln-primary, #83533c) !important;
     }
     @media (hover:hover) and (pointer:fine) {
@@ -776,9 +809,14 @@ function installSharedHeaderStyles() {
     }
     .ln-header-action:active { transform: scale(.96); }
     html.dark .ln-app-header {
-      background: rgba(34,31,29,.88) !important;
+      background: linear-gradient(145deg, rgba(23,32,50,.88), rgba(12,20,36,.80)) !important;
       border-color: rgba(255,255,255,.12) !important;
       box-shadow: 0 18px 48px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.10) !important;
+    }
+    html.dark .ln-app-header::before {
+      background:
+        radial-gradient(130px 82px at 18% 0%, rgba(34,211,238,.14), transparent 72%),
+        radial-gradient(130px 82px at 88% 0%, rgba(124,92,255,.14), transparent 72%);
     }
     html.dark .ln-header-action {
       background: rgba(255,255,255,.08) !important;
