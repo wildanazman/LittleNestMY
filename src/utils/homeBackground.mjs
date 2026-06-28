@@ -6,7 +6,11 @@ const KEY = "littlenest:homeBackground";
 
 export const HOME_BACKGROUNDS = [
   { id: "nursery", name: "LittleNest", description: "Purple welcome glow" },
+  { id: "nursery-tile", name: "Nursery Tile", description: "Soft premium motifs" },
   { id: "aurora", name: "Dream Glow", description: "Purple, pink and sky" },
+  { id: "cloud", name: "Cloud", description: "Airy sky wash" },
+  { id: "garden", name: "Garden", description: "Calm botanical tint" },
+  { id: "moon", name: "Moon Milk", description: "Dreamy night-light" },
   { id: "minimal", name: "Soft Lilac", description: "Calm and clean" }
 ];
 
