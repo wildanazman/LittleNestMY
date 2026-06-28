@@ -1,3 +1,7 @@
+# PAUSED FOR NOW:
+# This workflow is intentionally disabled without deleting it.
+# To re-enable later, uncomment the workflow configuration below.
+#
 # # Free alternative to a Vercel Pro sub-daily cron: GitHub's scheduler pings the
 # # pump-reminder endpoint every ~15 min so reminders fire at each scheduled pump
 # # time even when the app is closed. The endpoint itself decides who is due.
