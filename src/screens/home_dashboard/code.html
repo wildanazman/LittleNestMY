@@ -122,17 +122,12 @@
         :root.dark body {
           background: #07111f !important;
         }
-        /* Home backdrop: a crisp tiled nursery pattern (stars, moons, clouds,
-           hearts, dots) over a soft tinted base — viewport-locked so it reads
-           like designer nursery wallpaper, no blur. */
+        /* Home backdrop — user-selectable. Base holds layout only; the chosen
+           .home-bg-<id> class paints the background (each beats theme.css via
+           higher specificity + !important). */
         .home-premium-bg {
           position: relative;
           isolation: isolate;
-          background:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg fill='none' stroke='%23c89a85' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' stroke-opacity='0.55'%3E%3Cpath d='M26 20C27.3 26.8 29.2 28.7 36 30C29.2 31.3 27.3 33.2 26 40C24.7 33.2 22.8 31.3 16 30C22.8 28.7 24.7 26.8 26 20Z'/%3E%3Cpath d='M108 54C108.8 58.1 109.9 59.2 114 60C109.9 60.8 108.8 61.9 108 66C107.2 61.9 106.1 60.8 102 60C106.1 59.2 107.2 58.1 108 54Z'/%3E%3Cpath d='M99 17a10 10 0 1 0 4 18 a8 8 0 1 1 -4 -18Z'/%3E%3Cpath d='M50 79 a7 7 0 0 1 1 -13.4 a9 9 0 0 1 16.8 0.4 a6 6 0 0 1 0.7 13 Z'/%3E%3Cpath d='M30 108 C25 103 18 100 18 94 C18 90 22 88 25 90 C27 91.2 29 93 30 95 C31 93 33 91.2 35 90 C38 88 42 90 42 94 C42 100 35 103 30 108 Z'/%3E%3C/g%3E%3Cg fill='%23c89a85' fill-opacity='0.5'%3E%3Ccircle cx='100' cy='98' r='2'/%3E%3Ccircle cx='112' cy='108' r='1.4'/%3E%3Ccircle cx='86' cy='110' r='1.4'/%3E%3Ccircle cx='70' cy='40' r='1.4'/%3E%3C/g%3E%3C/svg%3E") left top / 128px 128px repeat fixed,
-            radial-gradient(130% 95% at 50% 0%, #fff8f1 0%, transparent 58%) center / cover no-repeat fixed,
-            linear-gradient(176deg, #fdf4ea 0%, #f7ecde 58%, #f0e4d6 100%) center / cover no-repeat fixed,
-            #fbf3ea !important;
         }
         .home-premium-bg::after {
           content: "";
@@ -148,15 +143,55 @@
           position: relative;
           z-index: 1;
         }
-        :root.dark .home-premium-bg {
+        :root.dark .home-premium-bg::after {
+          background: radial-gradient(145% 120% at 50% 40%, transparent 56%, rgba(0, 0, 0, 0.5) 100%);
+        }
+        /* ---- Nursery: tiled motif wallpaper ---- */
+        .home-premium-bg.home-bg-nursery {
+          background:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg fill='none' stroke='%23c89a85' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' stroke-opacity='0.55'%3E%3Cpath d='M26 20C27.3 26.8 29.2 28.7 36 30C29.2 31.3 27.3 33.2 26 40C24.7 33.2 22.8 31.3 16 30C22.8 28.7 24.7 26.8 26 20Z'/%3E%3Cpath d='M108 54C108.8 58.1 109.9 59.2 114 60C109.9 60.8 108.8 61.9 108 66C107.2 61.9 106.1 60.8 102 60C106.1 59.2 107.2 58.1 108 54Z'/%3E%3Cpath d='M99 17a10 10 0 1 0 4 18 a8 8 0 1 1 -4 -18Z'/%3E%3Cpath d='M50 79 a7 7 0 0 1 1 -13.4 a9 9 0 0 1 16.8 0.4 a6 6 0 0 1 0.7 13 Z'/%3E%3Cpath d='M30 108 C25 103 18 100 18 94 C18 90 22 88 25 90 C27 91.2 29 93 30 95 C31 93 33 91.2 35 90 C38 88 42 90 42 94 C42 100 35 103 30 108 Z'/%3E%3C/g%3E%3Cg fill='%23c89a85' fill-opacity='0.5'%3E%3Ccircle cx='100' cy='98' r='2'/%3E%3Ccircle cx='112' cy='108' r='1.4'/%3E%3Ccircle cx='86' cy='110' r='1.4'/%3E%3Ccircle cx='70' cy='40' r='1.4'/%3E%3C/g%3E%3C/svg%3E") left top / 128px 128px repeat fixed,
+            radial-gradient(130% 95% at 50% 0%, #fff8f1 0%, transparent 58%) center / cover no-repeat fixed,
+            linear-gradient(176deg, #fdf4ea 0%, #f7ecde 58%, #f0e4d6 100%) center / cover no-repeat fixed,
+            #fbf3ea !important;
+        }
+        :root.dark .home-premium-bg.home-bg-nursery {
           background:
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg fill='none' stroke='%23aeb8e0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' stroke-opacity='0.34'%3E%3Cpath d='M26 20C27.3 26.8 29.2 28.7 36 30C29.2 31.3 27.3 33.2 26 40C24.7 33.2 22.8 31.3 16 30C22.8 28.7 24.7 26.8 26 20Z'/%3E%3Cpath d='M108 54C108.8 58.1 109.9 59.2 114 60C109.9 60.8 108.8 61.9 108 66C107.2 61.9 106.1 60.8 102 60C106.1 59.2 107.2 58.1 108 54Z'/%3E%3Cpath d='M99 17a10 10 0 1 0 4 18 a8 8 0 1 1 -4 -18Z'/%3E%3Cpath d='M50 79 a7 7 0 0 1 1 -13.4 a9 9 0 0 1 16.8 0.4 a6 6 0 0 1 0.7 13 Z'/%3E%3Cpath d='M30 108 C25 103 18 100 18 94 C18 90 22 88 25 90 C27 91.2 29 93 30 95 C31 93 33 91.2 35 90 C38 88 42 90 42 94 C42 100 35 103 30 108 Z'/%3E%3C/g%3E%3Cg fill='%23aeb8e0' fill-opacity='0.3'%3E%3Ccircle cx='100' cy='98' r='2'/%3E%3Ccircle cx='112' cy='108' r='1.4'/%3E%3Ccircle cx='86' cy='110' r='1.4'/%3E%3Ccircle cx='70' cy='40' r='1.4'/%3E%3C/g%3E%3C/svg%3E") left top / 128px 128px repeat fixed,
             radial-gradient(130% 95% at 50% 0%, rgba(124, 108, 255, 0.12) 0%, transparent 58%) center / cover no-repeat fixed,
             linear-gradient(178deg, #0c1326 0%, #0a1020 56%, #070d1a 100%) center / cover no-repeat fixed,
             #070d1a !important;
         }
-        :root.dark .home-premium-bg::after {
-          background: radial-gradient(145% 120% at 50% 40%, transparent 56%, rgba(0, 0, 0, 0.5) 100%);
+        /* ---- Aurora: soft colour glow ---- */
+        .home-premium-bg.home-bg-aurora {
+          background:
+            radial-gradient(820px 560px at 6% -4%, rgba(255,206,187,0.55), transparent 66%) center / cover no-repeat fixed,
+            radial-gradient(760px 560px at 96% 0%, rgba(206,235,245,0.52), transparent 68%) center / cover no-repeat fixed,
+            radial-gradient(680px 540px at 78% 58%, rgba(235,226,255,0.46), transparent 72%) center / cover no-repeat fixed,
+            radial-gradient(560px 460px at 8% 88%, rgba(220,241,225,0.44), transparent 72%) center / cover no-repeat fixed,
+            linear-gradient(180deg, #fffaf6 0%, #fbf7f0 48%, #f2ece5 100%) center / cover no-repeat fixed,
+            #fbf7f0 !important;
+        }
+        :root.dark .home-premium-bg.home-bg-aurora {
+          background:
+            radial-gradient(860px 620px at 8% -6%, rgba(109,114,255,0.38), transparent 60%) center / cover no-repeat fixed,
+            radial-gradient(800px 620px at 100% 0%, rgba(34,211,238,0.26), transparent 62%) center / cover no-repeat fixed,
+            radial-gradient(900px 760px at 88% 86%, rgba(139,108,255,0.34), transparent 64%) center / cover no-repeat fixed,
+            radial-gradient(820px 720px at 2% 100%, rgba(56,189,248,0.22), transparent 66%) center / cover no-repeat fixed,
+            linear-gradient(178deg, #0c1326 0%, #0a1020 56%, #070d1a 100%) center / cover no-repeat fixed,
+            #070d1a !important;
+        }
+        /* ---- Minimal: calm, clean ---- */
+        .home-premium-bg.home-bg-minimal {
+          background:
+            radial-gradient(120% 82% at 50% -8%, #fffdfb 0%, transparent 60%) center / cover no-repeat fixed,
+            linear-gradient(180deg, #fbf6f0 0%, #f5efe6 100%) center / cover no-repeat fixed,
+            #f7f1ea !important;
+        }
+        :root.dark .home-premium-bg.home-bg-minimal {
+          background:
+            radial-gradient(120% 82% at 50% -8%, rgba(124,108,255,0.10) 0%, transparent 60%) center / cover no-repeat fixed,
+            linear-gradient(180deg, #10141c 0%, #0b0e14 100%) center / cover no-repeat fixed,
+            #0b0e14 !important;
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
         .soft-shadow { box-shadow: 0 16px 38px rgba(75, 50, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.78); }
@@ -403,7 +438,19 @@
   </style>
   <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="home-premium-bg bg-background text-on-background min-h-screen pb-32">
+<body class="home-premium-bg home-bg-nursery bg-background text-on-background min-h-screen pb-32">
+<script>
+  // Apply the saved home background before paint to avoid a flash.
+  try {
+    var __hb = localStorage.getItem("littlenest:homeBackground");
+    var __ids = ["nursery", "aurora", "minimal"];
+    var __id = __ids.indexOf(__hb) >= 0 ? __hb : "nursery";
+    if (__id !== "nursery") {
+      document.body.classList.remove("home-bg-nursery");
+      document.body.classList.add("home-bg-" + __id);
+    }
+  } catch (e) {}
+</script>
 <section class="max-w-md mx-auto px-container-padding pt-4 pb-32 space-y-lg" id="homeLoadingState" aria-label="Loading dashboard">
 <div class="flex items-center justify-between h-14">
 <div class="home-skeleton-block h-8 w-36 rounded-xl"></div>
