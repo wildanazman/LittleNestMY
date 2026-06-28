@@ -117,7 +117,7 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
-const { calculateBabyAge, formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { calculateBabyAge, formatDuration, formatDurationBetween, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
@@ -214,7 +214,9 @@ function card(title, value, detail, icon) {
 function feedingDetail(log) {
   if (log.amountMl) return `${log.amountMl} ml`;
   if (log.amountGrams) return `${log.amountGrams} g solid`;
+  if (log.type === "breast" && log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
   if (log.durationMinutes) return formatDuration(log.durationMinutes);
+  if (log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
   return log.type || "Logged";
 }
 

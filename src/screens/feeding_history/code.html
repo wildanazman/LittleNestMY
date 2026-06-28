@@ -291,7 +291,7 @@ const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}u
 const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
 const { deleteFeedingLogRemote, loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-const { formatDuration, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { formatDuration, formatDurationBetween, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
 
 const state = { typeFilter: "all", dateFilter: "", searchFilter: "" };
 const babyState = await loadBabyProfilesRemote(babyProfile);
@@ -403,10 +403,12 @@ const amount = log.amountGrams
 ? `${log.amountGrams} g`
 : log.amountMl
 ? `${log.amountMl} ml`
+: log.type === "breast" && log.endedAt
+? formatDurationBetween(log.startedAt, log.endedAt)
 : log.durationMinutes
 ? formatDuration(log.durationMinutes)
 : log.endedAt
-? formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))
+? formatDurationBetween(log.startedAt, log.endedAt)
 : "Logged";
 
 return `

@@ -1234,6 +1234,7 @@
         const {
             calculateBabyAge,
             formatDuration,
+            formatDurationBetween,
             formatEventDate,
             formatRelativeTime,
             formatTime,
@@ -1338,7 +1339,9 @@
             if (!log) return "";
             if (log.amountMl) return `${log.amountMl} ml`;
             if (log.amountGrams) return `${log.amountGrams} g`;
+            if (log.type === "breast" && log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
             if (log.durationMinutes) return formatDuration(log.durationMinutes);
+            if (log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
             return "";
         };
         const formatStatDate = (value) => new Date(value).toLocaleDateString("en-MY", { day: "numeric", month: "short" });
@@ -1643,7 +1646,7 @@
                         id: log.id,
                         at: log.startedAt,
                         type: "feed",
-                        main: log.amountGrams ? `${log.amountGrams}g ${labelFeedingType(log.type)}` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : log.durationMinutes ? `${formatDuration(log.durationMinutes)} ${labelFeedingType(log.type)}` : labelFeedingType(log.type),
+                        main: log.amountGrams ? `${log.amountGrams}g ${labelFeedingType(log.type)}` : log.amountMl ? `${log.amountMl}ml ${labelMilk(log.type)}` : feedAmountLabel(log) ? `${feedAmountLabel(log)} ${labelFeedingType(log.type)}` : labelFeedingType(log.type),
                         note: log.notes || ""
                     })),
                 ...allSleepLogs

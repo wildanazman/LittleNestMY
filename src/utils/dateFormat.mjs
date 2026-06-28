@@ -49,9 +49,29 @@ export function formatRelativeTime(dateTime, now = new Date()) {
 }
 
 export function formatDuration(totalMinutes) {
+  const numericMinutes = Number(totalMinutes);
+  if (Number.isFinite(numericMinutes) && numericMinutes > 0 && numericMinutes < 1) {
+    return `${Math.max(1, Math.round(numericMinutes * 60))}s`;
+  }
+  totalMinutes = numericMinutes;
   const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
+  const minutes = Math.round(totalMinutes % 60);
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+}
+
+export function formatDurationBetween(startedAt, endedAt) {
+  const start = new Date(startedAt);
+  const end = new Date(endedAt);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) return "";
+
+  const totalSeconds = Math.max(1, Math.round((end - start) / 1000));
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return seconds > 0 ? `${hours}h ${minutes}m ${seconds}s` : `${hours}h ${minutes}m`;
+  return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
 }
 
 export function formatEventDate(dateTime, now = new Date()) {

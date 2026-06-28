@@ -504,7 +504,7 @@
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, feedingLogs: mockFeedingLogs } = await import(`${moduleBase}data/mockData.mjs`);
-        const { formatDuration, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const { formatDuration, formatDurationBetween, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
@@ -773,7 +773,10 @@
             const durationValue = Number(durationInput.value);
             const usesAmount = ["bottle", "formula", "solid"].includes(state.feedingType);
             const usesDuration = ["breast", "bottle"].includes(state.feedingType);
-            const endedAt = usesDuration && durationValue > 0
+            const exactTimerMs = state.feedingType === "breast" ? Math.max(0, Math.round(timer.elapsedMs || 0)) : 0;
+            const endedAt = exactTimerMs > 0
+                ? new Date(new Date(startedAt).getTime() + exactTimerMs).toISOString()
+                : usesDuration && durationValue > 0
                 ? new Date(new Date(startedAt).getTime() + durationValue * 60000).toISOString()
                 : undefined;
             if ((amountInput.value && (!Number.isFinite(amountValue) || amountValue <= 0)) || (durationInput.value && (!Number.isFinite(durationValue) || durationValue <= 0))) {
@@ -862,10 +865,12 @@
                 ? `${log.amountGrams} g`
                 : log.amountMl
                     ? `${log.amountMl} ml`
+                    : log.type === "breast" && log.endedAt
+                        ? formatDurationBetween(log.startedAt, log.endedAt)
                     : log.durationMinutes
                         ? formatDuration(log.durationMinutes)
-                        : log.endedAt
-                            ? formatDuration(Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000))
+                    : log.endedAt
+                            ? formatDurationBetween(log.startedAt, log.endedAt)
                             : "Logged";
 
             return `

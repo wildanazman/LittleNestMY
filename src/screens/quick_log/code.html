@@ -474,7 +474,7 @@
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { saveGrowthRecordRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
-        const { formatDuration, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+        const { formatDuration, formatDurationBetween, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
         const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
@@ -643,7 +643,7 @@
                     at: log.startedAt,
                     icon: "restaurant",
                     title: `Feeding (${labelFeedingType(log.type)})`,
-                    detail: [log.amountMl ? `${log.amountMl}ml` : "", log.durationMinutes ? formatDuration(log.durationMinutes) : "", formatRelativeTime(log.startedAt, now)].filter(Boolean).join(" - ")
+                    detail: [feedingLogAmount(log), formatRelativeTime(log.startedAt, now)].filter(Boolean).join(" - ")
                 })),
                 ...logs.sleepLogs.map((log) => ({
                     at: log.startedAt,
@@ -710,6 +710,15 @@
         function durationMinutes(startedAt, endedAt) {
             if (!startedAt || !endedAt) return 0;
             return Math.max(0, Math.round((new Date(endedAt) - new Date(startedAt)) / 60000));
+        }
+
+        function feedingLogAmount(log) {
+            if (log.amountMl) return `${log.amountMl}ml`;
+            if (log.amountGrams) return `${log.amountGrams}g`;
+            if (log.type === "breast" && log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
+            if (log.durationMinutes) return formatDuration(log.durationMinutes);
+            if (log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
+            return "";
         }
 
         function labelFeedingType(type) {
