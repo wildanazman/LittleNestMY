@@ -26,8 +26,10 @@ jobs:
           APP_URL: ${{ vars.APP_URL || 'https://littlenestmy.com' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          code=$(curl -sS -o /tmp/body.txt -w "%{http_code}" \
-            -X POST "$APP_URL/api/cron-pump-reminders" \
+          # Trailing slash avoids the trailingSlash 308 redirect; -L follows it
+          # anyway as a safety net (308 preserves POST method + body).
+          code=$(curl -sSL -o /tmp/body.txt -w "%{http_code}" \
+            -X POST "$APP_URL/api/cron-pump-reminders/" \
             -H "Authorization: Bearer $CRON_SECRET")
           echo "HTTP $code"
           cat /tmp/body.txt
