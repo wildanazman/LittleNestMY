@@ -1,6 +1,5 @@
-// Home background preference. The actual visuals live as CSS classes
-// (.home-bg-<id>) scoped to .home-premium-bg in the home screen; this module
-// just stores the choice and toggles the class on <body>.
+// App background preference. The actual visuals live as CSS classes
+// (.home-bg-<id>) in theme.css and are also reused by the home screen.
 
 const KEY = "littlenest:homeBackground";
 

@@ -1,3 +1,5 @@
+import { applyHomeBackground } from "./homeBackground.mjs";
+
 const themeKey = "littlenest:theme";
 const allowedThemes = new Set(["light", "dark", "system"]);
 
@@ -45,6 +47,7 @@ export function watchSystemTheme() {
 }
 
 applyTheme();
+applyHomeBackground();
 watchSystemTheme();
 lockViewportZoom();
 
