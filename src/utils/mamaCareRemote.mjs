@@ -9,11 +9,19 @@ const mamaCareTables = {
   recoveryNotes: "mama_recovery_notes"
 };
 
+const mamaCareKeys = {
+  checkins: "littlenest:mamaCheckins",
+  supportTasks: "littlenest:mamaSupportTasks",
+  medications: "littlenest:mamaMedications",
+  appointments: "littlenest:mamaAppointments",
+  recoveryNotes: "littlenest:mamaRecoveryNotes"
+};
+
 export async function loadMamaCareData(babyId) {
-  const empty = emptyMamaCareData();
-  if (!babyId) return { ...empty, error: "Create a baby profile first to use Mama Care." };
-  if (!isSupabaseConfigured) return { ...empty, error: supabaseConfigMessage };
-  if (!(await getAuthSession())) return { ...empty, error: "Please log in to sync Mama Care." };
+  const local = loadMamaCareDataLocal(babyId);
+  if (!babyId) return { ...local, error: "Create a baby profile first to use Mama Care." };
+  if (!isSupabaseConfigured) return { ...local, error: supabaseConfigMessage };
+  if (!(await getAuthSession())) return { ...local, error: "Please log in to sync Mama Care." };
 
   try {
     const [checkins, supportTasks, medications, appointments, recoveryNotes] = await Promise.all([
@@ -24,7 +32,7 @@ export async function loadMamaCareData(babyId) {
       fetchTable(mamaCareTables.recoveryNotes, babyId, "note_date", false)
     ]);
 
-    return {
+    const remote = {
       checkins: checkins.map(fromCheckinRow),
       supportTasks: supportTasks.map(fromSupportTaskRow),
       medications: medications.map(fromMedicationRow),
@@ -32,9 +40,22 @@ export async function loadMamaCareData(babyId) {
       recoveryNotes: recoveryNotes.map(fromRecoveryNoteRow),
       error: ""
     };
+    cacheMamaCareData(remote);
+    return remote;
   } catch (error) {
-    return { ...empty, error: friendlyError(error, "load Mama Care data").message };
+    return { ...local, error: friendlyError(error, "load Mama Care data").message };
   }
+}
+
+export function loadMamaCareDataLocal(babyId) {
+  return {
+    checkins: forBaby(readJson(mamaCareKeys.checkins, []), babyId),
+    supportTasks: forBaby(readJson(mamaCareKeys.supportTasks, []), babyId),
+    medications: forBaby(readJson(mamaCareKeys.medications, []), babyId),
+    appointments: forBaby(readJson(mamaCareKeys.appointments, []), babyId),
+    recoveryNotes: forBaby(readJson(mamaCareKeys.recoveryNotes, []), babyId),
+    error: ""
+  };
 }
 
 export async function saveMamaCheckin(checkin) {
@@ -46,7 +67,7 @@ export async function saveMamaCheckin(checkin) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save Mama check-in");
-  return fromCheckinRow(data);
+  return saveLocal(mamaCareKeys.checkins, fromCheckinRow(data));
 }
 
 export async function saveMamaSupportTask(task) {
@@ -57,7 +78,7 @@ export async function saveMamaSupportTask(task) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save support task");
-  return fromSupportTaskRow(data);
+  return saveLocal(mamaCareKeys.supportTasks, fromSupportTaskRow(data));
 }
 
 export async function updateMamaSupportTaskStatus(taskId, status) {
@@ -73,10 +94,11 @@ export async function updateMamaSupportTaskStatus(taskId, status) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "update support task");
-  return fromSupportTaskRow(data);
+  return saveLocal(mamaCareKeys.supportTasks, fromSupportTaskRow(data));
 }
 
 export async function deleteMamaSupportTask(taskId) {
+  deleteLocal(mamaCareKeys.supportTasks, taskId);
   return deleteById(mamaCareTables.supportTasks, taskId, "delete support task");
 }
 
@@ -88,7 +110,7 @@ export async function saveMamaMedication(medication) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save medication");
-  return fromMedicationRow(data);
+  return saveLocal(mamaCareKeys.medications, fromMedicationRow(data));
 }
 
 export async function updateMamaMedicationStatus(medicationId, status) {
@@ -99,10 +121,11 @@ export async function updateMamaMedicationStatus(medicationId, status) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "update medication");
-  return fromMedicationRow(data);
+  return saveLocal(mamaCareKeys.medications, fromMedicationRow(data));
 }
 
 export async function deleteMamaMedication(medicationId) {
+  deleteLocal(mamaCareKeys.medications, medicationId);
   return deleteById(mamaCareTables.medications, medicationId, "delete medication");
 }
 
@@ -114,10 +137,11 @@ export async function saveMamaAppointment(appointment) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save appointment");
-  return fromAppointmentRow(data);
+  return saveLocal(mamaCareKeys.appointments, fromAppointmentRow(data));
 }
 
 export async function deleteMamaAppointment(appointmentId) {
+  deleteLocal(mamaCareKeys.appointments, appointmentId);
   return deleteById(mamaCareTables.appointments, appointmentId, "delete appointment");
 }
 
@@ -129,10 +153,11 @@ export async function saveMamaRecoveryNote(note) {
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save recovery note");
-  return fromRecoveryNoteRow(data);
+  return saveLocal(mamaCareKeys.recoveryNotes, fromRecoveryNoteRow(data));
 }
 
 export async function deleteMamaRecoveryNote(noteId) {
+  deleteLocal(mamaCareKeys.recoveryNotes, noteId);
   return deleteById(mamaCareTables.recoveryNotes, noteId, "delete recovery note");
 }
 
@@ -154,6 +179,51 @@ async function fetchTable(table, babyId, orderColumn, ascending) {
     .order(orderColumn, { ascending, nullsFirst: false });
   if (error) throw error;
   return data || [];
+}
+
+function cacheMamaCareData(data) {
+  writeBabyItems(mamaCareKeys.checkins, data.checkins);
+  writeBabyItems(mamaCareKeys.supportTasks, data.supportTasks);
+  writeBabyItems(mamaCareKeys.medications, data.medications);
+  writeBabyItems(mamaCareKeys.appointments, data.appointments);
+  writeBabyItems(mamaCareKeys.recoveryNotes, data.recoveryNotes);
+}
+
+function writeBabyItems(key, nextItems) {
+  const babyIds = new Set((nextItems || []).map((item) => item.babyId));
+  const existing = readJson(key, []).filter((item) => !babyIds.has(item.babyId));
+  writeJson(key, [...(nextItems || []), ...existing]);
+}
+
+function saveLocal(key, item) {
+  const items = readJson(key, []);
+  writeJson(key, [item, ...items.filter((entry) => entry.id !== item.id)]);
+  return item;
+}
+
+function deleteLocal(key, id) {
+  writeJson(key, readJson(key, []).filter((item) => item.id !== id));
+}
+
+function forBaby(items, babyId) {
+  return babyId ? (items || []).filter((item) => item.babyId === babyId) : [];
+}
+
+function readJson(key, fallback) {
+  try {
+    const value = window.localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeJson(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Local storage can be unavailable in restricted browser contexts.
+  }
 }
 
 async function deleteById(table, id, action) {

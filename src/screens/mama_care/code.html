@@ -17,7 +17,6 @@
 <title>Mama Care - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script>
 tailwind.config = {
@@ -53,14 +52,15 @@ tailwind.config = {
     font-variant-numeric: tabular-nums;
     -webkit-tap-highlight-color: transparent;
     background:
-      radial-gradient(circle at 16% 6%, rgba(247, 232, 237, .72), transparent 30%),
-      radial-gradient(circle at 86% 18%, rgba(238, 231, 216, .44), transparent 34%),
-      linear-gradient(180deg, #fffaf8 0%, #fbf7f4 52%, #f5eee9 100%);
+      radial-gradient(760px 520px at 96% -10%, rgba(155, 124, 255, 0.24), transparent 66%),
+      radial-gradient(620px 460px at -8% 28%, rgba(255, 159, 200, 0.20), transparent 70%),
+      radial-gradient(620px 480px at 88% 92%, rgba(132, 204, 255, 0.16), transparent 72%),
+      linear-gradient(180deg, #fbf9ff 0%, #f7f3ff 52%, #fff8fc 100%);
   }
   /* Premium display font on headings (cohesive with the rest of the app). */
-  h1, h2, h3 { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
+  h1, h2, h3 { font-family: "Nunito Sans", sans-serif; letter-spacing: 0; text-wrap: balance; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .soft-shadow { box-shadow: 0 18px 44px rgba(82, 54, 44, 0.08), inset 0 1px 0 rgba(255,255,255,.82); }
+  .soft-shadow { box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,.82); }
   .mama-topbar {
     top: max(10px, env(safe-area-inset-top));
     width: calc(100% - 28px);
@@ -68,20 +68,27 @@ tailwind.config = {
     margin: 0 auto;
     border: 1px solid rgba(255,255,255,.78);
     border-radius: 999px;
-    background: rgba(255,250,248,.9);
-    box-shadow: 0 16px 42px rgba(82,54,44,.08), inset 0 1px 0 rgba(255,255,255,.86);
+    background: rgba(255,255,255,.82);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,.86);
   }
   .mama-card {
-    background: rgba(255,255,255,.86);
+    background: rgba(255,255,255,.82);
     border: 1px solid rgba(255,255,255,.78);
-    box-shadow: 0 18px 44px rgba(82,54,44,.08), inset 0 1px 0 rgba(255,255,255,.82);
+    box-shadow: 0 14px 34px rgba(0,0,0,.075), inset 0 1px 0 rgba(255,255,255,.82);
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
   }
   .mama-card-inner {
     border: 1px solid rgba(38,25,28,.06);
     background: rgba(255,255,255,.68);
   }
-  .mama-action { transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms ease, color 180ms ease, box-shadow 180ms ease; }
-  .mama-action:active { transform: scale(.97); }
+  .mama-action {
+    touch-action: manipulation;
+    transition-property: transform, background-color, color, box-shadow, border-color, opacity;
+    transition-duration: 150ms, 180ms, 180ms, 180ms, 180ms, 150ms;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1), ease, ease, ease, ease, ease;
+  }
+  .mama-action:active { transform: scale(.96); }
   @media (hover: hover) and (pointer: fine) {
     .mama-action:hover { transform: translateY(-1px); }
   }
@@ -95,11 +102,34 @@ tailwind.config = {
   .mama-collapsible.is-collapsed .mama-collapse-body { display: none; }
   .mama-collapsible.is-collapsed { padding-top: 18px; padding-bottom: 18px; }
   .mama-hero {
-    background: linear-gradient(145deg, rgba(255,250,248,.94), rgba(247,232,237,.74));
+    background:
+      radial-gradient(240px 170px at 100% 0%, rgba(155,124,255,.18), transparent 70%),
+      linear-gradient(145deg, rgba(255,255,255,.90), rgba(248,244,255,.72));
   }
   .mama-stat {
     background: rgba(255,255,255,.72);
     border: 1px solid rgba(255,255,255,.74);
+  }
+  .mama-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .mama-quick-tile {
+    min-height: 82px;
+    border-radius: 22px;
+    background: rgba(255,255,255,.64);
+    border: 1px solid rgba(255,255,255,.76);
+    color: #7056f4;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.78);
+  }
+  .mama-quick-tile.is-primary {
+    background: linear-gradient(145deg, #9b7cff, #7056f4);
+    color: #fff;
+    box-shadow: 0 10px 18px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.22);
+  }
+  .mama-care-rings {
+    contain: layout paint;
   }
   .mama-bottom-nav {
     width: calc(100% - 28px);
@@ -109,17 +139,25 @@ tailwind.config = {
     bottom: max(10px, env(safe-area-inset-bottom));
     border: 1px solid rgba(255,255,255,.78);
     border-radius: 28px;
-    box-shadow: 0 18px 44px rgba(82,54,44,.12), inset 0 1px 0 rgba(255,255,255,.86);
+    box-shadow: 0 14px 34px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.86);
   }
   .mama-skeleton { border-radius: 26px; background: linear-gradient(90deg, rgba(252,228,236,.75), rgba(255,255,255,.92), rgba(252,228,236,.75)); background-size: 200% 100%; animation: mamaSkeletonPulse 1.4s cubic-bezier(.23,1,.32,1) infinite; }
   @keyframes mamaSkeletonPulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-  :root.dark body { background: #1f1a1a; color: #fff7ed; }
-  :root.dark .mama-card { background: #2d2425; border-color: rgba(255,255,255,.10); }
-  :root.dark .mama-topbar, :root.dark .mama-bottom-nav { background: rgba(45,36,37,.92); border-color: rgba(255,255,255,.10); }
+  :root.dark body {
+    background:
+      radial-gradient(780px 560px at 92% -12%, rgba(124,108,255,.24), transparent 62%),
+      radial-gradient(680px 520px at 0% 92%, rgba(34,211,238,.13), transparent 68%),
+      linear-gradient(178deg, #10142b 0%, #090d1d 100%);
+    color: #eef6ff;
+  }
+  :root.dark .mama-card { background: rgba(18,27,45,.82); border-color: rgba(214,204,255,.13); }
+  :root.dark .mama-topbar, :root.dark .mama-bottom-nav { background: rgba(18,27,45,.88); border-color: rgba(214,204,255,.13); }
   :root.dark .mama-card-inner, :root.dark .mama-stat { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.08); }
   :root.dark .mama-input { background: #1f1a1a; color: #fff7ed; border-color: rgba(255,255,255,.12); -webkit-text-fill-color: #fff7ed; }
   :root.dark .mama-input::placeholder { color: rgba(255,247,237,.55); -webkit-text-fill-color: rgba(255,247,237,.55); }
   :root.dark .mama-skeleton { background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08)); background-size: 200% 100%; }
+  :root.dark .mama-quick-tile { background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.08); color: #d6ccff; }
+  :root.dark .mama-quick-tile.is-primary { background: linear-gradient(145deg, #7c5cff, #22d3ee); color: #07111f; }
   :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="time"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.35); }
@@ -175,28 +213,28 @@ tailwind.config = {
       <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Quick Log</p>
       <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">Add what happened now</h2>
     </div>
-    <div class="grid grid-cols-3 gap-2">
-      <button class="mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
+    <div class="mama-quick-grid">
+      <button class="mama-action mama-quick-tile is-primary p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
         <span class="material-symbols-outlined">favorite</span>
         <span class="text-[12px]">Check-in</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickPumpButton" type="button">
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
         <span class="material-symbols-outlined">water_drop</span>
         <span class="text-[12px]">Pump</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMilkButton" type="button">
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMilkButton" type="button">
         <span class="material-symbols-outlined">inventory_2</span>
         <span class="text-[12px]">Milk</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMedButton" type="button">
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMedButton" type="button">
         <span class="material-symbols-outlined">pill</span>
         <span class="text-[12px]">Meds</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickTaskButton" type="button">
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickTaskButton" type="button">
         <span class="material-symbols-outlined">volunteer_activism</span>
         <span class="text-[12px]">Help</span>
       </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickNoteButton" type="button">
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickNoteButton" type="button">
         <span class="material-symbols-outlined">edit_note</span>
         <span class="text-[12px]">Note</span>
       </button>
@@ -474,6 +512,7 @@ const {
   deleteMamaRecoveryNote,
   deleteMamaSupportTask,
   loadMamaCareData,
+  loadMamaCareDataLocal,
   saveMamaAppointment,
   saveMamaCheckin,
   saveMamaMedication,
@@ -487,6 +526,7 @@ const {
   deletePumpSchedule,
   deletePumpSession,
   loadPumpingCareData,
+  loadPumpingCareDataLocal,
   saveMilkStorage,
   savePumpPart,
   savePumpSchedule,
@@ -501,6 +541,8 @@ let selectedBabyId = "";
 let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
 let mamaData = emptyMamaData();
 let pumpingData = emptyPumpingData();
+let remoteRefreshInFlight = false;
+let collapsiblesAutoExpanded = false;
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
@@ -574,17 +616,26 @@ async function bootstrap() {
       button.classList.add("opacity-60");
     });
   }
-  await refreshMamaCare();
+  mamaData = loadMamaCareDataLocal(selectedBabyId);
+  pumpingData = loadPumpingCareDataLocal(selectedBabyId);
+  renderAll();
   showMamaContent();
+  refreshMamaCare({ background: true });
 }
 
-async function refreshMamaCare() {
-  [mamaData, pumpingData] = await Promise.all([
-    loadMamaCareData(selectedBabyId),
-    loadPumpingCareData(selectedBabyId)
-  ]);
-  if (mamaData.error) showFeedback(mamaData.error, true);
-  if (pumpingData.error) showFeedback(pumpingData.error, true);
+async function refreshMamaCare({ background = false } = {}) {
+  if (remoteRefreshInFlight) return;
+  remoteRefreshInFlight = true;
+  try {
+    [mamaData, pumpingData] = await Promise.all([
+      loadMamaCareData(selectedBabyId),
+      loadPumpingCareData(selectedBabyId)
+    ]);
+  } finally {
+    remoteRefreshInFlight = false;
+  }
+  if (mamaData.error && (!background || !hasMamaData(mamaData))) showFeedback(mamaData.error, true);
+  if (pumpingData.error && (!background || !hasPumpingData(pumpingData))) showFeedback(pumpingData.error, true);
   renderAll();
 }
 
@@ -599,7 +650,6 @@ function renderAll() {
   syncCollapsibles();
 }
 
-let collapsiblesAutoExpanded = false;
 function syncCollapsibles() {
   // First render only: auto-expand a section that already has content, so nothing
   // meaningful is hidden; empty sections stay collapsed to keep the page calm.
@@ -676,6 +726,7 @@ function renderPumpingModule() {
   document.getElementById("pumpLongest").textContent = formatMinutes(longest);
   document.getElementById("storedMilkTotal").textContent = formatMilk(storedMl);
   document.getElementById("storedMilkMeta").textContent = `${activeStorage.length} container${activeStorage.length === 1 ? "" : "s"} · ${Math.floor(storedMl / 720)} days supply`;
+  if (document.getElementById("pumpingModule")?.classList.contains("hidden")) return;
   renderFifo(activeStorage);
   renderMilkStorageInventory(activeStorage);
   renderPumpAlerts(activeStorage);
@@ -1556,7 +1607,7 @@ function careRings({ water, meals, rest }) {
       </div>`;
   }).join("");
   return `
-    <div class="flex items-center gap-5">
+    <div class="mama-care-rings flex items-center gap-5">
       <div class="relative shrink-0" style="width:120px;height:120px">
         <svg viewBox="0 0 120 120" width="120" height="120">${ringSvg}</svg>
       </div>
@@ -1769,6 +1820,14 @@ function emptyMamaData() {
 
 function emptyPumpingData() {
   return { sessions: [], schedules: [], storage: [], parts: [], error: "" };
+}
+
+function hasMamaData(data) {
+  return Boolean(data?.checkins?.length || data?.supportTasks?.length || data?.medications?.length || data?.appointments?.length || data?.recoveryNotes?.length);
+}
+
+function hasPumpingData(data) {
+  return Boolean(data?.sessions?.length || data?.schedules?.length || data?.storage?.length || data?.parts?.length);
 }
 
 function escapeHtml(value) {

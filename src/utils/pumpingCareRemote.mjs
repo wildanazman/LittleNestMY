@@ -16,7 +16,7 @@ const tables = {
 };
 
 export async function loadPumpingCareData(babyId) {
-  const local = getLocalPumpingData(babyId);
+  const local = loadPumpingCareDataLocal(babyId);
   if (!babyId || !isSupabaseConfigured || !(await getAuthSession())) return local;
   try {
     const [sessions, schedules, storage, parts] = await Promise.all([
@@ -37,6 +37,10 @@ export async function loadPumpingCareData(babyId) {
   } catch (error) {
     return { ...local, error: friendlyError(error).message };
   }
+}
+
+export function loadPumpingCareDataLocal(babyId) {
+  return getLocalPumpingData(babyId);
 }
 
 export async function savePumpSession(session) {
