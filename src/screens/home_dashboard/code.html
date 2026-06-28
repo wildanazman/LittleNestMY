@@ -499,6 +499,102 @@
           border: 1px solid rgba(255, 255, 255, 0.72);
           box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.74);
         }
+        .home-vaccine-card {
+          position: relative;
+          isolation: isolate;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.72);
+          background:
+            linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.50)),
+            rgba(255, 255, 255, 0.60);
+          box-shadow: 0 24px 62px rgba(112, 86, 244, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(18px) saturate(1.18);
+          -webkit-backdrop-filter: blur(18px) saturate(1.18);
+          transition: transform 180ms cubic-bezier(.23,1,.32,1), box-shadow 180ms cubic-bezier(.23,1,.32,1);
+        }
+        .home-vaccine-card::before {
+          content: "";
+          position: absolute;
+          inset: 1px;
+          z-index: -1;
+          border-radius: 27px;
+          background:
+            radial-gradient(150px 120px at 90% 0%, rgba(155, 124, 255, 0.25), transparent 72%),
+            radial-gradient(180px 140px at 4% 100%, rgba(255, 159, 200, 0.15), transparent 76%);
+          pointer-events: none;
+        }
+        .home-vaccine-card:active { transform: scale(.985); }
+        @media (hover: hover) and (pointer: fine) {
+          .home-vaccine-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 28px 70px rgba(112, 86, 244, 0.17), inset 0 1px 0 rgba(255,255,255,.92);
+          }
+        }
+        .home-vaccine-icon {
+          background: linear-gradient(145deg, rgba(155, 124, 255, 0.20), rgba(112, 86, 244, 0.10));
+          color: #7056f4;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.84), 0 10px 24px rgba(112,86,244,.14);
+        }
+        .home-vaccine-status {
+          background: rgba(112, 86, 244, 0.10);
+          color: #7056f4;
+          border: 1px solid rgba(112, 86, 244, 0.14);
+        }
+        .home-vaccine-status.is-overdue {
+          background: rgba(225, 79, 104, 0.11);
+          color: #b6425b;
+          border-color: rgba(225, 79, 104, 0.18);
+        }
+        .home-vaccine-status.is-complete {
+          background: rgba(63, 143, 104, 0.11);
+          color: #3f8f68;
+          border-color: rgba(63, 143, 104, 0.18);
+        }
+        .home-vaccine-progress {
+          background: rgba(112, 86, 244, 0.10);
+          box-shadow: inset 0 1px 1px rgba(76, 52, 141, 0.08);
+        }
+        .home-vaccine-progress > div {
+          background: linear-gradient(90deg, #9b7cff, #7056f4);
+          box-shadow: 0 8px 18px rgba(112, 86, 244, 0.22);
+        }
+        :root.dark .home-vaccine-card {
+          background:
+            linear-gradient(145deg, rgba(18, 27, 45, 0.90), rgba(18, 22, 45, 0.74)),
+            rgba(18, 27, 45, 0.78) !important;
+          border-color: rgba(214, 204, 255, 0.14) !important;
+          box-shadow: 0 24px 62px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+        :root.dark #homeContent .home-vaccine-card {
+          border-color: rgba(214, 204, 255, 0.14) !important;
+        }
+        :root.dark .home-vaccine-card::before {
+          background:
+            radial-gradient(150px 120px at 90% 0%, rgba(214, 204, 255, 0.16), transparent 72%),
+            radial-gradient(180px 140px at 4% 100%, rgba(34, 211, 238, 0.10), transparent 76%);
+        }
+        :root.dark .home-vaccine-icon {
+          background: rgba(214, 204, 255, 0.12) !important;
+          color: #d6ccff !important;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.24);
+        }
+        :root.dark .home-vaccine-status {
+          background: rgba(214, 204, 255, 0.10) !important;
+          color: #d6ccff !important;
+          border-color: rgba(214, 204, 255, 0.16) !important;
+        }
+        :root.dark .home-vaccine-status.is-overdue {
+          background: rgba(251, 113, 133, 0.12) !important;
+          color: #fda4af !important;
+          border-color: rgba(251, 113, 133, 0.18) !important;
+        }
+        :root.dark .home-vaccine-status.is-complete {
+          background: rgba(134, 239, 172, 0.12) !important;
+          color: #86efac !important;
+          border-color: rgba(134, 239, 172, 0.18) !important;
+        }
+        :root.dark .home-vaccine-progress { background: rgba(214, 204, 255, 0.12) !important; }
+        :root.dark .home-vaccine-progress > div { background: linear-gradient(90deg, #7c5cff, #d6ccff) !important; }
         @keyframes homeSkeletonPulse {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
@@ -733,19 +829,30 @@
 </section>
 <!-- Vaccinations Card -->
 <section id="reminderSection">
-<div class="home-pressable rounded-[28px] p-4 soft-shadow relative overflow-hidden cursor-pointer active:scale-[0.99]" style="background:linear-gradient(150deg,#83533c,#b8795f)" data-screen-target="vaccinations" role="button" tabindex="0" aria-label="Open vaccinations">
-<div class="absolute right-[-10px] top-[-10px] opacity-15 rotate-12"><span class="material-symbols-outlined text-[110px] text-white">vaccines</span></div>
-<div class="flex items-center justify-between gap-2 mb-3 relative z-10">
-<div class="flex items-center gap-2">
-<span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center"><span class="material-symbols-outlined text-[18px] text-white" style="font-variation-settings:'FILL' 1;">vaccines</span></span>
-<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/85">Vaccinations</p>
+<div class="home-pressable home-vaccine-card rounded-[28px] p-4 cursor-pointer" data-screen-target="vaccinations" role="button" tabindex="0" aria-label="Open vaccinations">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="home-vaccine-icon w-12 h-12 rounded-[18px] flex items-center justify-center shrink-0" aria-hidden="true">
+<span class="material-symbols-outlined text-[25px]" style="font-variation-settings:'FILL' 1;">vaccines</span>
+</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 mb-1">
+<p class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-[#7056f4] dark:text-[#d6ccff]">Vaccinations</p>
+<span class="home-vaccine-status rounded-full px-2.5 py-1 text-[11px] font-extrabold leading-none" id="vaccHomeStatus">Checking</span>
 </div>
-<span class="material-symbols-outlined text-white/70 text-[20px]">chevron_right</span>
+<p class="font-headline-md text-headline-md text-on-surface leading-snug" id="vaccHeadline">Loading schedule...</p>
 </div>
-<p class="text-white font-bold text-[15px] leading-snug relative z-10 mb-3" id="vaccHeadline">Loading schedule...</p>
-<div class="relative z-10">
-<div class="h-2 w-full rounded-full bg-white/25 overflow-hidden"><div id="vaccHomeBar" class="h-full rounded-full bg-white transition-[width] duration-300 ease-[cubic-bezier(.23,1,.32,1)]" style="width:0%"></div></div>
-<p class="text-white/80 text-[11px] mt-1.5" id="vaccHomeSub"></p>
+</div>
+<span class="w-9 h-9 rounded-full bg-white/60 dark:bg-white/10 text-[#7056f4] dark:text-[#d6ccff] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</span>
+</div>
+<div class="mt-4">
+<div class="home-vaccine-progress h-2.5 w-full rounded-full overflow-hidden"><div id="vaccHomeBar" class="h-full rounded-full transition-[width] duration-300 ease-[cubic-bezier(.23,1,.32,1)]" style="width:0%"></div></div>
+<div class="flex items-center justify-between gap-3 mt-2">
+<p class="text-[12px] font-bold text-on-surface-variant" id="vaccHomeSub"></p>
+<p class="text-[12px] font-bold text-[#7056f4] dark:text-[#d6ccff]">Open schedule</p>
+</div>
 </div>
 </div>
 </section>
@@ -1430,11 +1537,18 @@
 
         // Vaccination card: next-due NIP dose + progress, computed from DOB.
         async function renderReminderBanner() {
-            if (!selectedBaby) return;
             const headlineEl = document.getElementById("vaccHeadline");
             const barEl = document.getElementById("vaccHomeBar");
             const subEl = document.getElementById("vaccHomeSub");
+            const statusEl = document.getElementById("vaccHomeStatus");
             if (!headlineEl || !barEl || !subEl) return;
+            if (!selectedBaby) {
+                headlineEl.textContent = "Add a baby profile to track vaccine timing.";
+                subEl.textContent = "NIP progress will appear here";
+                barEl.style.width = "0%";
+                if (statusEl) statusEl.textContent = "Setup";
+                return;
+            }
 
             const dob = selectedBaby.dateOfBirth || selectedBaby.dob || "";
             let region = "peninsular";
@@ -1451,15 +1565,24 @@
             const pct = s.total ? Math.round((s.done / s.total) * 100) : 0;
             barEl.style.width = `${pct}%`;
             subEl.textContent = `${s.done} of ${s.total} done`;
+            statusEl?.classList.remove("is-overdue", "is-complete");
 
             if (s.overdue > 0) {
                 const nd = V.nextDue(plan.nip);
                 headlineEl.textContent = `${s.overdue} vaccine${s.overdue === 1 ? "" : "s"} overdue${nd ? ` - ${nd.vaccine} needs catching up.` : "."}`;
+                if (statusEl) {
+                    statusEl.textContent = "Overdue";
+                    statusEl.classList.add("is-overdue");
+                }
             } else {
                 const nd = V.nextDue(plan.nip);
                 headlineEl.textContent = nd
                     ? `Next: ${nd.vaccine}${nd.dose ? ` (${nd.dose})` : ""} - due ${formatVaccDate(nd.dueDate)}.`
-                    : "All NIP vaccines done. 🎉";
+                    : "All NIP vaccines done.";
+                if (statusEl) {
+                    statusEl.textContent = nd ? "Next dose" : "Complete";
+                    if (!nd) statusEl.classList.add("is-complete");
+                }
             }
         }
 
