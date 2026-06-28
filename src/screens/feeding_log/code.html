@@ -138,8 +138,9 @@
             box-shadow: 0 10px 28px rgba(103, 78, 87, 0.07);
         }
         .feeding-type-tile {
-            min-width: 108px;
-            min-height: 102px;
+            min-width: 92px;
+            min-height: 56px;
+            padding: 0 20px;
             border: 2px solid transparent;
             box-shadow: 0 12px 26px rgba(216, 201, 194, 0.056);
             transition: transform 150ms var(--ln-ease-out), background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
@@ -311,22 +312,10 @@
 <h2 class="font-label-md text-label-md text-on-surface-variant px-1 uppercase tracking-wide">Feeding Type</h2>
 <div class="-mx-container-padding px-container-padding overflow-x-auto pb-2 hide-scrollbar">
 <div class="flex gap-gutter min-w-max">
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="breast" type="button" aria-label="Breast feeding">
-<span class="material-symbols-outlined text-[36px]">child_care</span>
-<span class="font-body-lg text-body-lg">Breast</span>
-</button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="bottle" type="button" aria-label="Bottle feeding">
-<span class="material-symbols-outlined text-[36px]">local_drink</span>
-<span class="font-body-lg text-body-lg">Bottle</span>
-</button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="formula" type="button" aria-label="Formula feeding">
-<span class="material-symbols-outlined text-[36px]">blender</span>
-<span class="font-body-lg text-body-lg">Formula</span>
-</button>
-<button class="feeding-type-tile rounded-[28px] bg-[#FFF0F5] flex flex-col items-center justify-center gap-3 text-on-surface-variant" data-feeding-type="solid" type="button" aria-label="Solid feeding">
-<span class="material-symbols-outlined text-[36px]">restaurant</span>
-<span class="font-body-lg text-body-lg">Solid</span>
-</button>
+<button class="feeding-type-tile rounded-full bg-[#FFF0F5] flex items-center justify-center text-on-surface-variant font-body-lg text-body-lg" data-feeding-type="breast" type="button">Breast</button>
+<button class="feeding-type-tile rounded-full bg-[#FFF0F5] flex items-center justify-center text-on-surface-variant font-body-lg text-body-lg" data-feeding-type="bottle" type="button">Bottle</button>
+<button class="feeding-type-tile rounded-full bg-[#FFF0F5] flex items-center justify-center text-on-surface-variant font-body-lg text-body-lg" data-feeding-type="formula" type="button">Formula</button>
+<button class="feeding-type-tile rounded-full bg-[#FFF0F5] flex items-center justify-center text-on-surface-variant font-body-lg text-body-lg" data-feeding-type="solid" type="button">Solid</button>
 </div>
 </div>
 <div class="hidden" id="active-indicator"></div>
@@ -351,8 +340,20 @@
 </div>
 </div>
 
+<div class="space-y-sm hidden" id="breastTimerField">
+<label class="block text-center font-label-md text-label-md text-on-surface uppercase tracking-wide">Breastfeeding timer</label>
+<div class="rounded-[24px] bg-surface-container-low p-5 flex flex-col items-center gap-4 border border-outline-variant/30">
+<p class="text-[56px] leading-none font-extrabold text-primary tabular-nums" id="breastTimerDisplay">00:00</p>
+<div class="flex items-center gap-3">
+<button class="feeding-pressable h-12 px-7 rounded-full bg-primary text-on-primary font-headline-md text-[18px] font-extrabold flex items-center gap-2" id="breastTimerToggle" type="button"><span class="material-symbols-outlined text-[20px]">play_arrow</span><span id="breastTimerToggleLabel">Start</span></button>
+<button class="feeding-pressable h-12 px-5 rounded-full bg-surface-container text-on-surface-variant font-headline-md text-[16px] font-bold" id="breastTimerReset" type="button">Reset</button>
+</div>
+<p class="font-body-md text-label-sm text-on-surface-variant text-center">Start stamps the feed time. Or enter minutes below.</p>
+</div>
+</div>
+
 <div class="space-y-sm" id="durationField">
-<label class="font-label-md text-label-md text-on-surface-variant px-1">Duration</label>
+<label class="font-label-md text-label-md text-on-surface-variant px-1">Minutes</label>
 <div class="relative">
 <input class="w-full h-14 bg-surface-container-low border-none rounded-2xl px-4 font-headline-md text-headline-md text-on-surface placeholder:text-outline-variant" id="durationInput" min="0" placeholder="15" type="number" inputmode="numeric"/>
 <span class="absolute right-4 top-1/2 -translate-y-1/2 font-label-md text-on-surface-variant">min</span>
@@ -515,6 +516,12 @@
         const amountUnit = document.getElementById("amountUnit");
         const durationField = document.getElementById("durationField");
         const durationInput = document.getElementById("durationInput");
+        const breastTimerField = document.getElementById("breastTimerField");
+        const breastTimerDisplay = document.getElementById("breastTimerDisplay");
+        const breastTimerToggle = document.getElementById("breastTimerToggle");
+        const breastTimerToggleLabel = document.getElementById("breastTimerToggleLabel");
+        const breastTimerReset = document.getElementById("breastTimerReset");
+        const timer = { running: false, elapsedMs: 0, startMs: 0, intervalId: null };
         const dateInput = document.getElementById("dateInput");
         const timeInput = document.getElementById("timeInput");
         const noteInput = document.getElementById("noteInput");
@@ -545,6 +552,8 @@
         });
         amountInput.addEventListener("input", updatePresetState);
         formulaBrandInput.addEventListener("input", () => state.brand = formulaBrandInput.value.trim());
+        breastTimerToggle.addEventListener("click", toggleBreastTimer);
+        breastTimerReset.addEventListener("click", resetBreastTimer);
 
         // Formula brand chips + sheet
         const ALL_FORMULA_BRANDS = ["Similac / Gain Plus (Abbott)","Enfalac / Enfagrow A+ (Mead Johnson)","Frisolac / Frisogrow (Friso)","S-26 Gold / Promil Gold (Wyeth)","Nestlé NAN Pro / Supremepro","Mamil Gold / Dumex Dugro","Anmum Infacare / Essential","Karihome (Goat Milk)","AptaGro (Aptamil)","Fernleaf / Fernleaf Formulated Milk Powder","Morinaga Chil-mil / Chil-kid","Lactogen / Lactogrow (Nestlé)","Bellamy's Organic","Novalac (Standard & Speciality formulas)","Wyeth SMA Nutrition"];
@@ -665,6 +674,9 @@
 
             amountField.classList.toggle("hidden", !usesAmount);
             durationField.classList.toggle("hidden", !usesDuration);
+            const usesTimer = state.feedingType === "breast";
+            breastTimerField.classList.toggle("hidden", !usesTimer);
+            if (!usesTimer && timer.running) pauseBreastTimer();
             formulaBrandField.classList.toggle("hidden", state.feedingType !== "formula");
             amountUnit.textContent = state.feedingType === "solid" ? "g" : "ml";
             amountInput.placeholder = state.feedingType === "solid" ? "45" : "120";
@@ -679,8 +691,71 @@
             updatePresetState();
         }
 
+        function toggleBreastTimer() {
+            if (timer.running) pauseBreastTimer();
+            else startBreastTimer();
+        }
+
+        function startBreastTimer() {
+            // First start of a fresh session stamps the feed's start time to now.
+            if (timer.elapsedMs === 0) {
+                dateInput.value = getCurrentDateValue();
+                timeInput.value = getCurrentTimeValue();
+            }
+            timer.running = true;
+            timer.startMs = Date.now() - timer.elapsedMs;
+            timer.intervalId = setInterval(tickBreastTimer, 1000);
+            breastTimerToggleLabel.textContent = "Pause";
+            breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "pause";
+        }
+
+        function pauseBreastTimer() {
+            timer.running = false;
+            if (timer.intervalId) clearInterval(timer.intervalId);
+            timer.intervalId = null;
+            timer.elapsedMs = Date.now() - timer.startMs;
+            syncDurationFromTimer();
+            breastTimerToggleLabel.textContent = timer.elapsedMs > 0 ? "Resume" : "Start";
+            breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "play_arrow";
+        }
+
+        function resetBreastTimer() {
+            if (timer.intervalId) clearInterval(timer.intervalId);
+            timer.running = false;
+            timer.intervalId = null;
+            timer.elapsedMs = 0;
+            timer.startMs = 0;
+            renderBreastTimer(0);
+            durationInput.value = "";
+            breastTimerToggleLabel.textContent = "Start";
+            breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "play_arrow";
+        }
+
+        function tickBreastTimer() {
+            const elapsed = Date.now() - timer.startMs;
+            renderBreastTimer(elapsed);
+            syncDurationFromTimer(elapsed);
+        }
+
+        function syncDurationFromTimer(elapsedMs = timer.elapsedMs) {
+            const minutes = Math.round(elapsedMs / 60000);
+            durationInput.value = minutes > 0 ? String(minutes) : "";
+        }
+
+        function renderBreastTimer(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const pad = (n) => String(n).padStart(2, "0");
+            breastTimerDisplay.textContent = hours > 0
+                ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+                : `${pad(minutes)}:${pad(seconds)}`;
+        }
+
         async function saveEntry() {
             if (state.isSaving) return;
+            if (timer.running) pauseBreastTimer(); // capture final minutes from a live session
             state.isSaving = true;
             saveButton.disabled = true;
             saveButton.classList.add("opacity-70");
@@ -724,6 +799,7 @@
             amountInput.value = "";
             durationInput.value = "";
             noteInput.value = "";
+            resetBreastTimer();
             formulaBrandInput.value = "";
             state.brand = "";
             dateInput.value = getCurrentDateValue();
