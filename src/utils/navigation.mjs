@@ -149,9 +149,9 @@ function ensureNavigationStyles() {
       justify-content: space-around !important;
       gap: 0.2rem !important;
       border-radius: 9999px !important;
-      border: 1px solid rgba(124, 92, 255, 0.12) !important;
-      background: rgba(255, 255, 255, 0.74) !important;
-      box-shadow: 0 18px 46px rgba(124, 92, 255, 0.16), inset 0 1px 0 rgba(255,255,255,.82) !important;
+      border: 1px solid var(--ln-nav-border, rgba(124, 92, 255, 0.12)) !important;
+      background: var(--ln-nav-surface, rgba(255, 255, 255, 0.74)) !important;
+      box-shadow: 0 18px 46px var(--ln-nav-shadow, rgba(124, 92, 255, 0.16)), inset 0 1px 0 rgba(255,255,255,.82) !important;
       backdrop-filter: blur(22px) saturate(1.35) !important;
       -webkit-backdrop-filter: blur(22px) saturate(1.35) !important;
       z-index: 9999 !important;
@@ -196,9 +196,10 @@ function ensureNavigationStyles() {
     }
     nav.fixed .nav-tab-active {
       outline: 0;
-      background: rgba(124, 92, 255, 0.14) !important;
-      border-color: rgba(124, 92, 255, 0.12) !important;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 20px rgba(124,92,255,.12) !important;
+      background: rgb(var(--ln-nav-accent-rgb, 112 86 244) / 0.14) !important;
+      color: var(--ln-nav-accent, #7056f4) !important;
+      border-color: rgb(var(--ln-nav-accent-rgb, 112 86 244) / 0.16) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 8px 20px rgb(var(--ln-nav-accent-rgb, 112 86 244) / 0.12) !important;
     }
   `;
   document.head.appendChild(style);
@@ -410,8 +411,8 @@ function normalizeNavItem(item, key, isActive) {
     item.style.maxWidth = "64px";
     item.style.height = "64px";
     item.style.marginTop = "-28px";
-    item.style.background = "linear-gradient(145deg, #9b7cff, #7056f4)";
-    item.style.boxShadow = "0 16px 32px rgba(124, 92, 255, 0.34)";
+    item.style.background = "linear-gradient(145deg, var(--ln-nav-accent-2, #9b7cff), var(--ln-nav-accent, #7056f4))";
+    item.style.boxShadow = "0 16px 32px rgb(var(--ln-nav-accent-rgb, 112 86 244) / 0.34)";
   }
 
   const icon = item.querySelector(".material-symbols-outlined");
