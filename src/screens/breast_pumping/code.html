@@ -750,7 +750,7 @@ function renderPumpAlerts(activeStorage) {
 }
 
 function renderPumpSchedules(sessionsToday) {
-  const schedules = [...pumpingData.schedules].filter((item) => item.active !== false).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
+  const schedules = [...pumpingData.schedules].filter((item) => item.active !== false && !item.reminderAt).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
   const list = document.getElementById("pumpScheduleList");
   if (!schedules.length) {
     list.innerHTML = emptyState("schedule", "No pump schedule yet.", "Use Smart schedule or add your preferred pump times.");
@@ -1666,6 +1666,25 @@ function writeManualNextPump(value) {
   manualNextPump = value;
   renderNextPumpReminderUI();
   updateNextPumpDisplay();
+  syncNextPumpServerReminder(value);
+}
+// Mirror the one-off reminder to the server as a one-off schedule so the push
+// cron can deliver it even when the app is closed (cleared when off/past).
+async function syncNextPumpServerReminder(value) {
+  if (!selectedBabyId) return;
+  const id = `nextpump-${selectedBabyId}`;
+  try {
+    const at = value?.at ? new Date(value.at) : null;
+    const future = at && !Number.isNaN(at.getTime()) && at.getTime() > Date.now();
+    if (value && value.remind && future) {
+      const pumpTime = `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
+      await savePumpSchedule({ id, babyId: selectedBabyId, pumpTime, label: "Next session", active: true, reminderAt: at.toISOString() });
+    } else {
+      await deletePumpSchedule(id);
+    }
+  } catch {
+    // Best-effort; the local reminder still works when the app is open.
+  }
 }
 function getManualNextDate() {
   if (!manualNextPump?.at) return null;
@@ -1752,7 +1771,7 @@ async function fireLocalPumpReminder() {
 }
 
 function getNextPumpSession() {
-  const schedules = pumpingData.schedules.filter((item) => item.active !== false).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
+  const schedules = pumpingData.schedules.filter((item) => item.active !== false && !item.reminderAt).sort((a, b) => a.pumpTime.localeCompare(b.pumpTime));
   if (!schedules.length) return null;
   const now = new Date();
   const candidates = schedules.map((schedule) => {

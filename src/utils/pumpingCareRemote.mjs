@@ -200,7 +200,8 @@ function toScheduleRow(schedule) {
     pump_time: schedule.pumpTime,
     label: clean(schedule.label),
     active: schedule.active !== false,
-    skipped_dates: schedule.skippedDates || []
+    skipped_dates: schedule.skippedDates || [],
+    reminder_at: schedule.reminderAt || null
   };
 }
 
@@ -212,6 +213,7 @@ function fromScheduleRow(row) {
     label: row.label || "",
     active: row.active !== false,
     skippedDates: row.skipped_dates || [],
+    reminderAt: row.reminder_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };

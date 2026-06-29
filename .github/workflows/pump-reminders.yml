@@ -1,0 +1,37 @@
+# Free scheduler for pump reminders: GitHub pings the pump-reminder endpoint
+# every ~15 min so reminders fire at each scheduled / next-session time even when
+# the app is closed. The endpoint decides who is due and sends the web push.
+#
+# Setup (one time):
+#   1. Set CRON_SECRET in the Vercel project env.
+#   2. Add a GitHub repo secret named CRON_SECRET with the SAME value
+#      (Settings -> Secrets and variables -> Actions -> New repository secret).
+#   3. (Optional) Add a repo variable APP_URL to override the default domain.
+#
+# Note: GitHub's scheduled runs can be delayed under load; timing is best-effort,
+# which is fine for reminders. Scheduled workflows only run on the default branch.
+name: Pump reminders
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {} # allows a manual run from the Actions tab to test
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger pump reminder cron
+        env:
+          APP_URL: ${{ vars.APP_URL || 'https://littlenestmy.com' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          # Trailing slash avoids the trailingSlash 308 redirect; -L follows it
+          # anyway as a safety net (308 preserves POST method + body).
+          code=$(curl -sSL -o /tmp/body.txt -w "%{http_code}" \
+            -X POST "$APP_URL/api/cron-pump-reminders/" \
+            -H "Authorization: Bearer $CRON_SECRET")
+          echo "HTTP $code"
+          cat /tmp/body.txt
+          # Fail the run on a non-2xx so failures are visible in the Actions tab.
+          [ "$code" -ge 200 ] && [ "$code" -lt 300 ]

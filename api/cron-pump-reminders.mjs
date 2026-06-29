@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
     const { data: schedules } = await service
       .from("mama_pump_schedules")
-      .select("id, baby_id, pump_time, label, active, skipped_dates")
+      .select("id, baby_id, pump_time, label, active, skipped_dates, reminder_at")
       .in("baby_id", babyIds)
       .eq("active", true);
     if (!schedules?.length) return done(res, { users: userIds.length, babies: babyIds.length, pushes: 0 });
@@ -69,9 +69,27 @@ export default async function handler(req, res) {
       sessionMinsByBaby.get(s.baby_id).push(localMin);
     }
 
-    // baby_id -> list of due schedules right now.
+    // baby_id -> list of due schedules right now. One-off reminders
+    // (reminder_at set) are matched against an absolute time and deactivated
+    // after firing so they only push once.
+    const nowMs = nowMy.getTime() - 8 * 3600000; // real UTC "now" in ms
     const dueByBaby = new Map();
+    const oneOffToClear = [];
     for (const schedule of schedules) {
+      if (schedule.reminder_at) {
+        const at = new Date(schedule.reminder_at).getTime();
+        if (Number.isNaN(at)) continue;
+        const elapsedMs = nowMs - at;
+        if (elapsedMs < 0) continue;                       // not due yet
+        if (elapsedMs >= WINDOW_MINUTES * 60000) {         // missed window → clear stale
+          oneOffToClear.push(schedule.id);
+          continue;
+        }
+        oneOffToClear.push(schedule.id);                   // due → fire once, then clear
+        if (!dueByBaby.has(schedule.baby_id)) dueByBaby.set(schedule.baby_id, []);
+        dueByBaby.get(schedule.baby_id).push(schedule);
+        continue;
+      }
       const pumpMin = pumpTimeToMinutes(schedule.pump_time);
       if (pumpMin == null) continue;
       const elapsed = nowMin - pumpMin;
@@ -82,6 +100,10 @@ export default async function handler(req, res) {
       if (alreadyPumped) continue;
       if (!dueByBaby.has(schedule.baby_id)) dueByBaby.set(schedule.baby_id, []);
       dueByBaby.get(schedule.baby_id).push(schedule);
+    }
+    // Deactivate one-off reminders we've handled so they never repeat.
+    if (oneOffToClear.length) {
+      await service.from("mama_pump_schedules").update({ active: false }).in("id", oneOffToClear);
     }
     if (!dueByBaby.size) return done(res, { users: userIds.length, babies: babyIds.length, pushes: 0 });
 
