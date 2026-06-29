@@ -262,6 +262,11 @@
             #0b0e14 !important;
         }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        html, body { overflow-x: hidden; }
+        body {
+          -webkit-font-smoothing: antialiased;
+          text-rendering: optimizeLegibility;
+        }
         .soft-shadow { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.78); }
         .timeline-line { background: linear-gradient(to bottom, rgba(124,92,255,0.28), rgba(124,92,255,0.12)); }
         .home-skeleton-block {
@@ -352,7 +357,7 @@
           position: absolute !important;
           left: 62px !important;
           right: 62px !important;
-          top: calc(50% + 1px) !important;
+          top: 50% !important;
           z-index: 4 !important;
           width: auto !important;
           max-width: none !important;
@@ -361,7 +366,7 @@
           text-align: center !important;
           pointer-events: none !important;
           font-size: 1.18rem !important;
-          line-height: 1.28 !important;
+          line-height: 1.36 !important;
           font-weight: 800 !important;
         }
         #homeContent main {
@@ -531,57 +536,79 @@
           border: 1px solid rgba(255,255,255,.82) !important;
           box-shadow: 0 8px 18px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255,255,255,.82) !important;
         }
+        #homeContent #activeStatusCard > .flex > div:first-child {
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.72), 0 7px 14px rgba(0,0,0,.07);
+        }
+        #homeContent #activeStatusCard[data-screen-target="diaper_log"] > .flex > div:first-child {
+          background: linear-gradient(145deg, rgba(220, 252, 231, .96), rgba(187, 247, 208, .72)) !important;
+          color: #15803d !important;
+        }
+        #homeContent #activeStatusCard[data-screen-target="feeding_log"] > .flex > div:first-child {
+          background: linear-gradient(145deg, rgba(255, 237, 213, .96), rgba(254, 215, 170, .72)) !important;
+          color: #c2410c !important;
+        }
+        #homeContent #activeStatusCard[data-screen-target="sleep_log"] > .flex > div:first-child {
+          background: linear-gradient(145deg, rgba(224, 242, 254, .96), rgba(186, 230, 253, .72)) !important;
+          color: #0369a1 !important;
+        }
         #homeContent #activeStatusCard #activeStatusLabel::before {
           content: "Next up · ";
           color: #7056f4;
           font-weight: 900;
         }
         #homeContent #statusGridSection {
-          margin-top: -6px;
+          margin-top: 2px;
         }
         #homeContent #statusGridSection > .flex p {
           display: none;
         }
         #homeContent #statusGridSection .grid {
-          grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-          gap: 8px !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 9px !important;
         }
         #homeContent .dashboard-stat-card {
-          min-height: 82px !important;
-          padding: 10px 8px !important;
-          border-radius: 20px !important;
-          justify-content: center !important;
+          min-height: 92px !important;
+          padding: 10px 11px !important;
+          border-radius: 22px !important;
+          justify-content: space-between !important;
           box-shadow:
             0 0 0 1px rgba(255, 255, 255, 0.68),
             0 6px 12px rgba(0, 0, 0, 0.06),
             inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
         }
         #homeContent .dashboard-stat-label {
-          display: flex !important;
-          flex-direction: column;
-          gap: 3px;
+          display: grid !important;
+          grid-template-columns: 28px minmax(0, 1fr);
+          gap: 7px;
           align-items: center;
-          text-align: center;
-          font-size: 11px !important;
-          line-height: 1.15 !important;
+          text-align: left;
+          font-size: 11.5px !important;
+          line-height: 1.18 !important;
         }
         #homeContent .dashboard-stat-label .material-symbols-outlined {
-          width: auto !important;
-          height: auto !important;
-          border-radius: 0 !important;
-          box-shadow: none !important;
-          font-size: 18px !important;
+          width: 28px !important;
+          height: 28px !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 12px !important;
+          background: rgba(255,255,255,.58);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.68) !important;
+          font-size: 17px !important;
         }
         #homeContent .dashboard-stat-value {
-          font-size: clamp(.92rem, 3.7vw, 1.06rem) !important;
-          line-height: 1.18 !important;
-          text-align: center;
-          padding-bottom: 2px;
+          font-size: clamp(1.02rem, 4.55vw, 1.22rem) !important;
+          line-height: 1.24 !important;
+          text-align: left;
+          padding-bottom: 3px;
+          white-space: normal !important;
+          overflow-wrap: anywhere;
         }
         #homeContent .dashboard-stat-detail {
           min-height: 0;
-          font-size: 10.5px !important;
-          text-align: center;
+          font-size: 11px !important;
+          line-height: 1.2 !important;
+          text-align: left;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
