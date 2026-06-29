@@ -59,7 +59,9 @@ export function loadMamaCareDataLocal(babyId) {
 }
 
 export async function saveMamaCheckin(checkin) {
-  const session = await requireSession();
+  const session = await getWritableSession();
+  const local = normalizeLocalCheckin(checkin);
+  if (!session) return saveLocal(mamaCareKeys.checkins, local);
   const row = toCheckinRow(checkin, session.user.id);
   const { data, error } = await supabase
     .from(mamaCareTables.checkins)
@@ -71,21 +73,27 @@ export async function saveMamaCheckin(checkin) {
 }
 
 export async function saveMamaSupportTask(task) {
-  const session = await requireSession();
+  const session = await getWritableSession();
+  const local = normalizeLocalSupportTask(task);
+  if (!session) return saveLocal(mamaCareKeys.supportTasks, local);
+  const remoteTask = task.id && !isRemoteId(task.id) ? { ...task, id: "" } : task;
   const { data, error } = await supabase
     .from(mamaCareTables.supportTasks)
-    .upsert(toSupportTaskRow(task, session.user.id), { onConflict: "id" })
+    .upsert(toSupportTaskRow(remoteTask, session.user.id), { onConflict: "id" })
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save support task");
+  if (task.id && !isRemoteId(task.id)) deleteLocal(mamaCareKeys.supportTasks, task.id);
   return saveLocal(mamaCareKeys.supportTasks, fromSupportTaskRow(data));
 }
 
 export async function updateMamaSupportTaskStatus(taskId, status) {
+  const session = await getWritableSession();
+  if (!session || !isRemoteId(taskId)) return updateLocalStatus(mamaCareKeys.supportTasks, taskId, status);
   const updates = {
     status,
     completed_at: status === "pending" ? null : new Date().toISOString(),
-    completed_by: status === "pending" ? null : (await requireSession()).user.id
+    completed_by: status === "pending" ? null : session.user.id
   };
   const { data, error } = await supabase
     .from(mamaCareTables.supportTasks)
@@ -99,21 +107,28 @@ export async function updateMamaSupportTaskStatus(taskId, status) {
 
 export async function deleteMamaSupportTask(taskId) {
   deleteLocal(mamaCareKeys.supportTasks, taskId);
+  if (!(await getWritableSession()) || !isRemoteId(taskId)) return true;
   return deleteById(mamaCareTables.supportTasks, taskId, "delete support task");
 }
 
 export async function saveMamaMedication(medication) {
-  const session = await requireSession();
+  const session = await getWritableSession();
+  const local = normalizeLocalMedication(medication);
+  if (!session) return saveLocal(mamaCareKeys.medications, local);
+  const remoteMedication = medication.id && !isRemoteId(medication.id) ? { ...medication, id: "" } : medication;
   const { data, error } = await supabase
     .from(mamaCareTables.medications)
-    .upsert(toMedicationRow(medication, session.user.id), { onConflict: "id" })
+    .upsert(toMedicationRow(remoteMedication, session.user.id), { onConflict: "id" })
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save medication");
+  if (medication.id && !isRemoteId(medication.id)) deleteLocal(mamaCareKeys.medications, medication.id);
   return saveLocal(mamaCareKeys.medications, fromMedicationRow(data));
 }
 
 export async function updateMamaMedicationStatus(medicationId, status) {
+  const session = await getWritableSession();
+  if (!session || !isRemoteId(medicationId)) return updateLocalStatus(mamaCareKeys.medications, medicationId, status);
   const { data, error } = await supabase
     .from(mamaCareTables.medications)
     .update({ status })
@@ -126,38 +141,49 @@ export async function updateMamaMedicationStatus(medicationId, status) {
 
 export async function deleteMamaMedication(medicationId) {
   deleteLocal(mamaCareKeys.medications, medicationId);
+  if (!(await getWritableSession()) || !isRemoteId(medicationId)) return true;
   return deleteById(mamaCareTables.medications, medicationId, "delete medication");
 }
 
 export async function saveMamaAppointment(appointment) {
-  const session = await requireSession();
+  const session = await getWritableSession();
+  const local = normalizeLocalAppointment(appointment);
+  if (!session) return saveLocal(mamaCareKeys.appointments, local);
+  const remoteAppointment = appointment.id && !isRemoteId(appointment.id) ? { ...appointment, id: "" } : appointment;
   const { data, error } = await supabase
     .from(mamaCareTables.appointments)
-    .upsert(toAppointmentRow(appointment, session.user.id), { onConflict: "id" })
+    .upsert(toAppointmentRow(remoteAppointment, session.user.id), { onConflict: "id" })
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save appointment");
+  if (appointment.id && !isRemoteId(appointment.id)) deleteLocal(mamaCareKeys.appointments, appointment.id);
   return saveLocal(mamaCareKeys.appointments, fromAppointmentRow(data));
 }
 
 export async function deleteMamaAppointment(appointmentId) {
   deleteLocal(mamaCareKeys.appointments, appointmentId);
+  if (!(await getWritableSession()) || !isRemoteId(appointmentId)) return true;
   return deleteById(mamaCareTables.appointments, appointmentId, "delete appointment");
 }
 
 export async function saveMamaRecoveryNote(note) {
-  const session = await requireSession();
+  const session = await getWritableSession();
+  const local = normalizeLocalRecoveryNote(note);
+  if (!session) return saveLocal(mamaCareKeys.recoveryNotes, local);
+  const remoteNote = note.id && !isRemoteId(note.id) ? { ...note, id: "" } : note;
   const { data, error } = await supabase
     .from(mamaCareTables.recoveryNotes)
-    .upsert(toRecoveryNoteRow(note, session.user.id), { onConflict: "id" })
+    .upsert(toRecoveryNoteRow(remoteNote, session.user.id), { onConflict: "id" })
     .select("*")
     .single();
   if (error) throw friendlyError(error, "save recovery note");
+  if (note.id && !isRemoteId(note.id)) deleteLocal(mamaCareKeys.recoveryNotes, note.id);
   return saveLocal(mamaCareKeys.recoveryNotes, fromRecoveryNoteRow(data));
 }
 
 export async function deleteMamaRecoveryNote(noteId) {
   deleteLocal(mamaCareKeys.recoveryNotes, noteId);
+  if (!(await getWritableSession()) || !isRemoteId(noteId)) return true;
   return deleteById(mamaCareTables.recoveryNotes, noteId, "delete recovery note");
 }
 
@@ -205,6 +231,21 @@ function deleteLocal(key, id) {
   writeJson(key, readJson(key, []).filter((item) => item.id !== id));
 }
 
+function updateLocalStatus(key, id, status) {
+  const now = new Date().toISOString();
+  const items = readJson(key, []);
+  const updated = items.map((item) => item.id === id
+    ? {
+        ...item,
+        status,
+        completedAt: status === "pending" ? "" : now,
+        updatedAt: now
+      }
+    : item);
+  writeJson(key, updated);
+  return updated.find((item) => item.id === id) || null;
+}
+
 function forBaby(items, babyId) {
   return babyId ? (items || []).filter((item) => item.babyId === babyId) : [];
 }
@@ -230,6 +271,12 @@ async function deleteById(table, id, action) {
   await requireSession();
   const { error } = await supabase.from(table).delete().eq("id", id);
   if (error) throw friendlyError(error, action);
+}
+
+async function getWritableSession() {
+  if (!isSupabaseConfigured) return null;
+  const session = await getAuthSession();
+  return session?.user?.id ? session : null;
 }
 
 async function requireSession() {
@@ -380,6 +427,95 @@ function fromRecoveryNoteRow(row) {
     note: row.note || "",
     createdAt: row.created_at
   };
+}
+
+function normalizeLocalCheckin(checkin) {
+  const existing = readJson(mamaCareKeys.checkins, []).find((item) => item.babyId === checkin.babyId && item.checkinDate === checkin.checkinDate);
+  const now = new Date().toISOString();
+  return {
+    id: checkin.id || existing?.id || localId("checkin"),
+    babyId: checkin.babyId,
+    checkinDate: checkin.checkinDate,
+    mood: checkin.mood || "",
+    painLevel: checkin.painLevel ?? "",
+    bleeding: checkin.bleeding || "",
+    sleepHours: checkin.sleepHours ?? "",
+    waterCups: checkin.waterCups ?? "",
+    mealsCount: checkin.mealsCount ?? "",
+    breastfeedingComfort: checkin.breastfeedingComfort || "",
+    woundNote: checkin.woundNote || "",
+    toiletNote: checkin.toiletNote || "",
+    notes: checkin.notes || "",
+    createdAt: checkin.createdAt || existing?.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function normalizeLocalSupportTask(task) {
+  const now = new Date().toISOString();
+  return {
+    id: task.id || localId("task"),
+    babyId: task.babyId,
+    taskTitle: task.taskTitle || "",
+    taskDate: task.taskDate,
+    status: task.status || "pending",
+    completedBy: task.completedBy || "",
+    completedAt: task.completedAt || "",
+    notes: task.notes || "",
+    createdAt: task.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function normalizeLocalMedication(medication) {
+  const now = new Date().toISOString();
+  return {
+    id: medication.id || localId("med"),
+    babyId: medication.babyId,
+    medicationName: medication.medicationName || "",
+    dose: medication.dose || "",
+    medicationTime: medication.medicationTime || "",
+    status: medication.status || "pending",
+    notes: medication.notes || "",
+    createdAt: medication.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function normalizeLocalAppointment(appointment) {
+  const now = new Date().toISOString();
+  return {
+    id: appointment.id || localId("appt"),
+    babyId: appointment.babyId,
+    title: appointment.title || "",
+    appointmentTime: appointment.appointmentTime || "",
+    location: appointment.location || "",
+    notes: appointment.notes || "",
+    reminderEnabled: Boolean(appointment.reminderEnabled),
+    createdAt: appointment.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function normalizeLocalRecoveryNote(note) {
+  const now = new Date().toISOString();
+  return {
+    id: note.id || localId("note"),
+    babyId: note.babyId,
+    noteDate: note.noteDate,
+    noteType: note.noteType || "",
+    note: note.note || "",
+    createdAt: note.createdAt || now,
+    updatedAt: now
+  };
+}
+
+function localId(prefix) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function isRemoteId(id) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id || ""));
 }
 
 function nullableNumber(value) {

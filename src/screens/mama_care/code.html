@@ -115,18 +115,28 @@ tailwind.config = {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
   }
+  .mama-primary-action {
+    min-height: 76px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #9b7cff, #7056f4);
+    color: #fff;
+    box-shadow: 0 10px 18px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.22);
+  }
   .mama-quick-tile {
-    min-height: 82px;
-    border-radius: 22px;
+    min-height: 74px;
+    border-radius: 20px;
     background: rgba(255,255,255,.64);
     border: 1px solid rgba(255,255,255,.76);
     color: #7056f4;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.78);
   }
-  .mama-quick-tile.is-primary {
-    background: linear-gradient(145deg, #9b7cff, #7056f4);
-    color: #fff;
-    box-shadow: 0 10px 18px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.22);
+  .mama-more-panel summary::-webkit-details-marker { display: none; }
+  .mama-more-panel[open] .mama-more-chevron { transform: rotate(180deg); }
+  .mama-care-cta {
+    border-radius: 22px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.78);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.78);
   }
   .mama-care-rings {
     contain: layout paint;
@@ -156,8 +166,9 @@ tailwind.config = {
   :root.dark .mama-input { background: #1f1a1a; color: #fff7ed; border-color: rgba(255,255,255,.12); -webkit-text-fill-color: #fff7ed; }
   :root.dark .mama-input::placeholder { color: rgba(255,247,237,.55); -webkit-text-fill-color: rgba(255,247,237,.55); }
   :root.dark .mama-skeleton { background: linear-gradient(90deg, rgba(255,255,255,.08), rgba(255,255,255,.14), rgba(255,255,255,.08)); background-size: 200% 100%; }
+  :root.dark .mama-primary-action { background: linear-gradient(145deg, #7c5cff, #22d3ee); color: #07111f; }
   :root.dark .mama-quick-tile { background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.08); color: #d6ccff; }
-  :root.dark .mama-quick-tile.is-primary { background: linear-gradient(145deg, #7c5cff, #22d3ee); color: #07111f; }
+  :root.dark .mama-care-cta { background: rgba(255,255,255,.055); border-color: rgba(255,255,255,.08); }
   :root.dark input[type="date"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="time"]::-webkit-calendar-picker-indicator,
   :root.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.35); }
@@ -190,13 +201,16 @@ tailwind.config = {
 <header class="mama-topbar sticky z-40 px-3 h-14 flex items-center justify-between backdrop-blur-md">
   <div class="flex items-center gap-2 min-w-0">
   <button class="mama-action w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 shrink-0" id="backToBaby" type="button" aria-label="Back to baby dashboard">
-    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+    <span class="material-symbols-outlined text-[20px]" aria-hidden="true">arrow_back</span>
   </button>
   <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Mama Care</h1>
   </div>
-  <button class="mama-action w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95" data-screen-target="settings" type="button" aria-label="Open settings">
-    <span class="material-symbols-outlined">settings</span>
-  </button>
+  <div class="flex items-center gap-2">
+    <span class="inline-flex rounded-full bg-primary-container px-2.5 py-1 text-[10px] font-extrabold text-primary" id="syncStatusPill" aria-live="polite">Local</span>
+    <button class="mama-action w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95" data-screen-target="settings" type="button" aria-label="Open settings">
+      <span class="material-symbols-outlined" aria-hidden="true">settings</span>
+    </button>
+  </div>
 </header>
 
 <main class="max-w-md mx-auto px-5 pt-7 flex flex-col gap-5" id="mamaApp">
@@ -211,34 +225,45 @@ tailwind.config = {
   <section class="order-3 mama-card rounded-[30px] p-4 soft-shadow space-y-3">
     <div>
       <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Quick Log</p>
-      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">Add what happened now</h2>
+      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">Start with the next useful thing</h2>
     </div>
+    <button class="mama-action mama-primary-action w-full p-4 flex items-center justify-between gap-3 text-left font-extrabold" id="quickCheckinButton" type="button" aria-label="Log today's Mama check-in">
+      <span>
+        <span class="block text-[12px] opacity-85">Most useful now</span>
+        <span class="block text-[20px] leading-6">Log today's check-in</span>
+      </span>
+      <span class="material-symbols-outlined text-[28px]" aria-hidden="true">favorite</span>
+    </button>
     <div class="mama-quick-grid">
-      <button class="mama-action mama-quick-tile is-primary p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
-        <span class="material-symbols-outlined">favorite</span>
-        <span class="text-[12px]">Check-in</span>
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMedButton" type="button" aria-label="Add Mama medication">
+        <span class="material-symbols-outlined" aria-hidden="true">pill</span>
+        <span class="text-[12px]">Medication</span>
       </button>
-      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
-        <span class="material-symbols-outlined">water_drop</span>
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickTaskButton" type="button" aria-label="Add family support task">
+        <span class="material-symbols-outlined" aria-hidden="true">volunteer_activism</span>
+        <span class="text-[12px]">Support</span>
+      </button>
+      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button" aria-label="Open Breast Pumping">
+        <span class="material-symbols-outlined" aria-hidden="true">water_drop</span>
         <span class="text-[12px]">Pump</span>
       </button>
-      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMilkButton" type="button">
-        <span class="material-symbols-outlined">inventory_2</span>
-        <span class="text-[12px]">Milk</span>
-      </button>
-      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMedButton" type="button">
-        <span class="material-symbols-outlined">pill</span>
-        <span class="text-[12px]">Meds</span>
-      </button>
-      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickTaskButton" type="button">
-        <span class="material-symbols-outlined">volunteer_activism</span>
-        <span class="text-[12px]">Help</span>
-      </button>
-      <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickNoteButton" type="button">
-        <span class="material-symbols-outlined">edit_note</span>
-        <span class="text-[12px]">Note</span>
-      </button>
     </div>
+    <details class="mama-more-panel">
+      <summary class="mama-action h-11 rounded-full bg-white/60 px-4 text-primary font-extrabold flex items-center justify-center gap-1 cursor-pointer dark:bg-white/10">
+        <span>More actions</span>
+        <span class="material-symbols-outlined mama-more-chevron text-[20px]" aria-hidden="true">expand_more</span>
+      </summary>
+      <div class="grid grid-cols-2 gap-2 pt-3">
+        <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickMilkButton" type="button" aria-label="Open milk storage in Breast Pumping">
+          <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+          <span class="text-[12px]">Milk storage</span>
+        </button>
+        <button class="mama-action mama-quick-tile p-3 flex flex-col items-center justify-center gap-1 font-extrabold" id="quickNoteButton" type="button" aria-label="Add recovery note">
+          <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+          <span class="text-[12px]">Recovery note</span>
+        </button>
+      </div>
+    </details>
   </section>
 
   <section class="order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
@@ -248,7 +273,7 @@ tailwind.config = {
         <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="carePlanTitle">Start with a gentle check-in.</h2>
         <p class="text-[14px] leading-5 text-on-surface-variant" id="carePlanDetail">Mama Care will turn check-ins, meds, and appointments into practical next steps.</p>
       </div>
-      <span class="material-symbols-outlined text-primary text-[30px]">favorite</span>
+      <span class="material-symbols-outlined text-primary text-[30px]" aria-hidden="true">favorite</span>
     </div>
     <div class="hidden rounded-2xl bg-error-container p-3 text-error font-bold" id="carePlanAlert"></div>
     <div id="carePlanGoals"></div>
@@ -262,8 +287,8 @@ tailwind.config = {
         <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pumping has its own page</h2>
         <p class="text-[14px] leading-5 text-on-surface-variant">Log pump sessions, manage stored milk, check expiry, and plan work pumping without crowding Mama Care.</p>
       </div>
-      <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined">water_drop</span>
+      <span class="w-11 h-11 rounded-2xl bg-primary-container text-primary flex items-center justify-center shrink-0" aria-hidden="true">
+        <span class="material-symbols-outlined" aria-hidden="true">water_drop</span>
       </span>
     </div>
     <div class="grid grid-cols-3 gap-2">
@@ -372,22 +397,22 @@ tailwind.config = {
     </div>
     <div class="grid grid-cols-2 gap-3 mt-4">
       <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
-        <span class="material-symbols-outlined text-primary">sentiment_satisfied</span>
+        <span class="material-symbols-outlined text-primary" aria-hidden="true">sentiment_satisfied</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Mood</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="moodValue">Not checked</p>
       </div>
       <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
-        <span class="material-symbols-outlined text-primary">healing</span>
+        <span class="material-symbols-outlined text-primary" aria-hidden="true">healing</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Pain</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="painValue">Not logged</p>
       </div>
       <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
-        <span class="material-symbols-outlined text-primary">bedtime</span>
+        <span class="material-symbols-outlined text-primary" aria-hidden="true">bedtime</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Rest</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="restValue">Not logged</p>
       </div>
       <div class="mama-stat rounded-2xl p-3 text-center dark:bg-white/10">
-        <span class="material-symbols-outlined text-primary">pill</span>
+        <span class="material-symbols-outlined text-primary" aria-hidden="true">pill</span>
         <p class="text-[12px] font-bold text-on-primary-container/70">Meds</p>
         <p class="text-[17px] font-extrabold text-on-primary-container" id="medsValue">0/0</p>
       </div>
@@ -396,8 +421,8 @@ tailwind.config = {
 
   <section class="order-7 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-start justify-between gap-3">
-      <button class="mama-collapse-toggle flex flex-1 items-start gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
-        <span class="material-symbols-outlined mama-chevron text-on-surface-variant mt-1">expand_more</span>
+      <button class="mama-collapse-toggle flex flex-1 items-start gap-2 text-left" data-collapse-toggle data-collapse-label="Support checklist" type="button" aria-expanded="false" aria-label="Expand Support checklist">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant mt-1" aria-hidden="true">expand_more</span>
         <span>
           <span class="block text-[12px] font-extrabold uppercase tracking-wide text-primary">Family Help</span>
           <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Support checklist</span>
@@ -419,8 +444,8 @@ tailwind.config = {
 
   <section class="order-8 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between gap-3">
-      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
-        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle data-collapse-label="Medication" type="button" aria-expanded="false" aria-label="Expand Medication">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant" aria-hidden="true">expand_more</span>
         <span>
           <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Medication</span>
           <span class="block text-[14px] text-on-surface-variant" id="medicationSummary">No medication logged yet.</span>
@@ -433,8 +458,8 @@ tailwind.config = {
 
   <section class="order-9 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between gap-3">
-      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
-        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle data-collapse-label="Appointments" type="button" aria-expanded="false" aria-label="Expand Appointments">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant" aria-hidden="true">expand_more</span>
         <span>
           <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Appointments</span>
           <span class="block text-[14px] text-on-surface-variant" id="appointmentSummary">No appointments yet.</span>
@@ -447,8 +472,8 @@ tailwind.config = {
 
   <section class="order-10 mama-card mama-collapsible is-collapsed rounded-[30px] p-5 soft-shadow space-y-4">
     <div class="flex items-center justify-between gap-3">
-      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle type="button" aria-expanded="false">
-        <span class="material-symbols-outlined mama-chevron text-on-surface-variant">expand_more</span>
+      <button class="mama-collapse-toggle flex flex-1 items-center gap-2 text-left" data-collapse-toggle data-collapse-label="Notes" type="button" aria-expanded="false" aria-label="Expand Notes">
+        <span class="material-symbols-outlined mama-chevron text-on-surface-variant" aria-hidden="true">expand_more</span>
         <span>
           <span class="block text-[21px] leading-7 font-extrabold text-on-surface">Notes</span>
           <span class="block text-[14px] text-on-surface-variant" id="recoveryNoteSummary">Private notes for recovery changes and reminders.</span>
@@ -461,7 +486,7 @@ tailwind.config = {
 
   <section class="order-11 rounded-[30px] bg-[#fff1f1] border border-[#f3b3b3] p-5 dark:bg-[#3a2020] dark:border-[#ff9b9b]/30">
     <div class="flex items-start gap-3">
-      <span class="material-symbols-outlined text-error mt-1">info</span>
+      <span class="material-symbols-outlined text-error mt-1" aria-hidden="true">info</span>
       <p class="text-[16px] leading-7 text-error">For tracking and family support only. Contact your doctor, Klinik Kesihatan, or emergency care if Mama has heavy bleeding, fever, severe pain, bad-smelling discharge, chest pain, breathing difficulty, severe headache, or feels extremely overwhelmed.</p>
     </div>
   </section>
@@ -469,7 +494,7 @@ tailwind.config = {
 
 <main class="hidden max-w-md mx-auto px-5 pt-8 text-center space-y-4" id="noBabyState">
   <div class="mx-auto w-16 h-16 rounded-2xl bg-primary-container text-primary flex items-center justify-center">
-    <span class="material-symbols-outlined text-[34px]">favorite</span>
+    <span class="material-symbols-outlined text-[34px]" aria-hidden="true">favorite</span>
   </div>
   <h1 class="text-[24px] leading-8 font-extrabold text-on-surface">Create a baby profile first to use Mama Care.</h1>
   <button class="mama-action h-12 rounded-2xl bg-primary px-6 text-on-primary font-extrabold" id="noBabyBackButton" type="button">Back to Baby Dashboard</button>
@@ -483,7 +508,7 @@ tailwind.config = {
         <h2 class="text-[22px] leading-7 font-extrabold text-on-surface" id="modalTitle">Add record</h2>
       </div>
       <button class="mama-action w-10 h-10 rounded-2xl bg-surface-container text-primary flex items-center justify-center" id="closeModalButton" type="button" aria-label="Close">
-        <span class="material-symbols-outlined">close</span>
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
       </button>
     </div>
     <form class="space-y-3" id="mamaForm"></form>
@@ -589,7 +614,7 @@ document.querySelectorAll("[data-collapse-toggle]").forEach((toggle) => {
   toggle.addEventListener("click", () => {
     const section = toggle.closest(".mama-collapsible");
     const collapsed = section.classList.toggle("is-collapsed");
-    toggle.setAttribute("aria-expanded", String(!collapsed));
+    updateCollapseToggle(toggle, !collapsed);
   });
 });
 
@@ -620,12 +645,14 @@ async function bootstrap() {
   pumpingData = loadPumpingCareDataLocal(selectedBabyId);
   renderAll();
   showMamaContent();
+  setSyncStatus("Syncing...");
   refreshMamaCare({ background: true });
 }
 
 async function refreshMamaCare({ background = false } = {}) {
   if (remoteRefreshInFlight) return;
   remoteRefreshInFlight = true;
+  if (!background) setSyncStatus("Syncing...");
   try {
     [mamaData, pumpingData] = await Promise.all([
       loadMamaCareData(selectedBabyId),
@@ -636,6 +663,7 @@ async function refreshMamaCare({ background = false } = {}) {
   }
   if (mamaData.error && (!background || !hasMamaData(mamaData))) showFeedback(mamaData.error, true);
   if (pumpingData.error && (!background || !hasPumpingData(pumpingData))) showFeedback(pumpingData.error, true);
+  setSyncStatus(mamaData.error || pumpingData.error ? "Offline" : "Synced");
   renderAll();
 }
 
@@ -648,6 +676,7 @@ function renderAll() {
   renderAppointments();
   renderRecoveryNotes();
   syncCollapsibles();
+  decorateIcons();
 }
 
 function syncCollapsibles() {
@@ -660,15 +689,38 @@ function syncCollapsibles() {
     const section = listEl?.closest(".mama-collapsible");
     if (section && listEl && !listEl.querySelector(".mama-empty")) {
       section.classList.remove("is-collapsed");
-      section.querySelector("[data-collapse-toggle]")?.setAttribute("aria-expanded", "true");
+      const toggle = section.querySelector("[data-collapse-toggle]");
+      if (toggle) updateCollapseToggle(toggle, true);
     }
   });
+}
+
+function updateCollapseToggle(toggle, expanded) {
+  const label = toggle.dataset.collapseLabel || "section";
+  toggle.setAttribute("aria-expanded", String(expanded));
+  toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${label}`);
 }
 
 function showMamaContent() {
   document.getElementById("mamaLoadingState")?.classList.add("hidden");
   document.getElementById("noBabyState")?.classList.add("hidden");
   document.getElementById("mamaContent")?.classList.remove("hidden");
+}
+
+function setSyncStatus(label) {
+  const pill = document.getElementById("syncStatusPill");
+  if (!pill) return;
+  pill.textContent = label;
+  pill.classList.toggle("bg-error-container", label === "Offline");
+  pill.classList.toggle("text-error", label === "Offline");
+  pill.classList.toggle("bg-primary-container", label !== "Offline");
+  pill.classList.toggle("text-primary", label !== "Offline");
+}
+
+function decorateIcons() {
+  document.querySelectorAll(".material-symbols-outlined").forEach((icon) => {
+    icon.setAttribute("aria-hidden", "true");
+  });
 }
 
 function renderMamaCarePlan() {
@@ -1034,6 +1086,11 @@ async function handleActionButton(button) {
     if (action === "med-edit") return openMedicationForm(mamaData.medications.find((item) => item.id === id));
     if (action === "appointment-edit") return openAppointmentForm(mamaData.appointments.find((item) => item.id === id));
     if (action === "note-edit") return openNoteForm(mamaData.recoveryNotes.find((item) => item.id === id));
+    if (action === "open-checkin") return openCheckinForm();
+    if (action === "open-medication") return openMedicationForm();
+    if (action === "open-task") return openTaskForm();
+    if (action === "open-note") return openNoteForm();
+    if (action === "open-pumping") return goToScreen("breast_pumping");
     if (action === "task-template") {
       button.textContent = "Adding...";
       await createSupportTaskTemplate(button.dataset.template);
@@ -1041,13 +1098,25 @@ async function handleActionButton(button) {
     if (action === "task-done") await updateMamaSupportTaskStatus(id, "done");
     if (action === "task-skip") await updateMamaSupportTaskStatus(id, "skipped");
     if (action === "task-reset") await updateMamaSupportTaskStatus(id, "pending");
-    if (action === "task-delete") await deleteMamaSupportTask(id);
+    if (action === "task-delete") {
+      if (!confirm("Delete this support task?")) return;
+      await deleteMamaSupportTask(id);
+    }
     if (action === "med-taken") await updateMamaMedicationStatus(id, "taken");
     if (action === "med-skip") await updateMamaMedicationStatus(id, "skipped");
     if (action === "med-reset") await updateMamaMedicationStatus(id, "pending");
-    if (action === "med-delete") await deleteMamaMedication(id);
-    if (action === "appointment-delete") await deleteMamaAppointment(id);
-    if (action === "note-delete") await deleteMamaRecoveryNote(id);
+    if (action === "med-delete") {
+      if (!confirm("Delete this medication?")) return;
+      await deleteMamaMedication(id);
+    }
+    if (action === "appointment-delete") {
+      if (!confirm("Delete this appointment?")) return;
+      await deleteMamaAppointment(id);
+    }
+    if (action === "note-delete") {
+      if (!confirm("Delete this recovery note?")) return;
+      await deleteMamaRecoveryNote(id);
+    }
     if (action === "pump-complete") await quickCompletePumpSchedule(id);
     if (action === "pump-schedule-delete") await deletePumpSchedule(id);
     if (action === "pump-session-delete") await deletePumpSession(id);
@@ -1402,6 +1471,7 @@ function openModal(title, body, onSubmit) {
   };
   document.getElementById("mamaModal").classList.remove("hidden");
   document.getElementById("mamaModal").classList.add("flex");
+  decorateIcons();
 }
 
 function closeModal() {
@@ -1444,7 +1514,7 @@ function editButton(kind, id) {
 function emptyState(icon, title, detail) {
   return `
     <div class="mama-empty rounded-[22px] bg-surface-container-low p-5 text-center border border-primary-container/30">
-      <span class="material-symbols-outlined text-primary text-[32px]">${icon}</span>
+      <span class="material-symbols-outlined text-primary text-[32px]" aria-hidden="true">${icon}</span>
       <p class="mt-1 font-extrabold text-on-surface">${title}</p>
       <p class="text-[14px] leading-5 text-on-surface-variant">${detail}</p>
     </div>
@@ -1617,18 +1687,68 @@ function careRings({ water, meals, rest }) {
 
 function nextMamaAction({ checkin, nextMed, pendingTask, nextAppt }) {
   if (!checkin) {
-    return `<p class="font-extrabold text-on-surface">Next: Add today's check-in</p><p class="text-[13px] text-on-surface-variant">It takes under a minute and makes the rest of Mama Care smarter.</p>`;
+    return actionStrip({
+      title: "Next: add today's check-in",
+      detail: "One short check-in makes the rest of Mama Care smarter.",
+      primaryLabel: "Start check-in",
+      primaryAction: "open-checkin",
+      secondaryLabel: "Add medication",
+      secondaryAction: "open-medication"
+    });
   }
   if (nextMed) {
-    return `<p class="font-extrabold text-on-surface">Next medicine: ${escapeHtml(nextMed.medicationName)}</p><p class="text-[13px] text-on-surface-variant">${escapeHtml(nextMed.dose || "Dose not set")} at ${formatTime(nextMed.medicationTime)}</p>`;
+    return actionStrip({
+      title: `Next medicine: ${escapeHtml(nextMed.medicationName)}`,
+      detail: `${escapeHtml(nextMed.dose || "Dose not set")} at ${formatTime(nextMed.medicationTime)}`,
+      primaryLabel: "Mark taken",
+      primaryAction: "med-taken",
+      primaryId: nextMed.id,
+      secondaryLabel: "Edit meds",
+      secondaryAction: "open-medication"
+    });
   }
   if (pendingTask) {
-    return `<p class="font-extrabold text-on-surface">Next family help: ${escapeHtml(pendingTask.taskTitle)}</p><p class="text-[13px] text-on-surface-variant">${escapeHtml(pendingTask.notes || "Mark done when completed.")}</p>`;
+    return actionStrip({
+      title: `Next family help: ${escapeHtml(pendingTask.taskTitle)}`,
+      detail: escapeHtml(pendingTask.notes || "Mark done when completed."),
+      primaryLabel: "Mark done",
+      primaryAction: "task-done",
+      primaryId: pendingTask.id,
+      secondaryLabel: "Add support",
+      secondaryAction: "open-task"
+    });
   }
   if (nextAppt) {
-    return `<p class="font-extrabold text-on-surface">Next appointment: ${escapeHtml(nextAppt.title)}</p><p class="text-[13px] text-on-surface-variant">${formatDateTime(nextAppt.appointmentTime)}</p>`;
+    return actionStrip({
+      title: `Next appointment: ${escapeHtml(nextAppt.title)}`,
+      detail: formatDateTime(nextAppt.appointmentTime),
+      primaryLabel: "Add support",
+      primaryAction: "open-task",
+      secondaryLabel: "Open pumping",
+      secondaryAction: "open-pumping"
+    });
   }
-  return `<p class="font-extrabold text-on-surface">Next: keep today gentle</p><p class="text-[13px] text-on-surface-variant">No urgent Mama Care action is pending right now.</p>`;
+  return actionStrip({
+    title: "Next: keep today gentle",
+    detail: "No urgent Mama Care action is pending right now.",
+    primaryLabel: "Add support",
+    primaryAction: "open-task",
+    secondaryLabel: "Recovery note",
+    secondaryAction: "open-note"
+  });
+}
+
+function actionStrip({ title, detail, primaryLabel, primaryAction, primaryId = "", secondaryLabel, secondaryAction }) {
+  return `
+    <div class="mama-care-cta p-3">
+      <p class="font-extrabold text-on-surface">${title}</p>
+      <p class="mt-0.5 text-[13px] leading-5 text-on-surface-variant">${detail}</p>
+      ${permissions.canAddLogs ? `<div class="mt-3 flex gap-2">
+        <button class="mama-action min-h-11 flex-1 rounded-full bg-primary px-4 text-on-primary text-[14px] font-extrabold" data-action="${primaryAction}" ${primaryId ? `data-id="${primaryId}"` : ""} type="button">${primaryLabel}</button>
+        <button class="mama-action min-h-11 rounded-full bg-primary-container px-4 text-primary text-[14px] font-extrabold" data-action="${secondaryAction}" type="button">${secondaryLabel}</button>
+      </div>` : ""}
+    </div>
+  `;
 }
 
 function supportTaskTemplate(template) {
