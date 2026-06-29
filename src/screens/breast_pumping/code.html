@@ -242,6 +242,26 @@ tailwind.config = {
         </div>
         <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-primary font-extrabold dark:bg-white/10 dark:text-primary" data-action="pump-snooze" type="button">Snooze</button>
       </div>
+      <div class="mt-3 pt-3 border-t border-black/5 dark:border-white/10">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <p class="text-[13px] font-extrabold text-on-surface">Set next session</p>
+          <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+            <span class="text-[13px] font-bold text-on-surface-variant">Remind me</span>
+            <input type="checkbox" id="nextPumpRemind" class="w-5 h-5 accent-primary"/>
+          </label>
+        </div>
+        <div class="flex flex-wrap gap-2" id="nextPumpQuickRow">
+          <button class="mama-action h-9 rounded-full bg-white/80 px-3 text-primary font-extrabold text-[13px] dark:bg-white/10" data-next-in="120" type="button">in 2h</button>
+          <button class="mama-action h-9 rounded-full bg-white/80 px-3 text-primary font-extrabold text-[13px] dark:bg-white/10" data-next-in="150" type="button">in 2h 30m</button>
+          <button class="mama-action h-9 rounded-full bg-white/80 px-3 text-primary font-extrabold text-[13px] dark:bg-white/10" data-next-in="180" type="button">in 3h</button>
+          <label class="mama-action h-9 rounded-full bg-white/80 px-3 text-primary font-extrabold text-[13px] dark:bg-white/10 inline-flex items-center gap-1 cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">schedule</span>
+            <input type="time" id="nextPumpPickInput" class="bg-transparent border-0 p-0 text-[13px] font-extrabold text-primary focus:ring-0 w-[68px]"/>
+          </label>
+          <button class="mama-action h-9 rounded-full bg-white/80 px-3 text-on-surface-variant font-extrabold text-[13px] dark:bg-white/10 hidden" id="nextPumpClearBtn" type="button">Clear</button>
+        </div>
+        <p class="mt-2 text-[12px] leading-4 text-on-surface-variant" id="nextPumpReminderStatus"></p>
+      </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3">
@@ -466,6 +486,7 @@ let permissions = { role: "viewer", canAddLogs: false, canEditLogs: false };
 let mamaData = emptyMamaData();
 let pumpingData = emptyPumpingData();
 let nextPumpTimerId = null;
+let manualNextPump = null;
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
@@ -498,6 +519,13 @@ document.getElementById("quickMilkButton").addEventListener("click", () => openM
 document.getElementById("quickMedButton").addEventListener("click", () => openMedicationForm());
 document.getElementById("quickTaskButton").addEventListener("click", () => openTaskForm());
 document.getElementById("quickNoteButton").addEventListener("click", () => openNoteForm());
+document.getElementById("nextPumpQuickRow").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-next-in]");
+  if (button) setManualNextPumpInMinutes(Number(button.dataset.nextIn));
+});
+document.getElementById("nextPumpPickInput").addEventListener("change", (event) => setManualNextPumpFromTime(event.target.value));
+document.getElementById("nextPumpClearBtn").addEventListener("click", clearManualNextPump);
+document.getElementById("nextPumpRemind").addEventListener("change", onToggleNextPumpRemind);
 
 await bootstrap();
 bindPrototypeActions();
@@ -550,6 +578,8 @@ function showMamaContent() {
   document.getElementById("mamaLoadingState")?.classList.add("hidden");
   document.getElementById("noBabyState")?.classList.add("hidden");
   document.getElementById("mamaContent")?.classList.remove("hidden");
+  manualNextPump = readManualNextPump();
+  renderNextPumpReminderUI();
   startNextPumpTimer();
 }
 
@@ -1539,9 +1569,138 @@ function updateNextPumpDisplay() {
   const countdown = document.getElementById("nextPumpCountdown");
   const nextTime = document.getElementById("nextPumpTime");
   if (!countdown || !nextTime) return;
-  const next = getNextPumpSession();
-  countdown.textContent = next ? formatCountdown(next.date) : "No schedule";
-  nextTime.textContent = next ? `Scheduled for ${formatClock(next.schedule.pumpTime)}` : "Generate or add pump times.";
+  const scheduleNext = getNextPumpSession();
+  const manualDate = getManualNextDate();
+
+  // Fire the local reminder when a manual next-session time arrives (app open).
+  if (manualNextPump && manualNextPump.remind && !manualNextPump.fired && manualDate && manualDate <= new Date()) {
+    fireLocalPumpReminder();
+    writeManualNextPump({ ...manualNextPump, fired: true });
+    return;
+  }
+
+  let next = scheduleNext;
+  if (manualDate && manualDate > new Date() && (!scheduleNext || manualDate < scheduleNext.date)) {
+    next = { date: manualDate, manual: true };
+  }
+  if (!next) {
+    countdown.textContent = "No schedule";
+    nextTime.textContent = "Set a time or add pump times.";
+    return;
+  }
+  countdown.textContent = formatCountdown(next.date);
+  nextTime.textContent = next.manual
+    ? `Next session at ${formatTime(next.date)}`
+    : `Scheduled for ${formatClock(next.schedule.pumpTime)}`;
+}
+
+// ---- Simple next-session reminder (stored locally per baby) ----
+function manualNextPumpKey() {
+  return `littlenest:nextPump:${selectedBabyId || "default"}`;
+}
+function readManualNextPump() {
+  try {
+    const raw = localStorage.getItem(manualNextPumpKey());
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.at ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+function writeManualNextPump(value) {
+  try {
+    if (value) localStorage.setItem(manualNextPumpKey(), JSON.stringify(value));
+    else localStorage.removeItem(manualNextPumpKey());
+  } catch {
+    // Storage may be unavailable (private mode); keep the in-memory value.
+  }
+  manualNextPump = value;
+  renderNextPumpReminderUI();
+  updateNextPumpDisplay();
+}
+function getManualNextDate() {
+  if (!manualNextPump?.at) return null;
+  const date = new Date(manualNextPump.at);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+function setManualNextPumpInMinutes(minutes) {
+  const at = new Date(Date.now() + minutes * 60000).toISOString();
+  const remind = document.getElementById("nextPumpRemind")?.checked || false;
+  writeManualNextPump({ at, remind, fired: false });
+  showFeedback(`Next session set for ${formatTime(at)}.`);
+}
+function setManualNextPumpFromTime(value) {
+  if (!value) return;
+  const [hours, minutes] = value.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours || 0, minutes || 0, 0, 0);
+  if (date <= new Date()) date.setDate(date.getDate() + 1); // next occurrence
+  const remind = document.getElementById("nextPumpRemind")?.checked || false;
+  writeManualNextPump({ at: date.toISOString(), remind, fired: false });
+  showFeedback(`Next session set for ${formatTime(date)}.`);
+}
+function clearManualNextPump() {
+  const pick = document.getElementById("nextPumpPickInput");
+  if (pick) pick.value = "";
+  writeManualNextPump(null);
+}
+async function onToggleNextPumpRemind(event) {
+  const on = event.target.checked;
+  if (on && !(await ensureNotifPermission())) {
+    event.target.checked = false;
+    const status = document.getElementById("nextPumpReminderStatus");
+    if (status) status.textContent = "Allow notifications in your browser to get pump reminders.";
+    return;
+  }
+  if (manualNextPump) writeManualNextPump({ ...manualNextPump, remind: on });
+  else renderNextPumpReminderUI();
+}
+async function ensureNotifPermission() {
+  if (!("Notification" in window)) return false;
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission === "denied") return false;
+  try {
+    return (await Notification.requestPermission()) === "granted";
+  } catch {
+    return false;
+  }
+}
+function renderNextPumpReminderUI() {
+  const remind = document.getElementById("nextPumpRemind");
+  const clearBtn = document.getElementById("nextPumpClearBtn");
+  const status = document.getElementById("nextPumpReminderStatus");
+  if (remind) remind.checked = Boolean(manualNextPump?.remind);
+  if (clearBtn) clearBtn.classList.toggle("hidden", !manualNextPump);
+  if (!status) return;
+  const notifReady = "Notification" in window && Notification.permission === "granted";
+  if (!manualNextPump) {
+    status.textContent = "Pick when your next session is — we'll remind you.";
+  } else if (manualNextPump.remind && !notifReady) {
+    status.textContent = `Set for ${formatTime(manualNextPump.at)} · allow notifications to be reminded.`;
+  } else if (manualNextPump.remind) {
+    status.textContent = `Reminder on for ${formatTime(manualNextPump.at)}.`;
+  } else {
+    status.textContent = `Set for ${formatTime(manualNextPump.at)}.`;
+  }
+}
+async function fireLocalPumpReminder() {
+  const title = "Time to pump";
+  const options = { body: "Your next pumping session is due.", icon: "/icons/icon-192.png", badge: "/icons/icon-192.png", tag: "pump-next", data: { url: "/breast_pumping/" } };
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, options);
+      return;
+    }
+  } catch {
+    // fall through to the basic Notification below
+  }
+  try {
+    if ("Notification" in window && Notification.permission === "granted") new Notification(title, options);
+  } catch {
+    // Notifications unavailable; the in-app countdown still updates.
+  }
 }
 
 function getNextPumpSession() {
