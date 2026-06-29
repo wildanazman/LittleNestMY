@@ -172,37 +172,10 @@ tailwind.config = {
 
   <p class="order-2 hidden rounded-2xl bg-primary-container p-3 text-[14px] font-bold text-primary" id="feedback" aria-live="polite"></p>
 
-  <section class="order-3 mama-card rounded-[30px] p-4 soft-shadow space-y-3">
-    <div>
-      <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Start here</p>
-      <h2 class="text-[22px] leading-7 font-extrabold text-on-surface">One-tap pumping actions</h2>
-    </div>
-    <div class="grid grid-cols-2 gap-2">
-      <button class="hidden mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold" id="quickCheckinButton" type="button">
-        <span class="material-symbols-outlined">favorite</span>
-        <span class="text-[12px]">Check-in</span>
-      </button>
-      <button class="mama-action rounded-2xl bg-primary text-on-primary p-3 min-h-[88px] flex flex-col items-center justify-center gap-1 font-extrabold" id="quickPumpButton" type="button">
-        <span class="material-symbols-outlined">water_drop</span>
-        <span class="text-[14px]">Log pump</span>
-      </button>
-      <button class="mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[88px] flex flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMilkButton" type="button">
-        <span class="material-symbols-outlined">inventory_2</span>
-        <span class="text-[14px]">Add milk</span>
-      </button>
-      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickMedButton" type="button">
-        <span class="material-symbols-outlined">pill</span>
-        <span class="text-[12px]">Meds</span>
-      </button>
-      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickTaskButton" type="button">
-        <span class="material-symbols-outlined">volunteer_activism</span>
-        <span class="text-[12px]">Help</span>
-      </button>
-      <button class="hidden mama-action rounded-2xl bg-white/70 text-primary p-3 min-h-[84px] flex-col items-center justify-center gap-1 font-extrabold border border-white/70" id="quickNoteButton" type="button">
-        <span class="material-symbols-outlined">edit_note</span>
-        <span class="text-[12px]">Note</span>
-      </button>
-    </div>
+  <section class="order-3">
+    <button class="mama-action w-full rounded-[22px] bg-primary text-on-primary py-4 flex items-center justify-center gap-2 font-extrabold soft-shadow active:scale-[0.98]" id="quickPumpButton" type="button">
+      <span class="material-symbols-outlined">water_drop</span><span class="text-[16px]">Log a pump session</span>
+    </button>
   </section>
 
   <section class="hidden order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="mamaCarePlan">
@@ -220,30 +193,6 @@ tailwind.config = {
   </section>
 
   <section class="order-4 mama-card rounded-[30px] p-5 soft-shadow space-y-4" id="pumpingModule">
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Breast Pumping</p>
-        <h2 class="text-[23px] leading-7 font-extrabold text-on-surface">Pumping dashboard</h2>
-        <p class="text-[14px] leading-5 text-on-surface-variant">Use Schedule for reminders, Storage for FIFO milk, and Insights for trends.</p>
-      </div>
-      <button class="mama-action h-10 rounded-full bg-primary px-4 text-on-primary font-extrabold shrink-0" id="addPumpSessionButton" type="button">Log</button>
-    </div>
-
-    <div class="grid grid-cols-3 gap-2">
-      <div class="rounded-2xl bg-primary-container/80 p-3">
-        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 1</p>
-        <p class="text-[13px] leading-4 font-bold text-on-surface">Log pump after a session.</p>
-      </div>
-      <div class="rounded-2xl bg-white/70 p-3">
-        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 2</p>
-        <p class="text-[13px] leading-4 font-bold text-on-surface">Add milk when stored.</p>
-      </div>
-      <div class="rounded-2xl bg-white/70 p-3">
-        <p class="text-[11px] font-extrabold uppercase tracking-wide text-primary">Step 3</p>
-        <p class="text-[13px] leading-4 font-bold text-on-surface">Use oldest milk first.</p>
-      </div>
-    </div>
-
     <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
       <div class="flex items-center justify-between gap-3">
         <div>
@@ -508,30 +457,26 @@ document.getElementById("mamaModal").addEventListener("click", (event) => {
   if (event.target.id === "mamaModal") closeModal();
 });
 
-document.getElementById("addCheckinButton").addEventListener("click", () => openCheckinForm());
-document.getElementById("addTaskButton").addEventListener("click", () => openTaskForm());
-document.getElementById("addMedicationButton").addEventListener("click", () => openMedicationForm());
-document.getElementById("addAppointmentButton").addEventListener("click", () => openAppointmentForm());
-document.getElementById("addNoteButton").addEventListener("click", () => openNoteForm());
-document.getElementById("addPumpSessionButton").addEventListener("click", () => openPumpSessionForm());
-document.getElementById("addMilkStorageButton").addEventListener("click", () => openMilkStorageForm());
-document.getElementById("addPumpScheduleButton").addEventListener("click", () => openPumpScheduleForm());
-document.getElementById("generatePumpScheduleButton").addEventListener("click", () => openSmartPumpScheduleForm());
-document.getElementById("addPumpPartButton").addEventListener("click", () => openPumpPartForm());
-document.getElementById("workPlannerButton").addEventListener("click", () => openWorkPlannerForm());
-document.getElementById("quickCheckinButton").addEventListener("click", () => openCheckinForm());
-document.getElementById("quickPumpButton").addEventListener("click", () => openPumpSessionForm());
-document.getElementById("quickMilkButton").addEventListener("click", () => openMilkStorageForm());
-document.getElementById("quickMedButton").addEventListener("click", () => openMedicationForm());
-document.getElementById("quickTaskButton").addEventListener("click", () => openTaskForm());
-document.getElementById("quickNoteButton").addEventListener("click", () => openNoteForm());
-document.getElementById("nextPumpQuickRow").addEventListener("click", (event) => {
+document.getElementById("addCheckinButton")?.addEventListener("click", () => openCheckinForm());
+document.getElementById("addTaskButton")?.addEventListener("click", () => openTaskForm());
+document.getElementById("addMedicationButton")?.addEventListener("click", () => openMedicationForm());
+document.getElementById("addAppointmentButton")?.addEventListener("click", () => openAppointmentForm());
+document.getElementById("addNoteButton")?.addEventListener("click", () => openNoteForm());
+document.getElementById("addPumpSessionButton")?.addEventListener("click", () => openPumpSessionForm());
+document.getElementById("addMilkStorageButton")?.addEventListener("click", () => openMilkStorageForm());
+document.getElementById("addPumpScheduleButton")?.addEventListener("click", () => openPumpScheduleForm());
+document.getElementById("generatePumpScheduleButton")?.addEventListener("click", () => openSmartPumpScheduleForm());
+document.getElementById("addPumpPartButton")?.addEventListener("click", () => openPumpPartForm());
+document.getElementById("workPlannerButton")?.addEventListener("click", () => openWorkPlannerForm());
+document.getElementById("quickPumpButton")?.addEventListener("click", () => openPumpSessionForm());
+document.getElementById("quickMilkButton")?.addEventListener("click", () => openMilkStorageForm());
+document.getElementById("nextPumpQuickRow")?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-next-in]");
   if (button) setManualNextPumpInMinutes(Number(button.dataset.nextIn));
 });
-document.getElementById("nextPumpPickInput").addEventListener("change", (event) => setManualNextPumpFromTime(event.target.value));
-document.getElementById("nextPumpClearBtn").addEventListener("click", clearManualNextPump);
-document.getElementById("nextPumpRemind").addEventListener("change", onToggleNextPumpRemind);
+document.getElementById("nextPumpPickInput")?.addEventListener("change", (event) => setManualNextPumpFromTime(event.target.value));
+document.getElementById("nextPumpClearBtn")?.addEventListener("click", clearManualNextPump);
+document.getElementById("nextPumpRemind")?.addEventListener("change", onToggleNextPumpRemind);
 document.querySelector(".pump-range-seg")?.addEventListener("click", (event) => {
   const tab = event.target.closest("[data-range]");
   if (!tab || tab.dataset.range === pumpRange) return;
@@ -799,14 +744,13 @@ function renderPumpAnalytics() {
   const recent = [...pumpingData.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 8);
   document.getElementById("pumpAnalyticsPanel").innerHTML = `
     <div class="flex items-center justify-between">
-      <h3 class="text-[18px] font-extrabold text-on-surface">Pumping Analytics</h3>
+      <h3 class="text-[18px] font-extrabold text-on-surface">Insights</h3>
       <span class="material-symbols-outlined text-primary">monitoring</span>
     </div>
-    <div class="grid grid-cols-2 gap-3">
-      <div><p class="text-[12px] text-on-surface-variant">This week</p><p class="text-[20px] font-extrabold">${formatMilk(thisTotal)}</p></div>
-      <div><p class="text-[12px] text-on-surface-variant">Growth</p><p class="text-[20px] font-extrabold">${lastTotal ? `${growth >= 0 ? "+" : ""}${growth}%` : "New"}</p></div>
+    <div class="grid grid-cols-3 gap-3">
+      <div><p class="text-[12px] text-on-surface-variant">vs last week</p><p class="text-[18px] font-extrabold tabular-nums">${lastTotal ? `${growth >= 0 ? "+" : ""}${growth}%` : "New"}</p></div>
       <div><p class="text-[12px] text-on-surface-variant">Best time</p><p class="text-[16px] font-extrabold">${bestWindow}</p></div>
-      <div><p class="text-[12px] text-on-surface-variant">Left vs right</p><p class="text-[16px] font-extrabold">${Math.round(leftAvg)} / ${Math.round(rightAvg)} ml</p></div>
+      <div><p class="text-[12px] text-on-surface-variant">Left / right</p><p class="text-[16px] font-extrabold tabular-nums">${Math.round(leftAvg)}/${Math.round(rightAvg)}</p></div>
     </div>
     <p class="text-[13px] leading-5 text-on-surface-variant">${pumpInsight(thisTotal, lastTotal, bestWindow)}</p>
     ${recent.length ? `<div class="space-y-2 pt-2 border-t border-primary-container/40">
