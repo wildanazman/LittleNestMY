@@ -85,6 +85,17 @@ tailwind.config = {
   .mama-input:focus { outline: none; border-color: rgba(159,73,96,.38); box-shadow: 0 0 0 4px rgba(159,73,96,.12), inset 0 1px 0 rgba(255,255,255,.86); }
   textarea.mama-input { min-height: 96px; padding-top: 12px; }
   .status-chip { border-radius: 9999px; padding: 4px 10px; font-size: 12px; font-weight: 800; }
+  .pump-range-seg { background: rgba(120,90,78,.10); box-shadow: inset 0 1px 2px rgba(103,78,87,.06); }
+  .pump-range-tab {
+    min-height: 30px; padding: 0 12px; border-radius: 9999px;
+    font-size: 12.5px; font-weight: 700; color: #6c5f59; background: transparent;
+    transition: transform 160ms cubic-bezier(.23,1,.32,1), background-color 200ms cubic-bezier(.23,1,.32,1), color 180ms ease, box-shadow 200ms cubic-bezier(.23,1,.32,1);
+  }
+  .pump-range-tab:active { transform: scale(.96); }
+  .pump-range-tab.is-active { background: #fff; color: #83533c; box-shadow: 0 1px 1px rgba(103,78,87,.05), 0 3px 8px rgba(103,78,87,.12); }
+  :root.dark .pump-range-seg { background: rgba(255,255,255,.07); box-shadow: inset 0 1px 2px rgba(0,0,0,.3); }
+  :root.dark .pump-range-tab { color: #94a3b8; }
+  :root.dark .pump-range-tab.is-active { background: #3a2f30; color: #ffbfa3; box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 3px 8px rgba(0,0,0,.3); }
   .mama-hero {
     background: linear-gradient(145deg, rgba(255,250,248,.94), rgba(247,232,237,.74));
   }
@@ -264,23 +275,17 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3">
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[12px] font-bold text-on-surface-variant">Today's Output</p>
-        <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodayMl">0 ml</p>
+    <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
+      <div class="flex items-center justify-between gap-2 mb-3">
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Milk output</p>
+        <div class="pump-range-seg flex gap-1 p-1 rounded-full" role="tablist">
+          <button class="pump-range-tab is-active" data-range="today" type="button" role="tab">Today</button>
+          <button class="pump-range-tab" data-range="week" type="button" role="tab">Week</button>
+          <button class="pump-range-tab" data-range="month" type="button" role="tab">Month</button>
+        </div>
       </div>
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[12px] font-bold text-on-surface-variant">Sessions</p>
-        <p class="text-[22px] font-extrabold text-on-surface" id="pumpTodaySessions">0</p>
-      </div>
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[12px] font-bold text-on-surface-variant">Average</p>
-        <p class="text-[22px] font-extrabold text-on-surface" id="pumpAverageMl">0 ml</p>
-      </div>
-      <div class="mama-stat rounded-2xl p-3">
-        <p class="text-[12px] font-bold text-on-surface-variant">Longest</p>
-        <p class="text-[22px] font-extrabold text-on-surface" id="pumpLongest">0m</p>
-      </div>
+      <p class="text-[34px] leading-9 font-extrabold text-on-surface tabular-nums" id="pumpRangeTotal">0 ml</p>
+      <p class="text-[14px] text-on-surface-variant" id="pumpRangeMeta">No sessions yet</p>
     </div>
 
     <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
@@ -487,6 +492,7 @@ let mamaData = emptyMamaData();
 let pumpingData = emptyPumpingData();
 let nextPumpTimerId = null;
 let manualNextPump = null;
+let pumpRange = "today";
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
@@ -526,6 +532,13 @@ document.getElementById("nextPumpQuickRow").addEventListener("click", (event) =>
 document.getElementById("nextPumpPickInput").addEventListener("change", (event) => setManualNextPumpFromTime(event.target.value));
 document.getElementById("nextPumpClearBtn").addEventListener("click", clearManualNextPump);
 document.getElementById("nextPumpRemind").addEventListener("change", onToggleNextPumpRemind);
+document.querySelector(".pump-range-seg")?.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-range]");
+  if (!tab || tab.dataset.range === pumpRange) return;
+  pumpRange = tab.dataset.range;
+  document.querySelectorAll(".pump-range-tab").forEach((el) => el.classList.toggle("is-active", el.dataset.range === pumpRange));
+  renderPumpRangeSummary();
+});
 
 await bootstrap();
 bindPrototypeActions();
@@ -622,15 +635,10 @@ function renderMamaCarePlan() {
 
 function renderPumpingModule() {
   const sessionsToday = pumpingData.sessions.filter((session) => localDate(new Date(session.startedAt)) === today);
-  const totalToday = sum(sessionsToday, (session) => Number(session.totalMl || 0));
-  const longest = Math.max(0, ...sessionsToday.map((session) => Number(session.durationMinutes || 0)));
   const activeStorage = pumpingData.storage.filter((entry) => Number(entry.remainingMl ?? entry.quantityMl) > 0);
   const storedMl = sum(activeStorage, (entry) => Number((entry.remainingMl ?? entry.quantityMl) || 0));
   updateNextPumpDisplay();
-  document.getElementById("pumpTodayMl").textContent = `${Math.round(totalToday)} ml`;
-  document.getElementById("pumpTodaySessions").textContent = String(sessionsToday.length);
-  document.getElementById("pumpAverageMl").textContent = `${sessionsToday.length ? Math.round(totalToday / sessionsToday.length) : 0} ml`;
-  document.getElementById("pumpLongest").textContent = formatMinutes(longest);
+  renderPumpRangeSummary();
   document.getElementById("storedMilkTotal").textContent = formatMilk(storedMl);
   document.getElementById("storedMilkMeta").textContent = `${activeStorage.length} container${activeStorage.length === 1 ? "" : "s"} · ${Math.floor(storedMl / 720)} days supply`;
   renderFifo(activeStorage);
@@ -639,6 +647,39 @@ function renderPumpingModule() {
   renderPumpSchedules(sessionsToday);
   renderPumpAnalytics();
   renderPumpMaintenance();
+}
+
+function pumpRangeStart(range) {
+  const now = new Date();
+  if (range === "week") {
+    const start = startOfDay(now);
+    start.setDate(start.getDate() - 6); // rolling 7 days incl. today
+    return start;
+  }
+  if (range === "month") {
+    const start = startOfDay(now);
+    start.setDate(start.getDate() - 29); // rolling 30 days incl. today
+    return start;
+  }
+  return startOfDay(now); // today
+}
+
+function renderPumpRangeSummary() {
+  const totalEl = document.getElementById("pumpRangeTotal");
+  const metaEl = document.getElementById("pumpRangeMeta");
+  if (!totalEl || !metaEl) return;
+  const start = pumpRangeStart(pumpRange);
+  const sessions = pumpingData.sessions.filter((session) => new Date(session.startedAt) >= start);
+  const total = sum(sessions, (session) => Number(session.totalMl || 0));
+  const count = sessions.length;
+  const avg = count ? Math.round(total / count) : 0;
+  totalEl.textContent = `${Math.round(total)} ml`;
+  if (!count) {
+    metaEl.textContent = pumpRange === "today" ? "No sessions yet today" : "No sessions in this range";
+    return;
+  }
+  const rangeLabel = pumpRange === "today" ? "today" : pumpRange === "week" ? "last 7 days" : "last 30 days";
+  metaEl.textContent = `${count} session${count === 1 ? "" : "s"} · ${avg} ml avg · ${rangeLabel}`;
 }
 
 function renderFifo(activeStorage) {
@@ -755,7 +796,7 @@ function renderPumpAnalytics() {
   const bestWindow = bestPumpWindow(pumpingData.sessions);
   const leftAvg = average(pumpingData.sessions, (session) => Number(session.leftMl || 0));
   const rightAvg = average(pumpingData.sessions, (session) => Number(session.rightMl || 0));
-  const recent = [...pumpingData.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 3);
+  const recent = [...pumpingData.sessions].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).slice(0, 8);
   document.getElementById("pumpAnalyticsPanel").innerHTML = `
     <div class="flex items-center justify-between">
       <h3 class="text-[18px] font-extrabold text-on-surface">Pumping Analytics</h3>
@@ -772,11 +813,14 @@ function renderPumpAnalytics() {
       <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Recent sessions</p>
       ${recent.map((session) => `
         <article class="rounded-2xl bg-surface-container-lowest p-3 flex items-center justify-between gap-3">
-          <div>
+          <div class="min-w-0">
             <p class="font-extrabold text-on-surface">${Math.round(session.totalMl || 0)} ml · ${formatMinutes(session.durationMinutes)}</p>
-            <p class="text-[13px] text-on-surface-variant">${formatDateTime(session.startedAt)}${session.pumpUsed ? ` · ${escapeHtml(session.pumpUsed)}` : ""}</p>
+            <p class="text-[13px] text-on-surface-variant truncate">${formatDateTime(session.startedAt)}${session.pumpUsed ? ` · ${escapeHtml(session.pumpUsed)}` : ""}</p>
           </div>
-          ${permissions.canAddLogs ? `<button class="h-9 rounded-full bg-error-container px-3 text-error font-bold" data-action="pump-session-delete" data-id="${session.id}" type="button">Delete</button>` : ""}
+          ${permissions.canAddLogs ? `<div class="flex gap-2 shrink-0">
+            <button class="h-9 rounded-full bg-primary-container px-3 text-primary font-bold" data-action="pump-session-edit" data-id="${session.id}" type="button">Edit</button>
+            <button class="h-9 w-9 rounded-full bg-error-container text-error font-bold flex items-center justify-center" data-action="pump-session-delete" data-id="${session.id}" type="button" aria-label="Delete session"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+          </div>` : ""}
         </article>
       `).join("")}
     </div>` : ""}
@@ -948,7 +992,11 @@ document.body.addEventListener("click", async (event) => {
     if (action === "pump-schedule-skip") await skipPumpScheduleToday(id);
     if (action === "pump-schedule-unskip") await unskipPumpScheduleToday(id);
     if (action === "pump-schedule-delete") await deletePumpSchedule(id);
-    if (action === "pump-session-delete") await deletePumpSession(id);
+    if (action === "pump-session-edit") return openPumpSessionForm(pumpingData.sessions.find((item) => item.id === id));
+    if (action === "pump-session-delete") {
+      if (!confirm("Delete this pump session?")) return;
+      await deletePumpSession(id);
+    }
     if (action === "milk-edit") return openMilkStorageForm(pumpingData.storage.find((item) => item.id === id));
     if (action === "milk-delete") {
       if (!confirm("Remove this milk storage entry?")) return;
