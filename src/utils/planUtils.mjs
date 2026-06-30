@@ -63,6 +63,39 @@ export function isPremium(plan) {
   return plan === "premium";
 }
 
+// Length of the automatic premium trial granted to new accounts.
+export const TRIAL_DAYS = 14;
+
+// Resolves the user-facing plan state for the header/badges.
+// - "premium": paid (or admin) account.
+// - "trial":   free plan, still inside the 14-day premium trial window
+//              (derived from the Supabase account creation date — no DB column needed).
+// - "free":    free plan, trial expired, or guest.
+// Returns { state, plan, daysLeft }.
+export async function getPlanStatus() {
+  const plan = await getCurrentPlan();
+  if (plan === "premium") return { state: "premium", plan, daysLeft: 0 };
+
+  if (isGuestMode()) return { state: "free", plan, daysLeft: 0 };
+
+  const session = await getAuthSession();
+  const createdAt = session?.user?.created_at;
+  if (!createdAt) return { state: "free", plan, daysLeft: 0 };
+
+  const created = new Date(createdAt).getTime();
+  if (Number.isNaN(created)) return { state: "free", plan, daysLeft: 0 };
+
+  const ageDays = (Date.now() - created) / 86400000;
+  const daysLeft = Math.ceil(TRIAL_DAYS - ageDays);
+  if (daysLeft > 0) return { state: "trial", plan, daysLeft };
+  return { state: "free", plan, daysLeft: 0 };
+}
+
+// True when premium features should be unlocked (paid OR active trial).
+export function isPremiumActive(status) {
+  return status?.state === "premium" || status?.state === "trial";
+}
+
 export async function requirePremium(message) {
   const plan = await getCurrentPlan();
   if (!isPremium(plan)) {

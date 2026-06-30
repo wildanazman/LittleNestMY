@@ -911,7 +911,7 @@
 <span class="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0" aria-hidden="true" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 6px 14px rgba(0,0,0,.12)">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">crib</span>
 </span>
-<h1 class="font-headline-lg text-headline-lg text-primary truncate">LittleNest MY</h1>
+<h1 class="font-headline-lg text-headline-lg text-primary truncate">LittleNest MY<span id="homePlanBadge" class="hidden"></span></h1>
 <span class="w-7 h-9 rounded-lg flex items-center justify-center text-primary/60 shrink-0" aria-hidden="true">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'wght' 500;">expand_more</span>
 </span>
@@ -1343,6 +1343,72 @@
     <div id="launcherResults" class="launcher-results"></div>
   </div>
 </div>
+<script type="module">
+  // Header plan badge: Premium (gold) / Premium Trial (lavender + countdown) / Free (upgrade hint).
+  try {
+    const base = window.location.protocol === "file:" ? "../../" : "/src/";
+    const [{ getPlanStatus }, { goToScreen }] = await Promise.all([
+      import(`${base}utils/planUtils.mjs`),
+      import(`${base}utils/prototypeUi.mjs`),
+    ]);
+    const el = document.getElementById("homePlanBadge");
+    if (el) {
+      const status = await getPlanStatus();
+      const darkMode = document.documentElement.classList.contains("dark");
+      const pill = "display:inline-flex;align-items:center;gap:2px;vertical-align:middle;position:relative;top:-2px;margin-left:6px;border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;letter-spacing:.06em;line-height:1;text-transform:uppercase;white-space:nowrap;pointer-events:auto;cursor:pointer;";
+      const ico = (n) => `<span class="material-symbols-outlined" style="font-size:10px;font-variation-settings:'FILL' 1;">${n}</span>`;
+      let style = "", html = "", label = "";
+      if (status.state === "premium") {
+        style = pill + "background:linear-gradient(135deg,#f7d774,#e7b41f);color:#5a4500;box-shadow:0 2px 6px rgba(214,168,0,.4);";
+        html = `${ico("workspace_premium")}Premium`;
+        label = "Premium plan";
+      } else if (status.state === "trial") {
+        const d = status.daysLeft;
+        style = pill + "background:linear-gradient(135deg,#9b7cff,#7056f4);color:#fff;box-shadow:0 2px 6px rgba(112,86,244,.4);";
+        html = `${ico("workspace_premium")}Trial · ${d}d`;
+        label = `Premium trial, ${d} day${d === 1 ? "" : "s"} left. Tap to upgrade.`;
+      } else {
+        style = pill + (darkMode
+          ? "background:rgba(196,181,255,.16);color:#c4b5ff;"
+          : "background:rgba(112,86,244,.14);color:#6f4df2;");
+        html = `${ico("lock_open")}Free`;
+        label = "Free plan. Tap to upgrade.";
+      }
+      el.setAttribute("style", style);
+      el.innerHTML = html;
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", label);
+      el.classList.remove("hidden");
+      el.addEventListener("click", (e) => { e.stopPropagation(); e.preventDefault(); goToScreen("subscription"); });
+
+      // Trial awareness banner — make it unmistakable the user is on a 14-day Premium trial.
+      if (status.state === "trial") {
+        const anchor = document.getElementById("babyProfileCard");
+        if (anchor && anchor.parentElement && !document.getElementById("planTrialNotice")) {
+          const d = status.daysLeft;
+          const dark = document.documentElement.classList.contains("dark");
+          const c = dark
+            ? { bg: "linear-gradient(135deg,rgba(124,92,255,.22),rgba(34,211,238,.10))", border: "rgba(124,92,255,.42)", icon: "#c4b5ff", title: "#efeaff", sub: "#c7bdec", chev: "#c4b5ff" }
+            : { bg: "linear-gradient(135deg,rgba(155,124,255,.16),rgba(112,86,244,.10))", border: "rgba(112,86,244,.18)", icon: "#7056f4", title: "#3a2d5e", sub: "#6b5e88", chev: "#7056f4" };
+          const note = document.createElement("button");
+          note.id = "planTrialNotice";
+          note.type = "button";
+          note.setAttribute("aria-label", `Premium trial, ${d} day${d === 1 ? "" : "s"} left. Tap to upgrade.`);
+          note.style.cssText = `display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-bottom:14px;padding:11px 14px;border-radius:18px;background:${c.bg};border:1px solid ${c.border};box-shadow:0 4px 14px rgba(112,86,244,.10);`;
+          note.innerHTML =
+            `<span class="material-symbols-outlined" style="font-size:20px;color:${c.icon};font-variation-settings:'FILL' 1;">workspace_premium</span>` +
+            `<span style="flex:1;min-width:0;">` +
+              `<span style="display:block;font-size:12.5px;font-weight:800;color:${c.title};line-height:1.2;">Premium trial · ${d} day${d === 1 ? "" : "s"} left</span>` +
+              `<span style="display:block;font-size:11px;color:${c.sub};line-height:1.35;margin-top:1px;">Every feature is free for your first 14 days. Tap to keep Premium.</span>` +
+            `</span>` +
+            `<span class="material-symbols-outlined" style="font-size:18px;color:${c.chev};">chevron_right</span>`;
+          note.addEventListener("click", () => goToScreen("subscription"));
+          anchor.parentElement.insertBefore(note, anchor);
+        }
+      }
+    }
+  } catch (_) { /* badge is non-critical */ }
+</script>
 <script type="module">
   const lModuleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { goToScreen } = await import(`${lModuleBase}utils/prototypeUi.mjs`);
