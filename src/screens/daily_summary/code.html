@@ -45,10 +45,56 @@ tailwind.config = {
 };
 </script>
 <style>
-  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; }
+  body { min-height: max(884px, 100dvh); font-family: "Nunito Sans", sans-serif; font-variant-numeric: tabular-nums; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
   :root.dark .summary-card { background: #242120; border-color: rgba(255,255,255,.10); }
+  :root { --ds-ease: cubic-bezier(0.23, 1, 0.32, 1); }
+
+  /* Hero — premium gradient with soft light bloom */
+  .ds-hero {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #ff9b73 0%, #ff6f91 48%, #9b6bff 100%);
+    color: #fff;
+  }
+  .ds-hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(120% 90% at 12% -10%, rgba(255,255,255,0.42), transparent 55%),
+      radial-gradient(90% 80% at 100% 110%, rgba(0,0,0,0.12), transparent 60%);
+  }
+  .ds-hero > * { position: relative; }
+  .ds-hero-btn { transition: transform 160ms var(--ds-ease), background-color 180ms ease, box-shadow 180ms ease; }
+  .ds-hero-btn:active { transform: scale(0.97); }
+
+  /* Stat cards — colour-toned tiles */
+  .ds-card {
+    border-radius: 24px; padding: 16px;
+    border: 1px solid transparent;
+    box-shadow: 0 10px 26px rgba(103, 78, 87, 0.07), inset 0 1px 0 rgba(255,255,255,0.55);
+    transition: transform 200ms var(--ds-ease), box-shadow 200ms var(--ds-ease);
+    animation: dsRise 460ms var(--ds-ease) both;
+  }
+  @media (hover: hover) and (pointer: fine) { .ds-card:hover { transform: translateY(-2px); } }
+  .ds-card:active { transform: scale(0.985); }
+  @keyframes dsRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .ds-card:nth-child(1){animation-delay:0ms}.ds-card:nth-child(2){animation-delay:45ms}.ds-card:nth-child(3){animation-delay:90ms}.ds-card:nth-child(4){animation-delay:135ms}.ds-card:nth-child(5){animation-delay:180ms}.ds-card:nth-child(6){animation-delay:225ms}
+  .ds-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .ds-icon .material-symbols-outlined { font-size: 21px; }
+  .ds-label { margin-top: 12px; font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+  .ds-value { margin-top: 2px; font-size: 21px; line-height: 1.2; font-weight: 800; color: #211a17; }
+  .ds-detail { margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: #7a6a64; }
+  :root.dark .ds-value { color: #f4ede9; }
+  :root.dark .ds-detail { color: #b3a59f; }
+
+  .ds-card[data-tone="feed"]   { background:#fff2ec; } .ds-card[data-tone="feed"]   .ds-icon{background:#ffd9c7;color:#b25a25} .ds-card[data-tone="feed"]   .ds-label{color:#b25a25}
+  .ds-card[data-tone="sleep"]  { background:#eef0ff; } .ds-card[data-tone="sleep"]  .ds-icon{background:#d9defb;color:#5a52cf} .ds-card[data-tone="sleep"]  .ds-label{color:#5a52cf}
+  .ds-card[data-tone="diaper"] { background:#e9f7ef; } .ds-card[data-tone="diaper"] .ds-icon{background:#c8e9d6;color:#1d8a5c} .ds-card[data-tone="diaper"] .ds-label{color:#1d8a5c}
+  .ds-card[data-tone="health"] { background:#ffeef1; } .ds-card[data-tone="health"] .ds-icon{background:#ffd4dc;color:#c0466a} .ds-card[data-tone="health"] .ds-label{color:#c0466a}
+  .ds-card[data-tone="mama"]   { background:#f3edff; } .ds-card[data-tone="mama"]   .ds-icon{background:#e2d6ff;color:#7a5cff} .ds-card[data-tone="mama"]   .ds-label{color:#7a5cff}
+  .ds-card[data-tone="next"]   { background:#fff6e6; } .ds-card[data-tone="next"]   .ds-icon{background:#ffe6b8;color:#b67d12} .ds-card[data-tone="next"]   .ds-label{color:#b67d12}
+  :root.dark .ds-card { background:#242120 !important; border-color: rgba(255,255,255,.08); box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+  :root.dark .ds-card .ds-icon { filter: saturate(1.1); }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -64,13 +110,14 @@ tailwind.config = {
 </header>
 
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5">
-  <section class="rounded-[28px] bg-primary-container p-5 soft-shadow">
-    <p class="text-[13px] font-extrabold uppercase tracking-wide text-primary">Family handoff</p>
-    <h2 class="mt-1 text-[28px] leading-9 font-extrabold text-on-primary-container">Today’s Care Summary</h2>
-    <p class="mt-1 text-[15px] leading-6 text-on-primary-container/80" id="summarySubtitle">Preparing calm update...</p>
+  <section class="ds-hero rounded-[30px] p-5 soft-shadow">
+    <p class="text-[12px] font-extrabold uppercase tracking-[0.12em] text-white/85">Family handoff · <span id="summaryDate"></span></p>
+    <h2 class="mt-1 text-[27px] leading-8 font-extrabold">Today’s care summary</h2>
+    <p class="mt-1 text-[14px] font-bold text-white/90" id="summarySubtitle">Preparing calm update…</p>
+    <p class="mt-3 text-[16px] leading-6 font-semibold text-white/95" id="summaryHeadline"></p>
     <div class="mt-4 flex gap-2">
-      <button class="flex-1 h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" id="copyButton" type="button">Copy Summary</button>
-      <button class="flex-1 h-12 rounded-full bg-white/70 text-primary font-extrabold active:scale-95 transition-transform dark:bg-white/10" id="whatsappButton" type="button">WhatsApp</button>
+      <button class="ds-hero-btn flex-1 h-12 rounded-full bg-white text-[#c0466a] font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,0,0,0.12)]" id="copyButton" type="button"><span class="material-symbols-outlined text-[19px]">content_copy</span>Copy</button>
+      <button class="ds-hero-btn flex-1 h-12 rounded-full bg-white/18 text-white font-extrabold flex items-center justify-center gap-2 border border-white/30 backdrop-blur-sm" id="whatsappButton" type="button"><span class="material-symbols-outlined text-[19px]">share</span>WhatsApp</button>
     </div>
   </section>
 
@@ -80,10 +127,15 @@ tailwind.config = {
 
   <section class="summary-card rounded-[26px] bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
     <div class="flex items-center justify-between gap-3">
-      <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Share Preview</h2>
+      <div>
+        <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Share preview</p>
+        <h2 class="text-[19px] leading-6 font-extrabold text-on-surface">What you’ll send</h2>
+      </div>
       <span class="material-symbols-outlined text-primary">ios_share</span>
     </div>
-    <pre class="mt-4 whitespace-pre-wrap break-words rounded-2xl bg-surface-container-low p-4 text-[14px] leading-6 text-on-surface-variant" id="summaryText">Loading...</pre>
+    <div class="mt-3 rounded-[20px] rounded-tl-md bg-[#e6f6ed] border border-[#c2e7d1] p-4 dark:bg-white/[0.06] dark:border-white/10">
+      <pre class="whitespace-pre-wrap break-words font-body text-[13.5px] leading-6 text-on-surface" id="summaryText">Loading…</pre>
+    </div>
   </section>
 
   <section class="summary-card rounded-[24px] bg-surface-container-lowest border border-white/60 p-4 soft-shadow">
@@ -167,21 +219,24 @@ async function renderSummary() {
   const mamaMeds = mama.error ? [] : mama.medications.filter((item) => item.medicationTime && localDate(new Date(item.medicationTime)) === todayKey);
   const mamaMedsTaken = mamaMeds.filter((item) => item.status === "taken").length;
 
-  const feedLabel = latestFeed ? `${formatRelativeTime(latestFeed.startedAt, now)} ago` : "No feeds yet";
+  const feedRel = latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "";
+  const feedLabel = latestFeed ? (/^(now|just now)$/i.test(feedRel) ? "Just now" : `${feedRel} ago`) : "No feeds yet";
   const sleepLabel = sleepMinutes ? formatDuration(sleepMinutes) : "0h";
   const diaperLabel = `${todayDiapers.length} today`;
   const healthLabel = todayHealth.length ? `${todayHealth.length} note${todayHealth.length === 1 ? "" : "s"} today` : "No health notes";
   const eventLabel = nextEvent ? `${nextEvent.title} (${new Date(nextEvent.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "short" })})` : "No upcoming";
   const mamaLabel = mamaCheckin ? `${mamaCheckin.mood || "Checked"}${mamaMeds.length ? `, meds ${mamaMedsTaken}/${mamaMeds.length}` : ""}` : (mamaMeds.length ? `Meds ${mamaMedsTaken}/${mamaMeds.length}` : "Not checked");
 
-  document.getElementById("summarySubtitle").textContent = `${baby.name} - ${calculateBabyAge(baby.dateOfBirth, now)}`;
+  document.getElementById("summarySubtitle").textContent = `${baby.name} · ${calculateBabyAge(baby.dateOfBirth, now)}`;
+  document.getElementById("summaryDate").textContent = now.toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "short" });
+  document.getElementById("summaryHeadline").textContent = buildHeadline(baby.name, latestFeed, feedingLogs, sleepMinutes, todayDiapers.length, now);
   document.getElementById("summaryCards").innerHTML = [
-    card("Feed", feedLabel, latestFeed ? feedingDetail(latestFeed) : "Add what you remember", "restaurant"),
-    card("Sleep", sleepLabel, "Total sleep today", "bedtime"),
-    card("Diaper", diaperLabel, "Wet, dirty, or mixed", "baby_changing_station"),
-    card("Health", healthLabel, "For records only", "medical_information"),
-    card("Mama Care", mamaLabel, "Family support check", "self_care"),
-    card("Next", eventLabel, "Appointment or reminder", "event")
+    card("Feed", feedLabel, latestFeed ? feedingDetail(latestFeed) : "Add what you remember", "restaurant", "feed"),
+    card("Sleep", sleepLabel, "Total sleep today", "bedtime", "sleep"),
+    card("Diaper", diaperLabel, "Wet, dirty, or mixed", "baby_changing_station", "diaper"),
+    card("Health", healthLabel, "For records only", "medical_information", "health"),
+    card("Mama Care", mamaLabel, "Family support check", "self_care", "mama"),
+    card("Next", eventLabel, "Appointment or reminder", "event", "next")
   ].join("");
 
   shareText = [
@@ -198,17 +253,28 @@ async function renderSummary() {
   document.getElementById("summaryText").textContent = shareText;
 }
 
-function card(title, value, detail, icon) {
+function card(title, value, detail, icon, tone = "feed") {
   return `
-    <article class="summary-card rounded-[22px] bg-surface-container-lowest border border-white/60 p-4 soft-shadow">
-      <div class="flex items-center gap-2 text-primary">
-        <span class="material-symbols-outlined">${icon}</span>
-        <p class="text-[12px] font-extrabold uppercase tracking-wide">${title}</p>
-      </div>
-      <p class="mt-2 text-[20px] leading-7 font-extrabold text-on-surface">${escapeHtml(value)}</p>
-      <p class="text-[13px] leading-5 text-on-surface-variant">${escapeHtml(detail)}</p>
+    <article class="ds-card" data-tone="${tone}">
+      <span class="ds-icon"><span class="material-symbols-outlined">${icon}</span></span>
+      <p class="ds-label">${escapeHtml(title)}</p>
+      <p class="ds-value">${escapeHtml(value)}</p>
+      <p class="ds-detail">${escapeHtml(detail)}</p>
     </article>
   `;
+}
+
+function buildHeadline(name, latestFeed, feedingLogs, sleepMinutes, diaperCount, when) {
+  const feedsToday = feedingLogs.filter((log) => isSameLocalDay(log.startedAt, when)).length;
+  const parts = [];
+  if (feedsToday) parts.push(`${feedsToday} feed${feedsToday === 1 ? "" : "s"}`);
+  if (sleepMinutes) parts.push(`${formatDuration(sleepMinutes)} sleep`);
+  if (diaperCount) parts.push(`${diaperCount} diaper change${diaperCount === 1 ? "" : "s"}`);
+  if (!parts.length) return `No logs yet today — add what you remember for ${name}.`;
+  const list = parts.length > 1
+    ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
+    : parts[0];
+  return `${name} had ${list} so far today.`;
 }
 
 function feedingDetail(log) {
