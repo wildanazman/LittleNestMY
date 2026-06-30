@@ -269,10 +269,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-primary">expand_more</span>
       </summary>
       <div class="mt-3 rounded-[20px] bg-white/70 p-4 space-y-3 dark:bg-white/10" id="pumpAnalyticsPanel"></div>
-      <div class="mt-3">
-        <button class="mama-action h-10 rounded-full bg-primary-container px-4 text-primary font-extrabold" id="addPumpPartButton" type="button">Update maintenance</button>
-      </div>
-      <div class="mt-3 space-y-3" id="pumpMaintenanceList"></div>
+      <div class="mt-3 rounded-[20px] bg-white/70 p-4 space-y-3 dark:bg-white/10" id="pumpMaintenanceList"></div>
     </details>
   </section>
 
@@ -772,28 +769,36 @@ function renderPumpAnalytics() {
 }
 
 function renderPumpMaintenance() {
-  const parts = pumpingData.parts.length ? pumpingData.parts : defaultPumpParts();
+  const parts = pumpingData.parts || [];
   const due = parts.filter((part) => daysUntil(addDays(part.lastChangedDate, Number(part.intervalDays || 30))) <= 0);
   const list = document.getElementById("pumpMaintenanceList");
-  list.innerHTML = `
-    <div class="flex items-center justify-between">
-      <h3 class="text-[18px] font-extrabold text-on-surface">Pump Maintenance</h3>
-      <p class="text-[13px] font-bold ${due.length ? "text-error" : "text-on-surface-variant"}">${due.length ? `${due.length} due` : "All okay"}</p>
-    </div>
+  if (!list) return;
+  const header = `
+    <div class="flex items-center justify-between gap-3">
+      <h3 class="text-[18px] font-extrabold text-on-surface">Pump maintenance</h3>
+      ${parts.length ? `<span class="status-chip ${due.length ? "bg-error-container text-error" : "bg-primary-container text-primary"}">${due.length ? `${due.length} due` : "All okay"}</span>` : ""}
+    </div>`;
+  if (!parts.length) {
+    list.innerHTML = `${header}
+      <p class="text-[14px] leading-5 text-on-surface-variant">Track when you replace valves, membranes, and tubing so suction stays strong.</p>
+      ${permissions.canAddLogs ? `<button class="mama-action h-10 w-full rounded-full bg-primary-container text-primary font-extrabold" data-action="pump-update" type="button">Add a part</button>` : ""}`;
+    return;
+  }
+  list.innerHTML = `${header}
     ${parts.slice(0, 4).map((part) => {
       const nextDate = addDays(part.lastChangedDate, Number(part.intervalDays || 30));
       const dueNow = daysUntil(nextDate) <= 0;
       return `
-        <article class="rounded-[22px] bg-surface-container-low p-3 flex items-center justify-between gap-3">
-          <div>
-            <p class="font-extrabold text-on-surface">${escapeHtml(part.partType)}</p>
+        <article class="rounded-[18px] bg-surface-container-lowest p-3 flex items-center justify-between gap-3 dark:bg-white/5">
+          <div class="min-w-0">
+            <p class="font-extrabold text-on-surface truncate">${escapeHtml(part.partType)}</p>
             <p class="text-[13px] text-on-surface-variant">Last changed ${formatDate(part.lastChangedDate)}</p>
           </div>
           <span class="status-chip ${dueNow ? "bg-error-container text-error" : "bg-primary-container text-primary"}">${dueNow ? "Replace" : `${daysUntil(nextDate)}d`}</span>
         </article>
       `;
     }).join("")}
-  `;
+    ${permissions.canAddLogs ? `<button class="mama-action h-10 w-full rounded-full bg-white/80 text-primary font-extrabold dark:bg-white/10" data-action="pump-update" type="button">Update maintenance</button>` : ""}`;
 }
 
 function renderCheckin() {
@@ -948,6 +953,7 @@ document.body.addEventListener("click", async (event) => {
     }
     if (action === "milk-use") await openUseMilkForm(id);
     if (action === "pump-snooze") await snoozeNextPump();
+    if (action === "pump-update") return openPumpPartForm();
     await refreshMamaCare();
   } catch (error) {
     showFeedback(error.message || "Could not update Mama Care.", true);
