@@ -93,7 +93,7 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#83533c","on-p
 </section>
 <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4" id="addMeasurementSection">
 <div class="flex items-center justify-between">
-<h2 class="font-headline-md text-headline-md text-on-surface">Add measurement</h2>
+<h2 class="font-headline-md text-headline-md text-on-surface" id="addMeasurementTitle">Add measurement</h2>
 <span class="font-label-sm text-label-sm text-on-surface-variant" id="lengthLabel">Length</span>
 </div>
 <div class="grid grid-cols-2 gap-3">
@@ -105,6 +105,7 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#83533c","on-p
 <textarea class="w-full min-h-20 rounded-2xl border-0 bg-surface-container px-3 py-3 text-on-surface placeholder:text-on-surface-variant" id="notesInput" placeholder="Optional note"></textarea>
 <p class="hidden font-label-md text-label-md text-error" id="formError"></p>
 <button class="w-full h-12 rounded-full bg-primary text-on-primary font-label-md text-label-md" id="saveButton" type="button">Save Measurement</button>
+<button class="hidden w-full h-10 text-on-surface-variant font-label-sm text-label-sm" id="cancelEditButton" type="button">Cancel edit</button>
 </section>
 <section class="rounded-[24px] bg-surface-container-lowest p-4 soft-shadow space-y-4">
 <div class="flex gap-2 overflow-x-auto pb-1" id="graphTabs"></div>
@@ -159,6 +160,7 @@ document.getElementById("lengthLabel").textContent = currentLengthLabel;
 document.getElementById("heightInputLabel").textContent = `${currentLengthLabel} cm`;
 if (permissions.canAddLogs) {
   document.getElementById("saveButton").addEventListener("click", saveMeasurement);
+  document.getElementById("cancelEditButton").addEventListener("click", exitEditMode);
 } else {
   document.getElementById("addMeasurementSection").classList.add("hidden");
   document.getElementById("growthStatus").textContent = viewOnlyMessage;
@@ -169,6 +171,29 @@ loadGrowthRecordsRemote(selectedBabyId, []).catch((error) => {
 renderTabs(); render();
 showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
+let editingId = null;
+function enterEditMode(id){
+  const r = records().find(x=>x.id===id);
+  if(!r) return;
+  editingId = id;
+  document.getElementById("weightInput").value = r.weightKg ?? "";
+  document.getElementById("heightInput").value = (r.heightCm || r.lengthCm) ?? "";
+  document.getElementById("headInput").value = r.headCircumferenceCm ?? "";
+  document.getElementById("dateInput").value = String(r.measuredAt).slice(0,10);
+  document.getElementById("notesInput").value = r.notes || "";
+  document.getElementById("addMeasurementTitle").textContent = "Edit measurement";
+  document.getElementById("saveButton").textContent = "Update Measurement";
+  document.getElementById("cancelEditButton").classList.remove("hidden");
+  document.getElementById("formError").classList.add("hidden");
+  document.getElementById("addMeasurementSection").scrollIntoView({ behavior:"smooth", block:"start" });
+}
+function exitEditMode(){
+  editingId = null;
+  ["weightInput","heightInput","headInput","notesInput"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("addMeasurementTitle").textContent = "Add measurement";
+  document.getElementById("saveButton").textContent = "Save Measurement";
+  document.getElementById("cancelEditButton").classList.add("hidden");
+}
 async function saveMeasurement(){
   const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
   const measuredAt = document.getElementById("dateInput").value;
@@ -177,12 +202,11 @@ async function saveMeasurement(){
     ? { lengthCm: heightValue || undefined }
     : { heightCm: heightValue || undefined };
   try {
-    await saveGrowthRecordRemote({ id:`growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, ...heightFields, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
+    await saveGrowthRecordRemote({ id: editingId || `growth-local-${Date.now()}`, babyId:selectedBabyId, measuredAt:new Date(`${measuredAt}T09:00:00`).toISOString(), weightKg: weightKg || undefined, ...heightFields, headCircumferenceCm: headCircumferenceCm || undefined, notes: document.getElementById("notesInput").value.trim() || undefined });
   } catch (syncError) {
     console.warn("Could not sync growth record to cloud.", syncError);
   }
-  ["weightInput","heightInput","headInput","notesInput"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("formError").classList.add("hidden"); render();
+  document.getElementById("formError").classList.add("hidden"); exitEditMode(); render();
 }
 function render(){
   const items = records();
@@ -194,7 +218,8 @@ function render(){
   document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby.dateOfBirth), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
   renderGraph(items);
   document.getElementById("historyList").innerHTML = items.length ? [...items].reverse().map(renderHistory).join("") : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-headline-md text-headline-md">No growth records yet</p><p class="font-body-md text-body-md text-on-surface-variant">Your first measurement will appear here.</p></div>`;
-  document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",async ()=>{ const id=btn.dataset.deleteGrowth; const removed=records().find(r=>r.id===id); try { await deleteGrowthRecordRemote(id); } catch (syncError) { console.warn("Could not delete growth record from cloud.", syncError); } render(); showUndoToast("Measurement deleted",async ()=>{ if(removed){ try { await saveGrowthRecordRemote(removed); } catch (e) { saveLocalGrowthRecord(removed); } render(); } }); }));
+  document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",async ()=>{ const id=btn.dataset.deleteGrowth; const removed=records().find(r=>r.id===id); try { await deleteGrowthRecordRemote(id); } catch (syncError) { console.warn("Could not delete growth record from cloud.", syncError); } if(id===editingId) exitEditMode(); render(); showUndoToast("Measurement deleted",async ()=>{ if(removed){ try { await saveGrowthRecordRemote(removed); } catch (e) { saveLocalGrowthRecord(removed); } render(); } }); }));
+  document.querySelectorAll("[data-edit-growth]").forEach(btn=>btn.addEventListener("click",()=>enterEditMode(btn.dataset.editGrowth)));
 }
 function renderTabs(){ document.getElementById("graphTabs").innerHTML = tabs.map(([id,label])=>`<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap ${id===activeTab?'bg-primary text-on-primary':'bg-surface-container text-on-surface-variant'}" data-tab="${id}" type="button">${label}</button>`).join(""); document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{activeTab=btn.dataset.tab; renderTabs(); render();})); }
 function monthsBetween(dateOfBirth, measuredAt){
@@ -206,7 +231,7 @@ function formatAxis(value, unit){
   const rounded = Math.abs(value) >= 10 ? value.toFixed(1).replace(/\.0$/,"") : value.toFixed(1);
   return unit ? `${rounded} ${unit}` : rounded;
 }
-function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button>` : ""}</article>`; }
+function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<div class="flex flex-col items-end gap-2 shrink-0"><button class="text-primary font-label-sm text-label-sm" data-edit-growth="${record.id}" type="button">Edit</button><button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button></div>` : ""}</article>`; }
 function renderGraph(items){
   const tab = graphConfig(activeTab);
   const points = items.map(tab.point).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).sort((a,b)=>a.x-b.x);
