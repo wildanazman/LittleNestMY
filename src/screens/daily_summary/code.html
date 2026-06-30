@@ -131,7 +131,9 @@ tailwind.config = {
         <p class="text-[12px] font-extrabold uppercase tracking-wide text-primary">Share preview</p>
         <h2 class="text-[19px] leading-6 font-extrabold text-on-surface">What you’ll send</h2>
       </div>
-      <span class="material-symbols-outlined text-primary">ios_share</span>
+      <button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="previewShareButton" type="button" aria-label="Share summary preview">
+        <span class="material-symbols-outlined">ios_share</span>
+      </button>
     </div>
     <div class="mt-3 rounded-[20px] rounded-tl-md bg-[#e6f6ed] border border-[#c2e7d1] p-4 dark:bg-white/[0.06] dark:border-white/10">
       <pre class="whitespace-pre-wrap break-words font-body text-[13.5px] leading-6 text-on-surface" id="summaryText">Loading…</pre>
@@ -169,7 +171,7 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
-const { calculateBabyAge, formatDuration, formatDurationBetween, formatRelativeTime, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
@@ -183,7 +185,8 @@ if (!(await isLoggedIn())) {
 
 document.getElementById("backButton").addEventListener("click", () => goBackOrTo("home_dashboard"));
 document.getElementById("copyButton").addEventListener("click", copySummary);
-document.getElementById("whatsappButton").addEventListener("click", shareWhatsApp);
+document.getElementById("whatsappButton").addEventListener("click", shareSummary);
+document.getElementById("previewShareButton").addEventListener("click", shareSummary);
 document.getElementById("weeklyInsightsButton").addEventListener("click", () => goToScreen("weekly_insights"));
 
 await renderSummary();
@@ -209,7 +212,7 @@ async function renderSummary() {
   const sleepLogs = core.sleepLogs || [];
   const diaperLogs = core.diaperLogs || [];
   const healthNotes = core.healthNotes || [];
-  const latestFeed = [...feedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
+  const feedingSummary = buildFeedingSummary(feedingLogs, now);
   const sleepMinutes = getTodaySleepMinutes(sleepLogs, now);
   const todayDiapers = diaperLogs.filter((log) => isSameLocalDay(log.changedAt, now));
   const todayHealth = healthNotes.filter((note) => isSameLocalDay(note.recordedAt || note.loggedAt, now));
@@ -219,8 +222,6 @@ async function renderSummary() {
   const mamaMeds = mama.error ? [] : mama.medications.filter((item) => item.medicationTime && localDate(new Date(item.medicationTime)) === todayKey);
   const mamaMedsTaken = mamaMeds.filter((item) => item.status === "taken").length;
 
-  const feedRel = latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : "";
-  const feedLabel = latestFeed ? (/^(now|just now)$/i.test(feedRel) ? "Just now" : `${feedRel} ago`) : "No feeds yet";
   const sleepLabel = sleepMinutes ? formatDuration(sleepMinutes) : "0h";
   const diaperLabel = `${todayDiapers.length} today`;
   const healthLabel = todayHealth.length ? `${todayHealth.length} note${todayHealth.length === 1 ? "" : "s"} today` : "No health notes";
@@ -229,9 +230,9 @@ async function renderSummary() {
 
   document.getElementById("summarySubtitle").textContent = `${baby.name} · ${calculateBabyAge(baby.dateOfBirth, now)}`;
   document.getElementById("summaryDate").textContent = now.toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "short" });
-  document.getElementById("summaryHeadline").textContent = buildHeadline(baby.name, latestFeed, feedingLogs, sleepMinutes, todayDiapers.length, now);
+  document.getElementById("summaryHeadline").textContent = buildHeadline(baby.name, feedingSummary.count, sleepMinutes, todayDiapers.length);
   document.getElementById("summaryCards").innerHTML = [
-    card("Feed", feedLabel, latestFeed ? feedingDetail(latestFeed) : "Add what you remember", "restaurant", "feed"),
+    card("Feed", feedingSummary.value, feedingSummary.detail, "restaurant", "feed"),
     card("Sleep", sleepLabel, "Total sleep today", "bedtime", "sleep"),
     card("Diaper", diaperLabel, "Wet, dirty, or mixed", "baby_changing_station", "diaper"),
     card("Health", healthLabel, "For records only", "medical_information", "health"),
@@ -242,7 +243,7 @@ async function renderSummary() {
   shareText = [
     "LittleNest MY Today Summary",
     `${baby.name} - ${calculateBabyAge(baby.dateOfBirth, now)}`,
-    `Feed: ${feedLabel}`,
+    `Feed: ${feedingSummary.share}`,
     `Sleep: ${sleepLabel} today`,
     `Diapers: ${diaperLabel}`,
     `Health: ${healthLabel}`,
@@ -264,8 +265,7 @@ function card(title, value, detail, icon, tone = "feed") {
   `;
 }
 
-function buildHeadline(name, latestFeed, feedingLogs, sleepMinutes, diaperCount, when) {
-  const feedsToday = feedingLogs.filter((log) => isSameLocalDay(log.startedAt, when)).length;
+function buildHeadline(name, feedsToday, sleepMinutes, diaperCount) {
   const parts = [];
   if (feedsToday) parts.push(`${feedsToday} feed${feedsToday === 1 ? "" : "s"}`);
   if (sleepMinutes) parts.push(`${formatDuration(sleepMinutes)} sleep`);
@@ -277,13 +277,81 @@ function buildHeadline(name, latestFeed, feedingLogs, sleepMinutes, diaperCount,
   return `${name} had ${list} so far today.`;
 }
 
-function feedingDetail(log) {
-  if (log.amountMl) return `${log.amountMl} ml`;
-  if (log.amountGrams) return `${log.amountGrams} g solid`;
-  if (log.type === "breast" && log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
-  if (log.durationMinutes) return formatDuration(log.durationMinutes);
-  if (log.endedAt) return formatDurationBetween(log.startedAt, log.endedAt);
-  return log.type || "Logged";
+function buildFeedingSummary(feedingLogs, date) {
+  const todayFeeds = (feedingLogs || []).filter((log) => isSameLocalDay(log.startedAt, date));
+  if (!todayFeeds.length) {
+    return {
+      count: 0,
+      value: "No feeds yet",
+      detail: "Add what you remember",
+      share: "No feeds logged today"
+    };
+  }
+
+  const totals = todayFeeds.reduce((acc, log) => {
+    const type = String(log.type || "").toLowerCase();
+    const amountMl = Number(log.amountMl) || 0;
+    const amountGrams = Number(log.amountGrams) || 0;
+    const minutes = feedingMinutes(log);
+
+    if (type === "breast") {
+      if (minutes > 0) acc.breastMinutes += minutes;
+      else acc.breastCount += 1;
+    } else if (type === "formula") {
+      if (amountMl > 0) acc.formulaMl += amountMl;
+      else acc.formulaCount += 1;
+    } else if (type === "bottle") {
+      if (amountMl > 0) acc.bottleMl += amountMl;
+      else acc.bottleCount += 1;
+    } else if (type === "solid") {
+      if (amountGrams > 0) acc.solidGrams += amountGrams;
+      else acc.solidCount += 1;
+    } else {
+      acc.otherCount += 1;
+    }
+    return acc;
+  }, {
+    breastMinutes: 0,
+    breastCount: 0,
+    formulaMl: 0,
+    formulaCount: 0,
+    bottleMl: 0,
+    bottleCount: 0,
+    solidGrams: 0,
+    solidCount: 0,
+    otherCount: 0
+  });
+
+  const parts = [];
+  if (totals.breastMinutes) parts.push(`BF ${formatDuration(totals.breastMinutes)}`);
+  if (totals.breastCount) parts.push(`BF ${totals.breastCount}x`);
+  if (totals.formulaMl) parts.push(`Formula ${roundTotal(totals.formulaMl)}ml`);
+  if (totals.formulaCount) parts.push(`Formula ${totals.formulaCount}x`);
+  if (totals.bottleMl) parts.push(`Bottle ${roundTotal(totals.bottleMl)}ml`);
+  if (totals.bottleCount) parts.push(`Bottle ${totals.bottleCount}x`);
+  if (totals.solidGrams) parts.push(`Solid ${roundTotal(totals.solidGrams)}g`);
+  if (totals.solidCount) parts.push(`Solid ${totals.solidCount}x`);
+  if (totals.otherCount) parts.push(`${totals.otherCount} other`);
+
+  const countLabel = `${todayFeeds.length} feed${todayFeeds.length === 1 ? "" : "s"} today`;
+  return {
+    count: todayFeeds.length,
+    value: parts.length ? parts.slice(0, 2).join(" • ") : countLabel,
+    detail: parts.slice(2).join(" • ") || countLabel,
+    share: parts.length ? `${parts.join(", ")} (${countLabel})` : countLabel
+  };
+}
+
+function feedingMinutes(log) {
+  const explicit = Number(log.durationMinutes) || 0;
+  if (explicit > 0) return explicit;
+  if (!log.startedAt || !log.endedAt) return 0;
+  return Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000));
+}
+
+function roundTotal(value) {
+  const rounded = Math.round(Number(value) || 0);
+  return Number.isFinite(rounded) ? rounded : 0;
 }
 
 function getTodaySleepMinutes(logs, date) {
@@ -312,6 +380,31 @@ async function copySummary() {
   } catch {
     showFeedback("Copy did not work here. You can select the preview text.", true);
   }
+}
+
+async function shareSummary() {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "LittleNest care summary", text: shareText });
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareText);
+  } catch {
+    // Clipboard can be blocked in some embedded browsers.
+  }
+
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const opened = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  if (!opened) {
+    window.location.href = whatsappUrl;
+    return;
+  }
+  showFeedback("Copied. Opening WhatsApp...");
 }
 
 async function shareWhatsApp() {
