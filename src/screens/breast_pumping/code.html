@@ -1668,10 +1668,21 @@ async function onToggleNextPumpRemind(event) {
     event.target.checked = false;
     const status = document.getElementById("nextPumpReminderStatus");
     if (status) status.textContent = "Allow notifications in your browser to get pump reminders.";
+    showFeedback("Turn on notifications first to get pump reminders.", true);
     return;
   }
-  if (manualNextPump) writeManualNextPump({ ...manualNextPump, remind: on });
-  else renderNextPumpReminderUI();
+  if (on && !manualNextPump) {
+    // No time picked yet — default to 3h so the reminder has something to fire on.
+    setManualNextPumpInMinutes(180);
+    showFeedback("Reminder on — next session in 3h. Tap a time to change.");
+    return;
+  }
+  if (manualNextPump) {
+    writeManualNextPump({ ...manualNextPump, remind: on });
+    showFeedback(on ? `Reminder on for ${formatTime(manualNextPump.at)}.` : "Reminder turned off.");
+  } else {
+    renderNextPumpReminderUI();
+  }
 }
 async function ensureNotifPermission() {
   if (!("Notification" in window)) return false;
