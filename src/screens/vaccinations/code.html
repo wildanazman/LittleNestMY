@@ -120,7 +120,7 @@ tailwind.config = {
   const { loadVaccinationRecordsRemote, saveVaccinationRecordRemote, deleteVaccinationRecordRemote } = await import(`${moduleBase}utils/vaccinationsRemote.mjs`);
   const { buildVaccinationPlan, groupByAge, summarise, nextDue } = await import(`${moduleBase}utils/vaccinations.mjs`);
   const { getBabyPermissions } = await import(`${moduleBase}utils/permissions.mjs`);
-  const { saveCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
+  const { loadCalendarEventsRemote, saveCalendarEventRemote, deleteCalendarEventRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
   const { goBackOrTo, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
 
@@ -156,6 +156,9 @@ tailwind.config = {
     let records = [];
     const loaded = await loadVaccinationRecordsRemote(selectedBabyId, []);
     records = loaded.records || [];
+    let calendarEvents = [];
+    try { calendarEvents = (await loadCalendarEventsRemote(selectedBabyId, [])).calendarEvents || []; } catch { calendarEvents = []; }
+    let openApptKey = null;
     render();
     window.dispatchEvent(new Event("littlenest:ready"));
 
@@ -191,42 +194,72 @@ tailwind.config = {
       container.querySelectorAll("[data-mark]").forEach((btn) => btn.addEventListener("click", () => markGiven(btn.dataset.mark)));
       container.querySelectorAll("[data-undo]").forEach((btn) => btn.addEventListener("click", () => undo(btn.dataset.undo)));
       container.querySelectorAll("[data-date-for]").forEach((input) => input.addEventListener("change", () => changeDate(input.dataset.dateFor, input.value)));
-      container.querySelectorAll("[data-appt]").forEach((btn) => btn.addEventListener("click", () => {
-        const key = btn.dataset.appt;
+      container.querySelectorAll("[data-appt-open]").forEach((b) => b.addEventListener("click", () => { openApptKey = b.dataset.apptOpen; render(); }));
+      container.querySelectorAll("[data-appt-cancel]").forEach((b) => b.addEventListener("click", () => { openApptKey = null; render(); }));
+      container.querySelectorAll("[data-appt-save]").forEach((b) => b.addEventListener("click", () => {
+        const key = b.dataset.apptSave;
         const dateInput = container.querySelector(`[data-appt-date="${key}"]`);
-        addAppointment(key, dateInput?.value, btn);
+        saveAppointment(key, dateInput?.value);
       }));
+      container.querySelectorAll("[data-appt-remove]").forEach((b) => b.addEventListener("click", () => removeAppointment(b.dataset.apptRemove)));
     }
 
-    async function addAppointment(key, dateStr, btn) {
+    async function saveAppointment(key, dateStr) {
       const item = apptItems[key];
       if (!item) return;
       const date = (dateStr || item.dueDate || "").slice(0, 10);
-      if (!date) { btn.textContent = "Pick a date"; return; }
-      const original = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span>Saving`;
+      if (!date) return;
       try {
-        const title = `${item.vaccine}${item.dose ? ` · ${item.dose}` : ""} vaccine`;
-        await saveCalendarEventRemote({
+        const saved = await saveCalendarEventRemote({
           id: crypto.randomUUID(),
           babyId: selectedBabyId,
           type: "vaccine",
-          title,
+          title: apptTitleFor(item),
           startsAt: new Date(`${date}T09:00:00`).toISOString(),
           notes: item.protects ? `Protects against: ${item.protects}` : "Vaccination appointment"
         });
-        btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">check</span>Added`;
-        btn.classList.add("bg-tertiary-container", "text-tertiary");
-        setTimeout(() => { btn.disabled = false; btn.innerHTML = original; btn.classList.remove("bg-tertiary-container", "text-tertiary"); }, 2500);
+        calendarEvents = [...calendarEvents.filter((e) => e.id !== saved.id), saved];
+        openApptKey = null;
+        render();
       } catch (error) {
         console.warn("Could not save vaccine appointment.", error);
-        btn.disabled = false;
-        btn.innerHTML = `<span class="material-symbols-outlined text-[16px]">error</span>Try again`;
-        setTimeout(() => { btn.innerHTML = original; }, 2500);
+        openApptKey = null;
+        render();
       }
     }
 
+    async function removeAppointment(key) {
+      const item = apptItems[key];
+      const appt = item && apptForItem(item);
+      if (!appt) return;
+      calendarEvents = calendarEvents.filter((e) => e.id !== appt.id);
+      render();
+      try { await deleteCalendarEventRemote(appt.id); } catch (error) { console.warn("Could not remove vaccine appointment.", error); }
+    }
+
+    function apptTitleFor(item) {
+      return `${item.vaccine}${item.dose ? ` · ${item.dose}` : ""} vaccine`;
+    }
+    function apptForItem(item) {
+      const title = apptTitleFor(item);
+      return calendarEvents.find((e) => e && e.type === "vaccine" && e.title === title) || null;
+    }
+    function pendingAction(item) {
+      const markBtn = `<button data-mark="${item.key}" class="h-9 px-4 rounded-full bg-primary text-on-primary text-sm font-bold active:scale-95" type="button">Mark given</button>`;
+      const appt = apptForItem(item);
+      let apptArea;
+      if (appt) {
+        apptArea = `<span class="badge badge-done"><span class="material-symbols-outlined text-[13px]">event_available</span>Appt ${fmtDate(appt.startsAt)}</span>
+          <button data-appt-remove="${item.key}" class="text-xs font-bold text-error" type="button">Remove</button>`;
+      } else if (openApptKey === item.key) {
+        apptArea = `<input type="date" data-appt-date="${item.key}" value="${(item.dueDate || "").slice(0,10)}" class="vacc-input bg-surface-container-lowest border border-outline-variant rounded-lg px-2 py-1 text-xs"/>
+          <button data-appt-save="${item.key}" class="h-9 px-3 rounded-full bg-primary text-on-primary text-sm font-bold active:scale-95" type="button">Save</button>
+          <button data-appt-cancel="${item.key}" class="text-xs font-bold text-on-surface-variant" type="button">Cancel</button>`;
+      } else {
+        apptArea = `<button data-appt-open="${item.key}" class="h-9 px-3 rounded-full bg-surface-container text-primary text-sm font-bold active:scale-95 flex items-center gap-1" type="button"><span class="material-symbols-outlined text-[16px]">event</span>Appointment</button>`;
+      }
+      return `<div class="mt-2 flex flex-wrap items-center gap-2">${markBtn}${apptArea}</div>`;
+    }
     function renderItem(item) {
       apptItems[item.key] = item;
       const badge = item.status === "done"
@@ -242,11 +275,7 @@ tailwind.config = {
              <input type="date" data-date-for="${item.key}" value="${(item.givenOn || "").slice(0,10)}" class="vacc-input bg-surface-container-lowest border border-outline-variant rounded-lg px-2 py-1 text-xs"/>
              <button data-undo="${item.key}" class="text-xs font-bold text-error" type="button">Undo</button>
            </div>`
-        : `<div class="mt-2 flex flex-wrap items-center gap-2">
-             <button data-mark="${item.key}" class="h-9 px-4 rounded-full bg-primary text-on-primary text-sm font-bold active:scale-95" type="button">Mark given</button>
-             <input type="date" data-appt-date="${item.key}" value="${(item.dueDate || "").slice(0,10)}" class="vacc-input bg-surface-container-lowest border border-outline-variant rounded-lg px-2 py-1 text-xs"/>
-             <button data-appt="${item.key}" class="h-9 px-3 rounded-full bg-surface-container text-primary text-sm font-bold active:scale-95 flex items-center gap-1" type="button"><span class="material-symbols-outlined text-[16px]">event</span>Appointment</button>
-           </div>`;
+        : pendingAction(item);
       return `
         <div class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow ${item.status === "overdue" ? "border border-error/30" : ""}">
           <div class="flex items-start justify-between gap-3">
