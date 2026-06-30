@@ -39,7 +39,7 @@ const routes = {
 
 function screenUrl(screenId) {
   if (window.LittleNestCompat?.screenUrl) return window.LittleNestCompat.screenUrl(screenId);
-  return window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}/`;
+  return window.location.protocol === "file:" ? `../${screenId}/code.html` : `/${screenId}`;
 }
 
 const activeGroups = {
@@ -680,7 +680,7 @@ function bindHeaderProfileButtons(root = document) {
         showGuestLocked("settings");
         return;
       }
-      navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
+      navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings");
     });
     target.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -689,7 +689,7 @@ function bindHeaderProfileButtons(root = document) {
           showGuestLocked("settings");
           return;
         }
-        navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
+        navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings");
       }
     });
   });

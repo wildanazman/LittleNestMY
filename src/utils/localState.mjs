@@ -2,6 +2,7 @@ import { shouldUseDemoData } from "./demoData.mjs";
 import { isGuestMode } from "./localAuth.mjs";
 
 const feedingLogsKey = "littlenest:feedingLogs";
+const activeFeedingKey = "littlenest:activeFeeding";
 const sleepLogsKey = "littlenest:sleepLogs";
 const activeSleepKey = "littlenest:activeSleep";
 const diaperLogsKey = "littlenest:diaperLogs";
@@ -20,6 +21,7 @@ const babyIdMapKey = "littlenest:babyIdMap";
 const guestStoragePrefix = "littlenest:guest:";
 const guestScopedKeys = new Set([
   feedingLogsKey,
+  activeFeedingKey,
   sleepLogsKey,
   activeSleepKey,
   diaperLogsKey,
@@ -141,6 +143,23 @@ export function saveLocalFeedingLog(log) {
 
 export function deleteLocalFeedingLog(logId) {
   return deleteCollectionItem(feedingLogsKey, logId);
+}
+
+export function getActiveFeedingSession() {
+  return readJson(activeFeedingKey, null);
+}
+
+export function saveActiveFeedingSession(session) {
+  writeJson(activeFeedingKey, session);
+  return session;
+}
+
+export function clearActiveFeedingSession() {
+  try {
+    window.localStorage.removeItem(storageKey(activeFeedingKey));
+  } catch {
+    // Local storage can be unavailable in private or restricted contexts.
+  }
 }
 
 export function getLogsForBaby(logs, babyId) {
@@ -442,6 +461,7 @@ function normalizeBabyProfile(profile) {
   if (!profile) return null;
   const now = new Date().toISOString();
   const name = String(profile.name || "Baby").trim() || "Baby";
+  const isPremature = profile.isPremature === true || String(profile.isPremature).toLowerCase() === "true";
   return {
     id: profile.id || `baby-${Date.now()}`,
     name,
@@ -452,6 +472,9 @@ function normalizeBabyProfile(profile) {
     photoUrl: profile.photoUrl || profile.avatarUrl || profile.avatar || "",
     feedingPreference: profile.feedingPreference || "",
     notes: profile.notes || "",
+    isPremature,
+    expectedDueDate: isPremature ? profile.expectedDueDate || "" : "",
+    gestationalAgeAtBirth: isPremature ? Number(profile.gestationalAgeAtBirth) || 0 : 0,
     createdAt: profile.createdAt || now,
     updatedAt: profile.updatedAt || now
   };

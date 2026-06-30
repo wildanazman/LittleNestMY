@@ -17,7 +17,7 @@
     if (isNativeCapacitor()) return `/${screenId}/index.html`;
     return window.location.protocol === "file:"
       ? `../${screenId}/code.html`
-      : `/${screenId}/`;
+      : `/${screenId}`;
   }
 
   function go(screenId) {

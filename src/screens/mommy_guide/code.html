@@ -80,7 +80,7 @@ const { goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { saveReminderRemote } = await import(`${moduleBase}utils/remindersRemote.mjs`);
 const selectedBabyId = getSelectedBabyId(babyProfile);
 const selectedBaby = getSelectedBabyProfile(babyProfile) || babyProfile;
-const guide = getFeedingGuideForBaby(selectedBaby.dateOfBirth);
+const guide = getFeedingGuideForBaby(selectedBaby);
 document.getElementById("backButton").addEventListener("click", () => goBackOrTo("settings"));
 document.getElementById("breastfeedingTable").innerHTML = breastfeedingGuide.map(row => `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow border border-white/60"><p class="font-label-md text-label-md text-primary">${row.age}</p><p class="font-body-md text-body-md text-on-surface"><strong>${row.pattern}</strong></p><p class="font-body-md text-body-md text-on-surface-variant">${row.solids}</p><p class="font-label-sm text-label-sm text-on-surface-variant">${row.notes}</p></article>`).join("");
 document.getElementById("appointmentChecklist").innerHTML = appointmentChecklist.map(item => `<div class="flex gap-2 rounded-2xl bg-surface-container-low p-3"><span class="material-symbols-outlined text-primary">check_circle</span><span class="font-body-md text-body-md text-on-surface-variant">${item}</span></div>`).join("");

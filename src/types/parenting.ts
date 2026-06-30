@@ -21,6 +21,9 @@ export interface BabyProfile {
   notes?: string;
   createdAt: ISODateTime;
   updatedAt: ISODateTime;
+  isPremature?: boolean;
+  expectedDueDate?: ISODate;
+  gestationalAgeAtBirth?: number;
 }
 
 export interface FeedingLog {

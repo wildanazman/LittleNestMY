@@ -171,7 +171,7 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { loadMamaCareData } = await import(`${moduleBase}utils/mamaCareRemote.mjs`);
 const { loadCalendarEventsRemote } = await import(`${moduleBase}utils/calendarEventsRemote.mjs`);
-const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { calculateBabyAge, profileAgeDisplay, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 
@@ -228,7 +228,11 @@ async function renderSummary() {
   const eventLabel = nextEvent ? `${nextEvent.title} (${new Date(nextEvent.startsAt).toLocaleDateString("en-MY", { day: "numeric", month: "short" })})` : "No upcoming";
   const mamaLabel = mamaCheckin ? `${mamaCheckin.mood || "Checked"}${mamaMeds.length ? `, meds ${mamaMedsTaken}/${mamaMeds.length}` : ""}` : (mamaMeds.length ? `Meds ${mamaMedsTaken}/${mamaMeds.length}` : "Not checked");
 
-  document.getElementById("summarySubtitle").textContent = `${baby.name} · ${calculateBabyAge(baby.dateOfBirth, now)}`;
+  const ageDisplay = profileAgeDisplay(baby, now);
+  document.getElementById("summarySubtitle").textContent = `${baby.name} · ${ageDisplay.corrected || ageDisplay.actual}`;
+  if (ageDisplay.corrected) {
+    document.getElementById("summarySubtitle").innerHTML = `${escapeHtml(baby.name)} · ${escapeHtml(ageDisplay.actual)} <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-tertiary-container/50 to-tertiary-container/30 text-on-tertiary-container px-2 py-0.5 text-[10px] font-bold border border-tertiary-container/25 shadow-sm"><span class="material-symbols-outlined text-[12px]">child_care</span>Corrected: ${escapeHtml(ageDisplay.corrected)}</span>`;
+  }
   document.getElementById("summaryDate").textContent = now.toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "short" });
   document.getElementById("summaryHeadline").textContent = buildHeadline(baby.name, feedingSummary.count, sleepMinutes, todayDiapers.length);
   document.getElementById("summaryCards").innerHTML = [
@@ -242,7 +246,7 @@ async function renderSummary() {
 
   shareText = [
     "LittleNest MY Today Summary",
-    `${baby.name} - ${calculateBabyAge(baby.dateOfBirth, now)}`,
+    `${baby.name} - ${ageDisplay.corrected || ageDisplay.actual}`,
     `Feed: ${feedingSummary.share}`,
     `Sleep: ${sleepLabel} today`,
     `Diapers: ${diaperLabel}`,

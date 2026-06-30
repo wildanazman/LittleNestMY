@@ -249,7 +249,7 @@ tailwind.config = {
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getAuthSession, isGuestMode, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-const { getPlanStatus, setCurrentTestPlan } = await import(`${moduleBase}utils/planUtils.mjs`);
+const { clearPlanCache, getPlanStatus, setCurrentTestPlan } = await import(`${moduleBase}utils/planUtils.mjs`);
 const { isTestPlanUser, TEST_USER_EMAIL } = await import(`${moduleBase}utils/testPlan.mjs`);
 const { requireSupabaseClient, isSupabaseConfigured } = await import(`${moduleBase}utils/supabaseClient.mjs`);
 
@@ -264,8 +264,37 @@ document.getElementById("testPlanFreeButton").addEventListener("click", () => se
 document.getElementById("testPlanTrialButton").addEventListener("click", () => setTestPlan("trial"));
 document.getElementById("testPlanPremiumButton").addEventListener("click", () => setTestPlan("premium"));
 
+await confirmReturnedCheckout();
 await renderPlanStatus();
 bindPrototypeActions();
+
+async function confirmReturnedCheckout() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("success") !== "true" || !params.get("session_id")) return;
+
+  showFeedback("Confirming your Premium purchase...", true);
+  try {
+    const session = await getAuthSession();
+    if (!session?.access_token) throw new Error("Please log in to confirm your purchase.");
+
+    const response = await fetch("/api/stripe-confirm-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${session.access_token}`
+      },
+      body: JSON.stringify({ sessionId: params.get("session_id") })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || "Could not confirm checkout session.");
+
+    clearPlanCache();
+    showFeedback("Payment confirmed. Premium is active.", false);
+    window.history.replaceState({}, "", window.location.pathname);
+  } catch (error) {
+    showFeedback(`${error.message} If payment was taken, contact support with your Stripe receipt.`, true);
+  }
+}
 
 async function renderPlanStatus() {
   const session = await getAuthSession();

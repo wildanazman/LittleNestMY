@@ -148,6 +148,19 @@ export const translations = {
       languageTitle: "Language",
       languageSubtitle: "Choose the app language",
       languageSaved: "Language saved. English remains the default for new devices."
+    },
+    premature: {
+      toggle: "Baby was born prematurely (Preterm)",
+      eddLabel: "Expected Due Date (EDD)",
+      eddPreferred: "preferred",
+      gaLabel: "Gestational Age at Birth",
+      gaPlaceholder: "e.g. 32, 34, 36",
+      gaUnit: "weeks",
+      orDivider: "or",
+      note: "Provide either the Expected Due Date (preferred) or Gestational Age at Birth for accurate corrected age tracking.",
+      correctedAgeLabel: "Corrected",
+      milestoneNote: "Milestones are shown based on your baby's corrected age because your baby was born prematurely.",
+      growthNote: "Growth charts use your baby's corrected age."
     }
   },
   ms: {
@@ -291,6 +304,19 @@ export const translations = {
       languageTitle: "Bahasa",
       languageSubtitle: "Pilih bahasa aplikasi",
       languageSaved: "Bahasa disimpan. English kekal sebagai pilihan asal untuk peranti baharu."
+    },
+    premature: {
+      toggle: "Bayi lahir pramatang (Preterm)",
+      eddLabel: "Tarikh Jangkaan Bersalin (EDD)",
+      eddPreferred: "diutamakan",
+      gaLabel: "Usia Gestasi Semasa Lahir",
+      gaPlaceholder: "cth. 32, 34, 36",
+      gaUnit: "minggu",
+      orDivider: "atau",
+      note: "Berikan sama ada Tarikh Jangkaan Bersalin (diutamakan) atau Usia Gestasi Semasa Lahir untuk pengiraan usia diperbetulkan yang tepat.",
+      correctedAgeLabel: "Diperbetulkan",
+      milestoneNote: "Milestone dipaparkan berdasarkan usia diperbetulkan bayi anda kerana bayi anda lahir pramatang.",
+      growthNote: "Carta tumbesaran menggunakan usia diperbetulkan bayi anda."
     }
   }
 };

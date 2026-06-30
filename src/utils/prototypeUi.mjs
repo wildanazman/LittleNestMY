@@ -22,7 +22,7 @@ export function screenUrl(screenId) {
   }
   return window.location.protocol === "file:"
     ? `../${screenId}/code.html`
-    : `/${screenId}/`;
+    : `/${screenId}`;
 }
 
 export function goToScreen(screenId) {

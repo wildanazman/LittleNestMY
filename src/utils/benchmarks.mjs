@@ -10,6 +10,54 @@ export function ageInMonths(dateOfBirth, at = new Date()) {
   return Math.max(0, (at - dob) / (1000 * 60 * 60 * 24 * 30.4375));
 }
 
+export function correctedAgeExpired(profile, at = new Date()) {
+  if (!profile?.dateOfBirth) return true;
+  return ageInMonths(profile.dateOfBirth, at) >= 24;
+}
+
+export function hasActivePrematureProfile(profile) {
+  return profile?.isPremature === true || String(profile?.isPremature || "").toLowerCase() === "true";
+}
+
+export function getEffectiveDateOfBirth(profile) {
+  if (!profile || !hasActivePrematureProfile(profile)) return profile?.dateOfBirth || null;
+  if (correctedAgeExpired(profile)) return profile.dateOfBirth;
+  if (profile.expectedDueDate) return profile.expectedDueDate;
+  if (profile.gestationalAgeAtBirth) {
+    const ga = Number(profile.gestationalAgeAtBirth);
+    if (Number.isNaN(ga) || ga >= 40) return profile.dateOfBirth;
+    const prematurityDays = Math.round((40 - ga) * 7);
+    const dob = new Date(`${String(profile.dateOfBirth).slice(0, 10)}T00:00:00`);
+    if (Number.isNaN(dob.getTime())) return profile.dateOfBirth;
+    dob.setDate(dob.getDate() + prematurityDays);
+    return dob.toISOString().slice(0, 10);
+  }
+  return profile.dateOfBirth;
+}
+
+export function correctedAgeInMonths(profile, at = new Date()) {
+  if (!profile || !hasActivePrematureProfile(profile)) return ageInMonths(profile?.dateOfBirth, at);
+  if (correctedAgeExpired(profile, at)) return ageInMonths(profile.dateOfBirth, at);
+  const effectiveDob = getEffectiveDateOfBirth(profile);
+  if (!effectiveDob) return 0;
+  return ageInMonths(effectiveDob, at);
+}
+
+export function hasReachedTermCorrected(profile, at = new Date()) {
+  if (!profile || !hasActivePrematureProfile(profile)) return true;
+  if (!profile.expectedDueDate && !profile.gestationalAgeAtBirth) return true;
+  if (profile.expectedDueDate) {
+    const edd = new Date(`${String(profile.expectedDueDate).slice(0, 10)}T00:00:00`);
+    return !Number.isNaN(edd.getTime()) && at >= edd;
+  }
+  return correctedAgeInMonths(profile, at) > 0;
+}
+
+export function isProfilePremature(profile) {
+  if (!profile || !hasActivePrematureProfile(profile)) return false;
+  return !correctedAgeExpired(profile);
+}
+
 // "Breastfeeding" | "Formula" | "Mixed" | "breast" | "formula" -> normalized key
 export function normalizeFeedingType(value) {
   const t = String(value || "").toLowerCase();
@@ -282,4 +330,70 @@ export function growthCorrelations(growthRecords, feeds, sleeps) {
     intervals.push({ fromAt: a.at, toAt: b.at, days: Math.round(days), gainPerWeek, avgFeeds, avgSleepHours });
   }
   return { hasData: true, intervals };
+}
+
+// ---------- PREMATURE: INTERGROWTH-21st / Fenton Preterm Growth ----------
+// PMA = Postmenstrual Age (weeks) = GA_at_birth + (actual_age_in_days / 7)
+export function pmaWeeks(profile, at = new Date()) {
+  if (!profile?.dateOfBirth) return 0;
+  const ga = profile.gestationalAgeAtBirth
+    ? Number(profile.gestationalAgeAtBirth)
+    : profile.expectedDueDate
+      ? 40 - Math.round((new Date(`${profile.expectedDueDate}T00:00:00`) - new Date(`${profile.dateOfBirth}T00:00:00`)) / (7 * 86400000))
+      : 40;
+  const actualDays = Math.max(0, (at - new Date(`${String(profile.dateOfBirth).slice(0, 10)}T00:00:00`)) / 86400000);
+  return Math.max(ga, ga + actualDays / 7);
+}
+
+export function pmaWeeksForRecord(profile, measuredAt) {
+  return pmaWeeks(profile, new Date(measuredAt));
+}
+
+export const PRETERM_CHART_THRESHOLD_WEEKS = 64;
+
+export function usePretermChart(profile) {
+  if (!profile || !hasActivePrematureProfile(profile)) return false;
+  if (correctedAgeExpired(profile)) return false;
+  return pmaWeeks(profile) < PRETERM_CHART_THRESHOLD_WEEKS;
+}
+
+// Intergrowth-21st / Fenton 50th percentile preterm reference (simplified)
+// [PMA_weeks, weight_kg, length_cm, head_cm]
+const PRETERM_REF = [
+  [24, 0.63, 31.0, 22.0],
+  [26, 0.83, 33.1, 24.0],
+  [28, 1.07, 35.4, 25.9],
+  [30, 1.36, 37.8, 27.7],
+  [32, 1.71, 40.2, 29.3],
+  [34, 2.12, 42.5, 30.8],
+  [36, 2.58, 44.7, 32.2],
+  [38, 2.98, 46.8, 33.5],
+  [40, 3.30, 49.0, 34.5],
+  [42, 3.70, 51.2, 35.5],
+  [44, 4.15, 53.3, 36.5],
+  [46, 4.60, 55.3, 37.4],
+  [48, 5.05, 57.2, 38.2],
+  [50, 5.50, 59.0, 38.9],
+  [52, 5.93, 60.7, 39.5],
+  [54, 6.33, 62.2, 40.1],
+  [56, 6.70, 63.6, 40.6],
+  [58, 7.05, 64.8, 41.1],
+  [60, 7.38, 66.0, 41.5],
+  [62, 7.69, 67.1, 41.9],
+  [64, 7.98, 68.1, 42.2]
+];
+
+export function pretermMedian(pmaWeeks, metric) {
+  const col = metric === "weight" ? 1 : metric === "length" ? 2 : metric === "head" ? 3 : null;
+  if (col == null) return null;
+  const table = PRETERM_REF;
+  const w = Math.max(table[0][0], Math.min(table[table.length - 1][0], pmaWeeks));
+  for (let i = 0; i < table.length - 1; i += 1) {
+    const [a] = table[i], [b] = table[i + 1];
+    if (w >= a && w <= b) {
+      const t = b === a ? 0 : (w - a) / (b - a);
+      return Math.round((table[i][col] + (table[i + 1][col] - table[i][col]) * t) * 10) / 10;
+    }
+  }
+  return table[table.length - 1][col];
 }

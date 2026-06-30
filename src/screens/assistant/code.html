@@ -619,7 +619,9 @@
   }
 
   // ---------- age-aware benchmark engine (RESEARCH.md) ----------
-  const ageMo = B.ageInMonths(selectedBaby?.dateOfBirth, now);
+  const ageMo = B.correctedAgeInMonths(selectedBaby, now);
+  const actualAgeMo = B.ageInMonths(selectedBaby?.dateOfBirth, now);
+  const isPremature = B.isProfilePremature(selectedBaby);
   const feedingType = selectedBaby?.feedingPreference || selectedBaby?.feedingType || "mixed";
   const growthRecords = getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId)
     .sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt));
@@ -629,11 +631,14 @@
 
   function renderNutrition() {
     const st = B.nutritionStage(ageMo);
+    const correctedNote = isPremature
+      ? `<div class="rounded-2xl bg-gradient-to-r from-tertiary-container/30 to-tertiary-container/10 border border-tertiary-container/20 p-3 mt-2 flex items-start gap-2.5"><span class="material-symbols-outlined text-[18px] text-tertiary shrink-0 mt-0.5">child_care</span><p class="font-label-sm text-[12px] text-on-tertiary-container leading-relaxed">Milestones, growth, and tips are based on your baby's <strong>corrected age</strong> (${Math.floor(ageMo)} mo) because your baby was born prematurely.</p></div>`
+      : "";
     document.getElementById("nutritionCard").innerHTML = `
       <span class="w-11 h-11 rounded-full bg-[#fff3da] text-[#b45309] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant_menu</span></span>
       <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Nutrition stage · ${Math.floor(ageMo)} mo</p>
       <p class="font-headline-md text-body-lg font-extrabold text-on-surface">${st.title}</p>
-      <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${st.guidance}</p></div>`;
+      <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${st.guidance}</p>${correctedNote}</div>`;
   }
 
   function renderWellness() {
@@ -719,8 +724,13 @@
   function renderGrowth() {
     const card = document.getElementById("growthCard");
     const latest = growthRecords[0];
+    const termReached = B.hasReachedTermCorrected(selectedBaby);
     if (!latest || (!latest.weightKg && !latest.heightCm && !latest.lengthCm)) {
       card.innerHTML = `<div class="flex items-center gap-3"><span class="w-10 h-10 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined">monitoring</span></span><p class="font-body-md text-body-md text-on-surface-variant">Add a growth measurement to compare with WHO medians for ${Math.floor(ageMo)} months.</p></div>`;
+      return;
+    }
+    if (isPremature && !termReached) {
+      card.innerHTML = `<div class="flex items-start gap-3"><span class="w-10 h-10 rounded-full bg-[#eee8ff] text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px]">child_care</span></span><div><p class="font-label-md text-[14px] text-on-surface font-bold">WHO comparison starts at term</p><p class="font-label-sm text-[12px] text-on-surface-variant mt-0.5">Your baby hasn't reached their corrected due date yet. WHO growth data applies from term corrected age onward.</p></div></div>`;
       return;
     }
     const rows = [];

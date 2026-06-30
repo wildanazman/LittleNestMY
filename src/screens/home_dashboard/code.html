@@ -122,7 +122,7 @@
         :root.dark body {
           background: #07111f !important;
         }
-        /* Home backdrop — user-selectable. Base holds layout only; the chosen
+        /* Home backdrop -- user-selectable. Base holds layout only; the chosen
            .home-bg-<id> class paints the background (each beats theme.css via
            higher specificity + !important). */
         .home-premium-bg {
@@ -296,6 +296,33 @@
             linear-gradient(118deg, rgba(255,255,255,.74) 0 24%, transparent 24% 100%),
             linear-gradient(150deg, transparent 0 62%, rgba(255, 158, 192, .18) 62% 100%);
           pointer-events: none;
+        }
+        .preterm-home-note {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          flex-wrap: wrap;
+          width: fit-content;
+          max-width: 100%;
+          border-radius: 999px;
+          background: rgba(181, 214, 175, .38);
+          color: #415e3f;
+          border: 1px solid rgba(65, 94, 63, .14);
+          padding: 4px 8px;
+          font-size: 10px;
+          line-height: 14px;
+          font-weight: 800;
+          white-space: normal;
+          overflow: visible;
+          text-overflow: clip;
+        }
+        .preterm-home-note__muted {
+          color: rgba(65, 94, 63, .72);
+          font-weight: 700;
+        }
+        .preterm-home-note > span,
+        .preterm-home-note .material-symbols-outlined {
+          color: inherit !important;
         }
         .home-panel {
           background: rgba(255, 255, 255, 0.82);
@@ -559,7 +586,7 @@
           color: #0369a1 !important;
         }
         #homeContent #activeStatusCard #activeStatusLabel::before {
-          content: "Next up · ";
+          content: "Next up - ";
           color: #7056f4;
           font-weight: 900;
         }
@@ -657,6 +684,14 @@
           background: rgba(32, 42, 61, 0.62) !important;
           border-color: rgba(132, 204, 255, 0.16);
           box-shadow: 0 18px 44px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        :root.dark .preterm-home-note {
+          background: rgba(154, 240, 188, .14);
+          border-color: rgba(154, 240, 188, .18);
+          color: #9af0bc;
+        }
+        :root.dark .preterm-home-note__muted {
+          color: rgba(223, 247, 223, .72);
         }
         :root.dark .home-panel {
           background: rgba(255, 255, 255, 0.06);
@@ -933,7 +968,41 @@
 <div class="flex items-end justify-between">
 <div>
 <span class="font-label-md text-label-md text-on-surface-variant" data-i18n="home.greeting">Good morning,</span>
-<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName" data-i18n="home.loading">Loading...</h2>
+<h2 class="font-display-lg text-display-lg text-on-surface" id="parentName">Parent</h2>
+<script>
+  (() => {
+    const readJson = (key) => {
+      try {
+        const raw = window.localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    };
+    const initialsFor = (name) => String(name || "Parent")
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("") || "P";
+    let userId = "";
+    try { userId = window.localStorage.getItem("littlenest:lastAuthUserId") || ""; } catch {}
+    const profile = readJson(userId ? `littlenest:parentProfile:${userId}` : "littlenest:parentProfile")
+      || readJson("littlenest:parentProfile")
+      || {};
+    const name = profile.name || "Parent";
+    const nameEl = document.getElementById("parentName");
+    const initialsEl = document.getElementById("homeParentInitials");
+    const photoEl = document.getElementById("homeParentPhoto");
+    if (nameEl) nameEl.textContent = name;
+    if (initialsEl) initialsEl.textContent = initialsFor(name);
+    if (photoEl && profile.photoUrl) {
+      photoEl.src = profile.photoUrl;
+      photoEl.classList.remove("hidden");
+      initialsEl?.classList.add("hidden");
+    }
+  })();
+</script>
 </div>
 <button type="button" id="homePlanPill" class="home-pressable flex items-center gap-1.5 px-3 py-1.5 rounded-full font-label-sm text-label-sm shrink-0" aria-label="Your plan">
 <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">wb_sunny</span>
@@ -952,6 +1021,7 @@
 <div class="min-w-0 flex-1">
 <h3 class="font-headline-md text-headline-md text-on-surface truncate" id="babyName">No baby profile yet</h3>
 <p class="font-label-md text-label-md text-on-surface-variant truncate" id="babyAge">Create a baby profile, or wait for an invitation</p>
+<p class="hidden font-label-sm text-label-sm mt-1" id="correctedAgeNote"></p>
 </div>
 <button aria-label="Baby profile menu" class="home-pressable shrink-0 self-start w-10 h-10 rounded-full bg-white/80 flex items-center justify-center text-primary shadow-sm active:scale-95" id="babyProfileMenuButton" type="button">
 <span class="material-symbols-outlined">settings_heart</span>
@@ -1175,7 +1245,7 @@
 <div>
 <p class="font-label-md text-label-md text-on-surface">9:20 AM</p>
 <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
-<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Nap</span> · Started</p>
+<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Nap</span> - Started</p>
 </div>
 </div>
 </div>
@@ -1186,7 +1256,7 @@
 <div>
 <p class="font-label-md text-label-md text-on-surface">10:45 AM</p>
 <div class="bg-surface-container-low p-3 rounded-xl mt-1 border border-surface-variant">
-<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Diaper</span> · Wet changed</p>
+<p class="font-body-md text-body-md text-on-surface"><span class="font-bold">Diaper</span> - Wet changed</p>
 </div>
 </div>
 </div>
@@ -1342,7 +1412,7 @@
   <div class="launcher-panel" role="dialog" aria-modal="true" aria-label="Navigate and search pages">
     <div class="launcher-search-row">
       <span class="material-symbols-outlined">search</span>
-      <input id="launcherSearch" type="text" placeholder="Search pages…" autocomplete="off" spellcheck="false" aria-label="Search pages"/>
+      <input id="launcherSearch" type="text" placeholder="Search pages..." autocomplete="off" spellcheck="false" aria-label="Search pages"/>
       <button class="launcher-close" id="launcherClose" data-launcher-close type="button" aria-label="Close"><span class="material-symbols-outlined">close</span></button>
     </div>
     <div id="launcherResults" class="launcher-results"></div>
@@ -1372,7 +1442,7 @@
       } else if (status.state === "trial") {
         const d = status.daysLeft;
         style = base2 + "background:linear-gradient(135deg,#9b7cff,#7056f4);color:#fff;box-shadow:0 4px 12px rgba(112,86,244,.32);";
-        html = `${ico("workspace_premium")}<span>Premium Trial · ${d}d</span>`;
+        html = `${ico("workspace_premium")}<span>Premium Trial - ${d}d</span>`;
         label = `Free plan with Premium trial active, ${d} day${d === 1 ? "" : "s"} left. Tap to keep Premium.`;
       } else {
         style = base2 + (darkMode
@@ -1386,7 +1456,7 @@
       el.setAttribute("aria-label", label);
       el.addEventListener("click", () => goToScreen("subscription"));
 
-      // Trial awareness banner — make it unmistakable the user is on a 14-day Premium trial.
+      // Trial awareness banner -- make it unmistakable the user is on a 14-day Premium trial.
       if (status.state === "trial") {
         const anchor = document.getElementById("babyProfileCard");
         if (anchor && anchor.parentElement && !document.getElementById("planTrialNotice")) {
@@ -1403,7 +1473,7 @@
           note.innerHTML =
             `<span class="material-symbols-outlined" style="font-size:20px;color:${c.icon};font-variation-settings:'FILL' 1;">workspace_premium</span>` +
             `<span style="flex:1;min-width:0;">` +
-              `<span style="display:block;font-size:12.5px;font-weight:800;color:${c.title};line-height:1.2;">Premium Trial · ${d} day${d === 1 ? "" : "s"} left</span>` +
+              `<span style="display:block;font-size:12.5px;font-weight:800;color:${c.title};line-height:1.2;">Premium Trial - ${d} day${d === 1 ? "" : "s"} left</span>` +
               `<span style="display:block;font-size:11px;color:${c.sub};line-height:1.35;margin-top:1px;">Your plan is Free, but Premium access is active for the first 14 days. Tap to keep Premium after trial.</span>` +
             `</span>` +
             `<span class="material-symbols-outlined" style="font-size:18px;color:${c.chev};">chevron_right</span>`;
@@ -1478,7 +1548,7 @@
     );
     results.innerHTML = matches.length
       ? matches.map(itemHtml).join("")
-      : `<p class="launcher-empty">No pages match “${q.replace(/[<>&]/g, "")}”.</p>`;
+      : `<p class="launcher-empty">No pages match "${q.replace(/[<>&]/g, "")}".</p>`;
     highlightFirst();
   }
 
@@ -1572,7 +1642,8 @@
             formatEventDate,
             formatRelativeTime,
             formatTime,
-            isSameLocalDay
+            isSameLocalDay,
+            profileAgeDisplay
         } = dateFormatModule;
         const {
             getPersistedCalendarEvents,
@@ -1584,6 +1655,8 @@
             getLogsForBaby,
             getBabyProfiles,
             readSelectedBabyId,
+            getActiveFeedingSession,
+            clearActiveFeedingSession,
             getActiveSleepSession,
             clearActiveSleepSession,
             deleteLocalFeedingLog,
@@ -1732,7 +1805,24 @@
         }
         if (selectedBaby) {
             setText("babyName", selectedBaby.name);
-            setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
+            const ageInfo = profileAgeDisplay(selectedBaby, now);
+            if (ageInfo.corrected) {
+                setText("babyAge", `Corrected age: ${ageInfo.corrected}`);
+                const noteEl = document.getElementById("correctedAgeNote");
+                if (noteEl) {
+                    noteEl.innerHTML = `<span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">child_care</span><span>Preterm</span><span class="preterm-home-note__muted">Actual age: ${escapeHtml(ageInfo.actual)}</span>`;
+                    noteEl.classList.remove("truncate");
+                    noteEl.classList.add("preterm-home-note");
+                    noteEl.classList.remove("hidden");
+                }
+            } else {
+                setText("babyAge", ageInfo.actual);
+                const noteEl = document.getElementById("correctedAgeNote");
+                if (noteEl) {
+                    noteEl.classList.remove("preterm-home-note");
+                    noteEl.classList.add("hidden");
+                }
+            }
         } else {
             setText("babyName", t("home.noBabyName"));
             setText("babyAge", t("home.noBabyAge"));
@@ -1918,7 +2008,7 @@
             if (!latestGrowth) return;
             const length = latestGrowth.heightCm || latestGrowth.lengthCm;
             setText("growthSummaryTitle", latestGrowth.weightKg ? `${latestGrowth.weightKg} kg` : "Growth saved");
-            setText("growthSummaryDetail", [length ? `${length} cm` : "", latestGrowth.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm head` : ""].filter(Boolean).join(" · ") || "Latest measurement saved");
+            setText("growthSummaryDetail", [length ? `${length} cm` : "", latestGrowth.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm head` : ""].filter(Boolean).join(" - ") || "Latest measurement saved");
         }
 
         // Vaccination card: next-due NIP dose + progress, computed from DOB.
@@ -2059,11 +2149,14 @@
             const timeline = document.getElementById("timelineList");
             if (!timeline) return;
 
-            const ongoing = getActiveSleepSession();
-            const ongoingHtml = (ongoing && (!ongoing.babyId || ongoing.babyId === selectedBabyId))
-                ? renderOngoingSleep(ongoing) : "";
+            const ongoingFeed = getActiveFeedingSession();
+            const ongoingSleep = getActiveSleepSession();
+            const ongoingFeedHtml = (ongoingFeed && (!ongoingFeed.babyId || ongoingFeed.babyId === selectedBabyId))
+                ? renderOngoingFeeding(ongoingFeed) : "";
+            const ongoingSleepHtml = (ongoingSleep && (!ongoingSleep.babyId || ongoingSleep.babyId === selectedBabyId))
+                ? renderOngoingSleep(ongoingSleep) : "";
             const itemsHtml = events.length ? events.map((event, index) => renderTimelineItem(event, index, events.length)).join("") : "";
-            const body = ongoingHtml + itemsHtml;
+            const body = ongoingFeedHtml + ongoingSleepHtml + itemsHtml;
             timeline.innerHTML = body
                 ? `<div class="space-y-3">${body}</div>`
                 : renderEmptyTimeline();
@@ -2091,7 +2184,7 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:${badgeBg};color:${badgeFg}">${badge}</span>
                         </div>
                         <p class="text-[15px] font-bold text-on-surface leading-snug">${main}</p>
-                        ${note ? `<p class="text-[13px] italic text-on-surface-variant mt-1">“${escapeHtml(note)}”</p>` : ""}
+                        ${note ? `<p class="text-[13px] italic text-on-surface-variant mt-1">"${escapeHtml(note)}"</p>` : ""}
                         ${deleteButton}
                     </div>
                 </div>`;
@@ -2114,15 +2207,35 @@
                 </div>`;
         }
 
+        function renderOngoingFeeding(session) {
+            const startedAt = new Date(session.startedAt);
+            const elapsedMinutes = Number.isNaN(startedAt.getTime())
+                ? 0
+                : Math.max(0, Math.floor((now - startedAt) / 60000));
+            return `
+                <div class="relative pl-7">
+                    <span class="absolute left-[1px] top-[18px] w-3.5 h-3.5 rounded-full border-[3px] border-white shadow-sm animate-pulse dark:border-[#1b2233]" style="background:#ff6fa5"></span>
+                    <div class="relative bg-[#fff0f5] rounded-2xl px-4 py-3 border border-[#ffc8dc]/70 shadow-[0_8px_22px_rgba(255,111,165,0.12)] dark:bg-white/10 dark:border-white/10">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-[12px] font-semibold text-on-surface-variant">${t("home.started")} ${formatTime(session.startedAt)}</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5" style="background:#ffe8ef;color:#c01f5b">Feed</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-[15px] font-bold text-on-surface leading-snug">Breastfeeding now${elapsedMinutes ? ` - ${formatDuration(elapsedMinutes)}` : ""}</p>
+                            <button class="shrink-0 h-8 px-4 rounded-full bg-primary text-on-primary text-[13px] font-semibold active:scale-95 transition-transform" data-stop-feeding="1" type="button">Stop</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
         function bindTimelineStop(date) {
-            const btn = document.querySelector("#timelineList [data-stop-sleep]");
-            if (!btn) return;
-            btn.addEventListener("click", async (event) => {
+            const sleepBtn = document.querySelector("#timelineList [data-stop-sleep]");
+            if (sleepBtn) sleepBtn.addEventListener("click", async (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 const session = getActiveSleepSession();
                 if (!session) return;
-                btn.disabled = true;
+                sleepBtn.disabled = true;
                 try {
                     await saveSleepLogRemote({
                         id: `sleep-local-${Date.now()}`,
@@ -2139,6 +2252,36 @@
                 const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
                 allSleepLogs.length = 0;
                 allSleepLogs.push(...result.sleepLogs);
+                renderTimeline(date);
+            });
+
+            const feedBtn = document.querySelector("#timelineList [data-stop-feeding]");
+            if (feedBtn) feedBtn.addEventListener("click", async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const session = getActiveFeedingSession();
+                if (!session) return;
+                feedBtn.disabled = true;
+                const endedAt = new Date().toISOString();
+                const durationMinutes = Math.max(1, Math.round((new Date(endedAt) - new Date(session.startedAt)) / 60000));
+                try {
+                    await saveFeedingLogRemote({
+                        id: `feed-local-${Date.now()}`,
+                        babyId: selectedBabyId,
+                        type: "breast",
+                        startedAt: session.startedAt,
+                        endedAt,
+                        durationMinutes,
+                        notes: "Logged from Home"
+                    });
+                } catch (error) {
+                    console.warn("Could not sync stopped feeding.", error);
+                }
+                clearActiveFeedingSession();
+                const result = await loadCoreLogsRemote(selectedBabyId, { feedingLogs: [], sleepLogs: [], diaperLogs: [], healthNotes: [] });
+                allFeedingLogs.length = 0;
+                allFeedingLogs.push(...result.feedingLogs);
+                renderDashboardStats();
                 renderTimeline(date);
             });
         }
@@ -2285,17 +2428,17 @@
             const type = normalizeDiaperType(log.type);
             if (type === "pee") {
                 const color = displayOther(log.peeColor, log.peeColorOther) || log.color;
-                return [log.peeAmount || log.texture, color].filter(Boolean).join(" · ") || "Pee changed";
+                return [log.peeAmount || log.texture, color].filter(Boolean).join(" - ") || "Pee changed";
             }
             if (type === "poop") {
                 const consistency = displayOther(log.poopConsistency, log.poopConsistencyOther) || log.texture;
                 const color = displayOther(log.poopColor, log.poopColorOther) || log.color;
-                return [consistency, color].filter(Boolean).join(" · ") || "Poop changed";
+                return [consistency, color].filter(Boolean).join(" - ") || "Poop changed";
             }
             const pee = [log.peeAmount, displayOther(log.peeColor, log.peeColorOther)].filter(Boolean).join(", ");
             const poop = [displayOther(log.poopConsistency, log.poopConsistencyOther), displayOther(log.poopColor, log.poopColorOther)].filter(Boolean).join(", ");
-            const fallback = [log.texture, log.color].filter(Boolean).join(" · ");
-            return [pee ? `Pee: ${pee}` : "", poop ? `Poop: ${poop}` : "", !pee && !poop ? fallback : ""].filter(Boolean).join(" · ") || "Mixed diaper changed";
+            const fallback = [log.texture, log.color].filter(Boolean).join(" - ");
+            return [pee ? `Pee: ${pee}` : "", poop ? `Poop: ${poop}` : "", !pee && !poop ? fallback : ""].filter(Boolean).join(" - ") || "Mixed diaper changed";
         }
 
         function normalizeDiaperType(type) {
@@ -2372,10 +2515,10 @@
         }
 
         function feedIntervalHours() {
-            const guide = getFeedingGuideForBaby(selectedBaby?.dateOfBirth);
+            const guide = getFeedingGuideForBaby(selectedBaby);
             if (guide?.suggestedIntervalHours) return guide.suggestedIntervalHours;
             const feedType = selectedBaby?.feedingPreference || selectedBaby?.feedingType || "mixed";
-            const fb = B.feedingBenchmark(B.ageInMonths(selectedBaby?.dateOfBirth), feedType);
+            const fb = B.feedingBenchmark(B.correctedAgeInMonths(selectedBaby), feedType);
             if (fb.freq) return Math.max(2, Math.round(24 / ((fb.freq[0] + fb.freq[1]) / 2)));
             return 3;
         }
@@ -2432,12 +2575,12 @@
                 if (remaining > 0) {
                     setText("activeStatusLabel", "Next feed");
                     setText("activeStatusTitle", `in ${formatDuration(Math.max(1, Math.round(remaining / 60000)))}`);
-                    setText("activeStatusDetail", `Every ${intervalH}h · last fed ${formatTime(latestFeed.startedAt)}`);
+                    setText("activeStatusDetail", `Every ${intervalH}h - last fed ${formatTime(latestFeed.startedAt)}`);
                     setActiveTarget("feeding_log", "Open feeding log", "restaurant");
                 } else {
                     setText("activeStatusLabel", "Feed due");
                     setText("activeStatusTitle", "Now");
-                    setText("activeStatusDetail", `Last fed ${formatTime(latestFeed.startedAt)} · ${formatDuration(Math.round(-remaining / 60000))} ago`);
+                    setText("activeStatusDetail", `Last fed ${formatTime(latestFeed.startedAt)} - ${formatDuration(Math.round(-remaining / 60000))} ago`);
                     setActiveTarget("feeding_log", "Log a feed now", "restaurant");
                 }
                 decorateHomeIcons();

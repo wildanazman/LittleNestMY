@@ -196,6 +196,20 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
         }
+        /* ········· Premature Baby Toggle ········· */
+        .preemie-toggle:active { transform: scale(.975); }
+        .preemie-active { background-color: #ffbfa3 !important; color: #7a4b36 !important; border-color: #83533c !important; box-shadow: 0 12px 32px rgba(131,83,60,.12), inset 0 1px 0 rgba(255,255,255,.78); }
+        .preemie-active .preemie-switch { background-color: #83533c !important; }
+        .preemie-active .preemie-switch-knob { transform: translateX(20px); }
+        .preemie-active .preemie-switch + * { color: #7a4b36 !important; }
+        .preemie-fields {
+          max-height: 0;
+          transition: max-height 420ms cubic-bezier(.23,1,.32,1), margin 300ms ease;
+        }
+        .preemie-fields.expanded {
+          max-height: 600px;
+        }
+        /* ········· Dark Mode ········· */
         :root.dark body {
             background:
               radial-gradient(circle at 12% -8%, rgba(34,211,238,.14), transparent 34%),
@@ -298,6 +312,38 @@
             color: #9af0bc !important;
             border: 1px solid rgba(154,240,188,.24);
         }
+        /* ········· Dark Mode — Premature Baby ········· */
+        :root.dark .preemie-toggle {
+            background: rgba(18,27,45,.92) !important;
+            color: #eef6ff !important;
+            border-color: rgba(132,204,255,.14) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.20) !important;
+        }
+        :root.dark .preemie-toggle .material-symbols-outlined { color: #22d3ee !important; }
+        :root.dark .preemie-toggle .preemie-switch { background: rgba(132,204,255,.20) !important; }
+        :root.dark .preemie-active {
+            background: rgba(34,211,238,.20) !important;
+            color: #22d3ee !important;
+            border-color: rgba(34,211,238,.46) !important;
+            box-shadow: 0 16px 34px rgba(34,211,238,.14), inset 0 1px 0 rgba(255,255,255,.08) !important;
+        }
+        :root.dark .preemie-active .preemie-switch { background: #22d3ee !important; }
+        :root.dark .preemie-active .material-symbols-outlined { color: #22d3ee !important; }
+        :root.dark .preemie-fields > div {
+            background: rgba(18,27,45,.88) !important;
+            border-color: rgba(132,204,255,.16) !important;
+            box-shadow: 0 16px 40px rgba(0,0,0,.36), inset 0 1px 0 rgba(255,255,255,.07) !important;
+        }
+        :root.dark .preemie-fields input {
+            background: rgba(7,17,31,.78) !important;
+            color: #eef6ff !important;
+            -webkit-text-fill-color: #eef6ff !important;
+            border: 1px solid rgba(132,204,255,.18) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.06) !important;
+        }
+        :root.dark .preemie-fields .bg-tertiary-container\/70 { background: rgba(154,240,188,.16) !important; color: #9af0bc !important; }
+        :root.dark .preemie-fields .text-tertiary { color: #9af0bc !important; }
+        :root.dark #gaAutoBadge { background: rgba(34,211,238,.16) !important; color: #22d3ee !important; }
     </style>
 <style>
     body {
@@ -364,9 +410,9 @@
 <div class="space-y-1.5">
 <label class="font-label-md text-label-md ml-2 text-on-surface-variant">Gender <span class="text-error">*</span></label>
 <div class="flex gap-3">
-<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Boy</button>
-<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Girl</button>
-<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Other</button>
+<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" data-gender="boy" onclick="toggleSelection(this, 'gender')" type="button">Boy</button>
+<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" data-gender="girl" onclick="toggleSelection(this, 'gender')" type="button">Girl</button>
+<button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" data-gender="other" onclick="toggleSelection(this, 'gender')" type="button">Other</button>
 </div>
 </div>
 <!-- Blood Type -->
@@ -390,24 +436,81 @@
 </select>
 </label>
 </div>
-<!-- Feeding Preference -->
-<div class="space-y-3 pt-2">
-<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Feeding Preference <span class="text-error">*</span></label>
-<div class="grid grid-cols-1 gap-3">
-<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
-<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">favorite</span> Breastfeeding</span>
-<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
-</button>
-<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
-<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">sanitizer</span> Formula</span>
-<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
-</button>
-<button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
-<span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">all_inclusive</span> Mixed</span>
-<span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
-</button>
-</div>
-</div>
+        <!-- Feeding Preference -->
+        <div class="space-y-3 pt-2">
+        <label class="font-label-md text-label-md ml-2 text-on-surface-variant">Feeding Preference <span class="text-error">*</span></label>
+        <div class="grid grid-cols-1 gap-3">
+        <button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" data-feeding="breastfeeding" onclick="toggleSelection(this, 'feeding')" type="button">
+        <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">favorite</span> Breastfeeding</span>
+        <span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+        </button>
+        <button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" data-feeding="formula" onclick="toggleSelection(this, 'feeding')" type="button">
+        <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">sanitizer</span> Formula</span>
+        <span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+        </button>
+        <button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" data-feeding="mixed" onclick="toggleSelection(this, 'feeding')" type="button">
+        <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">all_inclusive</span> Mixed</span>
+        <span class="material-symbols-outlined text-outline-variant group-[.radio-tile-active]:text-on-primary-container">check_circle</span>
+        </button>
+        </div>
+        </div>
+        <!-- Premature Baby Section -->
+        <div class="pt-2 space-y-0">
+        <!-- Premature Toggle Card -->
+        <button class="preemie-toggle w-full h-auto min-h-[72px] px-5 py-4 rounded-2xl bg-[#FFF7ED]/90 text-left transition-all hover:bg-secondary-container active:scale-[0.98] group border border-white/[0.68] shadow-[inset_0_1px_0_rgba(255,255,255,.72)] flex items-start gap-4" id="prematureToggle" type="button">
+        <div class="w-10 h-10 rounded-2xl bg-primary-container/50 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-primary-container transition-colors">
+        <span class="material-symbols-outlined text-xl text-primary group-[.preemie-active]:text-on-primary-container">child_care</span>
+        </div>
+        <div class="flex-1 min-w-0">
+        <p class="font-label-md text-label-md text-on-surface">Baby was born prematurely (Preterm)</p>
+        <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Enables corrected age for milestones, growth & tips</p>
+        </div>
+        <div class="preemie-switch shrink-0 mt-1.5 w-12 h-7 rounded-full bg-outline-variant/30 relative transition-colors duration-250">
+        <div class="preemie-switch-knob absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-250 ease-[cubic-bezier(.23,1,.32,1)]"></div>
+        </div>
+        </button>
+        <input class="hidden" id="isPremature" type="checkbox"/>
+        <!-- Premature Fields (expandable) -->
+        <div class="preemie-fields hidden overflow-hidden" id="prematureFields">
+        <div class="mt-3 rounded-[24px] border border-white/70 bg-white/56 p-5 space-y-5 shadow-[0_14px_40px_rgba(80,54,42,.08),inset_0_1px_0_rgba(255,255,255,.78)] backdrop-blur-sm">
+          <p class="font-label-sm text-[13px] text-on-surface-variant flex items-start gap-2">
+          <span class="material-symbols-outlined text-[18px] text-tertiary shrink-0 mt-0.5">lightbulb</span>
+          <span>Provide either the <strong class="text-on-surface">Expected Due Date</strong> (preferred) or <strong class="text-on-surface">Gestational Age at Birth</strong> for accurate corrected age tracking.</span>
+          </p>
+          <!-- EDD -->
+          <div class="space-y-1.5">
+          <label class="font-label-md text-label-md ml-2 text-on-surface-variant flex items-center gap-1.5" for="expectedDueDate">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">event_available</span>
+          Expected Due Date (EDD) <span class="rounded-full bg-tertiary-container/70 text-on-tertiary-container px-2 py-0.5 text-[10px] font-extrabold">Preferred</span>
+          </label>
+          <div class="relative">
+          <input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="expectedDueDate" type="date"/>
+          <span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">calendar_today</span>
+          </div>
+          <p class="font-label-sm text-[12px] text-on-surface-variant ml-2">The baby is expected to reach full term on this date.</p>
+          </div>
+          <!-- Divider -->
+          <div class="flex items-center gap-3">
+          <div class="flex-1 h-px bg-outline-variant/30"></div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">or</span>
+          <div class="flex-1 h-px bg-outline-variant/30"></div>
+          </div>
+          <!-- Gestational Age -->
+          <div class="space-y-1.5">
+          <label class="font-label-md text-label-md ml-2 text-on-surface-variant flex items-center gap-1.5" for="gestationalAge">
+          <span class="material-symbols-outlined text-[16px] text-tertiary">pregnant_woman</span>
+          Gestational Age at Birth
+          <span class="rounded-full bg-surface-container-high text-on-surface-variant px-2 py-0.5 text-[10px] font-bold hidden" id="gaAutoBadge">AUTO</span>
+          </label>
+          <div class="relative">
+          <input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="gestationalAge" placeholder="e.g. 32, 34, 36" type="number" min="22" max="36"/>
+          <span class="font-label-md text-label-md text-on-surface-variant absolute right-4 top-[17px] pointer-events-none">weeks</span>
+          </div>
+          <p class="font-label-sm text-[12px] text-on-surface-variant ml-2" id="gaHelp">Fill EDD above to auto-calculate, or enter manually.</p>
+          </div>
+        </div>
+        </div>
+        </div>
 </div>
 <!-- Submit Button -->
 <div class="pt-6">
@@ -450,6 +553,11 @@
         const dobInput = document.getElementById("dob");
         const bloodTypeInput = document.getElementById("bloodType");
         const rhesusFactorInput = document.getElementById("rhesusFactor");
+        const isPrematureCheckbox = document.getElementById("isPremature");
+        const prematureToggle = document.getElementById("prematureToggle");
+        const prematureFields = document.getElementById("prematureFields");
+        const expectedDueDateInput = document.getElementById("expectedDueDate");
+        const gestationalAgeInput = document.getElementById("gestationalAge");
         const formTitle = document.getElementById("formTitle");
         const formSubtitle = document.getElementById("formSubtitle");
         const saveButton = document.getElementById("saveBabyButton");
@@ -490,6 +598,49 @@
         }
         window.toggleSelection = toggleSelection;
 
+        prematureToggle.addEventListener("click", () => {
+          const active = prematureToggle.classList.toggle("preemie-active");
+          isPrematureCheckbox.checked = active;
+          if (active) {
+            prematureFields.classList.remove("hidden");
+            requestAnimationFrame(() => {
+              prematureFields.classList.add("expanded");
+            });
+          } else {
+            prematureFields.classList.remove("expanded");
+            setTimeout(() => prematureFields.classList.add("hidden"), 420);
+          }
+        });
+
+        expectedDueDateInput.addEventListener("change", () => {
+          if (!isPrematureCheckbox.checked) return;
+          const edd = expectedDueDateInput.value;
+          const dob = dobInput.value;
+          const gaBadge = document.getElementById("gaAutoBadge");
+          const gaHelp = document.getElementById("gaHelp");
+          if (!edd || !dob) {
+            gaBadge.classList.add("hidden");
+            if (gaHelp) gaHelp.textContent = "Fill EDD above to auto-calculate, or enter manually.";
+            return;
+          }
+          const eddDate = new Date(`${edd}T00:00:00`);
+          const dobDate = new Date(`${dob}T00:00:00`);
+          if (Number.isNaN(eddDate.getTime()) || Number.isNaN(dobDate.getTime())) return;
+          if (eddDate <= dobDate) return;
+          const weeksPremature = Math.round((eddDate - dobDate) / (7 * 86400000));
+          const ga = 40 - weeksPremature;
+          gestationalAgeInput.value = "";
+          gaBadge.classList.add("hidden");
+          if (ga >= 37) {
+            if (gaHelp) gaHelp.innerHTML = `<span class="text-[#b45309]">Based on EDD and DOB, this baby was born at ~${ga} weeks — not preterm. You can turn off the toggle above.</span>`;
+          } else {
+            const clamped = Math.max(22, Math.min(36, ga));
+            gestationalAgeInput.value = clamped;
+            gaBadge.classList.remove("hidden");
+            if (gaHelp) gaHelp.textContent = `Auto-calculated from EDD (~${ga} weeks). You can adjust if needed.`;
+          }
+        });
+
         await setupMode();
 
         document.getElementById('babyProfileForm').addEventListener('submit', async function(e) {
@@ -504,8 +655,10 @@
             const name = nameInput.value.trim();
             const dateOfBirth = dobInput.value;
 
-            const selectedGender = document.querySelector(".gender-btn.radio-tile-active")?.textContent.trim().toLowerCase() || "";
-            const selectedFeeding = document.querySelector(".feeding-btn.radio-tile-active")?.textContent.trim().replace(/\s+/g, " ") || "";
+            const selectedGenderEl = document.querySelector(".gender-btn.radio-tile-active");
+            const selectedFeedingEl = document.querySelector(".feeding-btn.radio-tile-active");
+            const selectedGender = selectedGenderEl?.getAttribute("data-gender") || selectedGenderEl?.textContent.trim().toLowerCase() || "";
+            const selectedFeeding = selectedFeedingEl?.getAttribute("data-feeding") || selectedFeedingEl?.textContent.trim().toLowerCase() || "";
 
             if (!name || !dateOfBirth || !selectedGender || !selectedFeeding) {
                 showFeedback("Baby name, date of birth, gender, and feeding preference are required.");
@@ -520,7 +673,10 @@
                 bloodType: bloodTypeInput.value,
                 rhesusFactor: rhesusFactorInput.value,
                 feedingPreference: selectedFeeding,
-                photoUrl: avatarDataUrl || editingProfile?.photoUrl || ""
+                photoUrl: avatarDataUrl || editingProfile?.photoUrl || "",
+                isPremature: isPrematureCheckbox.checked,
+                expectedDueDate: isPrematureCheckbox.checked ? expectedDueDateInput.value : "",
+                gestationalAgeAtBirth: isPrematureCheckbox.checked ? parseInt(gestationalAgeInput.value, 10) || 0 : 0
             };
 
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Saving...';
@@ -581,6 +737,16 @@
                 }
                 activateButton(".gender-btn", editingProfile.gender);
                 activateButton(".feeding-btn", editingProfile.feedingPreference);
+                if (editingProfile.isPremature) {
+                    isPrematureCheckbox.checked = true;
+                    prematureToggle.classList.add("preemie-active");
+                    prematureFields.classList.remove("hidden");
+                    requestAnimationFrame(() => {
+                      prematureFields.classList.add("expanded");
+                    });
+                    expectedDueDateInput.value = editingProfile.expectedDueDate || "";
+                    gestationalAgeInput.value = editingProfile.gestationalAgeAtBirth || "";
+                }
                 return;
             }
 
@@ -595,8 +761,14 @@
         function activateButton(selector, value) {
             if (!value) return;
             const normalized = String(value).toLowerCase();
-            const button = [...document.querySelectorAll(selector)].find((item) => item.textContent.trim().toLowerCase().includes(normalized));
-            if (button) toggleSelection(button, selector.includes("gender") ? "gender" : "feeding");
+            const isGender = selector.includes("gender");
+            const attr = isGender ? "data-gender" : "data-feeding";
+            const button = [...document.querySelectorAll(selector)].find((item) => {
+              const attrVal = (item.getAttribute(attr) || "").toLowerCase();
+              if (attrVal) return attrVal === normalized;
+              return item.textContent.trim().toLowerCase().includes(normalized);
+            });
+            if (button) toggleSelection(button, isGender ? "gender" : "feeding");
         }
 
         function showFeedback(message) {

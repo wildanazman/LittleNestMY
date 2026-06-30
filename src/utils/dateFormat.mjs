@@ -10,6 +10,8 @@ export function calculateBabyAge(dateOfBirth, now = new Date()) {
     anchor.setMonth(anchor.getMonth() + months);
   }
 
+  if (months < 0) return "0 months 0 days";
+
   const days = Math.max(0, Math.floor((startOfDay(now) - startOfDay(anchor)) / 86400000));
   const monthLabel = months === 1 ? "month" : "months";
   const dayLabel = days === 1 ? "day" : "days";
@@ -29,6 +31,8 @@ export function calculateBabyAgeShort(dateOfBirth, atDate = new Date()) {
     anchor = new Date(birth);
     anchor.setMonth(anchor.getMonth() + months);
   }
+
+  if (months < 0) return "0 days old";
 
   const days = Math.max(0, Math.floor((startOfDay(date) - startOfDay(anchor)) / 86400000));
 
@@ -98,4 +102,55 @@ export function isSameLocalDay(dateTime, now = new Date()) {
 
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function getCorrectedDateOfBirth(profile) {
+  if (!profile || !hasActivePrematureProfile(profile)) return null;
+  if (correctedAgeExpiredHelper(profile)) return null;
+  if (profile.expectedDueDate) return profile.expectedDueDate;
+  if (profile.gestationalAgeAtBirth) {
+    const ga = Number(profile.gestationalAgeAtBirth);
+    if (Number.isNaN(ga) || ga >= 40) return null;
+    const prematurityDays = Math.round((40 - ga) * 7);
+    const dob = new Date(`${profile.dateOfBirth}T00:00:00+08:00`);
+    if (Number.isNaN(dob.getTime())) return null;
+    dob.setDate(dob.getDate() + prematurityDays);
+    return dob.toISOString().slice(0, 10);
+  }
+  return null;
+}
+
+function correctedAgeExpiredHelper(profile) {
+  if (!profile?.dateOfBirth) return true;
+  const dob = new Date(`${profile.dateOfBirth}T00:00:00+08:00`);
+  if (Number.isNaN(dob.getTime())) return true;
+  const now = new Date();
+  const months = (now.getFullYear() - dob.getFullYear()) * 12 + now.getMonth() - dob.getMonth();
+  return months >= 24;
+}
+
+export function calculateCorrectedAge(profile, now = new Date()) {
+  const correctedDob = getCorrectedDateOfBirth(profile);
+  if (!correctedDob) return null;
+  return calculateBabyAge(correctedDob, now);
+}
+
+export function calculateCorrectedAgeShort(profile, atDate = new Date()) {
+  const correctedDob = getCorrectedDateOfBirth(profile);
+  if (!correctedDob) return null;
+  return calculateBabyAgeShort(correctedDob, atDate);
+}
+
+export function profileAgeDisplay(profile, now = new Date()) {
+  const actual = calculateBabyAge(profile?.dateOfBirth, now);
+  if (!hasActivePrematureProfile(profile)) return { actual, corrected: null, showNote: false };
+  if (correctedAgeExpiredHelper(profile)) return { actual, corrected: null, showNote: false };
+  const correctedDob = getCorrectedDateOfBirth(profile);
+  if (!correctedDob) return { actual, corrected: null, showNote: false };
+  const corrected = calculateBabyAge(correctedDob, now);
+  return { actual, corrected, showNote: true };
+}
+
+function hasActivePrematureProfile(profile) {
+  return profile?.isPremature === true || String(profile?.isPremature || "").toLowerCase() === "true";
 }

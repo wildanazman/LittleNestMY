@@ -85,8 +85,74 @@
     transition: transform 170ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, box-shadow 180ms ease;
   }
   .baby-action:active { transform: scale(.975); }
+  .delete-profile-action {
+    background: #f9d4d7 !important;
+    color: #8f1d18 !important;
+    border: 1px solid rgba(179, 38, 30, .16) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.72) !important;
+  }
+  .delete-profile-action:disabled {
+    opacity: .72;
+    color: #8f1d18 !important;
+  }
+  .preterm-summary {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    border: 1px solid rgba(65, 94, 63, .18);
+    background: #edf6eb;
+    border-radius: 18px;
+    padding: 12px;
+  }
+  .preterm-summary__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #dbeed8;
+    color: #415e3f;
+  }
+  .preterm-summary__label {
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 800;
+    color: rgba(47, 79, 48, .74);
+  }
+  .preterm-summary__value {
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 800;
+    color: #203f22;
+  }
+  .preterm-summary__meta {
+    margin-top: 2px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 700;
+    color: rgba(47, 79, 48, .72);
+  }
+  .preterm-summary__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 7px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.72);
+    padding: 4px 8px;
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 800;
+    color: #415e3f;
+  }
   @media (hover:hover) and (pointer:fine) {
     .baby-action:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 1px rgba(131,83,60,.06); }
+    .delete-profile-action:hover {
+      background: #f4bfc4 !important;
+      box-shadow: inset 0 0 0 1px rgba(179,38,30,.18) !important;
+    }
   }
   header {
     top: max(10px, env(safe-area-inset-top));
@@ -113,6 +179,25 @@
     box-shadow: 0 18px 48px rgba(80,54,42,.14), inset 0 1px 0 rgba(255,255,255,.92) !important;
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+  }
+  :root.dark .preterm-summary {
+    background: rgba(72, 102, 70, .20);
+    border-color: rgba(154, 240, 188, .18);
+  }
+  :root.dark .preterm-summary__icon {
+    background: rgba(154, 240, 188, .16);
+    color: #9af0bc;
+  }
+  :root.dark .preterm-summary__label,
+  :root.dark .preterm-summary__meta {
+    color: rgba(223, 247, 223, .72);
+  }
+  :root.dark .preterm-summary__value {
+    color: #f1fff0;
+  }
+  :root.dark .preterm-summary__chip {
+    background: rgba(255,255,255,.10);
+    color: #9af0bc;
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; }
@@ -168,7 +253,7 @@
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { calculateBabyAge } = await import(`${moduleBase}utils/dateFormat.mjs`);
+  const { calculateBabyAge, profileAgeDisplay } = await import(`${moduleBase}utils/dateFormat.mjs`);
   const {
     getLogsForBaby,
     getPersistedGrowthRecords
@@ -248,7 +333,19 @@
   }
 
   function renderProfileCard(profile, isSelected, totalProfiles, canManageBaby) {
-    const age = calculateBabyAge(profile.dateOfBirth, new Date());
+    const ageDisplay = profileAgeDisplay(profile, new Date());
+    const age = ageDisplay.actual;
+    const correctedNote = ageDisplay.corrected
+      ? `<div class="preterm-summary">
+          <span class="preterm-summary__icon"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">child_care</span></span>
+          <div class="min-w-0">
+            <p class="preterm-summary__label">Preterm tracking</p>
+            <p class="preterm-summary__value">Corrected age: ${escapeHtml(ageDisplay.corrected)}</p>
+            <p class="preterm-summary__meta">Born age: ${escapeHtml(ageDisplay.actual)}</p>
+            <span class="preterm-summary__chip"><span class="material-symbols-outlined text-[13px]">timeline</span> Growth and milestones use corrected age</span>
+          </div>
+        </div>`
+      : ageDisplay.showNote ? '<div class="rounded-2xl bg-[#fff3da]/60 border border-[#fcd34d]/30 p-3 flex items-start gap-2.5"><span class="material-symbols-outlined text-[20px] text-[#b45309] shrink-0 mt-0.5">info</span><div class="min-w-0"><p class="font-label-md text-[13px] font-bold text-[#92400e]">Add EDD or gestational age</p><p class="font-label-sm text-[11px] text-[#92400e]/70 mt-0.5">For accurate corrected age tracking.</p></div></div>' : '';
     const latestGrowth = getLatestGrowthForBaby(profile.id);
     const bloodGroup = formatBloodGroup(profile);
     const dob = new Date(`${profile.dateOfBirth}T00:00:00`).toLocaleDateString("en-MY", {
@@ -270,10 +367,11 @@
               <h2 class="font-headline-md text-[20px] leading-7 font-bold truncate">${escapeHtml(profile.name)}</h2>
               ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1 text-[11px] font-extrabold">Current</span>' : ""}
             </div>
-            <p class="font-body-md text-[15px] text-on-surface-variant">${age}</p>
+            <p class="font-body-md text-[15px] text-on-surface-variant">${ageDisplay.corrected ? `Corrected age: ${escapeHtml(ageDisplay.corrected)}` : escapeHtml(age)}</p>
             <p class="font-label-sm text-[12px] text-outline">Born ${dob}${bloodGroup ? ` · ${escapeHtml(bloodGroup)}` : ""}</p>
           </div>
         </div>
+        ${correctedNote ? correctedNote : ""}
         <button class="baby-action w-full rounded-[22px] bg-surface-container-low/80 p-3 text-left border border-white/60 flex items-center justify-between gap-3" data-growth-baby="${escapeHtml(profile.id)}" type="button">
           <span>
             <p class="font-label-sm text-[12px] text-on-surface-variant">Latest growth</p>
@@ -285,7 +383,7 @@
           ${canManageBaby ? `<button class="baby-action h-11 rounded-[18px] bg-surface-container-low text-primary font-label-md text-[14px] font-bold" data-edit-baby="${escapeHtml(profile.id)}" type="button">Edit profile</button>` : `<p class="h-11 rounded-[18px] bg-surface-container-low text-on-surface-variant font-label-md text-[14px] font-bold flex items-center justify-center">View-only access</p>`}
           ${isSelected ? "" : `<button class="baby-action h-11 rounded-[18px] bg-primary-container text-on-primary-container font-label-md text-[14px] font-bold" data-switch-baby="${escapeHtml(profile.id)}" type="button">Switch baby</button>`}
         </div>
-        ${canManageBaby && totalProfiles > 1 ? `<button class="baby-action w-full h-10 rounded-[18px] bg-[#ffe0e1] text-[#b3261e] dark:bg-red-500/20 dark:text-red-200 font-label-md text-[13px] font-extrabold active:scale-95 transition-transform" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete profile</button>` : ""}
+        ${canManageBaby && totalProfiles > 1 ? `<button class="baby-action delete-profile-action w-full h-10 rounded-[18px] font-label-md text-[13px] font-extrabold active:scale-95 transition-transform" data-delete-baby="${escapeHtml(profile.id)}" data-baby-name="${escapeHtml(profile.name)}" type="button">Delete profile</button>` : ""}
         ${isSelected && totalProfiles < 2 ? '<button class="baby-action w-full h-10 rounded-[18px] bg-surface-container text-on-surface-variant font-label-md text-[13px]" data-switch-baby="' + escapeHtml(profile.id) + '" type="button">Switch baby</button>' : ""}
         </div>
       </article>

@@ -66,7 +66,6 @@ export async function createBabyProfileRemote(profile, fallbackProfile) {
   const session = await getAuthSession();
   if (!session) throw new Error("Please log in before creating a baby profile.");
   const babyRow = toBabyRow(profile, session.user.id);
-  console.log("Creating baby row:", babyRow);
 
   const { data, error } = await supabase
     .from("babies")
@@ -180,6 +179,7 @@ export function setSelectedBabyIdRemote(babyId) {
 
 export function fromBabyRow(row) {
   if (!row) return null;
+  const isPremature = normalizePrematureFlag(row.is_premature);
   return {
     id: row.id,
     name: row.name,
@@ -191,11 +191,16 @@ export function fromBabyRow(row) {
     feedingPreference: row.feeding_preference || "",
     notes: row.notes || "",
     createdAt: row.created_at || "",
-    updatedAt: row.updated_at || ""
+    updatedAt: row.updated_at || "",
+    isPremature,
+    expectedDueDate: isPremature ? row.expected_due_date || "" : "",
+    gestationalAgeAtBirth: isPremature ? row.gestational_age_at_birth || 0 : 0
   };
 }
 
 export function toBabyRow(profile, createdBy = "") {
+  const hasCamelFlag = Object.prototype.hasOwnProperty.call(profile, "isPremature");
+  const isPremature = normalizePrematureFlag(hasCamelFlag ? profile.isPremature : profile.is_premature);
   const row = {
     name: String(profile.name || "").trim(),
     date_of_birth: profile.dateOfBirth || profile.date_of_birth,
@@ -204,7 +209,10 @@ export function toBabyRow(profile, createdBy = "") {
     rhesus_factor: normalizeRhesusFactor(profile.rhesusFactor || profile.rhesus_factor),
     photo_url: profile.photoUrl || profile.photo_url || null,
     feeding_preference: profile.feedingPreference || profile.feeding_preference || null,
-    notes: profile.notes || null
+    notes: profile.notes || null,
+    is_premature: isPremature,
+    expected_due_date: isPremature ? profile.expectedDueDate || profile.expected_due_date || null : null,
+    gestational_age_at_birth: isPremature ? normalizeGestationalAge(profile.gestationalAgeAtBirth || profile.gestational_age_at_birth) : null
   };
 
   if (createdBy) {
@@ -212,6 +220,15 @@ export function toBabyRow(profile, createdBy = "") {
   }
 
   return row;
+}
+
+function normalizePrematureFlag(value) {
+  return value === true || String(value).toLowerCase() === "true";
+}
+
+function normalizeGestationalAge(value) {
+  const weeks = Number(value);
+  return Number.isFinite(weeks) && weeks > 0 ? weeks : null;
 }
 
 function normalizeBloodType(value) {
@@ -241,7 +258,6 @@ async function migrateLocalBabyProfiles(localProfiles) {
 
   for (const localProfile of localProfiles) {
     const babyRow = toBabyRow(localProfile, session.user.id);
-    console.log("Creating baby row:", babyRow);
 
     const { data, error } = await supabase
       .from("babies")

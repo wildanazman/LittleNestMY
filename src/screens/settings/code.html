@@ -391,8 +391,8 @@
 </div>
 <div class="min-w-0 flex-1">
 <p class="text-[10px] font-extrabold uppercase tracking-[0.16em] text-primary/70">Parent profile</p>
-<h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Loading...</h2>
-<p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">Loading...</p>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate" id="parentName">Parent</h2>
+<p class="font-label-md text-label-md text-on-surface-variant truncate" id="parentEmail">No email linked</p>
 </div>
 </div>
 </div>
@@ -592,6 +592,17 @@
 <span class="flex-1 font-label-md text-label-md text-on-surface">Help &amp; Support</span>
 <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
 </a>
+<div class="h-px bg-surface-variant/40 mx-[18px]"></div>
+<button class="w-full flex items-center gap-3.5 p-3.5 rounded-[20px] list-item-hover transition-all duration-200 group text-left" id="openFeedbackButton" type="button">
+<div class="w-10 h-10 shrink-0 rounded-2xl bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">bug_report</span>
+</div>
+<div class="flex-1 min-w-0">
+<span class="block font-label-md text-label-md text-on-surface">Feedback or report issue</span>
+<span class="block text-[11px] leading-snug text-on-surface-variant/70 mt-0.5">Send a message with optional screenshot</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
 </div>
 </section>
 <!-- Danger Zone -->
@@ -639,6 +650,32 @@
 </label>
 <p class="hidden text-label-md text-error" id="parentProfileError" aria-live="polite"></p>
 <button class="w-full h-12 rounded-2xl bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform" type="submit">Save profile</button>
+</form>
+</div>
+<div class="fixed inset-0 z-[100] hidden items-end justify-center bg-black/25 px-5 pb-6" id="feedbackModal">
+<form class="w-full max-w-md rounded-[30px] bg-surface-container-lowest p-5 border border-white/60 space-y-4 soft-shadow" id="feedbackForm">
+<div class="flex items-start justify-between gap-3">
+<div>
+<p class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Feedback</p>
+<h2 class="font-headline-md text-headline-md text-on-surface">Report an issue</h2>
+<p class="mt-1 text-[12px] leading-snug text-on-surface-variant">Tell us what happened. A screenshot helps if something looks wrong.</p>
+</div>
+<button aria-label="Close feedback" class="w-10 h-10 rounded-2xl bg-surface-container text-on-surface-variant flex items-center justify-center" id="closeFeedbackButton" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<label class="block">
+<span class="font-label-md text-label-md text-on-surface">What happened?</span>
+<textarea class="mt-2 w-full min-h-[132px] rounded-2xl border-0 bg-surface-container px-4 py-3 focus:ring-2 focus:ring-primary resize-none" id="feedbackMessageInput" maxlength="5000" placeholder="Example: I tapped Save on vaccination page and nothing happened." required></textarea>
+</label>
+<label class="block">
+<span class="font-label-md text-label-md text-on-surface">Screenshot optional</span>
+<input class="mt-2 w-full rounded-2xl bg-surface-container px-4 py-3 text-label-md" id="feedbackScreenshotInput" accept="image/png,image/jpeg,image/webp" type="file"/>
+<span class="block mt-1 text-[11px] text-on-surface-variant" id="feedbackScreenshotName">PNG, JPG, or WebP under 3MB.</span>
+</label>
+<p class="hidden text-label-md text-error" id="feedbackError" aria-live="polite"></p>
+<p class="hidden text-label-md text-tertiary" id="feedbackSuccess" aria-live="polite">Thanks. Your report was sent.</p>
+<button class="w-full h-12 rounded-2xl bg-primary text-on-primary font-label-md text-label-md active:scale-95 transition-transform disabled:opacity-60" id="submitFeedbackButton" type="submit">Send feedback</button>
 </form>
 </div>
 <!-- Bottom Navigation Bar - Hidden for transactional sub-page according to rules, but kept for context if this is a top-level settings -->
@@ -697,7 +734,14 @@
         const parentModal = document.getElementById("parentProfileModal");
         const parentForm = document.getElementById("parentProfileForm");
         const parentError = document.getElementById("parentProfileError");
+        const feedbackModal = document.getElementById("feedbackModal");
+        const feedbackForm = document.getElementById("feedbackForm");
+        const feedbackError = document.getElementById("feedbackError");
+        const feedbackSuccess = document.getElementById("feedbackSuccess");
+        const feedbackScreenshotInput = document.getElementById("feedbackScreenshotInput");
+        const feedbackScreenshotName = document.getElementById("feedbackScreenshotName");
         let parentPhotoDataUrl = "";
+        let feedbackScreenshotFile = null;
         const NOTIF_TYPES = ["feeding", "medicine", "appointment", "vaccine"];
 
         applyTranslations();
@@ -828,6 +872,89 @@
         document.getElementById("closeParentProfileButton")?.addEventListener("click", closeParentProfileModal);
         parentModal.addEventListener("click", (event) => {
             if (event.target === parentModal) closeParentProfileModal();
+        });
+
+        document.getElementById("openFeedbackButton")?.addEventListener("click", () => {
+            openFeedbackModal();
+        });
+        document.getElementById("closeFeedbackButton")?.addEventListener("click", closeFeedbackModal);
+        feedbackModal?.addEventListener("click", (event) => {
+            if (event.target === feedbackModal) closeFeedbackModal();
+        });
+        feedbackScreenshotInput?.addEventListener("change", () => {
+            feedbackError.classList.add("hidden");
+            const file = feedbackScreenshotInput.files?.[0] || null;
+            feedbackScreenshotFile = null;
+            if (!file) {
+                feedbackScreenshotName.textContent = "PNG, JPG, or WebP under 3MB.";
+                return;
+            }
+            if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+                feedbackScreenshotInput.value = "";
+                feedbackScreenshotName.textContent = "PNG, JPG, or WebP under 3MB.";
+                showFeedbackError("Screenshot must be PNG, JPG, or WebP.");
+                return;
+            }
+            if (file.size > 3 * 1024 * 1024) {
+                feedbackScreenshotInput.value = "";
+                feedbackScreenshotName.textContent = "PNG, JPG, or WebP under 3MB.";
+                showFeedbackError("Screenshot must be under 3MB.");
+                return;
+            }
+            feedbackScreenshotFile = file;
+            feedbackScreenshotName.textContent = `${file.name} selected`;
+        });
+
+        feedbackForm?.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            feedbackError.classList.add("hidden");
+            feedbackSuccess.classList.add("hidden");
+            const button = document.getElementById("submitFeedbackButton");
+            const message = document.getElementById("feedbackMessageInput").value.trim();
+            if (message.length < 8) {
+                showFeedbackError("Write a little more detail before sending.");
+                return;
+            }
+            button.disabled = true;
+            const oldText = button.textContent;
+            button.textContent = "Sending...";
+            try {
+                const session = await getFreshAuthSession();
+                if (!session?.access_token) {
+                    showFeedbackError("Please log in again before sending feedback.");
+                    return;
+                }
+                const profile = getParentProfile();
+                const screenshot = feedbackScreenshotFile ? await fileToFeedbackAttachment(feedbackScreenshotFile) : null;
+                const response = await fetch("/api/feedback", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${session.access_token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message,
+                        name: profile.name || "",
+                        email: profile.email || session.user?.email || "",
+                        pageUrl: window.location.href,
+                        userAgent: navigator.userAgent,
+                        screenshot
+                    })
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || "Could not send feedback.");
+                feedbackSuccess.classList.remove("hidden");
+                document.getElementById("feedbackMessageInput").value = "";
+                feedbackScreenshotInput.value = "";
+                feedbackScreenshotFile = null;
+                feedbackScreenshotName.textContent = "PNG, JPG, or WebP under 3MB.";
+                setTimeout(closeFeedbackModal, 900);
+            } catch (error) {
+                showFeedbackError(error.message || "Could not send feedback.");
+            } finally {
+                button.disabled = false;
+                button.textContent = oldText;
+            }
         });
 
         document.getElementById("parentPhotoInput")?.addEventListener("change", async (event) => {
@@ -966,8 +1093,8 @@
             const initials = initialsForName(profile.name);
             const name = profile.name || "Parent";
             const email = profile.email || "";
-            document.getElementById("parentName").textContent = name === "Parent" ? "Loading..." : name;
-            document.getElementById("parentEmail").textContent = email || "Loading...";
+            document.getElementById("parentName").textContent = name;
+            document.getElementById("parentEmail").textContent = email || "No email linked";
             document.getElementById("parentInitials").textContent = initials;
             document.getElementById("topParentInitials").textContent = initials;
             renderPhoto("parentPhoto", "parentInitials", profile.photoUrl);
@@ -1003,6 +1130,41 @@
         function closeParentProfileModal() {
             parentModal.classList.add("hidden");
             parentModal.classList.remove("flex");
+        }
+
+        function openFeedbackModal() {
+            feedbackError.classList.add("hidden");
+            feedbackSuccess.classList.add("hidden");
+            feedbackModal.classList.remove("hidden");
+            feedbackModal.classList.add("flex");
+            setTimeout(() => document.getElementById("feedbackMessageInput")?.focus(), 60);
+        }
+
+        function closeFeedbackModal() {
+            feedbackModal.classList.add("hidden");
+            feedbackModal.classList.remove("flex");
+        }
+
+        function showFeedbackError(message) {
+            feedbackError.textContent = message;
+            feedbackError.classList.remove("hidden");
+        }
+
+        function fileToFeedbackAttachment(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error("Screenshot could not be read."));
+                reader.onload = () => {
+                    const result = String(reader.result || "");
+                    resolve({
+                        filename: file.name || "screenshot",
+                        contentType: file.type,
+                        size: file.size,
+                        content: result.split(",")[1] || ""
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         async function renderPlanLabel() {

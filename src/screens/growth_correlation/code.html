@@ -218,7 +218,9 @@ tailwind.config = {
     .sort((a, b) => new Date(a.measuredAt) - new Date(b.measuredAt));
   const recordsDesc = recordsAsc.slice().reverse();
   const latest = recordsDesc[0];
-  const ageMo = B.ageInMonths(selectedBaby.dateOfBirth, now);
+  const ageMo = B.correctedAgeInMonths(selectedBaby, now);
+  const usePreterm = B.usePretermChart(selectedBaby);
+  const termReached = B.hasReachedTermCorrected(selectedBaby);
   const firstName = (selectedBaby.name || "Baby").split(" ")[0];
 
   if (!latest) {
@@ -230,7 +232,7 @@ tailwind.config = {
   const latestInterval = correlations.hasData ? correlations.intervals[correlations.intervals.length - 1] : null;
   const latestWeight = Number(latest.weightKg || 0);
   const latestDate = new Date(latest.measuredAt);
-  const weightMedian = latestWeight ? B.whoMedian(ageMo, selectedBaby.gender, "weight") : null;
+  const weightMedian = (latestWeight && termReached) ? B.whoMedian(ageMo, selectedBaby.gender, "weight") : null;
   const weightCmp = latestWeight ? B.growthComparison(latestWeight, weightMedian) : null;
 
   document.getElementById("heroTitle").textContent = `${firstName}'s growth signal`;
@@ -245,14 +247,15 @@ tailwind.config = {
     if (!value) {
       return `<article class="metric-card p-3"><span class="material-symbols-outlined text-[#0f766e]">${icon}</span><p class="mt-2 text-[12px] font-bold text-on-surface-variant">${label}</p><p class="text-[15px] font-extrabold text-on-surface">No data</p></article>`;
     }
-    const median = B.whoMedian(ageMo, selectedBaby.gender, metric);
-    const cmp = B.growthComparison(Number(value), median);
-    const color = cmp.pctDiff < -7 ? "#b45309" : "#0f766e";
+    const median = termReached ? B.whoMedian(ageMo, selectedBaby.gender, metric) : null;
+    const cmp = median ? B.growthComparison(Number(value), median) : null;
+    const color = cmp ? (cmp.pctDiff < -7 ? "#b45309" : "#0f766e") : "#0f766e";
+    const vsLine = cmp ? `<p class="text-[11px] leading-4 font-bold" style="color:${color}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}% vs median</p>` : `<p class="text-[11px] leading-4 font-bold" style="color:#0f766e">Reached term — WHO charts active</p>`;
     return `<article class="metric-card p-3">
       <span class="w-8 h-8 rounded-full bg-[#e5fbf2] text-[#0f766e] flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">${icon}</span></span>
       <p class="mt-2 text-[12px] font-bold text-on-surface-variant">${label}</p>
       <p class="text-[17px] leading-6 font-extrabold text-on-surface tnum">${value}${unit}</p>
-      <p class="text-[11px] leading-4 font-bold" style="color:${color}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}% vs median</p>
+      ${vsLine}
     </article>`;
   }
 

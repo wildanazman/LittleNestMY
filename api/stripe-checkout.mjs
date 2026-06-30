@@ -72,8 +72,8 @@ export default async function handler(req, res) {
       customer: customerId,
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/subscription/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/subscription/?canceled=true`,
+      success_url: `${origin}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/subscription?canceled=true`,
       metadata: { supabaseUserId: auth.user.id }
     });
 

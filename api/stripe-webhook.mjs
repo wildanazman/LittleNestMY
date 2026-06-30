@@ -65,15 +65,10 @@ export default async function handler(req, res) {
       console.warn("stripe_events insert failed; processing without dedup.", insertError.message);
     }
 
-    if (event.type === "checkout.session.completed") {
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       const session = event.data.object;
       if (session.payment_status !== "paid") return ok(res, { received: true });
-      const userId = session.metadata?.supabaseUserId;
-      if (!userId) return ok(res, { received: true, note: "No supabaseUserId in metadata." });
-      await service.from("profiles").update({
-        plan: "premium",
-        stripe_customer_id: session.customer
-      }).eq("id", userId);
+      await upgradeFromCheckoutSession(service, session);
       return ok(res, { received: true });
     }
 
@@ -109,5 +104,20 @@ function ok(res, payload) {
 
 async function downgradeByCustomer(service, customerId) {
   if (!customerId) return;
-  await service.from("profiles").update({ plan: "free" }).eq("stripe_customer_id", customerId);
+  const { error } = await service.from("profiles").update({ plan: "free" }).eq("stripe_customer_id", customerId);
+  if (error) throw error;
+}
+
+async function upgradeFromCheckoutSession(service, session) {
+  const userId = session.metadata?.supabaseUserId || "";
+  const customerId = typeof session.customer === "string" ? session.customer : session.customer?.id || "";
+
+  let query = service.from("profiles").update({
+    plan: "premium",
+    stripe_customer_id: customerId || null
+  });
+
+  query = userId ? query.eq("id", userId) : query.eq("stripe_customer_id", customerId);
+  const { error } = await query;
+  if (error) throw error;
 }

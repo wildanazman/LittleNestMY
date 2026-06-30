@@ -216,7 +216,7 @@ tailwind.config = {
     .filter((log) => log.startedAt)
     .sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
   const completed = sleeps.filter((log) => log.endedAt && sleepMins(log) > 0);
-  const ageMo = B.ageInMonths(selectedBaby.dateOfBirth, now);
+  const ageMo = B.correctedAgeInMonths(selectedBaby, now);
   const benchmark = B.sleepBenchmark(ageMo);
   const prediction = B.predictSleep(sleeps, ageMo, now);
 

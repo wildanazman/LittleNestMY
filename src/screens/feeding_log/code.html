@@ -505,7 +505,13 @@
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
         const { babyProfile, feedingLogs: mockFeedingLogs } = await import(`${moduleBase}data/mockData.mjs`);
         const { formatDuration, formatDurationBetween, formatTime } = await import(`${moduleBase}utils/dateFormat.mjs`);
-        const { getLogsForBaby, getPersistedFeedingLogs } = await import(`${moduleBase}utils/localState.mjs`);
+        const {
+            clearActiveFeedingSession,
+            getActiveFeedingSession,
+            getLogsForBaby,
+            getPersistedFeedingLogs,
+            saveActiveFeedingSession
+        } = await import(`${moduleBase}utils/localState.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { deleteFeedingLogRemote, loadCoreLogsRemote, saveFeedingLogRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
         const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
@@ -656,9 +662,12 @@
             ? "formula"
             : (pref.includes("breast") || pref.includes("mix")) ? "breast" : "bottle";
         const typeIndexMap = { breast: 0, bottle: 1, formula: 2, solid: 3 };
-        state.feedingType = defaultType;
-        moveIndicator(typeIndexMap[defaultType]);
+        const activeFeedingSession = getActiveFeedingSession();
+        const hasActiveBreastSession = activeFeedingSession?.type === "breast" && (!activeFeedingSession.babyId || activeFeedingSession.babyId === selectedBabyId);
+        state.feedingType = hasActiveBreastSession ? "breast" : defaultType;
+        moveIndicator(typeIndexMap[state.feedingType]);
         updateRelevantFields();
+        if (hasActiveBreastSession) restoreActiveBreastTimer(activeFeedingSession);
         await refreshLogs();
 
         function moveIndicator(index) {
@@ -713,6 +722,11 @@
             }
             timer.running = true;
             timer.startMs = Date.now() - timer.elapsedMs;
+            saveActiveFeedingSession({
+                type: "breast",
+                babyId: selectedBabyId,
+                startedAt: buildDateTime(dateInput.value, timeInput.value)
+            });
             timer.intervalId = setInterval(tickBreastTimer, 1000);
             breastTimerToggleLabel.textContent = "Pause";
             breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "pause";
@@ -723,6 +737,7 @@
             if (timer.intervalId) clearInterval(timer.intervalId);
             timer.intervalId = null;
             timer.elapsedMs = Date.now() - timer.startMs;
+            clearActiveFeedingSession();
             syncDurationFromTimer();
             breastTimerToggleLabel.textContent = timer.elapsedMs > 0 ? "Resume" : "Start";
             breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "play_arrow";
@@ -734,10 +749,30 @@
             timer.intervalId = null;
             timer.elapsedMs = 0;
             timer.startMs = 0;
+            clearActiveFeedingSession();
             renderBreastTimer(0);
             durationInput.value = "";
             breastTimerToggleLabel.textContent = "Start";
             breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "play_arrow";
+        }
+
+        function restoreActiveBreastTimer(session) {
+            const startedAt = new Date(session.startedAt);
+            if (Number.isNaN(startedAt.getTime())) {
+                clearActiveFeedingSession();
+                return;
+            }
+            dateInput.value = localDateValue(startedAt);
+            timeInput.value = `${String(startedAt.getHours()).padStart(2, "0")}:${String(startedAt.getMinutes()).padStart(2, "0")}`;
+            timer.running = true;
+            timer.startMs = startedAt.getTime();
+            timer.elapsedMs = Math.max(0, Date.now() - timer.startMs);
+            if (timer.intervalId) clearInterval(timer.intervalId);
+            timer.intervalId = setInterval(tickBreastTimer, 1000);
+            renderBreastTimer(timer.elapsedMs);
+            syncDurationFromTimer(timer.elapsedMs);
+            breastTimerToggleLabel.textContent = "Pause";
+            breastTimerToggle.querySelector(".material-symbols-outlined").textContent = "pause";
         }
 
         function tickBreastTimer() {
@@ -811,6 +846,7 @@
             amountInput.value = "";
             durationInput.value = "";
             noteInput.value = "";
+            clearActiveFeedingSession();
             resetBreastTimer();
             formulaBrandInput.value = "";
             state.brand = "";
@@ -976,8 +1012,13 @@
 
         function getCurrentDateValue() {
             const date = new Date();
-            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-            return date.toISOString().slice(0, 10);
+            return localDateValue(date);
+        }
+
+        function localDateValue(date) {
+            const copy = new Date(date);
+            copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+            return copy.toISOString().slice(0, 10);
         }
 
         function getCurrentTimeValue() {

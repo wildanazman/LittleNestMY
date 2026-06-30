@@ -340,23 +340,34 @@ function renderSymptomTracker() {
   // medicine, clinic and generic "Health record" notes out of the tracker.
   const SYMPTOM_TYPES = new Set(["illness", "temperature"]);
   const SYMPTOM_TITLES = new Set([
-    "teething", "fever", "cough", "runny nose", "rash", "vomiting", "diarrhoea", "fussy / colic", "diaper rash"
+    "teething", "fever", "cough", "runny nose", "rash", "vomiting", "diarrhoea", "diarrhea", "fussy / colic", "diaper rash"
   ]);
   const groups = new Map();
+  const resolvedAtByTitle = new Map();
+
   for (const r of healthRecords) {
     const type = String(r.type || "note").toLowerCase();
     const title = String(r.title || "Symptom").trim() || "Symptom";
+    const at = new Date(r.recordedAt).getTime();
+    if (Number.isNaN(at)) continue;
+
+    if (type === "symptom_resolved") {
+      const previous = resolvedAtByTitle.get(title) || 0;
+      resolvedAtByTitle.set(title, Math.max(previous, at));
+      continue;
+    }
+
     const isSymptom = SYMPTOM_TYPES.has(type) || SYMPTOM_TITLES.has(title.toLowerCase());
     if (!isSymptom) continue;
-    const at = new Date(r.recordedAt).getTime();
-    if (Number.isNaN(at) || at < since) continue;
-    const key = title;
-    const g = groups.get(key) || { title: key, count: 0, first: at, last: at };
+    if (at < since || at <= (resolvedAtByTitle.get(title) || 0)) continue;
+
+    const g = groups.get(title) || { title, count: 0, first: at, last: at };
     g.count += 1;
     g.first = Math.min(g.first, at);
     g.last = Math.max(g.last, at);
-    groups.set(key, g);
+    groups.set(title, g);
   }
+
   const rows = [...groups.values()].sort((a, b) => b.last - a.last);
   if (!rows.length) { section.classList.add("hidden"); list.innerHTML = ""; return; }
   section.classList.remove("hidden");
@@ -371,33 +382,41 @@ function renderSymptomTracker() {
         ? "background:#ffe2b8;color:#7a4b06"
         : "background:#b5d6af;color:#1f3a1e";
     const spanDays = Math.max(1, Math.round((g.last - g.first) / DAY) + 1);
-    const spanLabel = g.count === 1 ? "once" : `${g.count}× over ${spanDays} day${spanDays === 1 ? "" : "s"}`;
+    const spanLabel = g.count === 1 ? "once" : `${g.count}x over ${spanDays} day${spanDays === 1 ? "" : "s"}`;
     const lastLabel = sinceLast <= 0 ? "today" : sinceLast === 1 ? "yesterday" : `${sinceLast} days ago`;
     return `
       <div class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex items-center justify-between gap-3">
         <div class="min-w-0">
           <p class="font-bold text-[16px] text-on-surface truncate">${escapeHtml(g.title)}</p>
-          <p class="text-[13px] text-on-surface-variant">${spanLabel} · last ${lastLabel}</p>
+          <p class="text-[13px] text-on-surface-variant">${spanLabel} - last ${lastLabel}</p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
           <span class="rounded-full px-3 py-1 text-[12px] font-extrabold" style="${badge}">${status}</span>
-          ${permissions.canAddLogs ? `<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-error hover:bg-error-container/30 active:scale-90 transition-all" data-clear-symptom="${escapeHtml(g.title)}" aria-label="Clear ${escapeHtml(g.title)} records" type="button"><span class="material-symbols-outlined text-[19px]">delete</span></button>` : ""}
+          ${permissions.canAddLogs ? `<button class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant/70 hover:text-tertiary hover:bg-tertiary-container/40 active:scale-90 transition-all" data-resolve-symptom="${escapeHtml(g.title)}" aria-label="Mark ${escapeHtml(g.title)} resolved" type="button"><span class="material-symbols-outlined text-[19px]">check_circle</span></button>` : ""}
         </div>
       </div>`;
   }).join("");
 
-  list.querySelectorAll("[data-clear-symptom]").forEach((btn) => {
+  list.querySelectorAll("[data-resolve-symptom]").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const title = btn.dataset.clearSymptom;
-      const ids = healthRecords.filter((r) => String(r.title || "").trim() === title).map((r) => r.id);
-      if (!ids.length) return;
-      if (!confirm(`Clear all "${title}" records (${ids.length})?`)) return;
+      const title = btn.dataset.resolveSymptom;
+      if (!title) return;
+      if (!confirm(`Mark "${title}" as resolved? History will stay saved.`)) return;
       btn.disabled = true;
-      for (const id of ids) {
-        try { await deleteHealthNoteRemote(id); } catch (e) { console.warn(e); }
+      try {
+        await saveHealthNoteRemote({
+          id: crypto.randomUUID ? crypto.randomUUID() : `health-local-${Date.now()}`,
+          babyId: selectedBabyId,
+          type: "symptom_resolved",
+          title,
+          details: "Symptom marked resolved. Previous history remains saved.",
+          recordedAt: new Date().toISOString()
+        });
+      } catch (error) {
+        showFeedback(`${error.message || "Could not sync."} Saved locally for now.`);
       }
       await refreshRecords();
-      showFeedback(`Cleared "${title}".`);
+      showFeedback(`Marked "${title}" resolved. History kept.`);
     });
   });
 }
@@ -470,6 +489,7 @@ function labelType(type) {
     illness: "Sickness",
     temperature: "Temperature",
     clinic: "Clinic",
+    symptom_resolved: "Resolved",
     note: "Health note"
   }[type] || "Medicine";
 }
@@ -480,6 +500,7 @@ function iconForType(type) {
     illness: "sick",
     temperature: "thermometer",
     clinic: "local_hospital",
+    symptom_resolved: "check_circle",
     note: "edit_note"
   }[type] || "medical_information";
 }

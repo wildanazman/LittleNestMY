@@ -14,15 +14,18 @@ export function isEmailProviderConfigured() {
   return Boolean(RESEND_API_KEY);
 }
 
-export async function sendEmail({ to, subject, html }) {
+export async function sendEmail({ to, subject, html, replyTo = "", attachments = [] }) {
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set.");
+  const payload = { from: EMAIL_FROM, to: [to], subject, html };
+  if (replyTo) payload.reply_to = replyTo;
+  if (attachments.length) payload.attachments = attachments;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${RESEND_API_KEY}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ from: EMAIL_FROM, to: [to], subject, html })
+    body: JSON.stringify(payload)
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");

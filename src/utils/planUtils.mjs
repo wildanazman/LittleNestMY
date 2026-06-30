@@ -68,6 +68,10 @@ export function setLocalPlan(plan) {
   localStorage.setItem(PLAN_KEY, plan);
 }
 
+export function clearPlanCache() {
+  planCache = { plan: "free", fetchedAt: 0, scope: "" };
+}
+
 export async function setCurrentTestPlan(plan) {
   const session = await getAuthSession();
   const nextPlan = setTestPlanOverride(session?.user, plan);

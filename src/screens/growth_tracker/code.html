@@ -136,12 +136,12 @@ const { deleteGrowthRecordRemote, loadGrowthRecordsRemote, saveGrowthRecordRemot
 const { getBabyPermissions, viewOnlyMessage } = await import(`${moduleBase}utils/permissions.mjs`);
 const { getMeasurementLabel } = await import(`${moduleBase}utils/careGuides.mjs`);
 const { goToScreen, goBackOrTo, showUndoToast } = await import(`${moduleBase}utils/prototypeUi.mjs`);
-const { whoMedian } = await import(`${moduleBase}utils/benchmarks.mjs`);
+const { whoMedian, getEffectiveDateOfBirth, isProfilePremature, hasReachedTermCorrected, usePretermChart, pmaWeeksForRecord, pretermMedian } = await import(`${moduleBase}utils/benchmarks.mjs`);
 const babyState = await loadBabyProfilesRemote(babyProfile);
 const selectedBabyId = babyState.selectedBabyId;
 const selectedBaby = babyState.selectedBaby || babyProfile;
 const permissions = await getBabyPermissions(selectedBabyId);
-const currentLengthLabel = getMeasurementLabel(selectedBaby.dateOfBirth);
+const currentLengthLabel = getMeasurementLabel(selectedBaby);
 const genderRaw = String(selectedBaby.gender || "").toLowerCase();
 const whoGender = /^(m|b)/.test(genderRaw) ? "male" : /^(f|g)/.test(genderRaw) ? "female" : "";
 const tabs = [
@@ -168,6 +168,10 @@ if (permissions.canAddLogs) {
 loadGrowthRecordsRemote(selectedBabyId, []).catch((error) => {
     showError(error?.message || "Could not sync growth records. Using local data.");
 });
+const effectiveDob = getEffectiveDateOfBirth(selectedBaby) || selectedBaby.dateOfBirth;
+const premature = isProfilePremature(selectedBaby);
+const usePreterm = usePretermChart(selectedBaby);
+const termReached = hasReachedTermCorrected(selectedBaby);
 renderTabs(); render();
 showGrowthContent();
 function records(){ return getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId).sort((a,b)=>new Date(a.measuredAt)-new Date(b.measuredAt)); }
@@ -198,7 +202,7 @@ async function saveMeasurement(){
   const weightKg = number("weightInput"), heightValue = number("heightInput"), headCircumferenceCm = number("headInput");
   const measuredAt = document.getElementById("dateInput").value;
   if (!weightKg && !heightValue && !headCircumferenceCm) return showError("Add at least one measurement.");
-  const heightFields = getMeasurementLabel(selectedBaby.dateOfBirth, new Date(`${measuredAt}T09:00:00`)) === "Length"
+  const heightFields = getMeasurementLabel(selectedBaby, new Date(`${measuredAt}T09:00:00`)) === "Length"
     ? { lengthCm: heightValue || undefined }
     : { heightCm: heightValue || undefined };
   try {
@@ -213,9 +217,15 @@ function render(){
   const latest = [...items].reverse().find(Boolean);
   document.getElementById("growthStatus").textContent = latest ? `Latest saved ${calculateBabyAgeShort(selectedBaby.dateOfBirth, new Date(latest.measuredAt))}. Tracking steadily.` : "Add a first measurement to start a gentle trend.";
   document.getElementById("growthInsightText").textContent = latest
-    ? `${selectedBaby.name}'s latest growth record is saved. Keep tracking trends and check with Klinik Kesihatan or your doctor if you are concerned.`
+    ? `${selectedBaby.name}'s latest growth record is saved. Keep tracking trends and check with Klinik Kesihatan or your doctor if you are concerned.${usePreterm ? " Using Intergrowth-21st preterm standards." : premature && !termReached ? " WHO comparison begins once baby reaches term corrected age." : premature ? " Growth charts use your baby's corrected age." : ""}`
     : "Add weight, length/height, or head circumference to build a simple local trend.";
-  document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby.dateOfBirth), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
+  const growthStatusEl = document.getElementById("growthStatus");
+  if (usePreterm) {
+    growthStatusEl.innerHTML = `${growthStatusEl.textContent} <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-tertiary-container/50 to-tertiary-container/30 text-on-tertiary-container px-2.5 py-1 text-[11px] font-semibold align-middle border border-tertiary-container/30 shadow-sm"><span class="material-symbols-outlined text-[14px]">child_care</span>Preterm chart</span>`;
+  } else if (premature) {
+    growthStatusEl.innerHTML = `${growthStatusEl.textContent} <span class="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-tertiary-container/50 to-tertiary-container/30 text-on-tertiary-container px-2.5 py-1 text-[11px] font-semibold align-middle border border-tertiary-container/30 shadow-sm"><span class="material-symbols-outlined text-[14px]">child_care</span>Corrected age</span>`;
+  }
+  document.getElementById("latestCards").innerHTML = [["Weight", latest?.weightKg ? `${latest.weightKg} kg` : "No data"], [getMeasurementLabel(selectedBaby), latest?.heightCm || latest?.lengthCm ? `${latest.heightCm || latest.lengthCm} cm` : "No data"], ["Head", latest?.headCircumferenceCm ? `${latest.headCircumferenceCm} cm` : "No data"]].map(([label,value])=>`<article class="rounded-2xl bg-surface-container-lowest p-3 soft-shadow min-w-0"><p class="font-label-sm text-label-sm text-on-surface-variant">${label}</p><p class="font-headline-md text-headline-md text-primary truncate">${value}</p></article>`).join("");
   renderGraph(items);
   document.getElementById("historyList").innerHTML = items.length ? [...items].reverse().map(renderHistory).join("") : `<div class="rounded-2xl bg-surface-container-low p-5 text-center"><p class="font-headline-md text-headline-md">No growth records yet</p><p class="font-body-md text-body-md text-on-surface-variant">Your first measurement will appear here.</p></div>`;
   document.querySelectorAll("[data-delete-growth]").forEach(btn=>btn.addEventListener("click",async ()=>{ const id=btn.dataset.deleteGrowth; const removed=records().find(r=>r.id===id); try { await deleteGrowthRecordRemote(id); } catch (syncError) { console.warn("Could not delete growth record from cloud.", syncError); } if(id===editingId) exitEditMode(); render(); showUndoToast("Measurement deleted",async ()=>{ if(removed){ try { await saveGrowthRecordRemote(removed); } catch (e) { saveLocalGrowthRecord(removed); } render(); } }); }));
@@ -227,24 +237,26 @@ function monthsBetween(dateOfBirth, measuredAt){
   const measured=new Date(measuredAt);
   return Math.max(0, (measured-birth)/(1000*60*60*24*30.4375));
 }
+function pmaAge(record){ return usePreterm ? pmaWeeksForRecord(selectedBaby, record.measuredAt) : monthsBetween(effectiveDob, record.measuredAt); }
+function formatPma(value){ return value >= 10 ? value.toFixed(1).replace(/\.0$/,"") : value.toFixed(1); }
 function formatAxis(value, unit){
   const rounded = Math.abs(value) >= 10 ? value.toFixed(1).replace(/\.0$/,"") : value.toFixed(1);
   return unit ? `${rounded} ${unit}` : rounded;
 }
-function renderHistory(record){ const h=record.heightCm||record.lengthCm; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<div class="flex flex-col items-end gap-2 shrink-0"><button class="text-primary font-label-sm text-label-sm" data-edit-growth="${record.id}" type="button">Edit</button><button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button></div>` : ""}</article>`; }
+function renderHistory(record){ const h=record.heightCm||record.lengthCm; const pmaNote = usePreterm ? ` · PMA ${formatPma(pmaWeeksForRecord(selectedBaby, record.measuredAt))}w` : ""; return `<article class="rounded-2xl bg-surface-container-lowest p-4 soft-shadow flex justify-between gap-3"><div><p class="font-label-md text-label-md text-on-surface">${new Date(record.measuredAt).toLocaleDateString("en-MY",{day:"numeric",month:"short",year:"numeric"})}${pmaNote}</p><p class="font-body-md text-body-md text-on-surface-variant">${[record.weightKg&&`${record.weightKg} kg`,h&&`${h} cm`,record.headCircumferenceCm&&`${record.headCircumferenceCm} cm head`].filter(Boolean).join(" · ")}</p>${record.notes?`<p class="font-label-sm text-label-sm text-on-surface-variant">${escapeHtml(record.notes)}</p>`:""}</div>${permissions.canManageBaby ? `<div class="flex flex-col items-end gap-2 shrink-0"><button class="text-primary font-label-sm text-label-sm" data-edit-growth="${record.id}" type="button">Edit</button><button class="text-error font-label-sm text-label-sm" data-delete-growth="${record.id}" type="button">Delete</button></div>` : ""}</article>`; }
 function renderGraph(items){
   const tab = graphConfig(activeTab);
   const points = items.map(tab.point).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).sort((a,b)=>a.x-b.x);
   const svg = document.getElementById("growthGraph");
   if (!points.length) {
-    svg.innerHTML = `<text x="170" y="88" text-anchor="middle" class="chart-label" fill="#8a746b">Add ${tab.emptyLabel} to see this chart</text><text x="170" y="114" text-anchor="middle" class="chart-label" fill="#8a746b">X-axis: ${tab.xAxisTitle} · Y-axis: ${tab.yAxisTitle}</text><text x="170" y="142" text-anchor="middle" class="chart-label" fill="#8a746b">Saved measurements only.</text>`;
+    svg.innerHTML = `<text x="170" y="88" text-anchor="middle" class="chart-label" fill="#8a746b">Add ${tab.emptyLabel} to see this chart</text><text x="170" y="114" text-anchor="middle" class="chart-label" fill="#8a746b">${usePreterm ? "X-axis: PMA weeks" : "X-axis: Age (months)"} · Y-axis: ${tab.yAxisTitle}</text><text x="170" y="142" text-anchor="middle" class="chart-label" fill="#8a746b">Saved measurements only.</text>`;
     return;
   }
   const xs = points.map(p=>p.x), ys = points.map(p=>p.y);
   const minX = Math.min(...xs), maxX = Math.max(...xs), rawSpanX = maxX - minX, spanX = Math.max(1, rawSpanX);
-  const whoPoints = (tab.whoMetric && whoGender)
+  const whoPoints = (tab.whoMetric && (usePreterm || (whoGender && termReached)))
     ? (rawSpanX === 0 ? [minX] : Array.from({length:24},(_,i)=>minX + (rawSpanX*i)/23))
-        .map(x=>({x, y: whoMedian(x, whoGender, tab.whoMetric)}))
+        .map(x=>({x, y: usePreterm ? pretermMedian(x, tab.whoMetric) : whoMedian(x, whoGender, tab.whoMetric)}))
         .filter(p=>Number.isFinite(p.y))
     : [];
   const allYs = ys.concat(whoPoints.map(p=>p.y));
@@ -259,15 +271,16 @@ function renderGraph(items){
   svg.innerHTML = `<text x="170" y="18" text-anchor="middle" class="chart-label" fill="#665650">${tab.title}</text><text x="48" y="34" class="chart-label" fill="#665650">${tab.yAxisTitle}</text><line x1="${chart.left}" y1="${chart.bottom}" x2="${chart.left + chart.width}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/><line x1="${chart.left}" y1="${chart.top}" x2="${chart.left}" y2="${chart.bottom}" stroke="rgba(131,83,60,.25)"/>${whoPath ? `<path d="${whoPath}" fill="none" stroke="#b9a6ff" stroke-width="2.5" stroke-dasharray="5 5" stroke-linecap="round" opacity="0.9"/>` : ""}${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round"/>` : ""}${yTicks.map(value=>`<text x="42" y="${yFor(value)+4}" text-anchor="end" class="chart-label" fill="#665650">${formatAxis(value,tab.yUnit)}</text>`).join("")}${xTicks.map(value=>`<text x="${xFor(value)}" y="188" text-anchor="middle" class="chart-label" fill="#665650">${formatAxis(value,tab.xUnit)}</text>`).join("")}<text x="174" y="210" text-anchor="middle" class="chart-label" fill="#665650">${tab.xAxisTitle}${rawSpanX === 0 ? "" : `: ${formatRange(minX,maxX,tab.xUnit)}`}</text>${points.map(p=>`<circle cx="${xFor(p.x)}" cy="${yFor(p.y)}" r="5.5" fill="#ffffff" stroke="#7c5cff" stroke-width="3"><title>${pointTooltip(tab,p)}</title></circle>`).join("")}`;
 }
 function graphConfig(id){
-  const ageMonths = (record) => monthsBetween(selectedBaby.dateOfBirth, record.measuredAt);
   const length = (record) => record.lengthCm || record.heightCm;
   const bmi = (record) => record.weightKg && length(record) ? record.weightKg / Math.pow(length(record) / 100, 2) : undefined;
+  const xLabel = usePreterm ? "PMA (wks)" : "Age (mo)";
+  const xUnit = usePreterm ? "wks" : "mo";
   const configs = {
-    weight: { title:"Weight-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Weight (kg)", xLabel:"Age", yLabel:"Weight", xUnit:"mo", yUnit:"kg", emptyLabel:"weight records", whoMetric:"weight", point:(r)=>growthPoint(r, ageMonths(r), r.weightKg) },
-    height: { title:`${currentLengthLabel}-for-age`, xAxisTitle:"Age (months)", yAxisTitle:`${currentLengthLabel} (cm)`, xLabel:"Age", yLabel:currentLengthLabel, xUnit:"mo", yUnit:"cm", emptyLabel:"length/height records", whoMetric:"length", point:(r)=>growthPoint(r, ageMonths(r), length(r)) },
-    head: { title:"Head circumference-for-age", xAxisTitle:"Age (months)", yAxisTitle:"Head circumference (cm)", xLabel:"Age", yLabel:"Head circumference", xUnit:"mo", yUnit:"cm", emptyLabel:"head circumference records", whoMetric:"head", point:(r)=>growthPoint(r, ageMonths(r), r.headCircumferenceCm) },
+    weight: { title:"Weight-for-age", xAxisTitle:`${usePreterm ? "Postmenstrual age" : "Age"} (${xUnit})`, yAxisTitle:"Weight (kg)", xLabel: usePreterm ? "PMA" : "Age", yLabel:"Weight", xUnit, yUnit:"kg", emptyLabel:"weight records", whoMetric:"weight", point:(r)=>growthPoint(r, pmaAge(r), r.weightKg) },
+    height: { title:`${currentLengthLabel}-for-age`, xAxisTitle:`${usePreterm ? "Postmenstrual age" : "Age"} (${xUnit})`, yAxisTitle:`${currentLengthLabel} (cm)`, xLabel: usePreterm ? "PMA" : "Age", yLabel:currentLengthLabel, xUnit, yUnit:"cm", emptyLabel:"length/height records", whoMetric:"length", point:(r)=>growthPoint(r, pmaAge(r), length(r)) },
+    head: { title:"Head circumference-for-age", xAxisTitle:`${usePreterm ? "Postmenstrual age" : "Age"} (${xUnit})`, yAxisTitle:"Head circumference (cm)", xLabel: usePreterm ? "PMA" : "Age", yLabel:"Head circumference", xUnit, yUnit:"cm", emptyLabel:"head circumference records", whoMetric:"head", point:(r)=>growthPoint(r, pmaAge(r), r.headCircumferenceCm) },
     wfl: { title:`Weight-for-${currentLengthLabel.toLowerCase()}`, xAxisTitle:`${currentLengthLabel} (cm)`, yAxisTitle:"Weight (kg)", xLabel:currentLengthLabel, yLabel:"Weight", xUnit:"cm", yUnit:"kg", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, length(r), r.weightKg) },
-    bmi: { title:"BMI-for-age", xAxisTitle:"Age (months)", yAxisTitle:"BMI", xLabel:"Age", yLabel:"BMI", xUnit:"mo", yUnit:"", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, ageMonths(r), bmi(r)) }
+    bmi: { title:"BMI-for-age", xAxisTitle:`${usePreterm ? "Postmenstrual age" : "Age"} (${xUnit})`, yAxisTitle:"BMI", xLabel: usePreterm ? "PMA" : "Age", yLabel:"BMI", xUnit, yUnit:"", emptyLabel:"weight and length records", point:(r)=>growthPoint(r, pmaAge(r), bmi(r)) }
   };
   return configs[id] || configs.weight;
 }

@@ -209,7 +209,7 @@ const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfiles
 const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
 const { getPersistedGrowthRecords, getPersistedMilestones, getLogsForBaby } = await import(`${moduleBase}utils/localState.mjs`);
 const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
-const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+const { calculateBabyAge, profileAgeDisplay, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
 const { hasPremiumAccess, TRIAL_DAYS } = await import(`${moduleBase}utils/planUtils.mjs`);
@@ -279,13 +279,17 @@ async function renderReport() {
   const length = latestGrowth ? (latestGrowth.heightCm || latestGrowth.lengthCm) : null;
 
   // Hero
+  const ageDisplay = profileAgeDisplay(baby, now);
   setText("babyName", baby.name);
-  setText("babyMeta", `${calculateBabyAge(baby.dateOfBirth, now)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`);
+  setText("babyMeta", `${ageDisplay.corrected || ageDisplay.actual}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`);
   setText("reportPeriod", `${formatDate(start)} – ${formatDate(now)}`);
+  const ageRow = ["Age", ageDisplay.corrected
+    ? `${ageDisplay.actual} (corrected: ${ageDisplay.corrected})`
+    : ageDisplay.actual];
   const patientDetails = [
     ["Child", baby.name],
     ["Date of birth", formatDate(baby.dateOfBirth)],
-    ["Age", calculateBabyAge(baby.dateOfBirth, now)],
+    ageRow,
     ["Gender", baby.gender ? capitalize(baby.gender) : "Not set"],
     ["Blood group", formatBloodGroup(baby) || "Not set"],
     ["Generated", formatDate(now)]
@@ -385,7 +389,7 @@ async function renderReport() {
   printPayload = {
     babyName: baby.name,
     patientDetails,
-    meta: `${calculateBabyAge(baby.dateOfBirth, now)} · DOB ${formatDate(baby.dateOfBirth)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`,
+    meta: `${ageDisplay.corrected || ageDisplay.actual} · DOB ${formatDate(baby.dateOfBirth)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`,
     generatedAt: formatDate(now),
     range: `${formatDate(start)} – ${formatDate(now)}`,
     summaryRows,

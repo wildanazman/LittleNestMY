@@ -605,7 +605,7 @@ Save Milestone
         const { fileToResizedDataUrl } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { compressVideoBlob } = await import(`${moduleBase}utils/videoCompress.mjs`);
         const { deleteMilestoneRemote, loadMilestonesRemote, saveMilestoneRemote } = await import(`${moduleBase}utils/milestonesRemote.mjs`);
-        const { ageInMonths, milestonesForAge } = await import(`${moduleBase}utils/benchmarks.mjs`);
+        const { ageInMonths, correctedAgeInMonths, milestonesForAge, isProfilePremature } = await import(`${moduleBase}utils/benchmarks.mjs`);
         const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
 
         const grid = document.getElementById("milestoneGrid");
@@ -1158,12 +1158,16 @@ Save Milestone
             if (!cdcSection) return;
             const dob = selectedBaby?.dateOfBirth;
             if (!dob) { cdcSection.classList.add("hidden"); return; }
-            const months = ageInMonths(dob);
+            const months = correctedAgeInMonths(selectedBaby);
+            const premature = isProfilePremature(selectedBaby);
             const { current, next } = milestonesForAge(months);
             if (!current && !next) { cdcSection.classList.add("hidden"); return; }
             cdcAgeBadge.textContent = months < 1 ? "Newborn" : `${Math.floor(months)} mo`;
             cdcTitle.textContent = current ? "What to look for now" : "First milestones ahead";
-            cdcBody.innerHTML = renderCdcGroup(current) + renderCdcGroup(next, { upcoming: true });
+            const prematureNote = premature
+              ? `<div class="rounded-[20px] bg-gradient-to-r from-tertiary-container/30 to-tertiary-container/10 border border-tertiary-container/20 p-3 mx-2 mb-3 flex items-start gap-2.5"><span class="material-symbols-outlined text-[18px] text-tertiary shrink-0 mt-0.5">child_care</span><p class="font-label-sm text-[12px] text-on-tertiary-container leading-relaxed">Milestones are shown based on your baby's <strong>corrected age</strong> because your baby was born prematurely.</p></div>`
+              : "";
+            cdcBody.innerHTML = prematureNote + renderCdcGroup(current) + renderCdcGroup(next, { upcoming: true });
             cdcSection.classList.remove("hidden");
             cdcBody.querySelectorAll("[data-cdc-mark]").forEach((btn) =>
                 btn.addEventListener("click", () => markCdcAchieved(btn.dataset.cdcMark)));
