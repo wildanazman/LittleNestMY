@@ -1612,6 +1612,20 @@
         const { t } = i18nModule;
         const { loadVaccinationRecordsRemote } = vaccinationsRemoteModule;
 
+        // Paint the parent name + avatar from local cache right away, before the
+        // auth/baby-data awaits below, so the greeting never lingers on "Loading...".
+        try {
+            const cachedParent = getParentProfile();
+            const earlyNameEl = document.getElementById("parentName");
+            if (earlyNameEl) earlyNameEl.textContent = cachedParent?.name || t("home.parent");
+            const earlyInitialsEl = document.getElementById("homeParentInitials");
+            if (earlyInitialsEl) earlyInitialsEl.textContent = initialsForName(cachedParent?.name);
+            if (cachedParent?.photoUrl) {
+                const earlyPhotoEl = document.getElementById("homeParentPhoto");
+                if (earlyPhotoEl) { earlyPhotoEl.src = cachedParent.photoUrl; earlyPhotoEl.classList.remove("hidden"); earlyInitialsEl?.classList.add("hidden"); }
+            }
+        } catch (e) { /* non-critical early paint */ }
+
         window.addEventListener("error", (event) => showHomeError(event.message || "Dashboard could not load."));
         window.addEventListener("unhandledrejection", (event) => showHomeError(event.reason?.message || "Dashboard could not load."));
         document.getElementById("homeRetryButton")?.addEventListener("click", () => window.location.reload());
