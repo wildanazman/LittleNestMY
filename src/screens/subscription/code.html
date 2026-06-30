@@ -63,7 +63,7 @@ tailwind.config = {
   <button class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="backButton" type="button" aria-label="Back" data-back-to="settings">
     <span class="material-symbols-outlined">arrow_back</span>
   </button>
-  <h1 class="text-[20px] leading-7 font-extrabold text-primary">Premium Plan</h1>
+  <h1 class="text-[20px] leading-7 font-extrabold text-primary">Early Premium</h1>
   <div class="w-10 h-10"></div>
 </header>
 
@@ -92,7 +92,7 @@ tailwind.config = {
   <!-- Plans -->
   <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
     <h2 class="text-[18px] font-extrabold text-on-surface text-center">Choose your plan</h2>
-    <p class="text-[13px] text-on-surface-variant text-center mt-1">Unlock premium features for your little one</p>
+    <p class="text-[13px] text-on-surface-variant text-center mt-1">Early-user lifetime access for your little one</p>
 
     <div class="mt-5 space-y-4">
       <!-- Free plan -->
@@ -130,15 +130,15 @@ tailwind.config = {
 
       <!-- Premium plan -->
       <div class="rounded-[22px] border-2 border-primary p-5 premium-glow relative" id="premiumPlanCard">
-        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[11px] font-extrabold uppercase tracking-wider px-4 py-1 rounded-full">Popular</div>
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[11px] font-extrabold uppercase tracking-wider px-4 py-1 rounded-full">Early-user deal</div>
         <div class="flex items-start justify-between">
           <div>
             <h3 class="text-[17px] font-extrabold text-primary">Premium</h3>
-            <p class="text-[13px] text-on-surface-variant">Everything unlocked</p>
+            <p class="text-[13px] text-on-surface-variant">Everything unlocked forever</p>
           </div>
           <div class="text-right">
-            <span class="text-[22px] font-extrabold text-on-surface">RM 39.90</span>
-            <span class="text-[13px] text-on-surface-variant">one-time</span>
+            <span class="text-[22px] font-extrabold text-on-surface">USD 6</span>
+            <span class="text-[13px] text-on-surface-variant">one-time early price</span>
           </div>
         </div>
         <div class="mt-4 space-y-2.5">
@@ -169,7 +169,7 @@ tailwind.config = {
         </div>
         <button class="mt-5 w-full h-12 rounded-full bg-primary text-on-primary text-[15px] font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="subscribeBtn" type="button">
           <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
-          Subscribe Now
+          Get Early Access
         </button>
       </div>
     </div>
@@ -212,7 +212,7 @@ tailwind.config = {
         </div>
         <div>
           <p class="text-[14px] font-bold text-on-surface">Lifetime Access</p>
-          <p class="text-[13px] text-on-surface-variant">Pay once at RM 39.90 and unlock all premium features forever. No subscription, no recurring fees.</p>
+          <p class="text-[13px] text-on-surface-variant">Pay once at USD 6 during the early-user offer and unlock all premium features forever. No subscription, no recurring fees.</p>
         </div>
       </div>
     </div>
@@ -286,12 +286,12 @@ async function renderPlanStatus() {
 
   const subscribeBtn = document.getElementById("subscribeBtn");
   if (isOnPremium) {
-    subscribeBtn.textContent = "Already subscribed";
+    subscribeBtn.textContent = "Lifetime access active";
     subscribeBtn.disabled = true;
     subscribeBtn.classList.remove("bg-primary", "text-on-primary");
     subscribeBtn.classList.add("bg-surface-container", "text-on-surface-variant");
   } else {
-    subscribeBtn.textContent = "Subscribe Now";
+    subscribeBtn.textContent = "Get Early Access";
     subscribeBtn.disabled = false;
     subscribeBtn.classList.remove("bg-surface-container", "text-on-surface-variant");
     subscribeBtn.classList.add("bg-primary", "text-on-primary");
@@ -301,13 +301,13 @@ async function renderPlanStatus() {
 async function subscribe() {
   const plan = await getCurrentPlan();
   if (isPremium(plan)) {
-    showFeedback("You are already subscribed!", false);
+    showFeedback("Lifetime access is already active.", false);
     return;
   }
 
   const guest = isGuestMode();
   if (guest) {
-    showFeedback("Sign up for an account to subscribe.", true);
+    showFeedback("Sign up for an account to buy early access.", true);
     return;
   }
 
@@ -320,7 +320,7 @@ async function subscribe() {
     if (!session?.access_token) {
       showFeedback("Please log in first.", true);
       btn.disabled = false;
-      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Subscribe Now';
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Get Early Access';
       return;
     }
 
@@ -352,7 +352,7 @@ async function subscribe() {
       : error.message;
     showFeedback(msg, true);
     btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Subscribe Now';
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">workspace_premium</span>Get Early Access';
   }
 }
 
