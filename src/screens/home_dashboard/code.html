@@ -316,6 +316,18 @@
             transform: translateY(-1px);
           }
         }
+        /* The header launcher holds the absolutely-centered title; any transform on it
+           would become the title's containing block and make the title jump on hover/press. */
+        #appLauncherButton:hover,
+        #appLauncherButton:active {
+          transform: none !important;
+        }
+        /* Shrink + raise the wordmark a touch so the title and the plan badge below it
+           read as one centered unit inside the 56px header. */
+        .ln-app-header-title:has(#homePlanBadge) {
+          top: calc(50% - 7px) !important;
+          font-size: 1.05rem !important;
+        }
         #homeContent header:not(nav),
         #babyProfileMenuButton,
         #homeContent [data-screen-target]:not(nav *):not([data-screen-target="mama_care"]) .w-14,
