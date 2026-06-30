@@ -8,6 +8,15 @@
   --auth-shadow: 0 22px 58px rgba(112, 86, 244, 0.12), 0 10px 28px rgba(255, 159, 200, 0.10);
 }
 
+:root.dark {
+  --auth-ink: #f6f8ff;
+  --auth-muted: #bac6dc;
+  --auth-primary: #c9bfff;
+  --auth-card: rgba(17, 24, 42, 0.88);
+  --auth-border: rgba(202, 216, 255, 0.16);
+  --auth-shadow: 0 22px 54px rgba(0, 0, 0, 0.36);
+}
+
 body.auth-polish {
   background:
     radial-gradient(circle at 12% 4%, rgba(155, 124, 255, 0.26), transparent 32%),
@@ -32,6 +41,12 @@ body.auth-polish::before {
 .auth-polish main {
   position: relative;
   isolation: isolate;
+}
+
+.auth-polish h1,
+.auth-polish h2,
+.auth-polish h3 {
+  text-wrap: balance;
 }
 
 .auth-polish form.soft-shadow,
@@ -159,6 +174,46 @@ body.auth-polish::before {
   border: 1px solid rgba(112, 86, 244, 0.10) !important;
 }
 
+.auth-polish .auth-welcome-shell {
+  color: var(--auth-ink);
+}
+
+.auth-polish .auth-welcome-brand {
+  color: #7056f4 !important;
+}
+
+.auth-polish .auth-welcome-hero {
+  background: linear-gradient(160deg, #efe7ff 0%, #ffe7f1 54%, #e6f4ff 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  box-shadow: 0 18px 46px rgba(112, 86, 244, 0.16), inset 0 1px 0 rgba(255,255,255,.82);
+}
+
+.auth-polish .auth-welcome-orb {
+  background: rgba(155,124,255,.42) !important;
+}
+
+.auth-polish .auth-welcome-avatar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #7056f4 !important;
+}
+
+.auth-polish .auth-floating-chip {
+  background: rgba(255,255,255,.80) !important;
+  border: 1px solid rgba(255,255,255,.72);
+}
+
+.auth-polish .auth-primary-action {
+  background: linear-gradient(145deg, #9b7cff, #7056f4) !important;
+  color: #fff !important;
+  box-shadow: 0 14px 30px rgba(112,86,244,.34) !important;
+}
+
+.auth-polish .auth-guest-action {
+  background: rgba(255,255,255,.72) !important;
+  color: #5c536d !important;
+  border: 1px solid rgba(255,255,255,.74) !important;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .auth-polish button:hover {
     transform: translateY(-1px);
@@ -171,23 +226,152 @@ body.auth-polish::before {
 
 :root.dark body.auth-polish {
   background:
-    radial-gradient(circle at 18% 10%, rgba(112, 86, 244, 0.17), transparent 34%),
-    radial-gradient(circle at 82% 20%, rgba(255, 191, 163, 0.1), transparent 30%),
-    linear-gradient(180deg, #181514 0%, #14100f 100%);
+    radial-gradient(620px 420px at 20% -8%, rgba(124, 92, 255, 0.34), transparent 68%),
+    radial-gradient(500px 360px at 88% 12%, rgba(34, 211, 238, 0.18), transparent 70%),
+    radial-gradient(420px 360px at 18% 96%, rgba(255, 159, 200, 0.14), transparent 72%),
+    linear-gradient(180deg, #11182a 0%, #09111f 58%, #070c17 100%) !important;
+  color: #f6f8ff !important;
 }
 
 :root.dark .auth-polish form.soft-shadow,
-:root.dark .auth-polish section.soft-shadow {
-  background: rgba(36, 31, 29, 0.88) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+:root.dark .auth-polish section.soft-shadow,
+:root.dark .auth-polish .auth-glass {
+  background:
+    linear-gradient(145deg, rgba(25, 34, 56, 0.92), rgba(13, 22, 40, 0.88)) !important;
+  border-color: rgba(202, 216, 255, 0.16) !important;
   box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+    0 18px 42px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+:root.dark .auth-polish .auth-glass label,
+:root.dark .auth-polish .auth-glass .text-on-surface,
+:root.dark .auth-polish .text-on-surface {
+  color: #f6f8ff !important;
+}
+
+:root.dark .auth-polish .text-on-surface-variant,
+:root.dark .auth-polish .auth-glass .text-on-surface-variant,
+:root.dark .auth-polish p {
+  color: #bac6dc !important;
 }
 
 :root.dark .auth-polish input:not([type="checkbox"]) {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.09) !important;
+  background: rgba(7, 14, 28, 0.72) !important;
+  border-color: rgba(202, 216, 255, 0.14) !important;
+  color: #f6f8ff !important;
+  -webkit-text-fill-color: #f6f8ff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+:root.dark .auth-polish input:not([type="checkbox"])::placeholder {
+  color: rgba(186, 198, 220, 0.72) !important;
+  -webkit-text-fill-color: rgba(186, 198, 220, 0.72) !important;
+}
+
+:root.dark .auth-polish input:not([type="checkbox"]):focus {
+  border-color: rgba(201, 191, 255, 0.44) !important;
+  box-shadow:
+    0 0 0 4px rgba(201, 191, 255, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+:root.dark .auth-polish input[type="checkbox"] {
+  background-color: rgba(7, 14, 28, 0.78) !important;
+  border-color: rgba(202, 216, 255, 0.28) !important;
+}
+
+:root.dark .auth-polish .auth-brand-chip {
+  background: rgba(17, 24, 42, 0.74) !important;
+  border-color: rgba(202, 216, 255, 0.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 12px 28px rgba(0,0,0,.24);
+}
+
+:root.dark .auth-polish .auth-brand-chip span:not(.auth-brand-mark),
+:root.dark .auth-polish .auth-welcome-brand,
+:root.dark .auth-polish .text-primary {
+  color: #c9bfff !important;
+}
+
+:root.dark .auth-polish .auth-brand-mark,
+:root.dark .auth-polish .auth-icon-tile {
+  background: linear-gradient(145deg, #8c78ff, #c9bfff) !important;
+  color: #07111f !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.32);
+}
+
+:root.dark .auth-polish .auth-hero-strip {
+  background:
+    radial-gradient(180px 110px at 100% 0%, rgba(201, 191, 255, 0.18), transparent 72%),
+    linear-gradient(145deg, rgba(24, 34, 58, 0.94), rgba(13, 22, 40, 0.86)) !important;
+  border-color: rgba(202, 216, 255, 0.16) !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+:root.dark .auth-polish .auth-welcome-hero {
+  background:
+    radial-gradient(220px 160px at 50% 42%, rgba(201, 191, 255, 0.22), transparent 68%),
+    radial-gradient(180px 130px at 20% 18%, rgba(255, 159, 200, 0.12), transparent 72%),
+    linear-gradient(155deg, rgba(24, 34, 58, 0.96), rgba(10, 18, 34, 0.92)) !important;
+  border-color: rgba(202, 216, 255, 0.15) !important;
+  box-shadow: 0 18px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+:root.dark .auth-polish .auth-welcome-orb {
+  background: rgba(201, 191, 255, 0.26) !important;
+}
+
+:root.dark .auth-polish .auth-welcome-avatar {
+  background: rgba(246, 248, 255, 0.10) !important;
+  color: #c9bfff !important;
+  border: 1px solid rgba(202, 216, 255, 0.16);
+  box-shadow: 0 18px 42px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.10) !important;
+}
+
+:root.dark .auth-polish .auth-floating-chip {
+  background: rgba(17, 24, 42, 0.78) !important;
+  border-color: rgba(202, 216, 255, 0.16) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+
+:root.dark .auth-polish .auth-primary-action,
+:root.dark .auth-polish button[type="submit"],
+:root.dark .auth-polish #continueButton,
+:root.dark .auth-polish #acceptButton {
+  background: linear-gradient(145deg, #c9bfff, #7c5cff) !important;
+  color: #07111f !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.30) !important;
+}
+
+:root.dark .auth-polish .auth-secondary-action {
+  background: rgba(201, 191, 255, 0.14) !important;
+  color: #dcd6ff !important;
+  border-color: rgba(201, 191, 255, 0.18) !important;
+}
+
+:root.dark .auth-polish .auth-guest-action,
+:root.dark .auth-polish #googleButton {
+  background: rgba(17, 24, 42, 0.82) !important;
+  color: #f6f8ff !important;
+  border-color: rgba(202, 216, 255, 0.16) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+
+:root.dark .auth-polish .password-peek-button,
+:root.dark .auth-polish [aria-label^="Back"] {
+  background: rgba(17, 24, 42, 0.82) !important;
+  color: #c9bfff !important;
+  border: 1px solid rgba(202, 216, 255, 0.16) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.24) !important;
+}
+
+:root.dark .auth-polish .bg-surface-container-high,
+:root.dark .auth-polish .h-px {
+  background-color: rgba(202, 216, 255, 0.16) !important;
+}
+
+:root.dark .auth-polish .text-error {
+  color: #ff9aa8 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
