@@ -556,6 +556,14 @@
           color: #7056f4;
           font-weight: 900;
         }
+        :root.dark #homeContent #activeStatusCard {
+          background:
+            radial-gradient(220px 140px at 100% 0%, rgba(124, 108, 255, 0.22), transparent 70%),
+            linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.04)) !important;
+          border-color: rgba(255,255,255,.10) !important;
+          box-shadow: 0 14px 30px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06) !important;
+        }
+        :root.dark #homeContent #activeStatusCard #activeStatusLabel::before { color: #b7bdff; }
         #homeContent #statusGridSection {
           margin-top: 2px;
         }

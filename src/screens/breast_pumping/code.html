@@ -240,11 +240,11 @@ tailwind.config = {
     <div class="mama-card-inner rounded-[24px] p-4 dark:bg-white/5 dark:border-white/10">
       <div class="flex items-center justify-between gap-3">
         <div>
-          <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857]">Storage Summary</p>
+          <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857] dark:text-[#5fd9ac]">Storage Summary</p>
           <p class="text-[25px] leading-8 font-extrabold text-on-surface" id="storedMilkTotal">0 ml</p>
           <p class="text-[14px] text-on-surface-variant" id="storedMilkMeta">0 containers · 0 days supply</p>
         </div>
-        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-[#047857] font-extrabold dark:bg-white/10" id="addMilkStorageButton" type="button">Add</button>
+        <button class="mama-action h-10 rounded-full bg-white/80 px-4 text-[#047857] font-extrabold dark:bg-white/10 dark:text-[#5fd9ac]" id="addMilkStorageButton" type="button">Add</button>
       </div>
       <div class="mt-3 rounded-2xl bg-white/70 p-3 dark:bg-white/10" id="fifoRecommendation"></div>
       <div class="mt-3 space-y-2" id="milkStorageList"></div>
@@ -632,7 +632,7 @@ function renderFifo(activeStorage) {
     return;
   }
   panel.innerHTML = `
-    <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857]">Use this next</p>
+    <p class="text-[12px] font-extrabold uppercase tracking-wide text-[#047857] dark:text-[#5fd9ac]">Use this next</p>
     <div class="mt-1 flex items-center justify-between gap-3">
       <div>
         <p class="text-[17px] font-extrabold text-on-surface">${Math.round(fifo.remainingMl ?? fifo.quantityMl)} ml · ${escapeHtml(fifo.label || fifo.containerType)}</p>
