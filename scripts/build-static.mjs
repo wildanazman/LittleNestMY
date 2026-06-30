@@ -28,11 +28,13 @@ for (const screen of screens) {
   cpSync(join(screensRoot, screen.id), join(dist, screen.id), { recursive: true });
   cpSync(join(screensRoot, screen.path), join(dist, screen.id, "index.html"));
   injectCapacitorCompat(join(dist, screen.id, "index.html"));
+  injectVercelAnalytics(join(dist, screen.id, "index.html"));
 }
 
 const defaultScreen = screens.find((screen) => screen.id === "auth_welcome") || screens[0];
 cpSync(join(screensRoot, defaultScreen.path), join(dist, "index.html"));
 injectCapacitorCompat(join(dist, "index.html"));
+injectVercelAnalytics(join(dist, "index.html"));
 
 cpSync(join(root, "src"), join(dist, "src"), { recursive: true });
 
@@ -58,6 +60,18 @@ function injectCapacitorCompat(filePath) {
   const tag = '<script src="/src/utils/capacitorCompat.js"></script>';
   let html = readFileSync(filePath, "utf8");
   if (html.includes("capacitorCompat.js")) return;
+  if (html.includes("</head>")) {
+    html = html.replace("</head>", `${tag}\n</head>`);
+  } else {
+    html = `${tag}\n${html}`;
+  }
+  writeFileSync(filePath, html);
+}
+
+function injectVercelAnalytics(filePath) {
+  const tag = '<script src="/src/utils/vercel-analytics.js"></script>';
+  let html = readFileSync(filePath, "utf8");
+  if (html.includes("vercel-analytics.js")) return;
   if (html.includes("</head>")) {
     html = html.replace("</head>", `${tag}\n</head>`);
   } else {
