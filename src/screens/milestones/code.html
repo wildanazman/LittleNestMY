@@ -727,7 +727,7 @@ Save Milestone
             if (pendingVideoBlobUrl) URL.revokeObjectURL(pendingVideoBlobUrl);
             pendingVideoBlobUrl = "";
             try {
-                milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 720, quality: 0.66 });
+                milestonePhotoDataUrl = await fileToResizedDataUrl(event.target.files[0], { maxSize: 800, quality: 0.7, targetBytes: 180_000 });
                 resetMediaLabels();
                 photoLabel.textContent = "Photo ready ✓";
                 showPhotoPreview(milestonePhotoDataUrl);

@@ -35,7 +35,11 @@ export async function fileToResizedDataUrl(file, options = {}) {
   const {
     maxSize = 720,
     quality = 0.82,
-    maxBytes = 2_500_000
+    maxBytes = 2_500_000,
+    // Soft target for the encoded data-URL length. Quality is stepped down
+    // until the photo fits, so cloud storage stays small and predictable.
+    targetBytes = maxBytes,
+    minQuality = 0.45
   } = options;
 
   if (!file) return "";
@@ -55,7 +59,14 @@ export async function fileToResizedDataUrl(file, options = {}) {
   canvas.height = height;
   const context = canvas.getContext("2d");
   context.drawImage(image, 0, 0, width, height);
-  const dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+  let currentQuality = quality;
+  let dataUrl = canvas.toDataURL("image/jpeg", currentQuality);
+  // Step quality down until under the soft target (keeps stored photos small).
+  while (dataUrl.length > targetBytes && currentQuality > minQuality) {
+    currentQuality = Math.max(minQuality, currentQuality - 0.1);
+    dataUrl = canvas.toDataURL("image/jpeg", currentQuality);
+  }
 
   if (dataUrl.length > maxBytes) {
     throw new Error("The photo is still too large after resizing. Please try a smaller image.");
