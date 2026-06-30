@@ -231,7 +231,7 @@ tailwind.config = {
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getAuthSession, isGuestMode, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
+const { getPlanStatus } = await import(`${moduleBase}utils/planUtils.mjs`);
 const { requireSupabaseClient, isSupabaseConfigured } = await import(`${moduleBase}utils/supabaseClient.mjs`);
 
 if (!(await isLoggedIn())) {
@@ -246,37 +246,38 @@ await renderPlanStatus();
 bindPrototypeActions();
 
 async function renderPlanStatus() {
-  const plan = await getCurrentPlan();
-  const isOnPremium = isPremium(plan);
+  const status = await getPlanStatus();
+  const isPaid = status.state === "premium";
+  const isTrial = status.state === "trial";
 
-  document.getElementById("planName").textContent = isOnPremium ? "Premium" : "Free";
-  document.getElementById("planMeta").textContent = isOnPremium
+  document.getElementById("planName").textContent = isPaid ? "Premium" : isTrial ? "Premium Trial" : "Free";
+  document.getElementById("planMeta").textContent = isPaid
     ? "All features unlocked"
-    : "Upgrade for doctor reports & AI insights";
+    : isTrial
+      ? `${status.daysLeft} day${status.daysLeft === 1 ? "" : "s"} left — subscribe to keep every feature`
+      : "Upgrade for doctor reports & AI insights";
 
   const icon = document.getElementById("planIcon");
-  icon.textContent = isOnPremium ? "workspace_premium" : "star";
+  icon.textContent = isPaid || isTrial ? "workspace_premium" : "star";
 
   const badge = document.getElementById("planBadge");
-  if (isOnPremium) {
-    badge.textContent = "Active";
+  if (isPaid || isTrial) {
+    badge.textContent = isPaid ? "Active" : "Trial";
     badge.classList.remove("hidden");
   } else {
     badge.classList.add("hidden");
   }
 
+  // "Purchased" note is only true for paid accounts, not the free trial.
   const purchasedNote = document.getElementById("purchasedNote");
-  if (isOnPremium) {
-    purchasedNote.classList.remove("hidden");
-  } else {
-    purchasedNote.classList.add("hidden");
-  }
+  purchasedNote.classList.toggle("hidden", !isPaid);
 
+  // Free-plan card is highlighted as "Current" only when neither paid nor on trial.
   const freeCard = document.getElementById("freePlanCard");
   const currentBadge = freeCard.querySelector("span:last-child");
   freeCard.classList.remove("border-primary");
   freeCard.classList.add("border-surface-container");
-  if (!isOnPremium) {
+  if (!isPaid && !isTrial) {
     freeCard.classList.remove("border-surface-container");
     freeCard.classList.add("border-primary");
     if (currentBadge) currentBadge.textContent = "Current";
@@ -284,14 +285,15 @@ async function renderPlanStatus() {
     if (currentBadge) currentBadge.textContent = "";
   }
 
+  // Paid users can't re-subscribe; trial + free users can (trial subscribes to keep access).
   const subscribeBtn = document.getElementById("subscribeBtn");
-  if (isOnPremium) {
+  if (isPaid) {
     subscribeBtn.textContent = "Lifetime access active";
     subscribeBtn.disabled = true;
     subscribeBtn.classList.remove("bg-primary", "text-on-primary");
     subscribeBtn.classList.add("bg-surface-container", "text-on-surface-variant");
   } else {
-    subscribeBtn.textContent = "Get Early Access";
+    subscribeBtn.textContent = isTrial ? "Keep Premium — Get Early Access" : "Get Early Access";
     subscribeBtn.disabled = false;
     subscribeBtn.classList.remove("bg-surface-container", "text-on-surface-variant");
     subscribeBtn.classList.add("bg-primary", "text-on-primary");
@@ -299,8 +301,8 @@ async function renderPlanStatus() {
 }
 
 async function subscribe() {
-  const plan = await getCurrentPlan();
-  if (isPremium(plan)) {
+  const status = await getPlanStatus();
+  if (status.state === "premium") {
     showFeedback("Lifetime access is already active.", false);
     return;
   }

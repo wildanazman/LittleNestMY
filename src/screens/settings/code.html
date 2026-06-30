@@ -650,7 +650,7 @@
         } = await import(`${moduleBase}utils/i18n.mjs`);
         const { bindPrototypeActions, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getFreshAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
+        const { getPlanStatus } = await import(`${moduleBase}utils/planUtils.mjs`);
         const { getParentProfile, initialsForName, refreshParentProfileFromSupabase, saveParentProfile, syncParentProfileToSupabase } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
@@ -956,10 +956,14 @@
 
         async function renderPlanLabel() {
             try {
-                const plan = await getCurrentPlan();
+                const status = await getPlanStatus();
                 const label = document.getElementById("planLabel");
                 if (label) {
-                    label.textContent = isPremium(plan) ? "Premium · Active" : "Free Plan";
+                    label.textContent = status.state === "premium"
+                        ? "Premium · Active"
+                        : status.state === "trial"
+                            ? `Premium Trial · ${status.daysLeft} day${status.daysLeft === 1 ? "" : "s"} left`
+                            : "Free Plan";
                 }
             } catch (e) {
                 // Silently fail — badge just won't update

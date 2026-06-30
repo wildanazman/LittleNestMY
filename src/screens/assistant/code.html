@@ -155,7 +155,7 @@
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
   const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getCurrentPlan, isPremium } = await import(`${moduleBase}utils/planUtils.mjs`);
+  const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
   const {
     getLogsForBaby, getPersistedDiaperLogs, getPersistedFeedingLogs, getPersistedSleepLogs,
     getPersistedGrowthRecords, getSelectedBabyId, getSelectedBabyProfile
@@ -630,14 +630,9 @@
   renderPremium();
   (async () => {
     try {
-      const plan = await getCurrentPlan();
-      if (isPremium(plan)) {
-        const section = document.getElementById("premiumSection");
-        if (section) section.classList.add("hidden");
-      } else {
-        const section = document.getElementById("premiumSection");
-        if (section) section.classList.remove("hidden");
-      }
+      const unlocked = await hasPremiumAccess();
+      const section = document.getElementById("premiumSection");
+      if (section) section.classList.toggle("hidden", unlocked);
     } catch (e) { /* premium section stays hidden on error */ }
   })();
 </script>

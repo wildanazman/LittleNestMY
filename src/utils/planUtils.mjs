@@ -96,9 +96,15 @@ export function isPremiumActive(status) {
   return status?.state === "premium" || status?.state === "trial";
 }
 
+// Convenience: resolves whether premium features should be unlocked right now
+// (paid OR inside the 14-day trial). Use this for feature gating; use
+// getPlanStatus() when you need to distinguish trial from paid (e.g. billing labels).
+export async function hasPremiumAccess() {
+  return isPremiumActive(await getPlanStatus());
+}
+
 export async function requirePremium(message) {
-  const plan = await getCurrentPlan();
-  if (!isPremium(plan)) {
+  if (!(await hasPremiumAccess())) {
     throw new Error(message || "This feature requires LittleNest Premium.");
   }
 }
