@@ -81,23 +81,34 @@ tailwind.config = {
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5">
   <p class="hidden rounded-2xl bg-tertiary-container p-3 text-[14px] font-extrabold text-tertiary" id="feedback" aria-live="polite"></p>
 
-  <!-- Baby profile -->
-  <section class="report-card bg-surface-container-lowest border border-white/60 p-4 soft-shadow flex items-center gap-4" id="babyCard">
-    <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container shrink-0 bg-surface-container flex items-center justify-center">
-      <img class="w-full h-full object-cover hidden" id="babyPhoto" alt="Baby profile"/>
-      <span class="material-symbols-outlined text-primary" id="babyPhotoFallback">child_care</span>
+  <!-- Premium hero -->
+  <section class="report-card p-5 soft-shadow relative overflow-hidden" id="babyCard" style="background:linear-gradient(135deg,#7c5cff,#9b7cff)">
+    <div class="absolute -right-6 -top-8 w-32 h-32 rounded-full" style="background:rgba(255,255,255,.12)"></div>
+    <div class="absolute -right-2 top-10 w-20 h-20 rounded-full" style="background:rgba(255,255,255,.08)"></div>
+    <div class="relative z-10 flex items-center gap-4">
+      <div class="w-16 h-16 rounded-full overflow-hidden shrink-0 flex items-center justify-center" style="background:rgba(255,255,255,.22);border:2px solid rgba(255,255,255,.6)">
+        <img class="w-full h-full object-cover hidden" id="babyPhoto" alt="Baby profile"/>
+        <span class="material-symbols-outlined text-white" id="babyPhotoFallback" style="font-variation-settings:'FILL' 1">child_care</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-1.5 mb-0.5">
+          <span class="material-symbols-outlined text-[14px] text-white/80" style="font-variation-settings:'FILL' 1">workspace_premium</span>
+          <p class="text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/80">Doctor Report</p>
+        </div>
+        <h2 class="text-[21px] leading-6 font-extrabold text-white truncate" id="babyName">Baby</h2>
+        <p class="text-[13px] text-white/85 truncate" id="babyMeta">Age</p>
+      </div>
     </div>
-    <div class="min-w-0">
-      <h2 class="text-[19px] leading-7 font-extrabold text-on-surface truncate" id="babyName">Baby</h2>
-      <p class="text-[14px] text-on-surface-variant" id="babyMeta">Age</p>
-      <p class="text-[14px] text-on-surface-variant" id="babyGender"></p>
+    <div class="relative z-10 mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5" style="background:rgba(255,255,255,.18)">
+      <span class="material-symbols-outlined text-[15px] text-white">date_range</span>
+      <span class="text-[12px] font-bold text-white" id="reportPeriod">Last 7 days</span>
     </div>
   </section>
 
-  <!-- Summary totals -->
-  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
-    <h2 class="text-[18px] leading-6 font-extrabold text-on-surface" id="summaryTitle">Summary (last 7 days)</h2>
-    <div class="mt-4 divide-y divide-surface-container" id="summaryList"></div>
+  <!-- Summary stat boxes -->
+  <section>
+    <h2 class="text-[16px] leading-6 font-extrabold text-on-surface mb-3 px-1" id="summaryTitle">Summary (last 7 days)</h2>
+    <div class="grid grid-cols-2 gap-3" id="summaryGrid"></div>
   </section>
 
   <!-- Daily breakdown -->
@@ -249,10 +260,10 @@ async function renderReport() {
   const latestGrowth = [...growth].reverse()[0];
   const length = latestGrowth ? (latestGrowth.heightCm || latestGrowth.lengthCm) : null;
 
-  // Baby card
+  // Hero
   setText("babyName", baby.name);
-  setText("babyMeta", `${calculateBabyAge(baby.dateOfBirth, now)} (${formatDate(baby.dateOfBirth)})`);
-  setText("babyGender", baby.gender ? capitalize(baby.gender) : "");
+  setText("babyMeta", `${calculateBabyAge(baby.dateOfBirth, now)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`);
+  setText("reportPeriod", `${formatDate(start)} – ${formatDate(now)}`);
   if (baby.photoUrl) {
     const img = document.getElementById("babyPhoto");
     img.src = baby.photoUrl;
@@ -260,7 +271,7 @@ async function renderReport() {
     document.getElementById("babyPhotoFallback").classList.add("hidden");
   }
 
-  // Summary
+  // Summary (rows kept for print/export; boxes for on-screen)
   setText("summaryTitle", `Summary (${formatDate(start)} – ${formatDate(now)})`);
   const summaryRows = [
     ["Total feedings", `${feeds7.length} times`],
@@ -270,10 +281,19 @@ async function renderReport() {
     ["Latest height/length", length ? `${length} cm` : "No data"],
     ["Latest head circ.", latestGrowth?.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm` : "No data"]
   ];
-  document.getElementById("summaryList").innerHTML = summaryRows.map(([label, value]) => `
-    <div class="flex items-center justify-between py-2.5">
-      <span class="text-[14px] text-on-surface-variant">${escapeHtml(label)}</span>
-      <span class="text-[14px] font-extrabold text-on-surface">${escapeHtml(value)}</span>
+  const metrics = [
+    { label: "Feedings", value: `${feeds7.length}`, sub: "times", icon: "restaurant", bg: "#fff1e9", fg: "#e8623d" },
+    { label: "Total sleep", value: sleepMinutes7 ? formatDuration(sleepMinutes7) : "0h", sub: "", icon: "bedtime", bg: "#eaf1ff", fg: "#3b6fe0" },
+    { label: "Diapers", value: `${diapers7.length}`, sub: "changes", icon: "local_laundry_service", bg: "#e7faf1", fg: "#0f9d6b" },
+    { label: "Weight", value: latestGrowth?.weightKg ? `${latestGrowth.weightKg} kg` : "—", sub: "latest", icon: "monitor_weight", bg: "#efeaff", fg: "#7056f4" },
+    { label: "Height", value: length ? `${length} cm` : "—", sub: "latest", icon: "straighten", bg: "#fdeef6", fg: "#d6457f" },
+    { label: "Head", value: latestGrowth?.headCircumferenceCm ? `${latestGrowth.headCircumferenceCm} cm` : "—", sub: "latest", icon: "radio_button_checked", bg: "#fff6e3", fg: "#c08a1e" }
+  ];
+  document.getElementById("summaryGrid").innerHTML = metrics.map((m) => `
+    <div class="report-card p-4 soft-shadow" style="background:${m.bg};border:1px solid rgba(255,255,255,.6)">
+      <span class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#fff;color:${m.fg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1">${m.icon}</span></span>
+      <p class="mt-2.5 text-[11px] font-extrabold uppercase tracking-wide" style="color:${m.fg}">${escapeHtml(m.label)}</p>
+      <p class="text-[19px] font-extrabold leading-tight" style="color:#241b3a">${escapeHtml(m.value)}${m.sub ? ` <span class="text-[11px] font-bold" style="color:#8a7fa8">${escapeHtml(m.sub)}</span>` : ""}</p>
     </div>`).join("");
 
   // Daily breakdown (newest first)
@@ -394,8 +414,8 @@ function renderGrowthChart(growth) {
     <text x="40" y="${yFor(minY) + 4}" text-anchor="end" class="chart-label" fill="#665650">${minY.toFixed(1)}</text>
     ${points.length > 1 ? `<path d="${path}" fill="none" stroke="#7c5cff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>` : ""}
     ${points.map((p) => `<circle cx="${xFor(p.at)}" cy="${yFor(p.y)}" r="5" fill="#fff" stroke="#7c5cff" stroke-width="3"/>`).join("")}
-    <text x="${chart.left}" y="168" text-anchor="middle" class="chart-label" fill="#665650">${formatDate(new Date(minX))}</text>
-    <text x="${chart.left + chart.width}" y="168" text-anchor="middle" class="chart-label" fill="#665650">${formatDate(new Date(maxX))}</text>`;
+    <text x="${chart.left}" y="168" text-anchor="start" class="chart-label" fill="#665650">${formatDate(new Date(minX))}</text>
+    <text x="${chart.left + chart.width}" y="168" text-anchor="end" class="chart-label" fill="#665650">${formatDate(new Date(maxX))}</text>`;
   setText("growthNote", `${points.length} weight measurement${points.length === 1 ? "" : "s"} saved.`);
 }
 
@@ -407,8 +427,12 @@ function buildPrintHtml() {
   const growthHtml = p.growth.length
     ? p.growth.slice().reverse().map((r) => `<tr><td>${escapeHtml(formatDate(r.measuredAt))}</td><td>${r.weightKg ? `${r.weightKg} kg` : "–"}</td><td>${(r.heightCm || r.lengthCm) ? `${r.heightCm || r.lengthCm} cm` : "–"}</td><td>${r.headCircumferenceCm ? `${r.headCircumferenceCm} cm` : "–"}</td></tr>`).join("")
     : `<tr><td colspan="4">No growth records.</td></tr>`;
-  const notesHtml = p.notes.length
-    ? p.notes.map((n) => `<li><strong>${escapeHtml(n.title)}</strong>${n.detail ? ` — ${escapeHtml(n.detail)}` : ""} <em>(${escapeHtml(formatDate(n.at))})</em></li>`).join("")
+  const allNotes = [
+    ...p.healthNotes.map((n) => ({ title: n.type, detail: n.detail, at: n.at })),
+    ...p.milestones.map((m) => ({ title: m.title, detail: m.detail, at: m.at }))
+  ].sort((a, b) => new Date(b.at) - new Date(a.at));
+  const notesHtml = allNotes.length
+    ? allNotes.map((n) => `<li><strong>${escapeHtml(n.title)}</strong>${n.detail ? ` — ${escapeHtml(n.detail)}` : ""} <em>(${escapeHtml(formatDate(n.at))})</em></li>`).join("")
     : "<li>No notes or milestones in this period.</li>";
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>LittleNest – Doctor Report</title>
