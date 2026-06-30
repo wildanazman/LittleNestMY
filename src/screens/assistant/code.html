@@ -124,7 +124,22 @@
 <div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-2" id="recsCard"></div>
 </section>
 
-<!-- Premium locked (hidden for now) -->
+<!-- Premium features (live) — shown to premium + trial users -->
+<section class="rise hidden space-y-3" id="premiumLiveSection" style="animation-delay:.25s">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[#7056f4]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Premium insights</h3>
+</div>
+<button type="button" id="premiumDoctorReport" class="w-full text-left rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3 active:scale-[0.99]">
+<span class="w-11 h-11 rounded-full bg-[#e8f1ff] text-[#2563eb] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">summarize</span></span>
+<div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">Doctor Report</p><p class="font-label-sm text-label-sm text-on-surface-variant">Formatted summary, daily breakdown, growth chart & notes — ready to print.</p></div>
+<span class="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
+</button>
+<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="sleepPredictCard"></div>
+<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="growthCorrCard"></div>
+</section>
+
+<!-- Premium locked teaser — shown to free users -->
 <section class="rise hidden" id="premiumSection" style="animation-delay:.25s">
 <div class="rounded-[24px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#241b3a,#3a2d63)">
 <div class="flex items-center gap-2 mb-3">
@@ -467,6 +482,63 @@
     </div>`).join("");
   }
 
+  // ---------- premium live: sleep predictions ----------
+  const fmtTime = (d) => B.formatMinutesOfDay(d.getHours() * 60 + d.getMinutes());
+  const fmtDate = (d) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+  function renderSleepPredict() {
+    const card = document.getElementById("sleepPredictCard");
+    if (!card) return;
+    const p = B.predictSleep(allSleeps, ageMo, now);
+    const head = `<div class="flex items-center gap-2 mb-3">
+      <span class="w-9 h-9 rounded-full bg-[#eef0ff] text-[#4f46e5] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">nightlight</span></span>
+      <h4 class="font-headline-md text-body-lg text-on-surface flex-1">Sleep predictions</h4>
+      ${p.hasData ? `<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full" style="background:#eef0ff;color:#4f46e5">${p.confidence}</span>` : ""}</div>`;
+    if (!p.hasData) {
+      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log a few sleeps and we'll predict the next nap window and a typical bedtime.</p>`;
+      return;
+    }
+    const rows = [];
+    if (p.nextNap) {
+      const w0 = Math.round(p.wakeWindow[0] / 6) / 10, w1 = Math.round(p.wakeWindow[1] / 6) / 10;
+      rows.push(`<div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">bedtime</span><div class="flex-1 min-w-0"><p class="font-body-md text-on-surface">Next nap window</p><p class="font-label-sm text-label-sm text-on-surface-variant">After a ${w0}–${w1}h awake window</p></div><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${fmtTime(p.nextNap.from)}–${fmtTime(p.nextNap.to)}</p></div>`);
+    }
+    if (p.bedtime) {
+      rows.push(`<div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">dark_mode</span><div class="flex-1 min-w-0"><p class="font-body-md text-on-surface">Typical bedtime</p><p class="font-label-sm text-label-sm text-on-surface-variant">From ${p.basedOnDays} day${p.basedOnDays === 1 ? "" : "s"} of sleep</p></div><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${B.formatMinutesOfDay(p.bedtime.from)}–${B.formatMinutesOfDay(p.bedtime.to)}</p></div>`);
+    }
+    if (!rows.length) rows.push(`<p class="font-body-md text-body-md text-on-surface-variant">End a sleep session to get the next nap prediction.</p>`);
+    card.innerHTML = head + `<div class="space-y-3">${rows.join('<div class="border-t border-surface-container"></div>')}</div>`;
+  }
+
+  // ---------- premium live: growth correlations ----------
+  function corrTakeaway(iv) {
+    if (iv.gainPerWeek >= 100) return `Strong weight gain alongside ${iv.avgFeeds} feeds and ${iv.avgSleepHours}h sleep a day.`;
+    if (iv.gainPerWeek >= 30) return `Steady gain with ${iv.avgFeeds} feeds and ${iv.avgSleepHours}h sleep a day.`;
+    if (iv.gainPerWeek >= 0) return `Slower gain this stretch — common as babies grow, seen with ${iv.avgFeeds} feeds/day.`;
+    return `Slight dip — worth mentioning to your doctor at the next visit.`;
+  }
+
+  function renderGrowthCorr() {
+    const card = document.getElementById("growthCorrCard");
+    if (!card) return;
+    const g = B.growthCorrelations(growthRecords, allFeeds, allSleeps);
+    const head = `<div class="flex items-center gap-2 mb-3">
+      <span class="w-9 h-9 rounded-full bg-[#e5fbf2] text-[#0f766e] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">monitoring</span></span>
+      <h4 class="font-headline-md text-body-lg text-on-surface flex-1">Growth correlations</h4></div>`;
+    if (!g.hasData) {
+      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log at least two weight measurements and we'll connect feeding & sleep to your baby's growth.</p>`;
+      return;
+    }
+    const body = g.intervals.slice(-3).reverse().map((iv) => {
+      const gain = `${iv.gainPerWeek >= 0 ? "+" : ""}${iv.gainPerWeek} g/wk`;
+      return `<div class="rounded-2xl bg-surface-container-low/60 p-3">
+        <div class="flex items-center justify-between gap-2"><p class="font-label-sm text-label-sm text-on-surface-variant">${fmtDate(iv.fromAt)} → ${fmtDate(iv.toAt)}</p><span class="font-headline-md text-body-md" style="color:${iv.gainPerWeek >= 0 ? "#15803D" : "#b45309"}">${gain}</span></div>
+        <div class="flex gap-4 mt-1.5"><span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">restaurant</span>${iv.avgFeeds}/day</span><span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">bedtime</span>${iv.avgSleepHours}h/day</span></div>
+        <p class="font-label-sm text-label-sm text-on-surface mt-1.5">${corrTakeaway(iv)}</p></div>`;
+    }).join('<div class="h-2"></div>');
+    card.innerHTML = head + body;
+  }
+
   // ---------- age-aware benchmark engine (RESEARCH.md) ----------
   const ageMo = B.ageInMonths(selectedBaby?.dateOfBirth, now);
   const feedingType = selectedBaby?.feedingPreference || selectedBaby?.feedingType || "mixed";
@@ -628,12 +700,15 @@
   renderNextMilestone();
   renderRecs();
   renderPremium();
+  renderSleepPredict();
+  renderGrowthCorr();
+  document.getElementById("premiumDoctorReport")?.addEventListener("click", () => goToScreen("doctor_report"));
   (async () => {
     try {
       const unlocked = await hasPremiumAccess();
-      const section = document.getElementById("premiumSection");
-      if (section) section.classList.toggle("hidden", unlocked);
-    } catch (e) { /* premium section stays hidden on error */ }
+      document.getElementById("premiumSection")?.classList.toggle("hidden", unlocked);
+      document.getElementById("premiumLiveSection")?.classList.toggle("hidden", !unlocked);
+    } catch (e) { /* sections stay hidden on error */ }
   })();
 </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

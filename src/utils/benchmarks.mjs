@@ -174,3 +174,112 @@ export function wellnessLabel(score) {
   if (score >= 50) return "Fair";
   return "Building";
 }
+
+// ---------- Premium: Sleep Predictions ----------
+// Age-appropriate awake window between sleeps, in minutes (AAP / pediatric sleep guidance).
+export function wakeWindowMinutes(m) {
+  if (m < 1) return [35, 60];
+  if (m < 3) return [60, 90];
+  if (m < 6) return [90, 120];
+  if (m < 9) return [120, 180];
+  if (m < 12) return [150, 210];
+  if (m < 18) return [180, 240];
+  if (m < 24) return [240, 300];
+  return [300, 360];
+}
+
+// Format minutes-of-day (0..1439) as a friendly "8:30 PM".
+export function formatMinutesOfDay(mins) {
+  let m = ((Math.round(mins) % 1440) + 1440) % 1440;
+  const h = Math.floor(m / 60), mm = m % 60;
+  const ap = h < 12 ? "AM" : "PM";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(mm).padStart(2, "0")} ${ap}`;
+}
+
+// Predict the next nap window (from the last sleep end + age-based wake window) and
+// the typical bedtime (average start of each day's longest evening sleep). Real logs only.
+export function predictSleep(sleeps, months, now = new Date()) {
+  const valid = (sleeps || [])
+    .filter((s) => s && s.startedAt)
+    .map((s) => ({ start: new Date(s.startedAt), end: s.endedAt ? new Date(s.endedAt) : null }))
+    .filter((s) => !Number.isNaN(s.start.getTime()))
+    .sort((a, b) => b.start - a.start);
+  if (!valid.length) return { hasData: false };
+
+  const byDay = {};
+  for (const s of valid) {
+    const k = s.start.toISOString().slice(0, 10);
+    const dur = s.end ? s.end - s.start : 0;
+    (byDay[k] = byDay[k] || []).push({ ...s, dur });
+  }
+  const basedOnDays = Object.keys(byDay).length;
+
+  // Bedtime = average start of each day's longest sleep that begins in the evening/night.
+  const nightStarts = [];
+  for (const k in byDay) {
+    const longest = byDay[k].slice().sort((a, b) => b.dur - a.dur)[0];
+    if (!longest) continue;
+    const h = longest.start.getHours();
+    if (h >= 17 || h <= 2) nightStarts.push(longest.start.getHours() * 60 + longest.start.getMinutes());
+  }
+  let bedtime = null;
+  if (nightStarts.length) {
+    // Average across the midnight wrap: shift post-midnight starts (before ~3 AM) by 24h
+    // so an 11 PM and a 1 AM bedtime average to ~midnight, not noon.
+    const shifted = nightStarts.map((m) => (m < 180 ? m + 1440 : m));
+    const avg = Math.round(shifted.reduce((a, b) => a + b, 0) / shifted.length) % 1440;
+    bedtime = { mid: avg, from: avg - 30, to: avg + 30 };
+  }
+
+  // Next nap = last sleep end + wake window (only when the last sleep has ended).
+  const [wmin, wmax] = wakeWindowMinutes(months);
+  const lastEnd = valid[0].end;
+  let nextNap = null;
+  if (lastEnd && !Number.isNaN(lastEnd.getTime())) {
+    nextNap = {
+      from: new Date(lastEnd.getTime() + wmin * 60000),
+      to: new Date(lastEnd.getTime() + wmax * 60000),
+      lastEnd,
+    };
+  }
+
+  const confidence = basedOnDays >= 5 ? "High" : basedOnDays >= 3 ? "Medium" : "Building";
+  return { hasData: true, basedOnDays, bedtime, nextNap, wakeWindow: [wmin, wmax], confidence };
+}
+
+// ---------- Premium: Growth Correlations ----------
+// Between each pair of weight measurements, compute weekly weight gain alongside the
+// average daily feeds and average daily sleep hours over that same window. Real logs only.
+export function growthCorrelations(growthRecords, feeds, sleeps) {
+  const recs = (growthRecords || [])
+    .filter((r) => r && r.measuredAt && r.weightKg != null)
+    .map((r) => ({ at: new Date(r.measuredAt), w: Number(r.weightKg) }))
+    .filter((r) => !Number.isNaN(r.at.getTime()) && !Number.isNaN(r.w))
+    .sort((a, b) => a.at - b.at);
+  if (recs.length < 2) return { hasData: false, needMore: 2 - recs.length };
+
+  const feedAt = (feeds || [])
+    .map((f) => (f && f.startedAt ? new Date(f.startedAt) : null))
+    .filter((d) => d && !Number.isNaN(d.getTime()));
+  const sleepSpans = (sleeps || [])
+    .filter((s) => s && s.startedAt && s.endedAt)
+    .map((s) => ({ s: new Date(s.startedAt), e: new Date(s.endedAt) }))
+    .filter((sp) => !Number.isNaN(sp.s.getTime()) && !Number.isNaN(sp.e.getTime()) && sp.e > sp.s);
+
+  const intervals = [];
+  for (let i = 1; i < recs.length; i++) {
+    const a = recs[i - 1], b = recs[i];
+    const days = Math.max(1, (b.at - a.at) / 86400000);
+    const gainPerWeek = Math.round(((b.w - a.w) * 1000) / days * 7);
+    const avgFeeds = +(feedAt.filter((t) => t >= a.at && t <= b.at).length / days).toFixed(1);
+    let sleepMs = 0;
+    for (const sp of sleepSpans) {
+      const s = Math.max(sp.s, a.at), e = Math.min(sp.e, b.at);
+      if (e > s) sleepMs += e - s;
+    }
+    const avgSleepHours = +((sleepMs / 3600000) / days).toFixed(1);
+    intervals.push({ fromAt: a.at, toAt: b.at, days: Math.round(days), gainPerWeek, avgFeeds, avgSleepHours });
+  }
+  return { hasData: true, intervals };
+}
