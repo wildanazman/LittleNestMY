@@ -1511,6 +1511,8 @@
             getPersistedReminders,
             getPersistedSleepLogs,
             getLogsForBaby,
+            getBabyProfiles,
+            readSelectedBabyId,
             getActiveSleepSession,
             clearActiveSleepSession,
             deleteLocalFeedingLog,
@@ -1534,7 +1536,7 @@
         const { scheduleAllReminders } = notificationsModule;
         const { getParentProfile, initialsForName } = profileModule;
         const { getFeedingGuideForBaby } = careGuidesModule;
-        const { getBabyPermissions, showViewOnlyNotice, viewOnlyMessage } = permissionsModule;
+        const { getBabyPermissions, permissionsForRole, showViewOnlyNotice, viewOnlyMessage } = permissionsModule;
         const { loadMamaCareData } = mamaCareRemoteModule;
         const { t } = i18nModule;
         const { loadVaccinationRecordsRemote } = vaccinationsRemoteModule;
@@ -1578,11 +1580,24 @@
                 await new Promise(() => {});
             }
         }
-        const babyProfileState = await loadBabyProfilesRemote(null);
+        const cachedProfiles = productionBabyProfiles(getBabyProfiles(null));
+        const cachedSelectedBabyId = readSelectedBabyId();
+        const cachedSelectedBaby = cachedProfiles.find((profile) => profile.id === cachedSelectedBabyId) || cachedProfiles[0] || null;
+        const babyProfileState = cachedSelectedBaby
+            ? {
+                profiles: cachedProfiles,
+                selectedBabyId: cachedSelectedBaby.id,
+                selectedBaby: cachedSelectedBaby,
+                source: "localStorage",
+                error: ""
+            }
+            : await loadBabyProfilesRemote(null);
+        const babyProfilesRefresh = cachedSelectedBaby ? loadBabyProfilesRemote(null).catch(() => null) : Promise.resolve(babyProfileState);
         const profiles = productionBabyProfiles(babyProfileState.profiles);
         const selectedBaby = isPrototypeBabyProfile(babyProfileState.selectedBaby) ? profiles[0] || null : babyProfileState.selectedBaby || profiles[0] || null;
         const selectedBabyId = selectedBaby?.id || "";
-        const permissions = await getBabyPermissions(selectedBabyId);
+        let permissions = selectedBabyId ? permissionsForRole("parent") : permissionsForRole("viewer");
+        const permissionsRefresh = selectedBabyId ? getBabyPermissions(selectedBabyId).catch(() => permissions) : Promise.resolve(permissions);
         const allFeedingLogs = productionRecords(getLogsForBaby(getPersistedFeedingLogs([]), selectedBabyId));
         const allSleepLogs = productionRecords(getLogsForBaby(getPersistedSleepLogs([]), selectedBabyId));
         const allDiaperLogs = productionRecords(getLogsForBaby(getPersistedDiaperLogs([]), selectedBabyId));
@@ -1608,6 +1623,18 @@
             return "";
         };
         const formatStatDate = (value) => new Date(value).toLocaleDateString("en-MY", { day: "numeric", month: "short" });
+        const latestByDate = (items, field, predicate = () => true) => {
+            let latest = null;
+            let latestTime = 0;
+            (items || []).forEach((item) => {
+                if (!predicate(item)) return;
+                const time = new Date(item?.[field]).getTime();
+                if (Number.isNaN(time) || time <= latestTime) return;
+                latest = item;
+                latestTime = time;
+            });
+            return latest;
+        };
 
         setText("parentName", primaryParent?.name || t("home.parent"));
         const homeParentPhoto = document.getElementById("homeParentPhoto");
@@ -1649,6 +1676,13 @@
         applyPermissions();
         bindBabyProfileMenu();
         showHomeContent();
+        permissionsRefresh.then((nextPermissions) => {
+            if (!nextPermissions) return;
+            permissions = nextPermissions;
+            applyPermissions();
+            renderTimeline(now);
+        }).catch(() => {});
+        babyProfilesRefresh.catch(() => {});
         renderReminderBanner();
         renderMamaCarePreview().catch(() => {});
         hydrateHomeData();
@@ -1657,7 +1691,7 @@
         scheduleAllReminders({ feedingLogs: allFeedingLogs, calendarEvents: allCalendarEvents, reminders: allReminders, babyName: babyNameForNotif, feedIntervalHours: selectedBaby ? feedIntervalHours() : 3 });
 
         function renderDashboardStats() {
-            latestFeed = [...allFeedingLogs].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0];
+            latestFeed = latestByDate(allFeedingLogs, "startedAt");
             todayDiaperCount = allDiaperLogs.filter((log) => isSameLocalDay(log.changedAt, now)).length;
             const todaySleepMinutes = getTodaySleepMinutes(allSleepLogs, now);
             setText("lastFeedTime", latestFeed ? formatRelativeTime(latestFeed.startedAt, now) : t("home.noFeedYet"));
@@ -1666,8 +1700,8 @@
             setText("todaySleepDetail", todaySleepMinutes ? t("home.totalToday") : t("home.tapToLog"));
             setText("lastDiaperTime", todayDiaperCount ? String(todayDiaperCount) : t("home.noDiaperYet"));
             setText("lastDiaperDetail", todayDiaperCount ? (todayDiaperCount === 1 ? t("home.changeToday") : t("home.changesToday")) : t("home.tapToLog"));
-            const latestWeightRecord = [...allGrowthRecords].filter((r) => r.weightKg).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
-            const latestHeightRecord = [...allGrowthRecords].filter((r) => r.heightCm || r.lengthCm).sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+            const latestWeightRecord = latestByDate(allGrowthRecords, "measuredAt", (r) => r.weightKg);
+            const latestHeightRecord = latestByDate(allGrowthRecords, "measuredAt", (r) => r.heightCm || r.lengthCm);
             setText("latestWeight", latestWeightRecord ? `${latestWeightRecord.weightKg} kg` : t("home.notLogged"));
             setText("latestHeight", latestHeightRecord ? `${latestHeightRecord.heightCm || latestHeightRecord.lengthCm} cm` : t("home.notLogged"));
         }
@@ -1795,7 +1829,7 @@
         }
 
         function renderGrowthSummary() {
-            const latestGrowth = [...allGrowthRecords].sort((a, b) => new Date(b.measuredAt) - new Date(a.measuredAt))[0];
+            const latestGrowth = latestByDate(allGrowthRecords, "measuredAt");
             if (!latestGrowth) return;
             const length = latestGrowth.heightCm || latestGrowth.lengthCm;
             setText("growthSummaryTitle", latestGrowth.weightKg ? `${latestGrowth.weightKg} kg` : "Growth saved");

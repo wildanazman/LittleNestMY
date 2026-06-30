@@ -209,6 +209,15 @@
   const isYesterday = (v) => between(v, yStart, startOfToday);
 
   const sleepMins = (s) => s.endedAt ? Math.max(0, Math.round((new Date(s.endedAt) - new Date(s.startedAt)) / 60000)) : 0;
+  const diaperType = (log) => String(log?.type || "").toLowerCase();
+  const isStoolDiaper = (log) => {
+    const type = diaperType(log);
+    return Boolean(log?.dirty || type === "dirty" || type === "mixed" || log?.poopColor || log?.poopConsistency);
+  };
+  const isWetDiaper = (log) => {
+    const type = diaperType(log);
+    return Boolean(log?.wet || type === "wet" || type === "mixed" || log?.peeColor || log?.peeAmount);
+  };
 
   const feedsW = allFeeds.filter((l) => inThisWeek(l.startedAt));
   const sleepsW = allSleeps.filter((l) => inThisWeek(l.startedAt));
@@ -220,6 +229,13 @@
   const sleepMinW = sleepsW.reduce((t, s) => t + sleepMins(s), 0);
   const sleepMinL = sleepsL.reduce((t, s) => t + sleepMins(s), 0);
   const totalLogs = feedsW.length + sleepsW.length + diapersW.length;
+  const wetTodayCount = diapersW.reduce((count, log) => count + (isToday(log.changedAt) && isWetDiaper(log) ? 1 : 0), 0);
+  const latestStool = allDiapers.reduce((latest, log) => {
+    if (!isStoolDiaper(log)) return latest;
+    const changedAt = new Date(log.changedAt);
+    if (Number.isNaN(changedAt.getTime())) return latest;
+    return !latest || changedAt > latest.changedAt ? { log, changedAt } : latest;
+  }, null);
 
   // per-day buckets (oldest -> today)
   const days = []; for (let i = 6; i >= 0; i -= 1) days.push(dayStart(i));
@@ -475,7 +491,7 @@
     const db = B.diaperBenchmark(ageMo, feedingType);
     const feedsToday = feedsW.filter((l) => isToday(l.startedAt)).length;
     const sleepTodayH = sleepsW.filter((s) => isToday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0) / 60;
-    const wetToday = diapersW.filter((l) => isToday(l.changedAt)).length;
+    const wetToday = wetTodayCount;
     const latest = growthRecords[0];
     const gMed = latest?.weightKg ? B.whoMedian(ageMo, selectedBaby?.gender, "weight") : null;
 
@@ -517,7 +533,7 @@
     const db = B.diaperBenchmark(ageMo, feedingType);
     const feedsToday = feedsW.filter((l) => isToday(l.startedAt)).length;
     const sleepTodayH = sleepsW.filter((s) => isToday(s.startedAt)).reduce((t, s) => t + sleepMins(s), 0) / 60;
-    const wetToday = diapersW.filter((l) => isToday(l.changedAt)).length;
+    const wetToday = wetTodayCount;
     const cards = [];
 
     cards.push(benchRow({ icon: "restaurant", chipBg: "#ffe3ec", chipFg: "#d6336c", label: "Feeds today", value: `${feedsToday}`,
@@ -540,8 +556,8 @@
       rangeText: `${db.wetMin}+ per day`, status: B.rangeStatus(wetToday, [db.wetMin, null]) }));
 
     // stool pattern (feeding-type aware)
-    const stools = diapersW.filter((l) => l.dirty || l.type === "dirty" || l.type === "mixed").sort((a, b) => new Date(b.changedAt) - new Date(a.changedAt));
-    const daysSince = stools.length ? Math.floor((startOfToday - new Date(new Date(stools[0].changedAt).getFullYear(), new Date(stools[0].changedAt).getMonth(), new Date(stools[0].changedAt).getDate())) / 86400000) : null;
+    const stoolDay = latestStool ? new Date(latestStool.changedAt.getFullYear(), latestStool.changedAt.getMonth(), latestStool.changedAt.getDate()) : null;
+    const daysSince = stoolDay ? Math.floor((startOfToday - stoolDay) / 86400000) : null;
     const ss = B.stoolStatus(daysSince, feedingType);
     cards.push(benchRow({ icon: "category", chipBg: "#fff3da", chipFg: "#b45309", label: "Last stool", value: daysSince == null ? "—" : (daysSince === 0 ? "Today" : `${daysSince}d ago`),
       rangeText: `${B.normalizeFeedingType(feedingType) === "breast" ? "breastfed" : "formula/mixed"} pattern`, status: { tone: ss.tone, short: ss.tone === "good" ? "Normal" : "Monitor" } }));
