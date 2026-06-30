@@ -4,8 +4,8 @@ import {
   hasServerSupabaseConfig,
   readJsonBody,
   sendJson
-} from "./_supabaseAdmin.mjs";
-import { isEmailProviderConfigured, sendEmail } from "./_email.mjs";
+} from "../lib/supabaseAdmin.mjs";
+import { isEmailProviderConfigured, sendEmail } from "../lib/email.mjs";
 
 const FEEDBACK_TO = "wildanazman072@gmail.com";
 const MAX_MESSAGE_CHARS = 5000;

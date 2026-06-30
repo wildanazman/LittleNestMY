@@ -3,7 +3,7 @@ import {
   getServiceClient,
   hasServerSupabaseConfig,
   sendJson
-} from "./_supabaseAdmin.mjs";
+} from "../lib/supabaseAdmin.mjs";
 
 // Public, read-only preview of an invitation by token. Returns only the
 // minimal, non-sensitive details needed to render the Accept Invite page

@@ -6,7 +6,7 @@ import {
   hasServerSupabaseConfig,
   readJsonBody,
   sendJson
-} from "./_supabaseAdmin.mjs";
+} from "../lib/supabaseAdmin.mjs";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {

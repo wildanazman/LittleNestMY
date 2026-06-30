@@ -1,5 +1,5 @@
-import { getServiceClient, hasServerSupabaseConfig } from "./_supabaseAdmin.mjs";
-import { configurePush, isPushConfigured, sendPushToUser } from "./_push.mjs";
+import { getServiceClient, hasServerSupabaseConfig } from "../lib/supabaseAdmin.mjs";
+import { configurePush, isPushConfigured, sendPushToUser } from "../lib/push.mjs";
 import { buildVaccinationPlan } from "../src/utils/vaccinations.mjs";
 
 // Vercel Cron hits this daily. For every user with a push subscription, check

@@ -6,8 +6,8 @@ import {
   hasServerSupabaseConfig,
   readJsonBody,
   sendJson
-} from "./_supabaseAdmin.mjs";
-import { isEmailProviderConfigured, resetEmailHtml, sendEmail } from "./_email.mjs";
+} from "../lib/supabaseAdmin.mjs";
+import { isEmailProviderConfigured, resetEmailHtml, sendEmail } from "../lib/email.mjs";
 
 const rateMap = new Map();
 const MAX_ATTEMPTS = 3;

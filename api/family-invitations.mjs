@@ -7,8 +7,8 @@ import {
   readJsonBody,
   requireParentForBaby,
   sendJson
-} from "./_supabaseAdmin.mjs";
-import { inviteEmailHtml, isEmailProviderConfigured, sendEmail } from "./_email.mjs";
+} from "../lib/supabaseAdmin.mjs";
+import { inviteEmailHtml, isEmailProviderConfigured, sendEmail } from "../lib/email.mjs";
 import { randomInt } from "node:crypto";
 
 const validRoles = new Set(["parent", "caregiver", "viewer"]);

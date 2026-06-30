@@ -1,5 +1,5 @@
-import { getServiceClient, hasServerSupabaseConfig } from "./_supabaseAdmin.mjs";
-import { configurePush, isPushConfigured, sendPushToUser } from "./_push.mjs";
+import { getServiceClient, hasServerSupabaseConfig } from "../lib/supabaseAdmin.mjs";
+import { configurePush, isPushConfigured, sendPushToUser } from "../lib/push.mjs";
 
 // Vercel Cron hits this every ~15 minutes. For every user with a push
 // subscription, push a "time to pump" reminder for any active pump schedule

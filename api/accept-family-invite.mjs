@@ -5,7 +5,7 @@ import {
   hasServerSupabaseConfig,
   readJsonBody,
   sendJson
-} from "./_supabaseAdmin.mjs";
+} from "../lib/supabaseAdmin.mjs";
 
 // Throttle redemption attempts so short invite codes can't be brute-forced.
 const attemptMap = new Map();

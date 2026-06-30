@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { getConfigError, getServiceClient, hasServerSupabaseConfig } from "./_supabaseAdmin.mjs";
+import { getConfigError, getServiceClient, hasServerSupabaseConfig } from "../lib/supabaseAdmin.mjs";
 
 export const config = { api: { bodyParser: false } };
 

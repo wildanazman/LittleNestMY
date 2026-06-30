@@ -1,5 +1,5 @@
-import { getAuthenticatedUser, getConfigError, getServiceClient, hasServerSupabaseConfig, sendJson } from "./_supabaseAdmin.mjs";
-import { isPushConfigured, sendPushToUser } from "./_push.mjs";
+import { getAuthenticatedUser, getConfigError, getServiceClient, hasServerSupabaseConfig, sendJson } from "../lib/supabaseAdmin.mjs";
+import { isPushConfigured, sendPushToUser } from "../lib/push.mjs";
 
 // Sends a test push to the signed-in user's own devices, so they can confirm
 // Web Push works (especially on an installed iOS PWA) without waiting for a
