@@ -314,9 +314,28 @@ async function copySummary() {
   }
 }
 
-function shareWhatsApp() {
-  const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-  window.open(url, "_blank", "noopener,noreferrer");
+async function shareWhatsApp() {
+  // Prefer the native share sheet (WhatsApp, Copy, etc.) — most reliable on
+  // mobile / installed PWA where popups to wa.me are often blocked.
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "LittleNest care summary", text: shareText });
+      return;
+    } catch (error) {
+      if (error && error.name === "AbortError") return; // user dismissed the sheet
+      // otherwise fall through to the web fallback below
+    }
+  }
+  // Desktop / no-share fallback: copy the text and open WhatsApp Web.
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(shareText);
+    copied = true;
+  } catch {
+    // clipboard may be blocked; continue to WhatsApp anyway
+  }
+  const opened = window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, "_blank", "noopener,noreferrer");
+  showFeedback(opened ? (copied ? "Copied. Opening WhatsApp…" : "Opening WhatsApp…") : "Summary copied — paste it into WhatsApp.", !opened);
 }
 
 function showFeedback(message, persistent = false) {
