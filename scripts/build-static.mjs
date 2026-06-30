@@ -28,11 +28,13 @@ for (const screen of screens) {
   cpSync(join(screensRoot, screen.id), join(dist, screen.id), { recursive: true });
   cpSync(join(screensRoot, screen.path), join(dist, screen.id, "index.html"));
   injectCapacitorCompat(join(dist, screen.id, "index.html"));
+  injectVercelAnalytics(join(dist, screen.id, "index.html"));
 }
 
 const defaultScreen = screens.find((screen) => screen.id === "auth_welcome") || screens[0];
 cpSync(join(screensRoot, defaultScreen.path), join(dist, "index.html"));
 injectCapacitorCompat(join(dist, "index.html"));
+injectVercelAnalytics(join(dist, "index.html"));
 
 cpSync(join(root, "src"), join(dist, "src"), { recursive: true });
 
@@ -62,6 +64,23 @@ function injectCapacitorCompat(filePath) {
     html = html.replace("</head>", `${tag}\n</head>`);
   } else {
     html = `${tag}\n${html}`;
+  }
+  writeFileSync(filePath, html);
+}
+
+function injectVercelAnalytics(filePath) {
+  const analyticsScript = `<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>`;
+  let html = readFileSync(filePath, "utf8");
+  if (html.includes("/_vercel/insights/script.js")) return;
+  if (html.includes("</body>")) {
+    html = html.replace("</body>", `${analyticsScript}\n</body>`);
+  } else if (html.includes("</html>")) {
+    html = html.replace("</html>", `${analyticsScript}\n</html>`);
+  } else {
+    html = `${html}\n${analyticsScript}`;
   }
   writeFileSync(filePath, html);
 }
