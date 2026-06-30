@@ -28,6 +28,12 @@ export async function loadGrowthRecordsRemote(selectedBabyId, fallback = []) {
       .order("measured_at", { ascending: false });
     if (error) throw error;
     const remote = (data || []).map(fromGrowthRow);
+    const remoteIds = new Set(remote.map((item) => item.id));
+    // Drop locally-cached synced records that no longer exist on the server (e.g.
+    // deleted on another device) so stale "zombie" rows never reappear here.
+    local
+      .filter((item) => item?.id && isUuid(item.id) && !remoteIds.has(item.id))
+      .forEach((item) => deleteLocalGrowthRecord(item.id));
     remote.forEach(saveLocalGrowthRecord);
     return { growthRecords: mergeById(remote, pendingLocalItems(local)), source: "supabase", error: "" };
   } catch (error) {
