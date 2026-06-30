@@ -15,9 +15,10 @@ const DONE_WITHIN_MINUTES = 75; // a session this close to the slot counts as do
 export default async function handler(req, res) {
   const secret = (process.env.CRON_SECRET || "").trim().replace(/^["']|["']$/g, "");
   const provided = (req.headers.authorization || "").replace(/^Bearer\s+/i, "").trim().replace(/^["']|["']$/g, "");
-  if (secret && provided !== secret) {
+  // Fail closed: require CRON_SECRET to be configured AND to match (no unset bypass).
+  if (!secret || provided !== secret) {
     res.statusCode = 401;
-    return res.end(JSON.stringify({ error: "Unauthorized.", hint: `expected length ${secret.length}` }));
+    return res.end(JSON.stringify({ error: "Unauthorized." }));
   }
   if (!hasServerSupabaseConfig() || !isPushConfigured()) {
     res.statusCode = 500;
