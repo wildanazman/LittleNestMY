@@ -9,8 +9,41 @@ import {
   sendJson
 } from "./_supabaseAdmin.mjs";
 import { inviteEmailHtml, isEmailProviderConfigured, sendEmail } from "./_email.mjs";
+import { randomInt } from "node:crypto";
 
 const validRoles = new Set(["parent", "caregiver", "viewer"]);
+
+// Crockford base32 (no I, L, O, U) — unambiguous when typed or read aloud.
+const CODE_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+
+export function generateInviteCode() {
+  let code = "";
+  for (let i = 0; i < 8; i += 1) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)];
+  return code;
+}
+
+export function normalizeInviteCode(value) {
+  return String(value || "").toUpperCase().replace(/[^0-9A-Z]/g, "");
+}
+
+function formatInviteCode(code) {
+  const c = normalizeInviteCode(code);
+  return c.length === 8 ? `${c.slice(0, 4)}-${c.slice(4, 8)}` : c;
+}
+
+// Insert an invitation, retrying on the rare invite_code uniqueness collision.
+async function insertInvitationWithCode(service, row) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const { data, error } = await service
+      .from("family_invitations")
+      .insert({ ...row, invite_code: generateInviteCode() })
+      .select("id,email,role,status,token,invite_code,expires_at,created_at")
+      .single();
+    if (!error) return { data, error: null };
+    if (error.code !== "23505") return { data: null, error };
+  }
+  return { data: null, error: new Error("Could not allocate a unique invite code.") };
+}
 
 const inviteRateMap = new Map();
 const INVITE_MAX = 5;
@@ -161,70 +194,71 @@ async function createInvitation(req, res, service, user) {
   const name = String(body.name || "").trim();
 
   if (!babyId) return sendJson(res, 400, { error: "Missing babyId." });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return sendJson(res, 400, { error: "Enter a valid email address." });
   if (!validRoles.has(role)) return sendJson(res, 400, { error: "Choose a valid role." });
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return sendJson(res, 400, { error: "Enter a valid email address." });
+  }
 
   recordInviteAttempt(user.id);
 
   const parent = await requireParentForBaby(service, babyId, user.id);
   if (!parent.ok) return sendJson(res, 403, { error: parent.error, currentRole: parent.role });
 
-  const existingUser = await findAuthUserByEmail(service, email);
-  if (existingUser) {
-    const { data: existingMember, error: existingMemberError } = await service
-      .from("baby_members")
-      .select("user_id,role")
+  // Email-bound path only: block existing members and reuse a pending invite.
+  if (email) {
+    const existingUser = await findAuthUserByEmail(service, email);
+    if (existingUser) {
+      const { data: existingMember, error: existingMemberError } = await service
+        .from("baby_members")
+        .select("user_id,role")
+        .eq("baby_id", babyId)
+        .eq("user_id", existingUser.id)
+        .maybeSingle();
+      if (existingMemberError) throw existingMemberError;
+      if (existingMember) {
+        return sendJson(res, 409, { error: "This person is already in this baby's care circle.", alreadyMember: true });
+      }
+    }
+
+    const { data: pendingInvitation, error: pendingError } = await service
+      .from("family_invitations")
+      .select("id,email,role,status,token,invite_code,expires_at,created_at")
       .eq("baby_id", babyId)
-      .eq("user_id", existingUser.id)
+      .eq("email", email)
+      .eq("status", "pending")
       .maybeSingle();
-    if (existingMemberError) throw existingMemberError;
-    if (existingMember) {
-      return sendJson(res, 409, {
-        error: "This person is already in this baby's care circle.",
-        alreadyMember: true
+    if (pendingError) throw pendingError;
+    if (pendingInvitation) {
+      return sendJson(res, 200, {
+        message: "Invitation is already pending.",
+        emailDelivery: "pending",
+        inviteUrl: buildInviteUrl(req, pendingInvitation.token),
+        inviteCode: formatInviteCode(pendingInvitation.invite_code),
+        invitation: pendingInvitation
       });
     }
   }
 
-  const { data: pendingInvitation, error: pendingError } = await service
-    .from("family_invitations")
-    .select("id,email,role,status,token,expires_at,created_at")
-    .eq("baby_id", babyId)
-    .eq("email", email)
-    .eq("status", "pending")
-    .maybeSingle();
-  if (pendingError) throw pendingError;
-
-  if (pendingInvitation) {
-    const inviteUrl = buildInviteUrl(req, pendingInvitation.token);
-    return sendJson(res, 200, {
-      message: "Invitation is already pending.",
-      emailDelivery: existingUser ? "existing_user" : "pending",
-      inviteUrl,
-      invitation: pendingInvitation
-    });
-  }
-
-  const { data: invitation, error: inviteError } = await service
-    .from("family_invitations")
-    .insert({
-      baby_id: babyId,
-      email,
-      role,
-      status: "pending",
-      invited_by: user.id,
-      accepted_by: null,
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-    })
-    .select("id,email,role,status,token,expires_at,created_at")
-    .single();
-
+  const { data: invitation, error: inviteError } = await insertInvitationWithCode(service, {
+    baby_id: babyId,
+    email: email || null,
+    role,
+    status: "pending",
+    invited_by: user.id,
+    accepted_by: null,
+    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+  });
   if (inviteError) throw inviteError;
 
-  const redirectTo = buildInviteUrl(req, invitation.token);
+  const inviteUrl = buildInviteUrl(req, invitation.token);
+  const inviteCode = formatInviteCode(invitation.invite_code);
 
-  // Own-brand invite email via Resend when configured. The invite has its own
-  // token + accept page, so it doesn't need Supabase's email at all.
+  // Code-only invite: nothing to email — the parent shares the code/link directly.
+  if (!email) {
+    return sendJson(res, 200, { message: "Invite code ready.", emailDelivery: "code_only", inviteUrl, inviteCode, invitation });
+  }
+
+  // Email-bound invite: own-brand Resend email when configured, else Supabase invite.
   if (isEmailProviderConfigured()) {
     try {
       const [{ data: babyRow }, { data: inviterRow }] = await Promise.all([
@@ -234,57 +268,27 @@ async function createInvitation(req, res, service, user) {
       await sendEmail({
         to: email,
         subject: `You're invited to care for ${babyRow?.name || "a baby"} on LittleNest MY`,
-        html: inviteEmailHtml({
-          inviteUrl: redirectTo,
-          babyName: babyRow?.name || "",
-          inviterName: inviterRow?.display_name || "",
-          role
-        })
+        html: inviteEmailHtml({ inviteUrl, babyName: babyRow?.name || "", inviterName: inviterRow?.display_name || "", role })
       });
-      return sendJson(res, 200, {
-        message: "Invitation sent.",
-        emailDelivery: "sent",
-        inviteUrl: redirectTo,
-        invitation: { ...invitation, status: "pending" }
-      });
+      return sendJson(res, 200, { message: "Invitation sent.", emailDelivery: "sent", inviteUrl, inviteCode, invitation });
     } catch (sendErr) {
       console.warn("Own-brand invite email failed; falling back to Supabase invite.", sendErr.message);
     }
   }
 
   const { error: emailError } = await service.auth.admin.inviteUserByEmail(email, {
-    redirectTo,
-    data: {
-      family_invitation_id: invitation.id,
-      baby_id: babyId,
-      role,
-      invited_name: name
-    }
+    redirectTo: inviteUrl,
+    data: { family_invitation_id: invitation.id, baby_id: babyId, role, invited_name: name }
   });
-
   if (emailError) {
     if (isExistingUserInviteError(emailError)) {
-      return sendJson(res, 200, {
-        message: "Invitation link ready.",
-        emailDelivery: "existing_user",
-        inviteUrl: redirectTo,
-        invitation: { ...invitation, status: "pending" }
-      });
+      return sendJson(res, 200, { message: "Invitation link ready.", emailDelivery: "existing_user", inviteUrl, inviteCode, invitation });
     }
-
     await service.from("family_invitations").update({ status: "failed" }).eq("id", invitation.id);
-    return sendJson(res, 502, {
-      error: `Invite failed. ${emailError.message}`,
-      invitation: { ...invitation, status: "failed" }
-    });
+    return sendJson(res, 502, { error: `Invite failed. ${emailError.message}`, invitation: { ...invitation, status: "failed" } });
   }
 
-  return sendJson(res, 200, {
-    message: "Invitation sent.",
-    emailDelivery: "sent",
-    inviteUrl: redirectTo,
-    invitation: { ...invitation, status: "pending" }
-  });
+  return sendJson(res, 200, { message: "Invitation sent.", emailDelivery: "sent", inviteUrl, inviteCode, invitation });
 }
 
 async function findAuthUserByEmail(service, email) {

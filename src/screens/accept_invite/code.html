@@ -64,6 +64,11 @@ tailwind.config = {
 </div>
 
 <button class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform flex items-center justify-center gap-2" id="acceptButton" type="button"><span class="material-symbols-outlined">favorite</span>Accept invite</button>
+<div class="hidden space-y-3" id="codeEntryBlock">
+<label class="block text-left"><span class="text-[13px] font-extrabold text-[#241b3a]">Invite code</span>
+<input id="codeInput" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX" maxlength="9" class="mt-1 w-full h-14 rounded-2xl border border-[#e4def6] bg-white px-4 text-center text-[20px] font-extrabold tracking-[0.25em] text-[#241b3a] uppercase placeholder:tracking-normal placeholder:text-[#b9b0d0] focus:ring-2 focus:ring-primary"/></label>
+<button id="codeConnectButton" type="button" class="w-full h-14 rounded-full bg-primary text-on-primary font-extrabold active:scale-[0.98] transition-transform flex items-center justify-center gap-2"><span class="material-symbols-outlined">link</span>Connect to baby</button>
+</div>
 <button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="loginButton" type="button">Log in to accept</button>
 <button class="w-full h-12 rounded-full bg-surface-container text-primary font-bold active:scale-[0.98] transition-transform hidden" id="signupButton" type="button">Create account</button>
 <button class="w-full h-11 rounded-full text-on-surface-variant font-bold active:scale-[0.98] transition-transform" id="declineButton" type="button">Decline / Back</button>
@@ -73,7 +78,7 @@ tailwind.config = {
 </main>
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-  const { acceptFamilyInviteRemote, loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
+  const { acceptFamilyInviteRemote, acceptFamilyInviteByCodeRemote, loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { loadBabyProfilesRemote, setSelectedBabyIdRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { clearPendingInviteToken, getAuthSession, isLoggedIn, markNeedsPasswordSetup, rememberPendingInviteToken } = await import(`${moduleBase}utils/localAuth.mjs`);
@@ -110,12 +115,54 @@ tailwind.config = {
 
   let isLoggedInCached = false;
 
+  // ---- code-entry flow (no token in URL: user pastes a shared invite code) ----
+  const codeEntryBlock = document.getElementById("codeEntryBlock");
+  const codeInput = document.getElementById("codeInput");
+  const codeConnectButton = document.getElementById("codeConnectButton");
+  codeInput?.addEventListener("input", () => {
+    const raw = codeInput.value.toUpperCase().replace(/[^0-9A-Z]/g, "").slice(0, 8);
+    codeInput.value = raw.length > 4 ? `${raw.slice(0, 4)}-${raw.slice(4)}` : raw;
+  });
+  codeConnectButton?.addEventListener("click", connectByCode);
+
   await init();
+
+  async function connectByCode() {
+    const code = codeInput.value.trim();
+    if (!code) { showError("Enter your invite code."); return; }
+    codeConnectButton.disabled = true;
+    codeConnectButton.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>Connecting...';
+    error.classList.add("hidden");
+    try {
+      const result = await acceptFamilyInviteByCodeRemote(code);
+      setSelectedBabyIdRemote(result.babyId);
+      clearPendingInviteToken();
+      await loadBabyProfilesRemote(babyProfile).catch(() => null);
+      codeConnectButton.innerHTML = "Connected! Opening home...";
+      setTimeout(() => window.location.href = screenUrl("home_dashboard"), 700);
+    } catch (e) {
+      showError(e.message || "Could not connect with that code.");
+      codeConnectButton.disabled = false;
+      codeConnectButton.innerHTML = '<span class="material-symbols-outlined">link</span>Connect to baby';
+    }
+  }
 
   async function init() {
     if (!token) {
-      showError("This invite link is missing its code.");
-      acceptButton.disabled = true;
+      isLoggedInCached = Boolean(await getAuthSession());
+      headline.textContent = "Join a Care Circle";
+      acceptButton.classList.add("hidden");
+      roleBadge.classList.add("hidden");
+      expiryBadge.classList.add("hidden");
+      if (!isLoggedInCached) {
+        subline.textContent = "Create an account or log in, then enter the invite code you were given.";
+        loginButton.classList.remove("hidden");
+        signupButton.classList.remove("hidden");
+        return;
+      }
+      subline.textContent = "Enter the invite code you received to connect to the baby.";
+      codeEntryBlock.classList.remove("hidden");
+      codeInput.focus();
       return;
     }
 

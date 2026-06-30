@@ -65,6 +65,14 @@ export async function loadInvitePreviewRemote(token) {
 }
 
 export async function acceptFamilyInviteRemote(token) {
+  return redeemInvite({ token });
+}
+
+export async function acceptFamilyInviteByCodeRemote(code) {
+  return redeemInvite({ code });
+}
+
+async function redeemInvite(payload) {
   const accessToken = await getAccessToken();
   const response = await fetch("/api/accept-family-invite", {
     method: "POST",
@@ -72,7 +80,7 @@ export async function acceptFamilyInviteRemote(token) {
       "content-type": "application/json",
       Authorization: `Bearer ${accessToken}`
     },
-    body: JSON.stringify({ token })
+    body: JSON.stringify(payload)
   });
   return readApiResponse(response);
 }

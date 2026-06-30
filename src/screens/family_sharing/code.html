@@ -230,8 +230,9 @@
 <div id="sheetStep1" class="space-y-4">
 <label class="block space-y-1"><span class="font-label-md text-label-md text-on-surface-variant">Their name</span>
 <input class="w-full h-12 bg-surface-container border-none rounded-2xl px-4 font-body-md text-body-md text-on-surface" id="sheetName" placeholder="Example: Atuk"/></label>
-<label class="block space-y-1"><span class="font-label-md text-label-md text-on-surface-variant">Their email</span>
+<label class="block space-y-1"><span class="font-label-md text-label-md text-on-surface-variant">Their email <span class="text-on-surface-variant/60">(optional)</span></span>
 <input class="w-full h-12 bg-surface-container border-none rounded-2xl px-4 font-body-md text-body-md text-on-surface" id="sheetEmail" inputmode="email" placeholder="name@example.my"/></label>
+<p class="font-label-sm text-label-sm text-on-surface-variant/80 -mt-1">Leave blank to just generate a code you can share on WhatsApp.</p>
 <div class="space-y-2">
 <span class="font-label-md text-label-md text-on-surface-variant">Choose a role</span>
 <div class="grid gap-2" id="sheetRoleCards"></div>
@@ -251,11 +252,16 @@
 </div>
 <p class="font-headline-md text-body-lg text-[#241b3a] leading-snug" id="previewTitle">You're invited 💜</p>
 <p class="font-label-md text-label-md text-[#5b4f72] mt-1"><span id="previewRole">Caregiver</span> · Valid for 7 days</p>
+<div class="mt-3 rounded-2xl bg-white/80 border border-white px-4 py-3">
+<p class="text-[11px] font-extrabold uppercase tracking-wide text-[#7056f4]">Invite code</p>
+<p class="text-[26px] leading-8 font-extrabold tracking-[0.18em] text-[#241b3a]" id="previewCode">—</p>
+<p class="text-[11px] text-[#5b4f72] mt-1">They create an account, tap "Accept invitation", and enter this code.</p>
+</div>
 </div>
 <p class="font-label-md text-label-md text-on-surface-variant text-center" id="sheetDelivery"></p>
 <div class="grid gap-2">
 <button class="w-full h-12 rounded-full bg-[#25D366] text-white font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="whatsappButton" type="button"><span class="material-symbols-outlined">chat</span>Share on WhatsApp</button>
-<button class="w-full h-12 rounded-full bg-surface-container text-primary font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="copyLinkButton" type="button"><span class="material-symbols-outlined text-[18px]">content_copy</span>Copy invite link</button>
+<button class="w-full h-12 rounded-full bg-surface-container text-primary font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform" id="copyLinkButton" type="button"><span class="material-symbols-outlined text-[18px]">content_copy</span>Copy code</button>
 <button class="w-full h-11 rounded-full text-on-surface-variant font-label-md text-label-md active:scale-95 transition-transform" id="sheetDoneButton" type="button">Done</button>
 </div>
 </div>
@@ -376,12 +382,12 @@
           const email = sheetEmail.value.trim().toLowerCase();
           sheetError.textContent = "";
           if (!name) { sheetError.textContent = "Add their name."; return; }
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { sheetError.textContent = "Enter a valid email."; return; }
+          if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { sheetError.textContent = "Enter a valid email, or leave it blank."; return; }
           sheetCreateButton.disabled = true;
           sheetCreateButton.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span>Creating...`;
           try {
             const result = await sendFamilyInviteRemote({ babyId: selectedBabyId, name, email, role: selectedRole });
-            lastInvite = { url: result.inviteUrl || "", role: selectedRole, email, name };
+            lastInvite = { url: result.inviteUrl || "", code: result.inviteCode || "", role: selectedRole, email, name };
             showPreview(result);
             await renderMembers();
           } catch (error) {
@@ -394,32 +400,34 @@
         function showPreview(result) {
           previewTitle.textContent = `You're invited to join ${babyName}'s Care Circle 💜`;
           previewRole.textContent = capitalize(lastInvite.role);
+          document.getElementById("previewCode").textContent = lastInvite.code || "—";
           const delivery = result.emailDelivery;
           sheetDelivery.textContent = delivery === "sent"
-            ? "Email invite sent. Share the link too so they get it faster."
+            ? "Email sent. Share the code on WhatsApp too so they get it faster."
             : delivery === "existing_user"
-              ? "They already have an account — share this link so they can accept."
-              : "Invite ready — share the link below.";
+              ? "They already have an account — share the code so they can connect."
+              : "Share this code with them on WhatsApp or copy it.";
           document.getElementById("sheetTitle").textContent = "Invite ready";
           sheetStep1.classList.add("hidden");
           sheetStep2.classList.remove("hidden");
         }
 
-        function inviteMessage(url) {
-          return `You're invited to help care for ${babyName} on LittleNest MY 💜\n${url}`;
+        function inviteMessage() {
+          const codeLine = lastInvite?.code ? `\n\nYour invite code: ${lastInvite.code}` : "";
+          const urlLine = lastInvite?.url ? `\nOr open: ${lastInvite.url}` : "";
+          return `You're invited to help care for ${babyName} on LittleNest MY 💜${codeLine}\n\nCreate an account, tap "Accept invitation", and enter the code.${urlLine}`;
         }
 
         async function shareInvite(method) {
-          const url = lastInvite?.url || "";
-          if (!url) { sheetDelivery.textContent = "No invite link available."; return; }
-          const text = inviteMessage(url);
+          if (!lastInvite?.code && !lastInvite?.url) { sheetDelivery.textContent = "No invite available."; return; }
           if (method === "whatsapp") {
-            try { if (navigator.share) { await navigator.share({ title: "LittleNest Care Circle", text, url }); return; } } catch { return; }
+            const text = inviteMessage();
+            try { if (navigator.share) { await navigator.share({ title: "LittleNest Care Circle", text }); return; } } catch { return; }
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
             return;
           }
-          try { await navigator.clipboard.writeText(url); sheetDelivery.textContent = "Invite link copied 💜"; }
-          catch { sheetDelivery.textContent = url; }
+          try { await navigator.clipboard.writeText(lastInvite.code || lastInvite.url); sheetDelivery.textContent = "Invite code copied 💜"; }
+          catch { sheetDelivery.textContent = lastInvite.code || lastInvite.url; }
         }
 
         async function renderMembers() {
