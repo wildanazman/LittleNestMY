@@ -1,4 +1,5 @@
 import { shouldUseDemoData } from "./demoData.mjs";
+import { isGuestMode } from "./localAuth.mjs";
 
 const feedingLogsKey = "littlenest:feedingLogs";
 const sleepLogsKey = "littlenest:sleepLogs";
@@ -16,6 +17,17 @@ const selectedBabyIdKey = "littlenest:selectedBabyId";
 const legacyBabyProfileKey = "littlenest:babyProfile";
 const legacyBabyProfilesBackupKey = "littlenest:legacyBabyProfilesBeforeSupabase";
 const babyIdMapKey = "littlenest:babyIdMap";
+const guestStoragePrefix = "littlenest:guest:";
+const guestScopedKeys = new Set([
+  feedingLogsKey,
+  sleepLogsKey,
+  activeSleepKey,
+  diaperLogsKey,
+  healthNotesKey,
+  babyProfilesKey,
+  selectedBabyIdKey,
+  babyIdMapKey
+]);
 
 export {
   babyProfilesKey,
@@ -228,7 +240,7 @@ export function saveActiveSleepSession(session) {
 
 export function clearActiveSleepSession() {
   try {
-    window.localStorage.removeItem(activeSleepKey);
+    window.localStorage.removeItem(storageKey(activeSleepKey));
   } catch {
     // Local storage can be unavailable in private or restricted contexts.
   }
@@ -374,7 +386,7 @@ export function getMvpCollections(fallbacks = {}) {
 
 function readJson(key, fallback) {
   try {
-    const value = window.localStorage.getItem(key);
+    const value = window.localStorage.getItem(storageKey(key));
     return value ? JSON.parse(value) : fallback;
   } catch {
     return fallback;
@@ -388,10 +400,14 @@ function readCollectionWithFallback(key, fallback = []) {
 
 function writeJson(key, value) {
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    window.localStorage.setItem(storageKey(key), JSON.stringify(value));
   } catch {
     // Local storage can be unavailable in private or restricted contexts.
   }
+}
+
+function storageKey(key) {
+  return isGuestMode() && guestScopedKeys.has(key) ? `${guestStoragePrefix}${key}` : key;
 }
 
 function upsertCollectionItem(key, item) {

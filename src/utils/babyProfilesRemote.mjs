@@ -7,6 +7,7 @@ import {
   readSelectedBabyId,
   rememberSupabaseBabyMapping,
   saveBabyProfile,
+  setSelectedBabyId,
   selectedBabyIdKey
 } from "./localState.mjs";
 import { getAuthSession, isGuestMode } from "./localAuth.mjs";
@@ -158,6 +159,8 @@ export async function getBabyProfileByIdRemote(babyId, fallbackProfile) {
 }
 
 export function setSelectedBabyIdRemote(babyId) {
+  if (isGuestMode()) return setSelectedBabyId(babyId, null);
+
   const resolvedBabyId = resolveSupabaseBabyId(babyId, { allowMissing: true });
   try {
     window.localStorage.setItem(selectedBabyIdKey, JSON.stringify(resolvedBabyId || ""));
