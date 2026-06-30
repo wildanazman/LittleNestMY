@@ -911,7 +911,7 @@
 <span class="w-9 h-9 rounded-xl flex items-center justify-center text-white shrink-0" aria-hidden="true" style="background:linear-gradient(145deg,#9b7cff,#7056f4);box-shadow:0 6px 14px rgba(0,0,0,.12)">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">crib</span>
 </span>
-<h1 class="font-headline-lg text-headline-lg text-primary truncate">LittleNest MY<span id="homePlanBadge" class="hidden"></span></h1>
+<h1 class="font-headline-lg text-headline-lg text-primary truncate" style="overflow:visible">LittleNest MY<span id="homePlanBadge" class="hidden"></span></h1>
 <span class="w-7 h-9 rounded-lg flex items-center justify-center text-primary/60 shrink-0" aria-hidden="true">
 <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'wght' 500;">expand_more</span>
 </span>
@@ -1355,7 +1355,7 @@
     if (el) {
       const status = await getPlanStatus();
       const darkMode = document.documentElement.classList.contains("dark");
-      const pill = "display:inline-flex;align-items:center;gap:2px;vertical-align:middle;position:relative;top:-2px;margin-left:6px;border-radius:999px;padding:2px 7px;font-size:9px;font-weight:800;letter-spacing:.06em;line-height:1;text-transform:uppercase;white-space:nowrap;pointer-events:auto;cursor:pointer;";
+      const pill = "position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:1px;display:inline-flex;align-items:center;gap:2px;border-radius:999px;padding:2px 7px;font-size:8.5px;font-weight:800;letter-spacing:.06em;line-height:1;text-transform:uppercase;white-space:nowrap;pointer-events:auto;cursor:pointer;";
       const ico = (n) => `<span class="material-symbols-outlined" style="font-size:10px;font-variation-settings:'FILL' 1;">${n}</span>`;
       let style = "", html = "", label = "";
       if (status.state === "premium") {
