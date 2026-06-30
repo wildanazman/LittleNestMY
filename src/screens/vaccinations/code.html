@@ -43,6 +43,10 @@ tailwind.config = {
   .badge-overdue { background:#ffdad6; color:#93000a; }
   .badge-due { background:#ffe2b8; color:#7a4b06; }
   .badge-upcoming { background:rgba(131,83,60,.10); color:#7a4b36; }
+  .vacc-lock-preview { position: relative; overflow: hidden; border-radius: 24px; }
+  .vacc-lock-blur { filter: blur(5px); opacity: .58; pointer-events: none; user-select: none; max-height: 360px; overflow: hidden; }
+  .vacc-lock-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .vacc-lock-card { width:100%; border-radius:22px; background:rgba(255,255,255,.96); border:1px solid rgba(131,83,60,.16); box-shadow:0 10px 28px rgba(36,27,58,.14); padding:18px; text-align:center; }
 </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
@@ -117,6 +121,7 @@ tailwind.config = {
   const { buildVaccinationPlan, groupByAge, summarise, nextDue } = await import(`${moduleBase}utils/vaccinations.mjs`);
   const { getBabyPermissions } = await import(`${moduleBase}utils/permissions.mjs`);
   const { goBackOrTo, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
 
   const regionKey = "littlenest:vaccRegion";
 
@@ -129,6 +134,9 @@ tailwind.config = {
 
   if (!selectedBabyId || !profile) {
     document.getElementById("vaccNoBaby").classList.remove("hidden");
+    window.dispatchEvent(new Event("littlenest:ready"));
+  } else if (!(await hasPremiumAccess())) {
+    renderPremiumLockedVaccinations();
     window.dispatchEvent(new Event("littlenest:ready"));
   } else {
     document.getElementById("vaccContent").classList.remove("hidden");
@@ -256,6 +264,51 @@ tailwind.config = {
   }
   function escapeHtml(value) {
     return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+  }
+
+  function renderPremiumLockedVaccinations() {
+    const content = document.getElementById("vaccContent");
+    content.classList.remove("hidden");
+    content.innerHTML = `
+      <section class="rounded-3xl bg-surface-container-lowest p-5 soft-shadow">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-primary-container/40 text-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[28px]">vaccines</span></div>
+          <div>
+            <p class="font-extrabold text-on-surface text-lg">Vaccination tracker is Premium</p>
+            <p class="text-sm text-on-surface-variant">Free users can preview the schedule. Upgrade to unlock full viewing, tracking, reminders, and private clinic optional vaccines.</p>
+          </div>
+        </div>
+        <button class="mt-4 w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95" type="button" data-screen-target="subscription">Unlock Early Bird - USD 6</button>
+      </section>
+      <section class="vacc-lock-preview bg-surface-container-lowest soft-shadow">
+        <div class="vacc-lock-blur p-5 space-y-4" aria-hidden="true">
+          <div class="flex items-center justify-between">
+            <div><p class="font-extrabold text-on-surface text-lg">Immunisation progress</p><p class="text-sm text-on-surface-variant">MOH Malaysia NIP</p></div>
+            <p class="text-2xl font-extrabold text-primary">62%</p>
+          </div>
+          <div class="h-2.5 w-full rounded-full bg-surface-container-high overflow-hidden"><div class="h-full rounded-full bg-primary" style="width:62%"></div></div>
+          <div class="rounded-2xl bg-surface-container-low p-4">
+            <p class="font-bold text-on-surface">DTaP/IPV/Hib/HepB</p>
+            <p class="text-[13px] text-on-surface-variant mt-0.5">Due 15 Jul 2026</p>
+          </div>
+          <div class="rounded-2xl bg-surface-container-low p-4">
+            <p class="font-bold text-on-surface">Pneumococcal</p>
+            <p class="text-[13px] text-on-surface-variant mt-0.5">Upcoming clinic visit</p>
+          </div>
+          <div class="rounded-2xl bg-surface-container-low p-4">
+            <p class="font-bold text-on-surface">Optional private vaccines</p>
+            <p class="text-[13px] text-on-surface-variant mt-0.5">Rotavirus, influenza, varicella</p>
+          </div>
+        </div>
+        <div class="vacc-lock-overlay">
+          <div class="vacc-lock-card">
+            <div class="w-12 h-12 rounded-full bg-primary-container text-primary mx-auto flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">lock</span></div>
+            <h3 class="mt-3 font-extrabold text-on-surface text-[18px]">Full vaccine content locked</h3>
+            <p class="mt-1 text-[13px] leading-5 text-on-surface-variant">Upgrade to view the full schedule and save vaccine records.</p>
+          </div>
+        </div>
+      </section>`;
+    content.querySelector("[data-screen-target='subscription']")?.addEventListener("click", () => goToScreen("subscription"));
   }
 </script>
 <script type="module" src="/src/utils/navigation.mjs"></script>

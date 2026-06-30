@@ -177,6 +177,7 @@
             -webkit-backdrop-filter: blur(14px);
         }
         input,
+        select,
         .gender-btn,
         .feeding-btn {
             border: 1px solid rgba(255,255,255,.68) !important;
@@ -237,7 +238,9 @@
             color: #a8b5ca !important;
         }
         :root.dark #babyName,
-        :root.dark #dob {
+        :root.dark #dob,
+        :root.dark #bloodType,
+        :root.dark #rhesusFactor {
             background: rgba(7,17,31,.78) !important;
             color: #eef6ff !important;
             -webkit-text-fill-color: #eef6ff !important;
@@ -346,29 +349,50 @@
 <div class="space-y-4">
 <!-- Baby Name -->
 <div class="space-y-1.5">
-<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="babyName">Baby Name</label>
-<input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all placeholder:text-outline-variant" id="babyName" placeholder="e.g. Noah Liam" type="text"/>
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="babyName">Baby Name <span class="text-error">*</span></label>
+<input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all placeholder:text-outline-variant" id="babyName" placeholder="e.g. Noah Liam" required type="text"/>
 </div>
 <!-- Date of Birth -->
 <div class="space-y-1.5">
-<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="dob">Date of Birth</label>
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant" for="dob">Date of Birth <span class="text-error">*</span></label>
 <div class="relative">
-<input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="dob" type="date"/>
+<input class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="dob" required type="date"/>
 <span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">calendar_today</span>
 </div>
 </div>
 <!-- Gender Selection -->
 <div class="space-y-1.5">
-<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Gender (Optional)</label>
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Gender <span class="text-error">*</span></label>
 <div class="flex gap-3">
 <button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Boy</button>
 <button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Girl</button>
 <button class="gender-btn flex-1 h-12 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95" onclick="toggleSelection(this, 'gender')" type="button">Other</button>
 </div>
 </div>
+<!-- Blood Type -->
+<div class="grid grid-cols-2 gap-3">
+<label class="space-y-1.5">
+<span class="block font-label-md text-label-md ml-2 text-on-surface-variant">Blood type <span class="font-normal">(optional)</span></span>
+<select class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="bloodType">
+<option value="">Not set</option>
+<option value="A">A</option>
+<option value="B">B</option>
+<option value="AB">AB</option>
+<option value="O">O</option>
+</select>
+</label>
+<label class="space-y-1.5">
+<span class="block font-label-md text-label-md ml-2 text-on-surface-variant">Rhesus <span class="font-normal">(optional)</span></span>
+<select class="w-full h-14 px-4 rounded-2xl border-none bg-[#FFF7ED]/90 text-body-md form-input-focus transition-all" id="rhesusFactor">
+<option value="">Not set</option>
+<option value="positive">Positive (+)</option>
+<option value="negative">Negative (-)</option>
+</select>
+</label>
+</div>
 <!-- Feeding Preference -->
 <div class="space-y-3 pt-2">
-<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Feeding Preference</label>
+<label class="font-label-md text-label-md ml-2 text-on-surface-variant">Feeding Preference <span class="text-error">*</span></label>
 <div class="grid grid-cols-1 gap-3">
 <button class="feeding-btn flex items-center justify-between w-full h-14 px-5 rounded-2xl bg-[#FFF7ED]/90 font-label-md text-label-md transition-all hover:bg-secondary-container active:scale-95 group" onclick="toggleSelection(this, 'feeding')" type="button">
 <span class="flex items-center gap-3"><span class="material-symbols-outlined text-primary group-[.radio-tile-active]:text-on-primary-container">favorite</span> Breastfeeding</span>
@@ -424,6 +448,8 @@
         const avatarPlaceholder = document.getElementById('avatarPlaceholder');
         const nameInput = document.getElementById("babyName");
         const dobInput = document.getElementById("dob");
+        const bloodTypeInput = document.getElementById("bloodType");
+        const rhesusFactorInput = document.getElementById("rhesusFactor");
         const formTitle = document.getElementById("formTitle");
         const formSubtitle = document.getElementById("formSubtitle");
         const saveButton = document.getElementById("saveBabyButton");
@@ -478,18 +504,21 @@
             const name = nameInput.value.trim();
             const dateOfBirth = dobInput.value;
 
-            if (!name || !dateOfBirth) {
-                showFeedback("Add baby name and date of birth to save.");
+            const selectedGender = document.querySelector(".gender-btn.radio-tile-active")?.textContent.trim().toLowerCase() || "";
+            const selectedFeeding = document.querySelector(".feeding-btn.radio-tile-active")?.textContent.trim().replace(/\s+/g, " ") || "";
+
+            if (!name || !dateOfBirth || !selectedGender || !selectedFeeding) {
+                showFeedback("Baby name, date of birth, gender, and feeding preference are required.");
                 return;
             }
 
-            const selectedGender = document.querySelector(".gender-btn.radio-tile-active")?.textContent.trim().toLowerCase() || "";
-            const selectedFeeding = document.querySelector(".feeding-btn.radio-tile-active")?.textContent.trim().replace(/\s+/g, " ") || "";
             const profileData = {
                 ...(editingProfile || {}),
                 name,
                 dateOfBirth,
                 gender: selectedGender,
+                bloodType: bloodTypeInput.value,
+                rhesusFactor: rhesusFactorInput.value,
                 feedingPreference: selectedFeeding,
                 photoUrl: avatarDataUrl || editingProfile?.photoUrl || ""
             };
@@ -542,6 +571,8 @@
                 saveButton.innerHTML = 'Save Changes <span class="material-symbols-outlined">check_circle</span>';
                 nameInput.value = editingProfile.name || "";
                 dobInput.value = editingProfile.dateOfBirth || "";
+                bloodTypeInput.value = editingProfile.bloodType || "";
+                rhesusFactorInput.value = editingProfile.rhesusFactor || "";
                 avatarDataUrl = editingProfile.photoUrl || "";
                 if (avatarDataUrl) {
                     babyAvatarPreview.src = avatarDataUrl;

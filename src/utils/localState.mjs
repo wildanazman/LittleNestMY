@@ -447,6 +447,8 @@ function normalizeBabyProfile(profile) {
     name,
     dateOfBirth: profile.dateOfBirth || profile.dob || new Date().toISOString().slice(0, 10),
     gender: profile.gender || "",
+    bloodType: profile.bloodType || profile.blood_type || "",
+    rhesusFactor: profile.rhesusFactor || profile.rhesus_factor || "",
     photoUrl: profile.photoUrl || profile.avatarUrl || profile.avatar || "",
     feedingPreference: profile.feedingPreference || "",
     notes: profile.notes || "",

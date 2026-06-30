@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://esm.sh" crossorigin/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Growth Correlation - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fbf9f4",
+        "surface-container": "#efeee9",
+        "surface-container-low": "#f5f3ee",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-high": "#eae8e3",
+        "on-surface": "#1b1c19",
+        "on-surface-variant": "#51443e",
+        tertiary: "#486646",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  :root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
+  body { font-family: "Nunito Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+  h1, h2, h3, .font-display { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(52, 96, 82, 0.12); }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .lab-header { justify-content: flex-start; }
+  .lab-title-wrap { min-width: 0; flex: 1 1 auto; }
+  .premium-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.22); font-size: 12px; line-height: 16px; font-weight: 800; white-space: nowrap; }
+  .lab-hero { border-radius: 26px; border: 1px solid rgba(255,255,255,.20); background: linear-gradient(145deg,#0f3b35,#0f766e 58%,#36b37e); }
+  .hero-metric { min-width: 0; border-radius: 18px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.16); padding: 12px; }
+  .metric-card { border-radius: 20px; background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.82); }
+  .comparison-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .mini-table-row { display: grid; grid-template-columns: 84px 1fr auto; gap: 10px; align-items: center; }
+  .pressable { transition: transform 160ms var(--ease-out), background-color 180ms ease; }
+  .pressable:active { transform: scale(.97); }
+  @media (max-width: 380px) { .comparison-grid { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .pressable { transition: none; } }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="lab-header sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-5 h-14 flex items-center w-full">
+  <div class="lab-title-wrap flex items-center gap-2">
+    <button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1 class="text-[22px] leading-7 font-extrabold text-primary truncate">Growth Correlation</h1>
+  </div>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5" id="content">
+  <section class="lab-hero p-5 soft-shadow relative overflow-hidden">
+    <div class="relative z-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <p class="min-w-0 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white/82">Growth intelligence</p>
+        <span class="premium-chip"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">workspace_premium</span>Premium</span>
+      </div>
+      <h2 class="mt-1 text-[25px] leading-8 font-extrabold text-white" id="heroTitle">Connecting growth to daily care</h2>
+      <p class="mt-2 text-[14px] leading-5 text-white/88" id="heroCopy">Weight velocity, WHO median context, feeding frequency, and sleep coverage in one premium view.</p>
+      <div class="mt-4 grid grid-cols-2 gap-3" id="heroMetrics"></div>
+    </div>
+  </section>
+
+  <section class="comparison-grid" id="comparisonCards"></section>
+
+  <section class="rounded-[24px] bg-surface-container-lowest border border-white/70 p-5 soft-shadow">
+    <div class="flex items-center justify-between gap-3 mb-3">
+      <div>
+        <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Weight trend</h2>
+        <p class="text-[13px] text-on-surface-variant">Logged measurements over time.</p>
+      </div>
+      <button class="pressable h-9 px-3 rounded-full bg-[#e5fbf2] text-[#0f766e] text-[12px] font-extrabold" id="logGrowthButton" type="button">Add data</button>
+    </div>
+    <div id="chartBox"></div>
+  </section>
+
+  <section class="rounded-[24px] bg-surface-container-lowest border border-white/70 p-5 soft-shadow">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-9 h-9 rounded-full bg-[#e5fbf2] text-[#0f766e] flex items-center justify-center"><span class="material-symbols-outlined">hub</span></span>
+      <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Care correlations</h2>
+    </div>
+    <div class="space-y-3" id="correlationRows"></div>
+  </section>
+
+  <section class="rounded-[24px] bg-surface-container-lowest border border-white/70 p-5 soft-shadow">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-9 h-9 rounded-full bg-[#fff3da] text-[#b45309] flex items-center justify-center"><span class="material-symbols-outlined">clinical_notes</span></span>
+      <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Clinic conversation notes</h2>
+    </div>
+    <div class="space-y-2" id="clinicNotes"></div>
+  </section>
+
+  <section class="rounded-2xl bg-surface-container-low/80 px-4 py-3 flex items-start gap-2.5">
+    <span class="material-symbols-outlined text-[18px] text-on-surface-variant/70 mt-0.5">health_and_safety</span>
+    <p class="text-[12px] leading-4 font-bold text-on-surface-variant/85">Growth charts and correlations are screening context only. They do not diagnose nutrition, development, or illness. Always confirm concerns with a doctor.</p>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container rounded-t-xl shadow-lg">
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="home_dashboard" href="#"><span class="material-symbols-outlined" data-icon="home">home</span><span class="font-label-sm text-label-sm-mobile">Home</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="quick_log" href="#"><span class="material-symbols-outlined" data-icon="add_circle">add_circle</span><span class="font-label-sm text-label-sm-mobile">Log</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="calendar" href="#"><span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span><span class="font-label-sm text-label-sm-mobile">Calendar</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="milestones" href="#"><span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span><span class="font-label-sm text-label-sm-mobile">Milestones</span></a>
+  <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" data-screen-target="assistant" href="#"><span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings:'FILL' 1;">smart_toy</span><span class="font-label-sm text-label-sm-mobile">Assistant</span></a>
+</nav>
+
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+  const { loadGrowthRecordsRemote } = await import(`${moduleBase}utils/growthRecordsRemote.mjs`);
+  const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
+  const {
+    getLogsForBaby, getPersistedFeedingLogs, getPersistedSleepLogs, getPersistedDiaperLogs,
+    getPersistedGrowthRecords
+  } = await import(`${moduleBase}utils/localState.mjs`);
+  const B = await import(`${moduleBase}utils/benchmarks.mjs`);
+
+  const content = document.getElementById("content");
+  document.getElementById("backButton")?.addEventListener("click", () => goBackOrTo("assistant"));
+  document.getElementById("logGrowthButton")?.addEventListener("click", () => goToScreen("growth_tracker"));
+  const ready = () => window.dispatchEvent(new CustomEvent("littlenest:ready"));
+
+  const now = new Date();
+  const fmtDate = (value) => new Date(value).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const fmtRange = (a, b) => `${fmtDate(a)} - ${fmtDate(b)}`;
+  const sleepMins = (log) => {
+    const start = new Date(log.startedAt);
+    const end = log.endedAt ? new Date(log.endedAt) : null;
+    return end && end > start ? Math.round((end - start) / 60000) : 0;
+  };
+
+  function setEmpty({ title, copy, cta, target }) {
+    content.innerHTML = `
+      <section class="rounded-[26px] bg-surface-container-lowest border border-white/70 soft-shadow p-8 text-center space-y-4 mt-6">
+        <div class="w-16 h-16 rounded-full bg-[#e5fbf2] text-[#0f766e] mx-auto flex items-center justify-center"><span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1;">monitoring</span></div>
+        <div><h2 class="text-[20px] leading-7 font-extrabold text-on-surface">${title}</h2><p class="mt-1 text-[15px] leading-6 text-on-surface-variant">${copy}</p></div>
+        <button class="h-12 px-6 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" id="emptyCta" type="button">${cta}</button>
+      </section>`;
+    document.getElementById("emptyCta")?.addEventListener("click", () => goToScreen(target));
+    ready();
+  }
+
+  function lockPremium() {
+    content.innerHTML = `
+      <section class="lab-hero p-6 soft-shadow relative overflow-hidden mt-6">
+        <div class="flex items-center justify-between gap-3">
+          <span class="w-12 h-12 rounded-full bg-white/16 text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">lock</span></span>
+          <span class="premium-chip"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">workspace_premium</span>Premium</span>
+        </div>
+        <h2 class="mt-4 text-[24px] leading-8 font-extrabold text-white">Growth Correlation is Premium</h2>
+        <p class="mt-2 text-[15px] leading-6 text-white/88">Unlock WHO median context, growth velocity, and feeding/sleep correlation notes for doctor visits.</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Unlocks</p><p class="mt-1 text-[15px] leading-5 font-extrabold text-white">Growth lab</p></div>
+          <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Offer</p><p class="mt-1 text-[15px] leading-5 font-extrabold text-white">USD 6</p></div>
+        </div>
+        <button class="pressable mt-5 h-12 w-full rounded-full bg-white text-[#0f3b35] font-extrabold" id="upgradeButton" type="button">Unlock Early Bird - USD 6</button>
+      </section>`;
+    document.getElementById("upgradeButton")?.addEventListener("click", () => goToScreen("subscription"));
+    ready();
+  }
+
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  const selectedBabyId = babyState.selectedBabyId;
+  const selectedBaby = babyState.selectedBaby || null;
+  if (!selectedBaby || !selectedBabyId) {
+    setEmpty({ title: "No baby selected", copy: "Create a baby profile first, then add growth records to build correlation insights.", cta: "Create baby profile", target: "add_baby_profile" });
+    await new Promise(() => {});
+  }
+  if (!(await hasPremiumAccess())) {
+    lockPremium();
+    await new Promise(() => {});
+  }
+
+  const fallbackCore = {
+    feedingLogs: getLogsForBaby(getPersistedFeedingLogs([]), selectedBabyId),
+    sleepLogs: getLogsForBaby(getPersistedSleepLogs([]), selectedBabyId),
+    diaperLogs: getLogsForBaby(getPersistedDiaperLogs([]), selectedBabyId),
+    healthNotes: []
+  };
+  const core = await loadCoreLogsRemote(selectedBabyId, fallbackCore).catch(() => fallbackCore);
+  const growthState = await loadGrowthRecordsRemote(selectedBabyId, getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId)).catch(() => ({ growthRecords: getLogsForBaby(getPersistedGrowthRecords([]), selectedBabyId) }));
+  const feeds = core.feedingLogs || fallbackCore.feedingLogs;
+  const sleeps = core.sleepLogs || fallbackCore.sleepLogs;
+  const recordsAsc = (growthState.growthRecords || [])
+    .filter((record) => record.measuredAt && (record.weightKg || record.heightCm || record.lengthCm || record.headCircumferenceCm))
+    .sort((a, b) => new Date(a.measuredAt) - new Date(b.measuredAt));
+  const recordsDesc = recordsAsc.slice().reverse();
+  const latest = recordsDesc[0];
+  const ageMo = B.ageInMonths(selectedBaby.dateOfBirth, now);
+  const firstName = (selectedBaby.name || "Baby").split(" ")[0];
+
+  if (!latest) {
+    setEmpty({ title: "Add a growth measurement", copy: "Weight, length, and head circumference unlock WHO comparison and trend context.", cta: "Open growth tracker", target: "growth_tracker" });
+    await new Promise(() => {});
+  }
+
+  const correlations = B.growthCorrelations(recordsAsc, feeds, sleeps);
+  const latestInterval = correlations.hasData ? correlations.intervals[correlations.intervals.length - 1] : null;
+  const latestWeight = Number(latest.weightKg || 0);
+  const latestDate = new Date(latest.measuredAt);
+  const weightMedian = latestWeight ? B.whoMedian(ageMo, selectedBaby.gender, "weight") : null;
+  const weightCmp = latestWeight ? B.growthComparison(latestWeight, weightMedian) : null;
+
+  document.getElementById("heroTitle").textContent = `${firstName}'s growth signal`;
+  document.getElementById("heroCopy").textContent = correlations.hasData
+    ? `Latest interval links ${latestInterval.avgFeeds} feeds/day and ${latestInterval.avgSleepHours}h sleep/day with growth velocity.`
+    : "Add at least two weight records to unlock interval velocity and care correlation.";
+  document.getElementById("heroMetrics").innerHTML = `
+    <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Latest weight</p><p class="mt-1 text-[18px] leading-5 font-extrabold text-white tnum">${latestWeight ? `${latestWeight} kg` : "--"}</p></div>
+    <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Velocity</p><p class="mt-1 text-[18px] leading-5 font-extrabold text-white tnum">${latestInterval ? `${latestInterval.gainPerWeek >= 0 ? "+" : ""}${latestInterval.gainPerWeek} g/wk` : "Needs 2"}</p></div>`;
+
+  function comparisonCard({ label, value, unit, metric, icon }) {
+    if (!value) {
+      return `<article class="metric-card p-3"><span class="material-symbols-outlined text-[#0f766e]">${icon}</span><p class="mt-2 text-[12px] font-bold text-on-surface-variant">${label}</p><p class="text-[15px] font-extrabold text-on-surface">No data</p></article>`;
+    }
+    const median = B.whoMedian(ageMo, selectedBaby.gender, metric);
+    const cmp = B.growthComparison(Number(value), median);
+    const color = cmp.pctDiff < -7 ? "#b45309" : "#0f766e";
+    return `<article class="metric-card p-3">
+      <span class="w-8 h-8 rounded-full bg-[#e5fbf2] text-[#0f766e] flex items-center justify-center"><span class="material-symbols-outlined text-[18px]">${icon}</span></span>
+      <p class="mt-2 text-[12px] font-bold text-on-surface-variant">${label}</p>
+      <p class="text-[17px] leading-6 font-extrabold text-on-surface tnum">${value}${unit}</p>
+      <p class="text-[11px] leading-4 font-bold" style="color:${color}">${cmp.pctDiff > 0 ? "+" : ""}${cmp.pctDiff}% vs median</p>
+    </article>`;
+  }
+
+  document.getElementById("comparisonCards").innerHTML = [
+    comparisonCard({ label: "Weight", value: latest.weightKg, unit: "kg", metric: "weight", icon: "monitor_weight" }),
+    comparisonCard({ label: "Length", value: latest.heightCm || latest.lengthCm, unit: "cm", metric: "length", icon: "straighten" }),
+    comparisonCard({ label: "Head", value: latest.headCircumferenceCm, unit: "cm", metric: "head", icon: "radio_button_checked" })
+  ].join("");
+
+  function renderChart() {
+    const box = document.getElementById("chartBox");
+    const weightRecords = recordsAsc.filter((record) => record.weightKg).slice(-8);
+    if (weightRecords.length < 2) {
+      box.innerHTML = `<div class="rounded-2xl bg-surface-container-low/70 p-4 text-[14px] leading-5 text-on-surface-variant">Add one more weight measurement to draw a trend line and calculate weekly velocity.</div>`;
+      return;
+    }
+    const values = weightRecords.map((record) => Number(record.weightKg));
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const pad = Math.max(0.25, (max - min) * 0.2);
+    const lo = min - pad;
+    const hi = max + pad;
+    const points = weightRecords.map((record, index) => {
+      const x = 26 + (index / Math.max(1, weightRecords.length - 1)) * 268;
+      const y = 128 - ((Number(record.weightKg) - lo) / Math.max(0.1, hi - lo)) * 92;
+      return { x, y, record };
+    });
+    const path = points.map((point) => `${point.x},${point.y}`).join(" ");
+    box.innerHTML = `
+      <svg viewBox="0 0 320 150" class="w-full h-auto" role="img" aria-label="Weight trend from ${fmtDate(weightRecords[0].measuredAt)} to ${fmtDate(weightRecords[weightRecords.length - 1].measuredAt)}">
+        <line x1="26" y1="128" x2="300" y2="128" stroke="#d8d2cc" stroke-width="1"/>
+        <line x1="26" y1="36" x2="300" y2="36" stroke="#d8d2cc" stroke-width="1" stroke-dasharray="4 5"/>
+        <polyline fill="none" stroke="#0f766e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${path}"/>
+        ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="5" fill="#0f766e" stroke="#fff" stroke-width="3"><title>${fmtDate(point.record.measuredAt)}: ${point.record.weightKg} kg</title></circle>`).join("")}
+      </svg>
+      <div class="mt-1 flex justify-between text-[11px] font-bold text-on-surface-variant"><span>${fmtDate(weightRecords[0].measuredAt)}</span><span>${fmtDate(weightRecords[weightRecords.length - 1].measuredAt)}</span></div>`;
+  }
+
+  function intervalTakeaway(iv) {
+    if (!iv) return "Add another weight record to calculate velocity.";
+    if (iv.gainPerWeek >= 100) return "Higher gain in this interval. Good context for the next checkup if it repeats.";
+    if (iv.gainPerWeek >= 30) return "Steady positive gain across this logged interval.";
+    if (iv.gainPerWeek >= 0) return "Slower positive gain. Trend matters more than a single point.";
+    return "A dip appeared in this interval. Bring it up with your doctor.";
+  }
+
+  function corrRow(icon, title, value, note, tone = "#0f766e") {
+    return `<div class="rounded-2xl bg-surface-container-low/70 p-3 flex items-start gap-3">
+      <span class="w-9 h-9 rounded-full bg-white flex items-center justify-center shrink-0" style="color:${tone}"><span class="material-symbols-outlined text-[19px]">${icon}</span></span>
+      <div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2"><p class="min-w-0 text-[14px] leading-5 font-extrabold text-on-surface">${title}</p><span class="shrink-0 text-[13px] font-extrabold tnum" style="color:${tone}">${value}</span></div><p class="text-[12px] leading-4 text-on-surface-variant">${note}</p></div>
+    </div>`;
+  }
+
+  const corrRows = [];
+  if (latestInterval) {
+    corrRows.push(corrRow("speed", "Growth velocity", `${latestInterval.gainPerWeek >= 0 ? "+" : ""}${latestInterval.gainPerWeek} g/wk`, `${fmtRange(latestInterval.fromAt, latestInterval.toAt)}. ${intervalTakeaway(latestInterval)}`, latestInterval.gainPerWeek < 0 ? "#b45309" : "#0f766e"));
+    corrRows.push(corrRow("restaurant", "Feeding coverage", `${latestInterval.avgFeeds}/day`, "Average feeds logged during the same measurement interval.", "#2563eb"));
+    corrRows.push(corrRow("bedtime", "Sleep coverage", `${latestInterval.avgSleepHours}h/day`, "Completed sleep logs overlapping the growth interval.", "#4f46e5"));
+  } else {
+    corrRows.push(corrRow("add_chart", "Correlation not ready", "1/2", "Log at least two weight measurements to compare changes between visits.", "#b45309"));
+    corrRows.push(corrRow("restaurant", "Daily care context", `${feeds.length} feeds`, "Feeding and sleep logs are ready to connect once a second growth record exists.", "#2563eb"));
+  }
+  document.getElementById("correlationRows").innerHTML = corrRows.join("");
+
+  const notes = [];
+  notes.push(["monitor_weight", "Latest measurement", `${fmtDate(latestDate)}: ${latestWeight ? `${latestWeight} kg` : "weight not recorded"}${weightCmp ? `, ${weightCmp.text.toLowerCase()}` : "."}`]);
+  if (latestInterval) {
+    notes.push(["speed", "Change since last measurement", `${latestInterval.gainPerWeek >= 0 ? "+" : ""}${latestInterval.gainPerWeek} g per week over ${latestInterval.days} days.`]);
+    notes.push(["restaurant", "Care context", `${latestInterval.avgFeeds} feeds/day and ${latestInterval.avgSleepHours}h completed sleep/day were logged in the same interval.`]);
+  } else {
+    notes.push(["add", "Next useful data", "Add one more weight measurement after the next clinic/home weigh-in."]);
+  }
+  notes.push(["clinical_notes", "Ask the doctor", "Is the trend steady for age and history, and should feeding or follow-up timing change?"]);
+
+  document.getElementById("clinicNotes").innerHTML = notes.map(([icon, title, copy]) => `
+    <div class="rounded-2xl bg-surface-container-low/70 p-3 flex items-start gap-3">
+      <span class="w-8 h-8 rounded-full bg-white text-[#b45309] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">${icon}</span></span>
+      <div><p class="text-[14px] leading-5 font-extrabold text-on-surface">${title}</p><p class="text-[12px] leading-4 text-on-surface-variant">${copy}</p></div>
+    </div>`).join("");
+
+  renderChart();
+  ready();
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
 <link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
-<title>Doctor Report - LittleNest MY</title>
+<title>Doctor Review Summary - LittleNest MY</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -49,6 +49,8 @@ tailwind.config = {
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
   .soft-shadow { box-shadow: 0 18px 45px rgba(131, 83, 60, 0.10); }
   .report-card { border-radius: 26px; }
+  .report-box { border-radius: 16px; border: 1px solid rgba(83,67,61,.14); background: rgba(255,255,255,.76); }
+  .report-box-label { color: #6f5b52; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
   .animate-slide-up { animation: slideUp .3s ease-out; }
   :root.dark .report-card { background: #242120; border-color: rgba(255,255,255,.10); }
@@ -57,7 +59,7 @@ tailwind.config = {
 </head>
 <body class="bg-surface text-on-surface min-h-screen pb-32">
 <!-- Loading -->
-<section class="max-w-md mx-auto px-5 pt-6 space-y-5" id="reportLoading" aria-label="Loading report">
+<section class="max-w-md mx-auto px-5 pt-6 space-y-5" id="reportLoading" aria-label="Loading summary">
 <div class="h-10 w-44 rounded-xl bg-surface-container animate-pulse"></div>
 <div class="h-24 rounded-[26px] bg-surface-container animate-pulse"></div>
 <div class="h-40 rounded-[26px] bg-surface-container animate-pulse"></div>
@@ -70,12 +72,11 @@ tailwind.config = {
 <button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
 <span class="material-symbols-outlined text-primary">arrow_back</span>
 </button>
-<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Doctor Report</h1>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary truncate">Doctor Review</h1>
 </div>
-<button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="shareButton" type="button" aria-label="Print or export report">
+<button class="w-10 h-10 rounded-full bg-primary-container text-primary flex items-center justify-center active:scale-95 transition-transform" id="shareButton" type="button" aria-label="Print or export summary">
 <span class="material-symbols-outlined">ios_share</span>
 </button>
-</header>
 </header>
 
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5">
@@ -93,7 +94,7 @@ tailwind.config = {
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-1.5 mb-0.5">
           <span class="material-symbols-outlined text-[14px] text-white/80" style="font-variation-settings:'FILL' 1">workspace_premium</span>
-          <p class="text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/80">Doctor Report</p>
+          <p class="text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/80">For doctor review</p>
         </div>
         <h2 class="text-[21px] leading-6 font-extrabold text-white truncate" id="babyName">Baby</h2>
         <p class="text-[13px] text-white/85 truncate" id="babyMeta">Age</p>
@@ -103,6 +104,15 @@ tailwind.config = {
       <span class="material-symbols-outlined text-[15px] text-white">date_range</span>
       <span class="text-[12px] font-bold text-white" id="reportPeriod">Last 7 days</span>
     </div>
+  </section>
+
+  <!-- Patient details -->
+  <section class="report-card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Patient details</h2>
+      <span class="text-[11px] font-extrabold text-primary bg-primary-container px-2.5 py-1 rounded-full">Caregiver logged</span>
+    </div>
+    <div class="mt-4 grid grid-cols-2 gap-3" id="patientDetailsGrid"></div>
   </section>
 
   <!-- Summary stat boxes -->
@@ -148,7 +158,7 @@ tailwind.config = {
   </section>
 
   <section class="rounded-[22px] bg-surface-container-low p-4 border border-primary-container">
-    <p class="text-[13px] leading-6 text-on-surface-variant">This report is a caregiver-logged summary for sharing with family or your clinic. It is based on recent logs only and is not a medical diagnosis. For any health concern, please consult a doctor or Klinik Kesihatan.</p>
+    <p class="text-[13px] leading-6 text-on-surface-variant">This is a caregiver-logged summary to help your doctor quickly review recent routines and notes. It is not a medical diagnosis. For any health concern, please consult a doctor or Klinik Kesihatan.</p>
   </section>
 
   <div class="flex gap-3">
@@ -168,7 +178,7 @@ tailwind.config = {
 <div class="fixed inset-0 z-50 bg-black/40 flex items-end justify-center hidden" id="exportOverlay">
   <div class="bg-surface w-full max-w-md rounded-t-[26px] p-6 pb-8 animate-slide-up" id="exportSheet">
     <div class="w-10 h-1 rounded-full bg-surface-container-highest mx-auto mb-5"></div>
-    <h3 class="text-[18px] font-extrabold text-on-surface text-center">Export report</h3>
+    <h3 class="text-[18px] font-extrabold text-on-surface text-center">Export summary</h3>
     <p class="text-[13px] text-on-surface-variant text-center mt-1">Choose a format to export</p>
     <div class="mt-5 space-y-3">
       <button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold flex items-center justify-center gap-2 active:scale-95 transition-transform" id="exportPdfBtn" type="button">
@@ -202,6 +212,7 @@ const { loadMilestonesRemote } = await import(`${moduleBase}utils/milestonesRemo
 const { calculateBabyAge, formatDuration, isSameLocalDay } = await import(`${moduleBase}utils/dateFormat.mjs`);
 const { bindPrototypeActions, goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
+const { hasPremiumAccess, TRIAL_DAYS } = await import(`${moduleBase}utils/planUtils.mjs`);
 
 const now = new Date();
 const DAYS = 7;
@@ -209,6 +220,13 @@ let printPayload = null;
 
 if (!(await isLoggedIn())) {
   window.location.replace(screenUrl("auth_welcome"));
+  await new Promise(() => {});
+}
+
+if (!(await hasPremiumAccess())) {
+  renderPremiumLocked();
+  showContent();
+  bindPrototypeActions();
   await new Promise(() => {});
 }
 
@@ -264,6 +282,19 @@ async function renderReport() {
   setText("babyName", baby.name);
   setText("babyMeta", `${calculateBabyAge(baby.dateOfBirth, now)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`);
   setText("reportPeriod", `${formatDate(start)} – ${formatDate(now)}`);
+  const patientDetails = [
+    ["Child", baby.name],
+    ["Date of birth", formatDate(baby.dateOfBirth)],
+    ["Age", calculateBabyAge(baby.dateOfBirth, now)],
+    ["Gender", baby.gender ? capitalize(baby.gender) : "Not set"],
+    ["Blood group", formatBloodGroup(baby) || "Not set"],
+    ["Generated", formatDate(now)]
+  ];
+  document.getElementById("patientDetailsGrid").innerHTML = patientDetails.map(([label, value]) => `
+    <div class="report-box p-3">
+      <p class="report-box-label">${escapeHtml(label)}</p>
+      <p class="mt-1 text-[14px] font-extrabold text-on-surface leading-snug">${escapeHtml(value)}</p>
+    </div>`).join("");
   if (baby.photoUrl) {
     const img = document.getElementById("babyPhoto");
     img.src = baby.photoUrl;
@@ -353,9 +384,12 @@ async function renderReport() {
   // Print payload
   printPayload = {
     babyName: baby.name,
-    meta: `${calculateBabyAge(baby.dateOfBirth, now)} · ${formatDate(baby.dateOfBirth)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`,
+    patientDetails,
+    meta: `${calculateBabyAge(baby.dateOfBirth, now)} · DOB ${formatDate(baby.dateOfBirth)}${baby.gender ? ` · ${capitalize(baby.gender)}` : ""}`,
+    generatedAt: formatDate(now),
     range: `${formatDate(start)} – ${formatDate(now)}`,
     summaryRows,
+    boxes: metrics.map((m) => ({ label: m.label, value: m.value, bg: m.bg, fg: m.fg })),
     days,
     growth,
     healthNotes: payloadHealthNotes,
@@ -365,15 +399,33 @@ async function renderReport() {
 
 function renderNoBaby() {
   setText("babyName", "No baby profile yet");
-  setText("babyMeta", "Create a baby profile to generate a report.");
+  setText("babyMeta", "Create a baby profile to generate a summary.");
   document.getElementById("summaryTitle").textContent = "Summary";
-  document.getElementById("summaryList").innerHTML = `<p class="py-2 text-[14px] text-on-surface-variant">No data yet.</p>`;
+  document.getElementById("patientDetailsGrid").innerHTML = `<p class="col-span-2 py-2 text-[14px] text-on-surface-variant">No baby profile yet.</p>`;
+  document.getElementById("summaryGrid").innerHTML = `<p class="col-span-2 py-2 text-[14px] text-on-surface-variant">No data yet.</p>`;
   document.getElementById("dailyTableBody").innerHTML = `<tr><td colspan="4" class="py-3 text-[14px] text-on-surface-variant">No logs yet.</td></tr>`;
   document.getElementById("growthChart").innerHTML = `<text x="170" y="100" text-anchor="middle" class="chart-label" fill="#8a746b">No growth records yet</text>`;
   document.getElementById("notesList").innerHTML = `<p class="text-[14px] text-on-surface-variant">Nothing logged yet.</p>`;
   const cta = document.getElementById("printButton");
   cta.innerHTML = `<span class="material-symbols-outlined">add</span> Create baby profile`;
   cta.addEventListener("click", (e) => { e.stopImmediatePropagation(); goToScreen("add_baby_profile"); }, true);
+}
+
+function renderPremiumLocked() {
+  const main = document.querySelector("#reportContent main");
+  if (main) {
+    main.innerHTML = `
+      <section class="report-card bg-surface-container-lowest border border-white/60 p-7 soft-shadow text-center space-y-4 mt-8">
+        <div class="w-16 h-16 rounded-full bg-primary-container text-primary mx-auto flex items-center justify-center">
+          <span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1">workspace_premium</span>
+        </div>
+        <div>
+          <h2 class="text-[21px] leading-7 font-extrabold text-on-surface">Doctor Review Summary is Premium</h2>
+          <p class="mt-2 text-[14px] leading-6 text-on-surface-variant">A simple PDF summary for clinic visits is included during the first ${TRIAL_DAYS} days, then unlocks with LittleNest Premium.</p>
+        </div>
+        <button class="w-full h-12 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" data-screen-target="subscription" type="button">View early-user price</button>
+      </section>`;
+  }
 }
 
 function sumSleepMinutes(logs, start, end) {
@@ -422,6 +474,8 @@ function renderGrowthChart(growth) {
 function buildPrintHtml() {
   if (!printPayload) return null;
   const p = printPayload;
+  const patientHtml = p.patientDetails.map(([l, v]) => `<div class="field"><span>${escapeHtml(l)}</span><strong>${escapeHtml(v)}</strong></div>`).join("");
+  const boxHtml = p.boxes.map((b) => `<div class="metric"><span>${escapeHtml(b.label)}</span><strong>${escapeHtml(b.value)}</strong></div>`).join("");
   const summaryHtml = p.summaryRows.map(([l, v]) => `<tr><td>${escapeHtml(l)}</td><td style="text-align:right;font-weight:700">${escapeHtml(v)}</td></tr>`).join("");
   const dailyHtml = p.days.map((d) => `<tr><td>${escapeHtml(formatDayLabel(d.day))}</td><td style="text-align:center">${d.feedCount}</td><td style="text-align:center">${d.sleepMin ? formatDuration(d.sleepMin) : "–"}</td><td style="text-align:center">${d.diaperCount}</td></tr>`).join("");
   const growthHtml = p.growth.length
@@ -435,28 +489,48 @@ function buildPrintHtml() {
     ? allNotes.map((n) => `<li><strong>${escapeHtml(n.title)}</strong>${n.detail ? ` — ${escapeHtml(n.detail)}` : ""} <em>(${escapeHtml(formatDate(n.at))})</em></li>`).join("")
     : "<li>No notes or milestones in this period.</li>";
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>LittleNest – Doctor Report</title>
+<html><head><meta charset="utf-8"><title>LittleNest Doctor Review Summary</title>
 <style>
-  *{box-sizing:border-box;margin:0}
-  body{font-family:Arial,Helvetica,sans-serif;color:#2b211d;padding:40px 32px;line-height:1.6;max-width:720px;margin:auto}
-  h1{font-size:22px;margin:0 0 4px} h2{font-size:16px;margin:28px 0 10px;border-bottom:2px solid #e9e1d8;padding-bottom:4px}
-  .meta{color:#53433d;font-size:13px;margin-bottom:4px}
-  table{width:100%;border-collapse:collapse;font-size:13px} td,th{padding:7px 10px;border-bottom:1px solid #e9e1d8;text-align:left}
-  th{background:#f4ebe6;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
-  ul{padding-left:20px;font-size:13px;line-height:1.8}
-  .note{margin-top:32px;padding-top:16px;border-top:1px solid #e9e1d8;font-size:11px;color:#8a746b}
-  .brand{text-align:center;margin-top:40px;font-size:12px;color:#83533c;border-top:1px solid #ffdcc8;padding-top:12px;letter-spacing:1px}
-  @media print{body{padding:20px 0}}
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:#1f2933;padding:32px;line-height:1.5;max-width:760px;margin:auto;background:#fff}
+  .letterhead{border:2px solid #233142;padding:18px 20px;margin-bottom:18px}
+  .brand-row{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+  h1{font-size:22px;margin:0;color:#233142;letter-spacing:.02em}
+  .facility{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#52616f;font-weight:700}
+  .generated{text-align:right;font-size:11px;color:#52616f;line-height:1.6;min-width:110px}
+  h2{font-size:13px;margin:22px 0 8px;color:#233142;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #c9d1d9;padding-bottom:5px}
+  .meta{color:#52616f;font-size:12px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .field,.metric{border:1px solid #d8dee6;background:#f8fafc;padding:9px 10px;min-height:52px}
+  .field span,.metric span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7785;font-weight:700}
+  .field strong,.metric strong{display:block;font-size:13px;color:#1f2933;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:12px;border:1px solid #d8dee6}
+  td,th{padding:7px 9px;border-bottom:1px solid #e5e9ef;text-align:left;vertical-align:top}
+  th{background:#edf2f7;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#3b4856}
+  ul{padding-left:18px;font-size:12px;line-height:1.75}
+  .notice{margin-top:24px;border:1px solid #d8dee6;background:#fbfcfd;padding:12px;font-size:11px;color:#52616f}
+  @media print{body{padding:18px}.letterhead{break-inside:avoid}}
 </style></head><body>
-<h1>LittleNest – Doctor / Family Report</h1>
-<div class="meta"><strong>${escapeHtml(p.babyName)}</strong> · ${escapeHtml(p.meta)}</div>
-<div class="meta">Reporting period: ${escapeHtml(p.range)}</div>
-<h2>Summary</h2><table>${summaryHtml}</table>
+<section class="letterhead">
+  <div class="brand-row">
+    <div>
+      <div class="facility">LittleNest MY Care Summary</div>
+      <h1>Doctor Review Summary</h1>
+      <div class="meta">A simple caregiver-entered summary for clinic discussion</div>
+    </div>
+    <div class="generated">
+      <strong>Generated</strong><br>${escapeHtml(p.generatedAt)}
+    </div>
+  </div>
+</section>
+<h2>Patient details</h2><div class="grid">${patientHtml}</div>
+<h2>Reporting period</h2><table><tr><td>Period covered</td><td style="text-align:right;font-weight:700">${escapeHtml(p.range)}</td></tr></table>
+<h2>Key summary</h2><div class="grid">${boxHtml}</div>
+<h2>Summary details</h2><table>${summaryHtml}</table>
 <h2>Daily breakdown</h2><table><tr><th>Day</th><th style="text-align:center">Feeds</th><th style="text-align:center">Sleep</th><th style="text-align:center">Diapers</th></tr>${dailyHtml}</table>
 <h2>Growth records</h2><table><tr><th>Date</th><th>Weight</th><th>Height/Length</th><th>Head</th></tr>${growthHtml}</table>
 <h2>Notes &amp; milestones</h2><ul>${notesHtml}</ul>
-<p class="note">This report is a caregiver-logged summary based on recent logs only. It is not a medical diagnosis. For health concerns, consult a doctor or Klinik Kesihatan.</p>
-<div class="brand">✦ LittleNest MY ✦</div>
+<div class="notice"><strong>Important:</strong> This summary is generated from caregiver-entered LittleNest MY logs. It is not a diagnosis, prescription, medical device output, or substitute for professional advice. Please verify details with the parent/caregiver and assess clinically as appropriate.</div>
 </body></html>`;
 }
 
@@ -466,77 +540,191 @@ async function printReport() {
   const { jsPDF } = await import("https://esm.sh/jspdf@2.5.2");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const p = printPayload;
-  let y = 50;
-  doc.setFont("Helvetica", "bold"); doc.setFontSize(18);
-  doc.text(`LittleNest — Doctor Report`, 40, y); y += 28;
-  doc.setFont("Helvetica", "normal"); doc.setFontSize(12);
-  doc.text(`${p.babyName} · ${p.meta}`, 40, y); y += 18;
-  doc.setFontSize(10); doc.setTextColor(100);
-  doc.text(`Period: ${p.range}`, 40, y); y += 22;
-  doc.setTextColor(0);
+  const margin = 40;
+  let y = 42;
 
-  doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
-  doc.text("Summary", 40, y); y += 18;
-  doc.setFont("Helvetica", "normal"); doc.setFontSize(11);
-  for (const [label, value] of p.summaryRows) {
-    if (y > 780) { doc.addPage(); y = 50; }
-    doc.text(label, 40, y); doc.text(value, 400, y, { align: "right" }); y += 16;
-  }
-  y += 10;
+  drawHeader(doc, p);
+  y = 138;
 
-  doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
-  doc.text("Daily Breakdown", 40, y); y += 18;
-  doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-  doc.text("Day", 40, y); doc.text("Feeds", 170, y); doc.text("Sleep", 240, y); doc.text("Diapers", 340, y);
-  y += 16;
-  for (const d of p.days) {
-    if (y > 780) { doc.addPage(); y = 50; }
-    doc.text(formatDayLabel(d.day), 40, y);
-    doc.text(String(d.feedCount), 170, y);
-    doc.text(d.sleepMin ? formatDuration(d.sleepMin) : "—", 240, y);
-    doc.text(String(d.diaperCount), 340, y);
-    y += 15;
-  }
-  y += 12;
+  y = drawSectionTitle(doc, "Patient details", y);
+  y = drawKeyValueGrid(doc, p.patientDetails, y);
 
-  if (p.healthNotes.length) {
-    doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
-    doc.text("Health Notes", 40, y); y += 18;
-    doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Date", 40, y); doc.text("Type", 140, y); doc.text("Details", 220, y);
-    y += 16;
-    for (const n of p.healthNotes) {
-      if (y > 780) { doc.addPage(); y = 50; }
-      doc.text(formatDate(n.at), 40, y);
-      doc.text(n.type, 140, y);
-      doc.text(n.detail || "—", 220, y);
-      y += 15;
-    }
-    y += 10;
-  }
+  y = drawSectionTitle(doc, "Reporting period", y + 8);
+  y = drawKeyValueTable(doc, [["Period covered", p.range], ["Generated", p.generatedAt]], y);
 
-  if (p.milestones.length) {
-    doc.setFont("Helvetica", "bold"); doc.setFontSize(13);
-    doc.text("Milestones", 40, y); y += 18;
-    doc.setFont("Helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Date", 40, y); doc.text("Milestone", 140, y); doc.text("Notes", 280, y);
-    y += 16;
-    for (const m of p.milestones) {
-      if (y > 780) { doc.addPage(); y = 50; }
-      doc.text(formatDate(m.at), 40, y);
-      doc.text(m.title, 140, y);
-      doc.text(m.detail || "—", 280, y);
-      y += 15;
-    }
-  }
+  y = drawSectionTitle(doc, "Key summary", y + 8);
+  y = drawMetricBoxes(doc, p.boxes, y);
+
+  y = drawSectionTitle(doc, "Summary details", y + 8);
+  y = drawKeyValueTable(doc, p.summaryRows, y);
+
+  y = drawSectionTitle(doc, "Daily breakdown", y + 8);
+  y = drawTable(doc, ["Day", "Feeds", "Sleep", "Diapers"], p.days.map((d) => [
+    formatDayLabel(d.day),
+    String(d.feedCount),
+    d.sleepMin ? formatDuration(d.sleepMin) : "-",
+    String(d.diaperCount)
+  ]), y);
+
+  y = drawSectionTitle(doc, "Growth records", y + 8);
+  const growthRows = p.growth.length
+    ? p.growth.slice().reverse().map((r) => [
+      formatDate(r.measuredAt),
+      r.weightKg ? `${r.weightKg} kg` : "-",
+      (r.heightCm || r.lengthCm) ? `${r.heightCm || r.lengthCm} cm` : "-",
+      r.headCircumferenceCm ? `${r.headCircumferenceCm} cm` : "-"
+    ])
+    : [["No growth records", "-", "-", "-"]];
+  y = drawTable(doc, ["Date", "Weight", "Height/Length", "Head"], growthRows, y);
+
+  const notesRows = [
+    ...p.healthNotes.map((n) => [formatDate(n.at), n.type, n.detail || "-"]),
+    ...p.milestones.map((m) => [formatDate(m.at), m.title, m.detail || "-"])
+  ];
+  y = drawSectionTitle(doc, "Notes and milestones", y + 8);
+  y = drawTable(doc, ["Date", "Item", "Details"], notesRows.length ? notesRows : [["No notes in period", "-", "-"]], y);
+
+  y = ensurePageSpace(doc, y, 80);
+  doc.setDrawColor(216, 222, 230);
+  doc.setFillColor(248, 250, 252);
+  doc.rect(margin, y, 515, 48, "FD");
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(35, 49, 66);
+  doc.text("Important", margin + 12, y + 15);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(82, 97, 111);
+  doc.text(doc.splitTextToSize("This summary is generated from caregiver-entered LittleNest MY logs. It is not a diagnosis, prescription, medical device output, or substitute for professional advice. Please verify details clinically.", 490), margin + 12, y + 29);
 
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = `LittleNest_Report_${p.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
+  a.href = url; a.download = `LittleNest_Doctor_Summary_${p.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.pdf`;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   showFeedback("PDF downloaded.", false);
+}
+
+function drawHeader(doc, p) {
+  doc.setDrawColor(35, 49, 66);
+  doc.setLineWidth(1.4);
+  doc.rect(40, 34, 515, 82);
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(82, 97, 111);
+  doc.text("LITTLENEST MY CARE SUMMARY", 56, 55);
+  doc.setFontSize(18);
+  doc.setTextColor(35, 49, 66);
+  doc.text("Doctor Review Summary", 56, 78);
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(82, 97, 111);
+  doc.text("Simple caregiver-entered summary for clinic discussion", 56, 96);
+  doc.setFont("Helvetica", "bold");
+  doc.text("GENERATED", 430, 68);
+  doc.setFont("Helvetica", "normal");
+  doc.text(p.generatedAt, 430, 84);
+}
+
+function ensurePageSpace(doc, y, needed) {
+  if (y + needed <= 790) return y;
+  doc.addPage();
+  return 42;
+}
+
+function drawSectionTitle(doc, title, y) {
+  y = ensurePageSpace(doc, y, 34);
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(10);
+  doc.setTextColor(35, 49, 66);
+  doc.text(title.toUpperCase(), 40, y);
+  doc.setDrawColor(201, 209, 217);
+  doc.line(40, y + 6, 555, y + 6);
+  return y + 20;
+}
+
+function drawKeyValueGrid(doc, rows, y) {
+  const colW = 248;
+  const rowH = 44;
+  rows.forEach(([label, value], i) => {
+    y = ensurePageSpace(doc, y, rowH + 6);
+    const x = 40 + (i % 2) * (colW + 19);
+    const yy = y + Math.floor(i / 2) * 0;
+    doc.setDrawColor(216, 222, 230);
+    doc.setFillColor(248, 250, 252);
+    doc.rect(x, yy, colW, rowH, "FD");
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(107, 119, 133);
+    doc.text(String(label).toUpperCase(), x + 10, yy + 14);
+    doc.setFontSize(10.5);
+    doc.setTextColor(31, 41, 51);
+    doc.text(doc.splitTextToSize(String(value || "-"), colW - 20), x + 10, yy + 31);
+    if (i % 2 === 1 || i === rows.length - 1) y += rowH + 8;
+  });
+  return y;
+}
+
+function drawMetricBoxes(doc, boxes, y) {
+  const boxW = 160;
+  const boxH = 48;
+  boxes.forEach((box, i) => {
+    y = ensurePageSpace(doc, y, boxH + 8);
+    const x = 40 + (i % 3) * (boxW + 17);
+    const yy = y + Math.floor((i % 3) / 3) * 0;
+    doc.setDrawColor(216, 222, 230);
+    doc.setFillColor(248, 250, 252);
+    doc.rect(x, yy, boxW, boxH, "FD");
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(107, 119, 133);
+    doc.text(String(box.label).toUpperCase(), x + 10, yy + 15);
+    doc.setFontSize(13);
+    doc.setTextColor(31, 41, 51);
+    doc.text(String(box.value || "-"), x + 10, yy + 34);
+    if (i % 3 === 2 || i === boxes.length - 1) y += boxH + 8;
+  });
+  return y;
+}
+
+function drawKeyValueTable(doc, rows, y) {
+  return drawTable(doc, ["Field", "Value"], rows, y, [300, 215]);
+}
+
+function drawTable(doc, headers, rows, y, widths) {
+  const tableW = 515;
+  const colW = widths || headers.map(() => tableW / headers.length);
+  y = ensurePageSpace(doc, y, 24);
+  doc.setFillColor(237, 242, 247);
+  doc.setDrawColor(216, 222, 230);
+  doc.rect(40, y, tableW, 20, "FD");
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(7.5);
+  doc.setTextColor(59, 72, 86);
+  let x = 46;
+  headers.forEach((header, i) => {
+    doc.text(String(header).toUpperCase(), x, y + 13);
+    x += colW[i];
+  });
+  y += 20;
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(31, 41, 51);
+  rows.forEach((row) => {
+    y = ensurePageSpace(doc, y, 24);
+    const wrapped = row.map((cell, i) => doc.splitTextToSize(String(cell || "-"), Math.max(40, colW[i] - 12)));
+    const rowH = Math.max(22, ...wrapped.map((lines) => lines.length * 10 + 10));
+    y = ensurePageSpace(doc, y, rowH);
+    doc.setDrawColor(229, 233, 239);
+    doc.rect(40, y, tableW, rowH);
+    let cx = 46;
+    wrapped.forEach((lines, i) => {
+      doc.text(lines, cx, y + 14);
+      cx += colW[i];
+    });
+    y += rowH;
+  });
+  return y + 8;
 }
 
 function exportPdf() {
@@ -553,12 +741,12 @@ function exportHtml() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `LittleNest_Report_${printPayload.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.html`;
+  a.download = `LittleNest_Doctor_Summary_${printPayload.babyName.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}.html`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
-  showFeedback("Report exported as HTML.", false);
+  showFeedback("Summary exported as HTML.", false);
 }
 
 function showExportSheet() {
@@ -571,6 +759,11 @@ function setText(id, value) { const el = document.getElementById(id); if (el) el
 function formatDate(value) { return new Date(typeof value === "string" && value.length === 10 ? `${value}T00:00:00` : value).toLocaleDateString("en-MY", { day: "numeric", month: "short", year: "numeric" }); }
 function formatDayLabel(date) { return date.toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "short" }); }
 function capitalize(value) { return `${String(value).charAt(0).toUpperCase()}${String(value).slice(1)}`; }
+function formatBloodGroup(profile) {
+  if (!profile?.bloodType) return "";
+  const rh = profile.rhesusFactor === "positive" ? "+" : profile.rhesusFactor === "negative" ? "-" : "";
+  return `${profile.bloodType}${rh}`;
+}
 function showFeedback(message, persistent = false) {
   const f = document.getElementById("feedback");
   f.textContent = message; f.classList.remove("hidden");

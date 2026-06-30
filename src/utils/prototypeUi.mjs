@@ -300,7 +300,7 @@ export function bindBottomNavigationFallback(root = document) {
     || (activeScreen === "daily_summary" ? "home" : "")
     || (activeScreen === "weekly_insights" ? "calendar" : "")
     || (activeScreen === "memory_book" ? "milestones" : "")
-    || (["settings", "privacy_safety", "family_sharing", "mommy_guide", "add_baby_profile", "baby_profiles"].includes(activeScreen) ? "assistant" : "")
+    || (["settings", "privacy_safety", "family_sharing", "mommy_guide", "add_baby_profile", "baby_profiles", "sleep_prediction", "growth_correlation"].includes(activeScreen) ? "assistant" : "")
     || "home";
 
   root.querySelectorAll("nav.fixed a, nav.fixed button").forEach((item) => {

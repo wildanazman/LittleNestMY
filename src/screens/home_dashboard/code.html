@@ -1352,13 +1352,15 @@
   // Plan pill in the greeting row: Premium (gold) / Premium Trial (lavender + countdown) / Free.
   try {
     const base = window.location.protocol === "file:" ? "../../" : "/src/";
-    const [{ getPlanStatus }, { goToScreen }] = await Promise.all([
+    const [{ getPlanStatus }, { goToScreen }, { setHomeBackground }] = await Promise.all([
       import(`${base}utils/planUtils.mjs`),
       import(`${base}utils/prototypeUi.mjs`),
+      import(`${base}utils/homeBackground.mjs`),
     ]);
     const el = document.getElementById("homePlanPill");
     if (el) {
       const status = await getPlanStatus();
+      if (status.state === "free") setHomeBackground("nursery");
       const darkMode = document.documentElement.classList.contains("dark");
       const ico = (n) => `<span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">${n}</span>`;
       const base2 = "font-weight:800;letter-spacing:.01em;border:0;";
@@ -1370,8 +1372,8 @@
       } else if (status.state === "trial") {
         const d = status.daysLeft;
         style = base2 + "background:linear-gradient(135deg,#9b7cff,#7056f4);color:#fff;box-shadow:0 4px 12px rgba(112,86,244,.32);";
-        html = `${ico("workspace_premium")}<span>Trial · ${d}d</span>`;
-        label = `Premium trial, ${d} day${d === 1 ? "" : "s"} left. Tap to upgrade.`;
+        html = `${ico("workspace_premium")}<span>Premium Trial · ${d}d</span>`;
+        label = `Free plan with Premium trial active, ${d} day${d === 1 ? "" : "s"} left. Tap to keep Premium.`;
       } else {
         style = base2 + (darkMode
           ? "background:rgba(196,181,255,.16);color:#c4b5ff;"
@@ -1396,13 +1398,13 @@
           const note = document.createElement("button");
           note.id = "planTrialNotice";
           note.type = "button";
-          note.setAttribute("aria-label", `Premium trial, ${d} day${d === 1 ? "" : "s"} left. Tap to upgrade.`);
-          note.style.cssText = `display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-bottom:14px;padding:11px 14px;border-radius:18px;background:${c.bg};border:1px solid ${c.border};box-shadow:0 4px 14px rgba(112,86,244,.10);`;
+          note.setAttribute("aria-label", `Free plan with Premium trial active, ${d} day${d === 1 ? "" : "s"} left. Tap to keep Premium.`);
+          note.style.cssText = `display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin-bottom:14px;padding:12px 14px;border-radius:18px;background:${c.bg};border:1px solid ${c.border};box-shadow:0 4px 14px rgba(112,86,244,.10);`;
           note.innerHTML =
             `<span class="material-symbols-outlined" style="font-size:20px;color:${c.icon};font-variation-settings:'FILL' 1;">workspace_premium</span>` +
             `<span style="flex:1;min-width:0;">` +
-              `<span style="display:block;font-size:12.5px;font-weight:800;color:${c.title};line-height:1.2;">Premium trial · ${d} day${d === 1 ? "" : "s"} left</span>` +
-              `<span style="display:block;font-size:11px;color:${c.sub};line-height:1.35;margin-top:1px;">Every feature is free for your first 14 days. Tap to keep Premium.</span>` +
+              `<span style="display:block;font-size:12.5px;font-weight:800;color:${c.title};line-height:1.2;">Premium Trial · ${d} day${d === 1 ? "" : "s"} left</span>` +
+              `<span style="display:block;font-size:11px;color:${c.sub};line-height:1.35;margin-top:1px;">Your plan is Free, but Premium access is active for the first 14 days. Tap to keep Premium after trial.</span>` +
             `</span>` +
             `<span class="material-symbols-outlined" style="font-size:18px;color:${c.chev};">chevron_right</span>`;
           note.addEventListener("click", () => goToScreen("subscription"));

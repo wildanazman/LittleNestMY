@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<link rel="preconnect" href="https://cdn.tailwindcss.com"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://esm.sh" crossorigin/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta name="theme-color" content="#ffbfa3"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="LittleNest MY"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="stylesheet" href="/src/utils/pwa-safe-area.css?v=soft-bg-20260615"/>
+<link rel="stylesheet" href="/src/utils/theme.css?v=soft-bg-20260615"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"/>
+<title>Sleep Prediction - LittleNest MY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        primary: "#83533c",
+        "on-primary": "#ffffff",
+        "primary-container": "#ffdcc8",
+        "on-primary-container": "#321304",
+        surface: "#fbf9f4",
+        "surface-container": "#efeee9",
+        "surface-container-low": "#f5f3ee",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-high": "#eae8e3",
+        "on-surface": "#1b1c19",
+        "on-surface-variant": "#51443e",
+        tertiary: "#486646",
+        error: "#ba1a1a"
+      },
+      fontFamily: { body: ["Nunito Sans", "sans-serif"] }
+    }
+  }
+};
+</script>
+<style>
+  :root { --ease-out: cubic-bezier(0.23, 1, 0.32, 1); }
+  body { font-family: "Nunito Sans", sans-serif; -webkit-tap-highlight-color: transparent; }
+  h1, h2, h3, .font-display { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .soft-shadow { box-shadow: 0 18px 45px rgba(78, 62, 122, 0.12); }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .lab-header { justify-content: flex-start; }
+  .lab-title-wrap { min-width: 0; flex: 1 1 auto; }
+  .premium-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.22); font-size: 12px; line-height: 16px; font-weight: 800; white-space: nowrap; }
+  .lab-hero { border-radius: 26px; border: 1px solid rgba(255,255,255,.20); background: linear-gradient(145deg,#241b3a,#4f46e5 58%,#7c5cff); }
+  .hero-metric { min-width: 0; border-radius: 18px; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.16); padding: 12px; }
+  .metric-card { border-radius: 20px; background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.82); }
+  .sleep-track { position: relative; height: 16px; border-radius: 999px; background: linear-gradient(90deg,#fff7ed,#eef2ff 45%,#e0f2fe 72%,#312e81); overflow: hidden; }
+  .sleep-seg { position: absolute; top: 3px; height: 10px; border-radius: 999px; background: rgba(49,46,129,.76); box-shadow: inset 0 1px 0 rgba(255,255,255,.22); }
+  .pressable { transition: transform 160ms var(--ease-out), background-color 180ms ease; }
+  .pressable:active { transform: scale(.97); }
+  @media (prefers-reduced-motion: reduce) { .pressable { transition: none; } }
+</style>
+<script type="module" src="/src/utils/theme.mjs"></script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<header class="lab-header sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-5 h-14 flex items-center w-full">
+  <div class="lab-title-wrap flex items-center gap-2">
+    <button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="backButton" type="button">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h1 class="text-[22px] leading-7 font-extrabold text-primary truncate">Sleep Prediction</h1>
+  </div>
+</header>
+
+<main class="max-w-md mx-auto px-5 pt-5 space-y-5" id="content">
+  <section class="lab-hero p-5 soft-shadow relative overflow-hidden">
+    <div class="relative z-10">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <p class="min-w-0 text-[11px] font-extrabold uppercase tracking-[0.12em] text-white/82">Predictive sleep lab</p>
+        <span class="premium-chip"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">workspace_premium</span>Premium</span>
+      </div>
+      <h2 class="mt-1 text-[25px] leading-8 font-extrabold text-white" id="heroTitle">Reading baby's sleep rhythm</h2>
+      <p class="mt-2 text-[14px] leading-5 text-white/88" id="heroCopy">A premium planner using recent sleep logs, age-aware wake windows, and bedtime consistency.</p>
+      <div class="mt-4 grid grid-cols-2 gap-3" id="heroMetrics"></div>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-2 gap-3" id="metricGrid"></section>
+
+  <section class="rounded-[24px] bg-surface-container-lowest border border-white/70 p-5 soft-shadow">
+    <div class="flex items-center justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Sleep rhythm map</h2>
+        <p class="text-[13px] text-on-surface-variant">Last 7 days, midnight to midnight.</p>
+      </div>
+      <span class="material-symbols-outlined text-[#4f46e5]">timeline</span>
+    </div>
+    <div class="space-y-3" id="rhythmRows"></div>
+    <div class="mt-3 flex justify-between text-[10px] font-bold text-on-surface-variant/70">
+      <span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>12 AM</span>
+    </div>
+  </section>
+
+  <section class="rounded-[24px] bg-surface-container-lowest border border-white/70 p-5 soft-shadow">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="w-9 h-9 rounded-full bg-[#e0f2fe] text-[#0369a1] flex items-center justify-center"><span class="material-symbols-outlined">checklist</span></span>
+      <h2 class="text-[18px] leading-6 font-extrabold text-on-surface">Best next actions</h2>
+    </div>
+    <div class="space-y-2" id="actionsList"></div>
+  </section>
+
+  <section class="rounded-2xl bg-surface-container-low/80 px-4 py-3 flex items-start gap-2.5">
+    <span class="material-symbols-outlined text-[18px] text-on-surface-variant/70 mt-0.5">health_and_safety</span>
+    <p class="text-[12px] leading-4 font-bold text-on-surface-variant/85">Prediction is a planning aid, not medical advice. Use safe sleep practices and consult your doctor if sleep, feeding, breathing, or growth concerns appear.</p>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container rounded-t-xl shadow-lg">
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="home_dashboard" href="#"><span class="material-symbols-outlined" data-icon="home">home</span><span class="font-label-sm text-label-sm-mobile">Home</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="quick_log" href="#"><span class="material-symbols-outlined" data-icon="add_circle">add_circle</span><span class="font-label-sm text-label-sm-mobile">Log</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="calendar" href="#"><span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span><span class="font-label-sm text-label-sm-mobile">Calendar</span></a>
+  <a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant rounded-full px-4 py-1" data-screen-target="milestones" href="#"><span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span><span class="font-label-sm text-label-sm-mobile">Milestones</span></a>
+  <a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90" data-screen-target="assistant" href="#"><span class="material-symbols-outlined" data-icon="smart_toy" style="font-variation-settings:'FILL' 1;">smart_toy</span><span class="font-label-sm text-label-sm-mobile">Assistant</span></a>
+</nav>
+
+<script type="module">
+  const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
+  const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
+  const { goToScreen, goBackOrTo } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+  const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
+  const { loadCoreLogsRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
+  const { hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
+  const { getLogsForBaby, getPersistedFeedingLogs, getPersistedSleepLogs, getPersistedDiaperLogs } = await import(`${moduleBase}utils/localState.mjs`);
+  const B = await import(`${moduleBase}utils/benchmarks.mjs`);
+
+  const content = document.getElementById("content");
+  const backButton = document.getElementById("backButton");
+  backButton?.addEventListener("click", () => goBackOrTo("assistant"));
+
+  const ready = () => window.dispatchEvent(new CustomEvent("littlenest:ready"));
+  const now = new Date();
+  const dayMs = 86400000;
+  const fmtClock = (date) => date ? B.formatMinutesOfDay(date.getHours() * 60 + date.getMinutes()) : "--";
+  const minToHours = (minutes) => {
+    if (!minutes) return "0h";
+    const h = Math.floor(minutes / 60);
+    const m = Math.round(minutes % 60);
+    return h ? `${h}h ${m ? `${m}m` : ""}`.trim() : `${m}m`;
+  };
+  const localDayKey = (date) => {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const dayLabel = (date) => date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  const sleepMins = (log) => {
+    const start = new Date(log.startedAt);
+    const end = log.endedAt ? new Date(log.endedAt) : null;
+    return end && end > start ? Math.round((end - start) / 60000) : 0;
+  };
+
+  function setEmpty({ title, copy, cta, target }) {
+    content.innerHTML = `
+      <section class="rounded-[26px] bg-surface-container-lowest border border-white/70 soft-shadow p-8 text-center space-y-4 mt-6">
+        <div class="w-16 h-16 rounded-full bg-[#eee8ff] text-[#4f46e5] mx-auto flex items-center justify-center"><span class="material-symbols-outlined text-[34px]" style="font-variation-settings:'FILL' 1;">nightlight</span></div>
+        <div><h2 class="text-[20px] leading-7 font-extrabold text-on-surface">${title}</h2><p class="mt-1 text-[15px] leading-6 text-on-surface-variant">${copy}</p></div>
+        <button class="h-12 px-6 rounded-full bg-primary text-on-primary font-extrabold active:scale-95 transition-transform" id="emptyCta" type="button">${cta}</button>
+      </section>`;
+    document.getElementById("emptyCta")?.addEventListener("click", () => goToScreen(target));
+    ready();
+  }
+
+  function lockPremium() {
+    content.innerHTML = `
+      <section class="lab-hero p-6 soft-shadow relative overflow-hidden mt-6">
+        <div class="flex items-center justify-between gap-3">
+          <span class="w-12 h-12 rounded-full bg-white/16 text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">lock</span></span>
+          <span class="premium-chip"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">workspace_premium</span>Premium</span>
+        </div>
+        <h2 class="mt-4 text-[24px] leading-8 font-extrabold text-white">Sleep Prediction is Premium</h2>
+        <p class="mt-2 text-[15px] leading-6 text-white/88">Free users can preview insights, but the full nap window, rhythm map, and confidence model are premium features.</p>
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Unlocks</p><p class="mt-1 text-[15px] leading-5 font-extrabold text-white">Nap lab</p></div>
+          <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Offer</p><p class="mt-1 text-[15px] leading-5 font-extrabold text-white">USD 6</p></div>
+        </div>
+        <button class="pressable mt-5 h-12 w-full rounded-full bg-white text-[#241b3a] font-extrabold" id="upgradeButton" type="button">Unlock Early Bird - USD 6</button>
+      </section>`;
+    document.getElementById("upgradeButton")?.addEventListener("click", () => goToScreen("subscription"));
+    ready();
+  }
+
+  const babyState = await loadBabyProfilesRemote(babyProfile);
+  const selectedBabyId = babyState.selectedBabyId;
+  const selectedBaby = babyState.selectedBaby || null;
+  if (!selectedBaby || !selectedBabyId) {
+    setEmpty({ title: "No baby selected", copy: "Create a baby profile first, then log sleeps to build a prediction model.", cta: "Create baby profile", target: "add_baby_profile" });
+    await new Promise(() => {});
+  }
+  if (!(await hasPremiumAccess())) {
+    lockPremium();
+    await new Promise(() => {});
+  }
+
+  const fallback = {
+    feedingLogs: getLogsForBaby(getPersistedFeedingLogs([]), selectedBabyId),
+    sleepLogs: getLogsForBaby(getPersistedSleepLogs([]), selectedBabyId),
+    diaperLogs: getLogsForBaby(getPersistedDiaperLogs([]), selectedBabyId),
+    healthNotes: []
+  };
+  const core = await loadCoreLogsRemote(selectedBabyId, fallback).catch(() => fallback);
+  const sleeps = (core.sleepLogs || fallback.sleepLogs)
+    .filter((log) => log.startedAt)
+    .sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
+  const completed = sleeps.filter((log) => log.endedAt && sleepMins(log) > 0);
+  const ageMo = B.ageInMonths(selectedBaby.dateOfBirth, now);
+  const benchmark = B.sleepBenchmark(ageMo);
+  const prediction = B.predictSleep(sleeps, ageMo, now);
+
+  if (!sleeps.length) {
+    setEmpty({ title: "Start with sleep logs", copy: "After a few completed naps or night sleeps, LittleNest can estimate a realistic next window.", cta: "Log sleep", target: "sleep_log" });
+    await new Promise(() => {});
+  }
+
+  function sleepsForLast(days) {
+    const start = startOfDay(now);
+    start.setDate(start.getDate() - (days - 1));
+    return completed.filter((log) => new Date(log.startedAt) >= start);
+  }
+
+  const recent = sleepsForLast(7);
+  const recentMinutes = recent.reduce((sum, log) => sum + sleepMins(log), 0);
+  const averageDailyMinutes = Math.round(recentMinutes / 7);
+  const longestStretch = recent.reduce((max, log) => Math.max(max, sleepMins(log)), 0);
+  const todayKey = localDayKey(now);
+  const napsToday = sleeps.filter((log) => localDayKey(log.startedAt) === todayKey && String(log.status || "").includes("nap")).length;
+
+  function bedtimeStats() {
+    const byDay = new Map();
+    completed.forEach((log) => {
+      const start = new Date(log.startedAt);
+      const h = start.getHours();
+      if (!(h >= 17 || h <= 2)) return;
+      const key = localDayKey(start);
+      const item = { start, minutes: sleepMins(log) };
+      const old = byDay.get(key);
+      if (!old || item.minutes > old.minutes) byDay.set(key, item);
+    });
+    const starts = [...byDay.values()].slice(-7).map((item) => {
+      const mins = item.start.getHours() * 60 + item.start.getMinutes();
+      return mins < 180 ? mins + 1440 : mins;
+    });
+    if (starts.length < 2) return { label: "Building", detail: "Needs more evening sleeps" };
+    const avg = starts.reduce((a, b) => a + b, 0) / starts.length;
+    const avgDev = starts.reduce((sum, value) => sum + Math.abs(value - avg), 0) / starts.length;
+    if (avgDev <= 35) return { label: "Steady", detail: "Bedtime varies about 35m" };
+    if (avgDev <= 70) return { label: "Mixed", detail: "Bedtime varies about 1h" };
+    return { label: "Variable", detail: "Bedtime still shifting" };
+  }
+
+  const [wakeMin, wakeMax] = B.wakeWindowMinutes(ageMo);
+  const bedtime = bedtimeStats();
+  const nextNapText = prediction.nextNap ? `${fmtClock(prediction.nextNap.from)} - ${fmtClock(prediction.nextNap.to)}` : "End current sleep";
+  const bedtimeText = prediction.bedtime ? `${B.formatMinutesOfDay(prediction.bedtime.from)} - ${B.formatMinutesOfDay(prediction.bedtime.to)}` : benchmark.bedtimeLabel;
+
+  document.getElementById("heroTitle").textContent = `${(selectedBaby.name || "Baby").split(" ")[0]}'s next sleep window`;
+  document.getElementById("heroCopy").textContent = `Based on ${prediction.basedOnDays || 1} logged day${(prediction.basedOnDays || 1) === 1 ? "" : "s"}, typical ${Math.round(wakeMin / 60 * 10) / 10}-${Math.round(wakeMax / 60 * 10) / 10}h wake windows, and ${benchmark.band} sleep guidance.`;
+  document.getElementById("heroMetrics").innerHTML = `
+    <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Next nap</p><p class="mt-1 text-[16px] leading-5 font-extrabold text-white tnum">${nextNapText}</p></div>
+    <div class="hero-metric"><p class="text-[11px] font-extrabold uppercase tracking-[0.1em] text-white/78">Confidence</p><p class="mt-1 text-[16px] leading-5 font-extrabold text-white">${prediction.confidence || "Building"}</p></div>`;
+
+  const metric = (icon, label, value, note, bg, fg) => `
+    <article class="metric-card p-4">
+      <span class="w-10 h-10 rounded-2xl flex items-center justify-center" style="background:${bg};color:${fg}"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">${icon}</span></span>
+      <p class="mt-3 text-[12px] font-bold text-on-surface-variant">${label}</p>
+      <p class="text-[20px] leading-7 font-extrabold text-on-surface tnum">${value}</p>
+      <p class="text-[12px] leading-4 text-on-surface-variant">${note}</p>
+    </article>`;
+
+  document.getElementById("metricGrid").innerHTML = [
+    metric("bedtime", "Average sleep", minToHours(averageDailyMinutes), `Target ${benchmark.totalHours[0]}-${benchmark.totalHours[1]}h/day`, "#eee8ff", "#4f46e5"),
+    metric("dark_mode", "Bedtime rhythm", bedtime.label, bedtime.detail, "#e0f2fe", "#0369a1"),
+    metric("timer", "Longest stretch", minToHours(longestStretch), "Recent completed sleep", "#e5fbf2", "#047857"),
+    metric("crib", "Naps today", String(napsToday), `Typical ${benchmark.naps[0]}-${benchmark.naps[1]} nap/day`, "#fff3da", "#b45309")
+  ].join("");
+
+  function segmentsForDay(day) {
+    const dayStart = startOfDay(day);
+    const dayEnd = new Date(dayStart.getTime() + dayMs);
+    return completed.map((log) => {
+      const start = new Date(log.startedAt);
+      const end = new Date(log.endedAt);
+      const s = Math.max(start.getTime(), dayStart.getTime());
+      const e = Math.min(end.getTime(), dayEnd.getTime());
+      if (e <= s) return "";
+      const left = ((s - dayStart.getTime()) / dayMs) * 100;
+      const width = Math.max(1.4, ((e - s) / dayMs) * 100);
+      return `<span class="sleep-seg" style="left:${left}%;width:${width}%"></span>`;
+    }).join("");
+  }
+
+  const rows = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = startOfDay(now);
+    d.setDate(d.getDate() - i);
+    rows.push(`<div class="grid grid-cols-[72px_1fr] gap-3 items-center"><p class="text-[12px] font-extrabold text-on-surface-variant">${dayLabel(d)}</p><div class="sleep-track" aria-label="Sleep periods for ${dayLabel(d)}">${segmentsForDay(d)}</div></div>`);
+  }
+  document.getElementById("rhythmRows").innerHTML = rows.join("");
+
+  const actions = [];
+  if (prediction.nextNap && now > prediction.nextNap.to) actions.push(["watch_later", "Nap window may be closing", "If baby shows sleepy cues, start a calm wind-down now."]);
+  else if (prediction.nextNap) actions.push(["nightlight", "Prepare the next nap routine", `Aim for ${nextNapText}, then adjust based on baby's cues.`]);
+  actions.push(["shield_moon", "Keep safe sleep visible", "Back sleeping, firm flat surface, and no loose bedding are still the non-negotiables."]);
+  if (averageDailyMinutes / 60 < benchmark.totalHours[0]) actions.push(["edit_note", "Log wakes and short naps", "More complete sleep starts and ends will improve confidence and show whether this is a one-day dip."]);
+  else actions.push(["calendar_month", "Protect the steady rhythm", "Repeat the wind-down routine around the predicted bedtime window for a few nights."]);
+  actions.push(["monitoring", "Check this with growth", "Use Growth Correlation when you want to compare sleep, feeding, and weight changes together."]);
+
+  document.getElementById("actionsList").innerHTML = actions.map(([icon, title, copy]) => `
+    <div class="rounded-2xl bg-surface-container-low/70 p-3 flex items-start gap-3">
+      <span class="w-8 h-8 rounded-full bg-white text-[#4f46e5] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">${icon}</span></span>
+      <div><p class="text-[14px] leading-5 font-extrabold text-on-surface">${title}</p><p class="text-[12px] leading-4 text-on-surface-variant">${copy}</p></div>
+    </div>`).join("");
+
+  ready();
+</script>
+<script type="module" src="/src/utils/navigation.mjs"></script>
+<script type="module">
+  if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+    navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+  }
+</script>
+</body></html>

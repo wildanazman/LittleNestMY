@@ -185,6 +185,8 @@ export function fromBabyRow(row) {
     name: row.name,
     dateOfBirth: row.date_of_birth,
     gender: row.gender || "",
+    bloodType: row.blood_type || "",
+    rhesusFactor: row.rhesus_factor || "",
     photoUrl: row.photo_url || "",
     feedingPreference: row.feeding_preference || "",
     notes: row.notes || "",
@@ -198,6 +200,8 @@ export function toBabyRow(profile, createdBy = "") {
     name: String(profile.name || "").trim(),
     date_of_birth: profile.dateOfBirth || profile.date_of_birth,
     gender: profile.gender || null,
+    blood_type: normalizeBloodType(profile.bloodType || profile.blood_type),
+    rhesus_factor: normalizeRhesusFactor(profile.rhesusFactor || profile.rhesus_factor),
     photo_url: profile.photoUrl || profile.photo_url || null,
     feeding_preference: profile.feedingPreference || profile.feeding_preference || null,
     notes: profile.notes || null
@@ -208,6 +212,16 @@ export function toBabyRow(profile, createdBy = "") {
   }
 
   return row;
+}
+
+function normalizeBloodType(value) {
+  const normalized = String(value || "").trim().toUpperCase();
+  return ["A", "B", "AB", "O"].includes(normalized) ? normalized : null;
+}
+
+function normalizeRhesusFactor(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["positive", "negative"].includes(normalized) ? normalized : null;
 }
 
 async function fetchRemoteBabyProfiles() {

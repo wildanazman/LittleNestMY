@@ -89,6 +89,24 @@ tailwind.config = {
     </div>
   </section>
 
+  <section class="card bg-[#241b3a] text-white p-5 soft-shadow hidden" id="testPlanPanel">
+    <div class="flex items-start gap-3">
+      <div class="w-11 h-11 rounded-full bg-white/12 text-[#f7b89d] flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">science</span>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-white/55">Test user only</p>
+        <h2 class="text-[18px] leading-6 font-extrabold">Premium / Free switch</h2>
+        <p class="mt-1 text-[13px] leading-5 text-white/70" id="testPlanMeta">This control only appears for the LittleNest test account.</p>
+      </div>
+    </div>
+    <div class="mt-4 grid grid-cols-3 gap-2">
+      <button class="h-11 rounded-full bg-white/10 text-white font-extrabold active:scale-95 transition-transform" id="testPlanFreeButton" type="button">Set Free</button>
+      <button class="h-11 rounded-full bg-white/10 text-white font-extrabold active:scale-95 transition-transform" id="testPlanTrialButton" type="button">Set Trial</button>
+      <button class="h-11 rounded-full bg-white text-[#241b3a] font-extrabold active:scale-95 transition-transform" id="testPlanPremiumButton" type="button">Set Premium</button>
+    </div>
+  </section>
+
   <!-- Plans -->
   <section class="card bg-surface-container-lowest border border-white/60 p-5 soft-shadow">
     <h2 class="text-[18px] font-extrabold text-on-surface text-center">Choose your plan</h2>
@@ -193,8 +211,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[18px]">nightlight</span>
         </div>
         <div>
-          <p class="text-[14px] font-bold text-on-surface">Sleep Predictions</p>
-          <p class="text-[13px] text-on-surface-variant">Smart predictions that help you plan naps and bedtime based on your baby's sleep patterns.</p>
+          <p class="text-[14px] font-bold text-on-surface">Sleep Prediction Lab</p>
+          <p class="text-[13px] text-on-surface-variant">Plan naps with age-aware wake windows, bedtime rhythm, confidence level, and a 7-day sleep map.</p>
         </div>
       </div>
       <div class="flex gap-3">
@@ -202,8 +220,8 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[18px]">monitoring</span>
         </div>
         <div>
-          <p class="text-[14px] font-bold text-on-surface">Growth Correlations</p>
-          <p class="text-[13px] text-on-surface-variant">See how feeding, sleep, and milestones connect to your baby's growth patterns over time.</p>
+          <p class="text-[14px] font-bold text-on-surface">Growth Correlation Lab</p>
+          <p class="text-[13px] text-on-surface-variant">Compare growth with WHO medians and connect weight velocity with feeding and sleep logs.</p>
         </div>
       </div>
       <div class="flex gap-3">
@@ -231,7 +249,8 @@ tailwind.config = {
 const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
 const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 const { getAuthSession, isGuestMode, isLoggedIn } = await import(`${moduleBase}utils/localAuth.mjs`);
-const { getPlanStatus } = await import(`${moduleBase}utils/planUtils.mjs`);
+const { getPlanStatus, setCurrentTestPlan } = await import(`${moduleBase}utils/planUtils.mjs`);
+const { isTestPlanUser, TEST_USER_EMAIL } = await import(`${moduleBase}utils/testPlan.mjs`);
 const { requireSupabaseClient, isSupabaseConfigured } = await import(`${moduleBase}utils/supabaseClient.mjs`);
 
 if (!(await isLoggedIn())) {
@@ -241,11 +260,15 @@ if (!(await isLoggedIn())) {
 
 document.getElementById("backButton").addEventListener("click", () => goBackOrTo("settings"));
 document.getElementById("subscribeBtn").addEventListener("click", subscribe);
+document.getElementById("testPlanFreeButton").addEventListener("click", () => setTestPlan("free"));
+document.getElementById("testPlanTrialButton").addEventListener("click", () => setTestPlan("trial"));
+document.getElementById("testPlanPremiumButton").addEventListener("click", () => setTestPlan("premium"));
 
 await renderPlanStatus();
 bindPrototypeActions();
 
 async function renderPlanStatus() {
+  const session = await getAuthSession();
   const status = await getPlanStatus();
   const isPaid = status.state === "premium";
   const isTrial = status.state === "trial";
@@ -298,6 +321,34 @@ async function renderPlanStatus() {
     subscribeBtn.classList.remove("bg-surface-container", "text-on-surface-variant");
     subscribeBtn.classList.add("bg-primary", "text-on-primary");
   }
+
+  renderTestPlanPanel(session?.user, status);
+}
+
+function renderTestPlanPanel(user, status) {
+  const panel = document.getElementById("testPlanPanel");
+  const visible = isTestPlanUser(user);
+  panel.classList.toggle("hidden", !visible);
+  if (!visible) return;
+
+  const label = status.state === "premium" ? "Premium" : status.state === "trial" ? `Premium Trial (${status.daysLeft} days left)` : "Free";
+  document.getElementById("testPlanMeta").textContent = `${TEST_USER_EMAIL} is currently ${label}. This override is local to this test account.`;
+  document.getElementById("testPlanFreeButton").classList.toggle("ring-2", status.state === "free");
+  document.getElementById("testPlanFreeButton").classList.toggle("ring-white", status.state === "free");
+  document.getElementById("testPlanTrialButton").classList.toggle("ring-2", status.state === "trial");
+  document.getElementById("testPlanTrialButton").classList.toggle("ring-[#f7b89d]", status.state === "trial");
+  document.getElementById("testPlanPremiumButton").classList.toggle("ring-2", status.state === "premium");
+  document.getElementById("testPlanPremiumButton").classList.toggle("ring-[#f7b89d]", status.state === "premium");
+}
+
+async function setTestPlan(plan) {
+  const nextPlan = await setCurrentTestPlan(plan);
+  if (!nextPlan) {
+    showFeedback("This switch is only available for the test user.", true);
+    return;
+  }
+  await renderPlanStatus();
+  showFeedback(`Test user switched to ${nextPlan === "premium" ? "Premium" : nextPlan === "trial" ? "Premium Trial" : "Free"}.`, false);
 }
 
 async function subscribe() {

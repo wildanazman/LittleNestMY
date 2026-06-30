@@ -250,6 +250,7 @@
   function renderProfileCard(profile, isSelected, totalProfiles, canManageBaby) {
     const age = calculateBabyAge(profile.dateOfBirth, new Date());
     const latestGrowth = getLatestGrowthForBaby(profile.id);
+    const bloodGroup = formatBloodGroup(profile);
     const dob = new Date(`${profile.dateOfBirth}T00:00:00`).toLocaleDateString("en-MY", {
       day: "numeric",
       month: "short",
@@ -270,7 +271,7 @@
               ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1 text-[11px] font-extrabold">Current</span>' : ""}
             </div>
             <p class="font-body-md text-[15px] text-on-surface-variant">${age}</p>
-            <p class="font-label-sm text-[12px] text-outline">Born ${dob}</p>
+            <p class="font-label-sm text-[12px] text-outline">Born ${dob}${bloodGroup ? ` · ${escapeHtml(bloodGroup)}` : ""}</p>
           </div>
         </div>
         <button class="baby-action w-full rounded-[22px] bg-surface-container-low/80 p-3 text-left border border-white/60 flex items-center justify-between gap-3" data-growth-baby="${escapeHtml(profile.id)}" type="button">
@@ -308,6 +309,12 @@
       height ? `${height} cm` : "",
       latest.headCircumferenceCm ? `${latest.headCircumferenceCm} cm head` : ""
     ].filter(Boolean).join(" / ") || "Measurement saved";
+  }
+
+  function formatBloodGroup(profile) {
+    if (!profile?.bloodType) return "";
+    const rh = profile.rhesusFactor === "positive" ? "+" : profile.rhesusFactor === "negative" ? "-" : "";
+    return `${profile.bloodType}${rh}`;
   }
 
   function renderEmptyState() {

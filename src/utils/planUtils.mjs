@@ -1,29 +1,38 @@
 import { requireSupabaseClient, isSupabaseConfigured } from "./supabaseClient.mjs";
 import { getAuthSession, isGuestMode } from "./localAuth.mjs";
 import { isAdminEmail } from "./admin.mjs";
+import { getTestPlanOverride, setTestPlanOverride } from "./testPlan.mjs";
 
 const PLAN_KEY = "littlenest:plan";
 const PLAN_CACHE_TTL = 5 * 60 * 1000;
-let planCache = { plan: "free", fetchedAt: 0 };
+let planCache = { plan: "free", fetchedAt: 0, scope: "" };
 
 export async function getCurrentPlan() {
   const guest = isGuestMode();
   if (guest) return "free";
 
   const now = Date.now();
-  if (planCache.fetchedAt && (now - planCache.fetchedAt) < PLAN_CACHE_TTL) {
+  const session = await getAuthSession();
+  const cacheScope = session?.user?.id || "local";
+  if (planCache.scope === cacheScope && planCache.fetchedAt && (now - planCache.fetchedAt) < PLAN_CACHE_TTL) {
     return planCache.plan;
   }
 
-  const session = await getAuthSession();
   if (!session?.user?.id || !isSupabaseConfigured) {
-    planCache = { plan: getLocalPlan(), fetchedAt: now };
+    planCache = { plan: getLocalPlan(), fetchedAt: now, scope: cacheScope };
     return planCache.plan;
+  }
+
+  const testPlan = getTestPlanOverride(session.user);
+  if (testPlan) {
+    const resolvedPlan = testPlan === "premium" ? "premium" : "free";
+    planCache = { plan: resolvedPlan, fetchedAt: now, scope: cacheScope };
+    return resolvedPlan;
   }
 
   // Admin accounts always have premium.
   if (isAdminEmail(session.user.email)) {
-    planCache = { plan: "premium", fetchedAt: now };
+    planCache = { plan: "premium", fetchedAt: now, scope: cacheScope };
     return "premium";
   }
 
@@ -36,16 +45,16 @@ export async function getCurrentPlan() {
       .maybeSingle();
 
     if (error || !data) {
-      planCache = { plan: getLocalPlan(), fetchedAt: now };
+      planCache = { plan: getLocalPlan(), fetchedAt: now, scope: cacheScope };
       return planCache.plan;
     }
 
     const plan = data.plan === "premium" ? "premium" : "free";
-    planCache = { plan, fetchedAt: now };
+    planCache = { plan, fetchedAt: now, scope: cacheScope };
     localStorage.setItem(PLAN_KEY, plan);
     return plan;
   } catch {
-    planCache = { plan: getLocalPlan(), fetchedAt: now };
+    planCache = { plan: getLocalPlan(), fetchedAt: now, scope: cacheScope };
     return planCache.plan;
   }
 }
@@ -55,8 +64,17 @@ export function getLocalPlan() {
 }
 
 export function setLocalPlan(plan) {
-  planCache = { plan, fetchedAt: Date.now() };
+  planCache = { plan, fetchedAt: Date.now(), scope: "local" };
   localStorage.setItem(PLAN_KEY, plan);
+}
+
+export async function setCurrentTestPlan(plan) {
+  const session = await getAuthSession();
+  const nextPlan = setTestPlanOverride(session?.user, plan);
+  if (nextPlan) {
+    planCache = { plan: nextPlan, fetchedAt: Date.now(), scope: session?.user?.id || "local" };
+  }
+  return nextPlan;
 }
 
 export function isPremium(plan) {
@@ -73,12 +91,19 @@ export const TRIAL_DAYS = 14;
 // - "free":    free plan, trial expired, or guest.
 // Returns { state, plan, daysLeft }.
 export async function getPlanStatus() {
+  const session = isGuestMode() ? null : await getAuthSession();
+  const testPlan = getTestPlanOverride(session?.user);
+  if (testPlan) {
+    if (testPlan === "premium") return { state: "premium", plan: "premium", daysLeft: 0, testOverride: true };
+    if (testPlan === "trial") return { state: "trial", plan: "free", daysLeft: TRIAL_DAYS, testOverride: true };
+    return { state: "free", plan: "free", daysLeft: 0, testOverride: true };
+  }
+
   const plan = await getCurrentPlan();
   if (plan === "premium") return { state: "premium", plan, daysLeft: 0 };
 
   if (isGuestMode()) return { state: "free", plan, daysLeft: 0 };
 
-  const session = await getAuthSession();
   const createdAt = session?.user?.created_at;
   if (!createdAt) return { state: "free", plan, daysLeft: 0 };
 

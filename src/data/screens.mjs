@@ -25,6 +25,8 @@ export const screens = [
   { id: "growth_tracker", title: "Growth Tracker", group: "core", path: "growth_tracker/code.html", preview: "growth_tracker/screen.png" },
   { id: "weekly_insights", title: "Weekly Insights", group: "insight", path: "weekly_insights/code.html", preview: "weekly_insights/screen.png" },
   { id: "doctor_report", title: "Doctor Report", group: "insight", path: "doctor_report/code.html", preview: "growth_tracker/screen.png" },
+  { id: "sleep_prediction", title: "Sleep Prediction", group: "insight", path: "sleep_prediction/code.html", preview: "sleep_log/screen.png" },
+  { id: "growth_correlation", title: "Growth Correlation", group: "insight", path: "growth_correlation/code.html", preview: "growth_tracker/screen.png" },
   { id: "milestones", title: "Milestones", group: "core", path: "milestones/code.html", preview: "milestones/screen.png" },
   { id: "vaccinations", title: "Vaccinations", group: "core", path: "vaccinations/code.html", preview: "milestones/screen.png" },
   { id: "memory_book", title: "Memory Book", group: "core", path: "memory_book/code.html", preview: "memory_book/screen.png" },

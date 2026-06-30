@@ -204,6 +204,7 @@
         }
         #homeBgOptions::-webkit-scrollbar { display: none; }
         .home-bg-card {
+            position: relative;
             flex: 0 0 calc((100% - 20px) / 3);
             min-width: 0;
             display: flex;
@@ -217,6 +218,30 @@
             box-shadow: 0 6px 16px rgba(80,54,42,.10), inset 0 1px 0 rgba(255,255,255,.5);
             transition: transform 160ms cubic-bezier(.32,.72,0,1), border-color 160ms ease, box-shadow 160ms ease;
         }
+        .home-bg-card.is-locked .swatch { filter: saturate(.7); opacity: .72; }
+        .home-bg-card.is-locked:not(.is-selected)::after {
+            content: "";
+            position: absolute;
+            inset: 0 0 23px;
+            border-radius: 16px;
+            background: linear-gradient(to bottom, rgba(255,255,255,.10), rgba(36,27,58,.26));
+            pointer-events: none;
+        }
+        .home-bg-lock {
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            z-index: 2;
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            background: rgba(255,255,255,.92);
+            color: #7056f4;
+            box-shadow: 0 4px 12px rgba(36,27,58,.14);
+        }
+        .home-bg-lock .material-symbols-outlined { font-size: 15px; }
         .home-bg-card:active .swatch { transform: scale(.96); }
         .home-bg-card.is-selected .swatch { border-color: #7056f4; box-shadow: 0 8px 20px rgba(112,86,244,.22); }
         :root.dark .home-bg-card.is-selected .swatch { border-color: #67e8f9; box-shadow: 0 8px 20px rgba(34,211,238,.28); }
@@ -648,9 +673,9 @@
             setLanguage,
             t
         } = await import(`${moduleBase}utils/i18n.mjs`);
-        const { bindPrototypeActions, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, goBackOrTo, goToScreen, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getAuthSession, getFreshAuthSession, getNeedsPasswordSetup, logoutLocalUser } = await import(`${moduleBase}utils/localAuth.mjs`);
-        const { getPlanStatus } = await import(`${moduleBase}utils/planUtils.mjs`);
+        const { getPlanStatus, hasPremiumAccess } = await import(`${moduleBase}utils/planUtils.mjs`);
         const { getParentProfile, initialsForName, refreshParentProfileFromSupabase, saveParentProfile, syncParentProfileToSupabase } = await import(`${moduleBase}utils/profile.mjs`);
         const { fileToCroppedAvatarDataUrl, persistAvatar } = await import(`${moduleBase}utils/imageUpload.mjs`);
         const { getThemePreference, setThemePreference } = await import(`${moduleBase}utils/theme.mjs`);
@@ -687,7 +712,7 @@
         renderPasswordReminder();
         renderNotifToggles();
         renderPlanLabel();
-        setupHomeBackgroundPicker();
+        await setupHomeBackgroundPicker();
 
         // "Send test notification" — confirms Web Push works on this device.
         (function setupTestNotif() {
@@ -711,10 +736,36 @@
           });
         })();
 
-        function setupHomeBackgroundPicker() {
+        async function setupHomeBackgroundPicker() {
             const container = document.getElementById("homeBgOptions");
             const feedback = document.getElementById("homeBgFeedback");
             if (!container) return;
+            const canCustomize = await hasPremiumAccess();
+            if (!canCustomize) {
+                const defaultBg = HOME_BACKGROUNDS.find((bg) => bg.id === "nursery") || HOME_BACKGROUNDS[0];
+                setHomeBackground(defaultBg.id);
+                container.innerHTML = HOME_BACKGROUNDS.map((bg) => {
+                    const isDefault = bg.id === defaultBg.id;
+                    return `
+                        <button class="home-bg-card${isDefault ? " is-selected" : " is-locked"}" data-home-bg="${bg.id}" data-bg-locked="${isDefault ? "false" : "true"}" type="button" aria-pressed="${isDefault}" aria-label="${bg.name}${isDefault ? "" : " locked, Premium required"}">
+                            <span class="swatch swatch-${bg.id}"></span>
+                            ${isDefault ? "" : `<span class="home-bg-lock" aria-hidden="true"><span class="material-symbols-outlined">lock</span></span>`}
+                            <span class="swatch-label">${bg.name}</span>
+                        </button>`;
+                }).join("");
+                container.addEventListener("click", (event) => {
+                    const card = event.target.closest("[data-home-bg]");
+                    if (!card) return;
+                    if (card.dataset.bgLocked === "true") {
+                        if (feedback) feedback.textContent = "Background locked. Upgrade to customise your home screen.";
+                        goToScreen("subscription");
+                        return;
+                    }
+                    if (feedback) feedback.textContent = "Free plan uses the default LittleNest background.";
+                });
+                if (feedback) feedback.textContent = "Free plan uses the default LittleNest background. Locked backgrounds unlock with Premium.";
+                return;
+            }
             let current = getHomeBackground();
             container.innerHTML = HOME_BACKGROUNDS.map((bg) => `
                 <button class="home-bg-card${bg.id === current ? " is-selected" : ""}" data-home-bg="${bg.id}" type="button" aria-pressed="${bg.id === current}">
