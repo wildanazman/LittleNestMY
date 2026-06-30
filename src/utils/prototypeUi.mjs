@@ -1,4 +1,5 @@
 import { screens } from "../data/screens.mjs";
+import { getGuestLockMessage, isGuestScreenAllowed, rememberGuestLockNotice } from "./guestAccess.mjs";
 
 const NAV_STACK_KEY = "littlenest:navStack";
 const MAX_NAV_STACK = 24;
@@ -25,6 +26,7 @@ export function screenUrl(screenId) {
 }
 
 export function goToScreen(screenId) {
+  if (!ensureGuestCanOpen(screenId)) return;
   navigateWithTransition(screenUrl(screenId));
 }
 
@@ -48,6 +50,7 @@ export function navigateWithTransition(url, options = {}) {
 }
 
 function navigateToScreen(screenId, options = {}) {
+  if (!ensureGuestCanOpen(screenId)) return;
   navigateToUrl(screenUrl(validScreenOrDefault(screenId)), options);
 }
 
@@ -162,12 +165,41 @@ export function showComingSoon(title, message = "This prototype flow is coming s
 
   modal.querySelector("[data-coming-soon-title]").textContent = title;
   modal.querySelector("[data-coming-soon-message]").textContent = message;
+  modal.querySelector("[data-guest-login]")?.classList.add("hidden");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
 
+export function showGuestLocked(screenId = "") {
+  rememberGuestLockNotice(screenId);
+  showComingSoon("Create an account to unlock", getGuestLockMessage());
+  const modal = document.getElementById("prototypeComingSoonModal");
+  const sheet = modal?.querySelector(".w-full.max-w-md");
+  if (!modal || !sheet) return;
+  let loginButton = modal.querySelector("[data-guest-login]");
+  if (!loginButton) {
+    loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.dataset.guestLogin = "true";
+    loginButton.className = "w-full h-12 rounded-full bg-primary-container text-primary font-label-md text-label-md active:scale-95 transition-transform";
+    loginButton.textContent = "Log in / Create account";
+    loginButton.addEventListener("click", () => {
+      window.location.href = screenUrl("auth_welcome");
+    });
+    sheet.insertBefore(loginButton, sheet.querySelector("[data-coming-soon-close]"));
+  }
+  loginButton.classList.remove("hidden");
+}
+
+function ensureGuestCanOpen(screenId) {
+  if (isGuestScreenAllowed(screenId)) return true;
+  showGuestLocked(screenId);
+  return false;
+}
+
 export function bindPrototypeActions(root = document) {
   bindBottomNavigationFallback(root);
+  markGuestLockedTargets(root);
 
   root.querySelectorAll("[data-screen-target]").forEach((element) => {
     element.addEventListener("click", () => goToScreen(element.dataset.screenTarget));
@@ -185,6 +217,71 @@ export function bindPrototypeActions(root = document) {
       element.dataset.comingSoonMessage || "This prototype flow is coming soon."
     ));
   });
+}
+
+function markGuestLockedTargets(root = document) {
+  ensureGuestLockStyles();
+  root.querySelectorAll("[data-screen-target]").forEach((element) => {
+    const screenId = element.dataset.screenTarget;
+    const locked = !isGuestScreenAllowed(screenId);
+    if (locked) {
+      element.setAttribute("data-guest-locked", "true");
+      element.setAttribute("aria-disabled", "true");
+      element.setAttribute("title", "Create an account to unlock");
+    } else {
+      element.removeAttribute("data-guest-locked");
+      element.removeAttribute("aria-disabled");
+      element.removeAttribute("title");
+    }
+  });
+}
+
+function ensureGuestLockStyles() {
+  if (document.getElementById("littleNestGuestLockStyles")) return;
+  const style = document.createElement("style");
+  style.id = "littleNestGuestLockStyles";
+  style.textContent = `
+    [data-guest-locked="true"] {
+      position: relative;
+    }
+    [data-guest-locked="true"]::after {
+      content: "lock";
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      z-index: 3;
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.86);
+      color: var(--color-primary, #7056f4);
+      border: 1px solid rgba(124,92,255,.14);
+      box-shadow: 0 6px 14px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.82);
+      font-family: "Material Symbols Outlined";
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 1;
+      pointer-events: none;
+      font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20;
+    }
+    nav [data-guest-locked="true"]::after {
+      right: 4px;
+      top: 2px;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+    }
+    :root.dark [data-guest-locked="true"]::after {
+      background: rgba(18,27,45,.92);
+      color: #d6ccff;
+      border-color: rgba(214,204,255,.18);
+      box-shadow: 0 8px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08);
+    }
+  `;
+  document.head.appendChild(style);
 }
 
 export function bindBottomNavigationFallback(root = document) {
@@ -214,7 +311,7 @@ export function bindBottomNavigationFallback(root = document) {
 
     item.dataset.prototypeNavBound = "true";
     normalizeNavItem(item, label === activeKey);
-    if (item.tagName === "A") item.href = screenUrl(screenId);
+    if (item.tagName === "A") item.href = isGuestScreenAllowed(screenId) ? screenUrl(screenId) : "#";
     item.addEventListener("click", (event) => {
       event.preventDefault();
       goToScreen(screenId);

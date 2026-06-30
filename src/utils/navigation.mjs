@@ -5,7 +5,8 @@ import { isAdminEmail } from "./admin.mjs";
 import { initErrorMonitor } from "./errorMonitor.mjs";
 import { getParentProfile, initialsForName } from "./profile.mjs";
 import { acceptFamilyInviteRemote, declineFamilyInviteRemote, loadPendingFamilyInvitesRemote } from "./familyInvitesRemote.mjs";
-import { goBackOrTo } from "./prototypeUi.mjs";
+import { goBackOrTo, showGuestLocked } from "./prototypeUi.mjs";
+import { getGuestFallbackScreen, isGuestScreenAllowed, rememberGuestLockNotice, takeGuestLockNotice } from "./guestAccess.mjs";
 
 // Screens that already paint their own inline loading skeleton — the shared
 // global skeleton would double up, so it is suppressed there.
@@ -96,17 +97,25 @@ export function setupBottomNavigation(currentPath = window.location.pathname) {
     labelElement.textContent = t(`navigation.${key}`);
 
     if (link.tagName === "A") {
-      link.href = route;
+      link.href = isGuestScreenAllowed(routes[key]) ? route : "#";
       link.addEventListener("click", (event) => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         popNavIcon(link);
+        if (!isGuestScreenAllowed(routes[key])) {
+          showGuestLocked(routes[key]);
+          return;
+        }
         navigateWithTransition(route);
       });
     } else {
       link.type = "button";
       link.addEventListener("click", () => {
         popNavIcon(link);
+        if (!isGuestScreenAllowed(routes[key])) {
+          showGuestLocked(routes[key]);
+          return;
+        }
         navigateWithTransition(route);
       });
     }
@@ -442,7 +451,15 @@ async function guardAuthenticatedRoutes() {
   if (publicScreens.includes(screenId)) return;
 
   // Guests stay local-only and are always allowed into the app shell.
-  if (isGuestMode()) return;
+  if (isGuestMode()) {
+    if (!isGuestScreenAllowed(screenId)) {
+      rememberGuestLockNotice(screenId);
+      window.location.replace(screenUrl(getGuestFallbackScreen()));
+    } else {
+      queueGuestLockNotice();
+    }
+    return;
+  }
 
   const redirect = (screen) => window.location.replace(screenUrl(screen));
 
@@ -464,6 +481,12 @@ async function guardAuthenticatedRoutes() {
   }
   // While the app is open, kick instantly if another device takes over.
   watchDeviceSession(userId, () => { kickToLogin(); });
+}
+
+function queueGuestLockNotice() {
+  const notice = takeGuestLockNotice();
+  if (!notice) return;
+  window.setTimeout(() => showGuestLocked(notice.screenId || ""), 250);
 }
 
 async function kickToLogin() {
@@ -649,11 +672,19 @@ function bindHeaderProfileButtons(root = document) {
     image.className = "w-full h-full object-cover";
     renderHeaderProfileAvatar(target, image);
     target.addEventListener("click", () => {
+      if (!isGuestScreenAllowed("settings")) {
+        showGuestLocked("settings");
+        return;
+      }
       navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
     });
     target.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
+        if (!isGuestScreenAllowed("settings")) {
+          showGuestLocked("settings");
+          return;
+        }
         navigateWithTransition(window.location.protocol === "file:" ? "../settings/code.html" : "/settings/");
       }
     });
@@ -759,6 +790,11 @@ function setupMotionReady() {
 
 function navigateWithTransition(url) {
   if (!url || isSameLocation(url)) return;
+  const targetScreenId = screenIdFromUrl(url);
+  if (targetScreenId && !isGuestScreenAllowed(targetScreenId)) {
+    showGuestLocked(targetScreenId);
+    return;
+  }
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     window.location.href = url;
     return;
@@ -767,6 +803,17 @@ function navigateWithTransition(url) {
   window.setTimeout(() => {
     window.location.href = url;
   }, 170);
+}
+
+function screenIdFromUrl(url) {
+  try {
+    const next = new URL(url, window.location.href);
+    const fileMatch = next.pathname.replaceAll("\\", "/").match(/\/src\/screens\/([^/]+)\/code\.html$/);
+    if (fileMatch) return fileMatch[1];
+    return next.pathname.split("/").filter(Boolean)[0] || "";
+  } catch {
+    return "";
+  }
 }
 
 // Quick squash-and-pop on the tapped nav icon for tactile feedback.

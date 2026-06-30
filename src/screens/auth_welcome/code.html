@@ -121,11 +121,11 @@ html, body { height: 100%; overflow: hidden; }
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
   const { hasAnyBabyProfileRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
-  const { getPendingInviteToken, clearPendingInviteToken, isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
+  const { getPendingInviteToken, clearPendingInviteToken, isGuestMode, isLoggedIn, loginAsGuest, routeAfterAuth } = await import(`${moduleBase}utils/localAuth.mjs`);
   const { loadInvitePreviewRemote } = await import(`${moduleBase}utils/familyInvitesRemote.mjs`);
   const { bindPrototypeActions, screenUrl, showComingSoon } = await import(`${moduleBase}utils/prototypeUi.mjs`);
 
-  if (await isLoggedIn()) {
+  if (!isGuestMode() && await isLoggedIn()) {
     const pendingInviteToken = getPendingInviteToken();
     if (await hasUsablePendingInvite(pendingInviteToken)) {
       window.location.replace(`${screenUrl("accept_invite")}?token=${encodeURIComponent(pendingInviteToken)}`);

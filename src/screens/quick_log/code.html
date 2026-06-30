@@ -469,7 +469,8 @@
 <!-- Micro-interactions Script -->
 <script type="module">
         const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
-        const { bindPrototypeActions, goToScreen } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { bindPrototypeActions, goToScreen, showGuestLocked } = await import(`${moduleBase}utils/prototypeUi.mjs`);
+        const { isGuestRestricted, isGuestScreenAllowed } = await import(`${moduleBase}utils/guestAccess.mjs`);
         const { babyProfile } = await import(`${moduleBase}data/mockData.mjs`);
         const { loadBabyProfilesRemote } = await import(`${moduleBase}utils/babyProfilesRemote.mjs`);
         const { loadCoreLogsRemote, saveHealthNoteRemote } = await import(`${moduleBase}utils/coreLogsRemote.mjs`);
@@ -486,9 +487,11 @@
         bindPrototypeActions();
         await renderRecentLogs();
         applyPermissions();
+        applyGuestLocks();
         const quickTypeParam = new URLSearchParams(window.location.search).get("type");
         if (quickTypeParam && quickTypeParam.toLowerCase() === "note") {
-            openQuickForm("Note");
+            if (isGuestRestricted()) showGuestLocked("quick_log_note");
+            else openQuickForm("Note");
         }
 
         document.querySelectorAll('.category-card').forEach(button => {
@@ -500,6 +503,7 @@
                 const label = button.querySelector('[data-log-label]')?.innerText || button.querySelector('span:last-child')?.innerText || "Log";
                 const target = button.dataset.logTarget;
                 const logType = button.dataset.logType;
+                const targetScreen = target ? target.replaceAll("/", "") : "";
                 const feedback = document.getElementById('quickLogFeedback');
                 
                 // Visual confirmation ripple effect or similar
@@ -513,6 +517,11 @@
                     showViewOnlyNotice(viewOnlyMessage);
                     return;
                 }
+                if ((targetScreen && !isGuestScreenAllowed(targetScreen)) || (logType && isGuestRestricted())) {
+                    if (feedback) feedback.textContent = "Create an account to unlock this log.";
+                    showGuestLocked(targetScreen || `quick_log_${String(logType).toLowerCase()}`);
+                    return;
+                }
 
                 if (feedback) {
                     feedback.textContent = target ? `Opening ${label} log.` : `Opening ${label} form.`;
@@ -520,7 +529,7 @@
 
                 if (target) {
                     setTimeout(() => {
-                        goToScreen(target.replaceAll("/", ""));
+                        goToScreen(targetScreen);
                     }, 120);
                 } else if (logType) {
                     openQuickForm(logType);
@@ -540,6 +549,18 @@
             }
         }
 
+        function applyGuestLocks() {
+            document.querySelectorAll(".category-card").forEach((button) => {
+                const targetScreen = button.dataset.logTarget?.replaceAll("/", "") || "";
+                const logType = button.dataset.logType || "";
+                const locked = (targetScreen && !isGuestScreenAllowed(targetScreen)) || (logType && isGuestRestricted());
+                if (!locked) return;
+                button.setAttribute("data-guest-locked", "true");
+                button.setAttribute("aria-disabled", "true");
+                button.setAttribute("title", "Create an account to unlock");
+            });
+        }
+
         document.getElementById("quickFormClose").addEventListener("click", closeQuickForm);
         modal.addEventListener("click", (event) => {
             if (event.target === modal) closeQuickForm();
@@ -556,6 +577,10 @@
         });
 
         function openQuickForm(type) {
+            if (isGuestRestricted()) {
+                showGuestLocked(`quick_log_${String(type).toLowerCase()}`);
+                return;
+            }
             if (!permissions.canAddLogs) {
                 showViewOnlyNotice(viewOnlyMessage);
                 return;
