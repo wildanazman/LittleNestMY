@@ -42,24 +42,139 @@
   h1, h2, h3, #summaryTitle, .font-display { font-family: "Plus Jakarta Sans", "Nunito Sans", sans-serif; letter-spacing: -0.02em; }
   .tnum { font-variant-numeric: tabular-nums; }
   .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  .soft-shadow { box-shadow: 0 18px 45px rgba(131,83,60,.12); }
-  .rise { animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  .premium-lock-content { position: relative; filter: blur(5px); opacity: .58; pointer-events: none; user-select: none; max-height: 210px; overflow: hidden; }
-  .premium-lock-content::after { content: ""; position: absolute; inset: auto 0 0; height: 80px; background: linear-gradient(to bottom, rgba(251,249,244,0), #fbf9f4); }
-  .premium-lock-shell { position: relative; }
-  .premium-lock-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .premium-lock-card { width: 100%; border-radius: 20px; background: rgba(255,255,255,.94); border: 1px solid rgba(131,83,60,.16); box-shadow: 0 8px 22px rgba(36,27,58,.12); padding: 14px; }
-  .premium-preview-cta { border-radius: 22px; background: #241b3a; color: #fff; padding: 16px; box-shadow: 0 8px 22px rgba(36,27,58,.16); }
-  @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
+  .ln-insights-screen {
+    background:
+      radial-gradient(circle at 18% -4%, rgba(255, 191, 163, .34), transparent 24rem),
+      radial-gradient(circle at 94% 2%, rgba(124, 92, 255, .18), transparent 22rem),
+      linear-gradient(180deg, #fffaf6 0%, #fbf9f4 44%, #f4efe8 100%);
+  }
+  .ln-insights-header {
+    border-bottom: 1px solid rgba(255,255,255,.62);
+    box-shadow: 0 14px 34px rgba(76,52,141,.08);
+  }
+  .soft-shadow { box-shadow: 0 18px 42px rgba(76,52,141,.11), inset 0 1px 0 rgba(255,255,255,.78); }
+  .rise { animation: rise 0.42s cubic-bezier(.23,1,.32,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .ins-card {
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.72);
+    background: rgba(255,255,255,.82);
+    box-shadow: 0 16px 36px rgba(76,52,141,.09), inset 0 1px 0 rgba(255,255,255,.82);
+  }
+  .ins-section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; padding-inline: 2px; }
   .ins-h3 { display: flex; align-items: center; gap: 8px; }
-  .ins-h3::before { content: ""; width: 4px; height: 15px; border-radius: 99px; background: linear-gradient(#9b7cff, #7056f4); flex-shrink: 0; }
+  .ins-h3::before { content: ""; width: 5px; height: 18px; border-radius: 99px; background: linear-gradient(#9b7cff, #7056f4); flex-shrink: 0; box-shadow: 0 0 0 4px rgba(112,86,244,.10); }
+  .ins-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: 20px;
+    background:
+      radial-gradient(220px 150px at 92% 0%, rgba(255,255,255,.62), transparent 66%),
+      linear-gradient(155deg,#ece3ff,#ffe9f2 58%,#e3f3ff);
+  }
+  .ins-hero::after {
+    content: "";
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    right: -72px;
+    bottom: -92px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(112,86,244,.24), rgba(112,86,244,0) 68%);
+    pointer-events: none;
+  }
+  .ins-hero > * { position: relative; z-index: 1; }
+  .ins-hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    padding: 5px 10px 5px 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.62);
+    color: #5b3ecb;
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 900;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+  .ins-brief-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  .ins-brief-chip { border-radius: 16px; background: rgba(255,255,255,.58); padding: 10px; min-height: 72px; }
+  .ins-brief-chip span { display: block; color: #5f536f; font-size: 10px; line-height: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+  .ins-brief-chip strong { display: block; margin-top: 4px; color: #241b3a; font-size: 18px; line-height: 22px; font-weight: 900; }
+  .ins-primary-action, .ins-premium-action {
+    transition: transform 160ms cubic-bezier(.23,1,.32,1), box-shadow 180ms cubic-bezier(.23,1,.32,1), background-color 180ms ease;
+  }
+  .ins-primary-action:active, .ins-premium-action:active, .premium-lab-card:active { transform: scale(.985); }
+  @media (hover:hover) and (pointer:fine) {
+    .ins-primary-action:hover, .premium-lab-card:hover { transform: translateY(-1px); box-shadow: 0 18px 34px rgba(76,52,141,.14); }
+  }
+  .premium-lock-content { position: relative; filter: blur(4px); opacity: .52; pointer-events: none; user-select: none; max-height: 230px; overflow: hidden; }
+  .premium-lock-content::after { content: ""; position: absolute; inset: auto 0 0; height: 96px; background: linear-gradient(to bottom, rgba(251,249,244,0), #fbf9f4); }
+  .premium-lock-shell { position: relative; min-height: 116px; }
+  .premium-lock-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 14px; }
+  .premium-lock-card { width: 100%; border-radius: 18px; background: rgba(255,255,255,.96); border: 1px solid rgba(112,86,244,.18); box-shadow: 0 14px 30px rgba(36,27,58,.14); padding: 14px; }
+  .premium-preview-cta, .premium-teaser {
+    border-radius: 22px;
+    background:
+      radial-gradient(180px 120px at 92% 0%, rgba(247,184,157,.30), transparent 70%),
+      linear-gradient(150deg,#241b3a,#3a2d63);
+    color: #fff;
+    padding: 18px;
+    box-shadow: 0 18px 44px rgba(36,27,58,.18), inset 0 1px 0 rgba(255,255,255,.10);
+  }
+  .premium-lab-card {
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.72);
+    background: rgba(255,255,255,.86);
+    box-shadow: 0 16px 36px rgba(76,52,141,.10), inset 0 1px 0 rgba(255,255,255,.84);
+    transition: transform 170ms cubic-bezier(.23,1,.32,1), box-shadow 170ms cubic-bezier(.23,1,.32,1);
+  }
+  .ins-lab-meter { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; margin-top: 12px; }
+  .ins-lab-meter > span { height: 6px; border-radius: 999px; background: currentColor; opacity: .24; }
+  .ins-lab-meter > span.is-on { opacity: 1; }
+  .ins-mini-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ins-mini-row + .ins-mini-row { border-top: 1px solid rgba(81,68,62,.10); padding-top: 10px; margin-top: 10px; }
+  @media (prefers-reduced-motion: reduce) {
+    .rise { animation: none; }
+    .ins-primary-action, .ins-premium-action, .premium-lab-card { transition: none; }
+  }
+  @media (max-width: 380px) {
+    .ins-brief-grid { grid-template-columns: 1fr; }
+  }
+  :root.dark .ln-insights-screen {
+    background:
+      radial-gradient(circle at 18% -4%, rgba(34,211,238,.13), transparent 24rem),
+      radial-gradient(circle at 94% 2%, rgba(124,92,255,.18), transparent 22rem),
+      linear-gradient(180deg,#101a2e 0%,#0b1528 48%,#07111f 100%) !important;
+  }
+  :root.dark .ins-card,
+  :root.dark .premium-lab-card {
+    background: rgba(18,27,45,.86) !important;
+    border-color: rgba(132,204,255,.14) !important;
+    box-shadow: 0 18px 42px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.06) !important;
+  }
+  :root.dark .ins-hero {
+    background:
+      radial-gradient(220px 150px at 92% 0%, rgba(124,92,255,.22), transparent 66%),
+      linear-gradient(145deg, rgba(26,35,58,.96), rgba(17,34,54,.90)) !important;
+  }
+  :root.dark .ins-hero-kicker,
+  :root.dark .ins-brief-chip {
+    background: rgba(255,255,255,.08);
+    color: #c4b5ff;
+  }
+  :root.dark .ins-brief-chip strong { color: #eef6ff; }
+  :root.dark .premium-lock-content::after { background: linear-gradient(to bottom, rgba(7,17,31,0), #07111f); }
+  :root.dark .premium-lock-card { background: rgba(18,27,45,.96); border-color: rgba(132,204,255,.18); }
 </style>
 <style> body { min-height: 100dvh; } </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
 </head>
-<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
-<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
+<body class="ln-insights-screen bg-surface text-on-surface font-body min-h-screen pb-32">
+<header class="ln-insights-header sticky top-0 z-40 bg-surface/95 backdrop-blur-md px-container-padding h-14 flex justify-between items-center w-full">
 <div class="flex items-center gap-2 min-w-0">
 <button aria-label="Back to home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-primary shrink-0" id="assistantBackButton" type="button">
 <span class="material-symbols-outlined">arrow_back</span>
@@ -73,14 +188,19 @@
 
 <main class="max-w-md mx-auto px-5 pt-5 space-y-5 pb-40" id="insightsContent">
 <!-- Weekly summary (narrative) -->
-<section class="rounded-[26px] p-5 soft-shadow relative overflow-hidden rise" style="background:linear-gradient(155deg,#ece3ff,#ffe9f2 58%,#e3f3ff)">
-<div class="flex items-center gap-2 mb-2">
-<span class="w-8 h-8 rounded-full bg-white/70 text-[#7056f4] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">auto_awesome</span></span>
-<p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-[#7056f4]/85">Weekly summary</p>
+<section class="ins-hero soft-shadow rise">
+<div class="flex items-center justify-between gap-3 mb-3">
+<p class="ins-hero-kicker"><span class="w-6 h-6 rounded-full bg-white/70 flex items-center justify-center"><span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1;">auto_awesome</span></span>Care briefing</p>
+<span class="inline-flex items-center gap-1.5 rounded-full bg-white/55 px-2.5 py-1 text-[11px] font-extrabold text-[#5b3ecb]"><span class="material-symbols-outlined text-[14px]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>Premium lens</span>
 </div>
 <h2 class="text-[clamp(20px,5.4vw,25px)] leading-tight font-extrabold text-[#241b3a]" id="summaryTitle">This week with your baby</h2>
 <p class="text-[15px] leading-relaxed text-[#3f3357] mt-2" id="summaryText">Reading this week's logs...</p>
-<button id="fullWeeklyInsightsButton" class="mt-4 w-full flex items-center justify-between gap-3 rounded-2xl bg-white/70 px-4 py-3 active:scale-[0.99] transition-transform" type="button">
+<div class="ins-brief-grid" id="briefMetrics">
+<div class="ins-brief-chip"><span>Logs</span><strong>--</strong></div>
+<div class="ins-brief-chip"><span>Days</span><strong>--</strong></div>
+<div class="ins-brief-chip"><span>Confidence</span><strong>--</strong></div>
+</div>
+<button id="fullWeeklyInsightsButton" class="ins-primary-action mt-4 w-full flex items-center justify-between gap-3 rounded-2xl bg-white/72 px-4 py-3" type="button">
 <span class="flex items-center gap-2.5">
 <span class="w-8 h-8 rounded-full bg-[#7056f4]/12 text-[#7056f4] flex items-center justify-center"><span class="material-symbols-outlined text-[19px]">monitoring</span></span>
 <span class="font-bold text-[14px] text-[#241b3a]">Full weekly insights</span>
@@ -90,11 +210,11 @@
 </section>
 
 <!-- Wellness score (headline) -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.03s"><div class="rounded-[26px] p-5 soft-shadow text-white relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" id="wellnessCard"></div></section>
+<section class="rise" data-premium-lock="true" style="animation-delay:.03s"><div class="rounded-[24px] p-5 soft-shadow text-white relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" id="wellnessCard"></div></section>
 
 <!-- Today vs guidelines -->
 <section class="rise" data-premium-lock="true" style="animation-delay:.05s">
-<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Today vs guidelines</h3>
+<div class="ins-section-title"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Today vs guidelines</h3><span class="text-[11px] font-extrabold text-on-surface-variant/70">Age-aware</span></div>
 <div class="grid grid-cols-1 gap-2.5" id="benchmarkCards"></div>
 </section>
 
@@ -103,13 +223,13 @@
 
 <!-- Trends -->
 <section class="space-y-4 rise" data-premium-lock="true" style="animation-delay:.09s">
-<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface px-1">Trends &amp; patterns</h3>
+<div class="ins-section-title"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Trends &amp; patterns</h3><span class="text-[11px] font-extrabold text-on-surface-variant/70">7-day model</span></div>
 <div class="space-y-4" id="trendCards"></div>
 </section>
 
 <!-- Weekly highlights -->
 <section class="rise" data-premium-lock="true" style="animation-delay:.11s">
-<div class="flex items-center justify-between mb-2 px-1">
+<div class="ins-section-title">
 <h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Weekly highlights</h3>
 <button class="text-[#7056f4] flex items-center gap-1 font-label-md text-label-md active:scale-95 transition-transform" id="shareHighlights" type="button"><span class="material-symbols-outlined text-[18px]">ios_share</span>Share</button>
 </div>
@@ -117,41 +237,41 @@
 </section>
 
 <!-- Growth vs WHO -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.13s"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Growth vs WHO median</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="growthCard"></div></section>
+<section class="rise" data-premium-lock="true" style="animation-delay:.13s"><div class="ins-section-title"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Growth vs WHO median</h3><span class="text-[11px] font-extrabold text-on-surface-variant/70">Context only</span></div><div class="ins-card p-4" id="growthCard"></div></section>
 
 <!-- Next milestone -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.15s"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">What's next</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="milestoneNextCard"></div></section>
+<section class="rise" data-premium-lock="true" style="animation-delay:.15s"><div class="ins-section-title"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">What's next</h3><span class="text-[11px] font-extrabold text-on-surface-variant/70">Milestones</span></div><div class="ins-card p-4" id="milestoneNextCard"></div></section>
 
 <!-- Data confidence -->
 <section class="rise" data-premium-lock="true" style="animation-delay:.17s">
-<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-5" id="confidenceCard"></div>
+<div class="ins-card p-5" id="confidenceCard"></div>
 </section>
 
 <!-- Recommendations -->
 <section class="rise" data-premium-lock="true" style="animation-delay:.19s">
-<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Recommended next steps</h3>
-<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-2" id="recsCard"></div>
+<div class="ins-section-title"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Recommended next steps</h3><span class="text-[11px] font-extrabold text-on-surface-variant/70">Actionable</span></div>
+<div class="ins-card p-2" id="recsCard"></div>
 </section>
 
-<!-- Premium features (live) — shown to premium + trial users -->
+<!-- Premium features (live) - shown to premium + trial users -->
 <section class="rise hidden space-y-3" id="premiumLiveSection" style="animation-delay:.25s">
 <div class="flex items-center gap-2 px-1">
 <span class="material-symbols-outlined text-[#7056f4]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
 <h3 class="font-headline-md text-headline-md text-on-surface">Premium insights</h3>
 </div>
-<button type="button" id="premiumDoctorReport" class="w-full text-left rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3 active:scale-[0.99]">
+<button type="button" id="premiumDoctorReport" class="premium-lab-card w-full text-left p-4 flex items-center gap-3">
 <span class="w-11 h-11 rounded-full bg-[#e8f1ff] text-[#2563eb] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">summarize</span></span>
-<div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">Doctor Review Summary</p><p class="font-label-sm text-label-sm text-on-surface-variant">Formatted summary, daily breakdown, growth chart & notes — ready to print.</p></div>
+<div class="min-w-0 flex-1"><p class="font-headline-md text-body-md text-on-surface">Doctor Review Summary</p><p class="font-label-sm text-label-sm text-on-surface-variant">Formatted summary, daily breakdown, growth chart & notes - ready to print.</p></div>
 <span class="material-symbols-outlined text-on-surface-variant shrink-0">chevron_right</span>
 </button>
-<button type="button" id="premiumSleepPrediction" class="w-full text-left rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 active:scale-[0.99] transition-transform">
+<button type="button" id="premiumSleepPrediction" class="premium-lab-card w-full text-left p-4">
 <div id="sleepPredictCard"></div>
 <div class="mt-3 pt-3 border-t border-surface-container flex items-center justify-between gap-3 text-[#4f46e5]">
 <span class="font-label-md text-label-md font-extrabold">Open Sleep Prediction Lab</span>
 <span class="material-symbols-outlined shrink-0">chevron_right</span>
 </div>
 </button>
-<button type="button" id="premiumGrowthCorrelation" class="w-full text-left rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 active:scale-[0.99] transition-transform">
+<button type="button" id="premiumGrowthCorrelation" class="premium-lab-card w-full text-left p-4">
 <div id="growthCorrCard"></div>
 <div class="mt-3 pt-3 border-t border-surface-container flex items-center justify-between gap-3 text-[#0f766e]">
 <span class="font-label-md text-label-md font-extrabold">Open Growth Correlation Lab</span>
@@ -160,9 +280,9 @@
 </button>
 </section>
 
-<!-- Premium locked teaser — shown to free users -->
+<!-- Premium locked teaser - shown to free users -->
 <section class="rise hidden" id="premiumSection" style="animation-delay:.25s">
-<div class="rounded-[24px] p-5 soft-shadow relative overflow-hidden" style="background:linear-gradient(150deg,#241b3a,#3a2d63)">
+<div class="premium-teaser relative overflow-hidden">
 <div class="flex items-center gap-2 mb-3">
 <span class="material-symbols-outlined text-[#f7b89d]" style="font-variation-settings:'FILL' 1;">workspace_premium</span>
 <h3 class="font-headline-md text-headline-md text-white">Unlock full insights</h3>
@@ -175,7 +295,7 @@
 <!-- Disclaimer footer -->
 <section class="rounded-2xl bg-surface-container-low/70 px-4 py-3 flex items-center gap-2.5">
 <span class="material-symbols-outlined text-[18px] text-on-surface-variant/70">health_and_safety</span>
-<p class="font-label-sm text-label-sm text-on-surface-variant/80">Gentle observations from your logs — not medical advice. For concerns, consult your doctor or Klinik Kesihatan.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant/80">Gentle observations from your logs - not medical advice. For concerns, consult your doctor or Klinik Kesihatan.</p>
 </section>
 </main>
 
@@ -210,7 +330,7 @@
   const selectedBaby = babyState.selectedBaby || null;
 
   // No real baby yet (guest or freshly logged-in): never fall back to the
-  // mock profile — show a CTA instead of fake "Aisyah" insights.
+  // mock profile - show a CTA instead of fake "Aisyah" insights.
   if (!selectedBaby || !selectedBabyId) {
     document.getElementById("insightsContent").innerHTML = `
       <section class="rounded-[26px] bg-surface-container-lowest border border-white/60 soft-shadow p-8 text-center space-y-4 mt-6">
@@ -370,16 +490,39 @@
 
     const text = parts.length
       ? `Based on this week's logs, ${parts.join(", and ")}.`
-      : `${firstName}'s logs are building up — a few more days will sharpen these observations.`;
+      : `${firstName}'s logs are building up - a few more days will sharpen these observations.`;
     document.getElementById("summaryText").textContent = text;
+  }
+
+  function loggedDaysThisWeek() {
+    return new Set([
+      ...feedsW.map((l) => dKey(l.startedAt)),
+      ...sleepsW.map((l) => dKey(l.startedAt)),
+      ...diapersW.map((l) => dKey(l.changedAt))
+    ]).size;
+  }
+
+  function confidenceModel() {
+    const daysLogged = loggedDaysThisWeek();
+    let confidence = "Building", color = "#b45309", level = 1;
+    if (totalLogs >= 14 && daysLogged >= 5) { confidence = "High"; color = "#15803D"; level = 3; }
+    else if (totalLogs >= 6 && daysLogged >= 3) { confidence = "Medium"; color = "#7056f4"; level = 2; }
+    return { confidence, color, level, daysLogged };
+  }
+
+  function renderBriefMetrics() {
+    const { confidence, color, daysLogged } = confidenceModel();
+    const metric = (label, value, sub = "") => `<div class="ins-brief-chip"><span>${label}</span><strong class="tnum" style="${label === "Confidence" ? `color:${color}` : ""}">${value}</strong>${sub ? `<em class="not-italic block mt-0.5 text-[10px] leading-3 font-bold text-[#5f536f]/75">${sub}</em>` : ""}</div>`;
+    document.getElementById("briefMetrics").innerHTML = [
+      metric("Logs", totalLogs, "this week"),
+      metric("Days", `${daysLogged}/7`, "covered"),
+      metric("Confidence", confidence, "model")
+    ].join("");
   }
 
   // ---------- data confidence ----------
   function renderConfidence() {
-    const daysLogged = new Set([...feedsW.map((l) => dKey(l.startedAt)), ...sleepsW.map((l) => dKey(l.startedAt)), ...diapersW.map((l) => dKey(l.changedAt))]).size;
-    let confidence = "Building", cColor = "#b45309", level = 1;
-    if (totalLogs >= 14 && daysLogged >= 5) { confidence = "High"; cColor = "#15803D"; level = 3; }
-    else if (totalLogs >= 6 && daysLogged >= 3) { confidence = "Medium"; cColor = "#7056f4"; level = 2; }
+    const { confidence, color: cColor, level, daysLogged } = confidenceModel();
     const consistency = daysLogged >= 6 ? "Excellent" : daysLogged >= 4 ? "Good" : "Getting started";
     const dots = (n) => Array.from({ length: 3 }, (_, i) => `<span class="w-2.5 h-2.5 rounded-full" style="background:${i < n ? cColor : "#00000014"}"></span>`).join("");
     document.getElementById("confidenceCard").innerHTML = `
@@ -399,28 +542,31 @@
   function renderHighlights() {
     const items = [];
     const bs = bestSleepDay();
-    if (bs) items.push({ emoji: "🌙", bg: "#eee8ff", label: "Best sleep day", val: `${bs.day} · ${fmtDur(bs.mins)}` });
+    if (bs) items.push({ icon: "nightlight", bg: "#eee8ff", fg: "#7056f4", label: "Best sleep day", val: `${bs.day} - ${fmtDur(bs.mins)}` });
     const fd = bestDay(feedsW, "startedAt");
-    if (fd) items.push({ emoji: "🍼", bg: "#ffe3ec", label: "Most feeding activity", val: fd });
+    if (fd) items.push({ icon: "restaurant", bg: "#ffe3ec", fg: "#d6336c", label: "Most feeding activity", val: fd });
     const longest = sleepsW.reduce((mx, s) => Math.max(mx, sleepMins(s)), 0);
-    if (longest > 0) { const ls = sleepsW.filter((s) => s.endedAt).sort((a, b) => sleepMins(b) - sleepMins(a))[0]; items.push({ emoji: "🏆", bg: "#fff3da", label: "Longest single sleep", val: `${fmtDur(longest)} · ${weekday(ls.startedAt)}` }); }
+    if (longest > 0) {
+      const ls = sleepsW.filter((s) => s.endedAt).sort((a, b) => sleepMins(b) - sleepMins(a))[0];
+      items.push({ icon: "trophy", bg: "#fff3da", fg: "#b45309", label: "Longest single sleep", val: `${fmtDur(longest)} - ${weekday(ls.startedAt)}` });
+    }
 
     const card = document.getElementById("highlightsCard");
     if (!items.length) {
       document.getElementById("shareHighlights").classList.add("hidden");
-      card.innerHTML = `<div class="rounded-[20px] bg-surface-container-low p-5 text-center"><p class="text-3xl mb-2">✨</p><p class="font-body-md text-body-md text-on-surface-variant">Your weekly highlights — best sleep day, busiest feeding day — appear here once a few days are logged.</p></div>`;
+      card.innerHTML = `<div class="ins-card p-5 text-center"><div class="w-12 h-12 rounded-full bg-[#eee8ff] text-[#7056f4] mx-auto grid place-items-center mb-2"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">auto_awesome</span></div><p class="font-body-md text-body-md text-on-surface-variant">Your weekly highlights - best sleep day, busiest feeding day - appear here once a few days are logged.</p></div>`;
       return;
     }
-    card.innerHTML = items.map((it) => `<div class="flex items-center gap-3 rounded-[20px] p-3.5" style="background:${it.bg}">
-      <span class="text-2xl shrink-0">${it.emoji}</span>
+    card.innerHTML = items.map((it) => `<div class="flex items-center gap-3 rounded-[18px] p-3.5" style="background:${it.bg}">
+      <span class="w-10 h-10 rounded-full bg-white/68 shrink-0 grid place-items-center" style="color:${it.fg}"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">${it.icon}</span></span>
       <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide" style="color:#6b5e72">${it.label}</p><p class="font-headline-md text-body-lg font-extrabold truncate" style="color:#241b3a">${it.val}</p></div>
     </div>`).join("");
     window.__highlights = items;
   }
 
   document.getElementById("shareHighlights").addEventListener("click", async () => {
-    const lines = (window.__highlights || []).map((it) => `${it.emoji} ${it.label}: ${it.val}`);
-    const text = `${firstName}'s week on LittleNest 💜\n${lines.join("\n")}`;
+    const lines = (window.__highlights || []).map((it) => `${it.label}: ${it.val}`);
+    const text = `${firstName}'s week on LittleNest\n${lines.join("\n")}`;
     try { if (navigator.share) { await navigator.share({ title: "LittleNest weekly highlights", text }); return; } } catch { return; }
     try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
   });
@@ -451,7 +597,7 @@
     if (prev === 0 && curr === 0) return `No ${period} data to compare.`;
     const p = pct(curr, prev);
     if (p === 0) return `Same as ${period}.`;
-    return `${p > 0 ? "↑" : "↓"} ${Math.abs(p)}% ${p > 0 ? "more" : "fewer"} than ${period}.`;
+    return `${p > 0 ? "up" : "down"} ${Math.abs(p)}% ${p > 0 ? "more" : "fewer"} than ${period}.`;
   }
 
   function renderTrends() {
@@ -482,11 +628,11 @@
     const sleepDaysMissing = days.filter((d) => !sleepsW.some((l) => dKey(l.startedAt) === dKey(d))).length;
 
     if (sleepsW.length < TREND_MIN) recs.push({ icon: "bedtime", c: "#7056f4", t: `Track ${TREND_MIN - sleepsW.length} more sleep session${TREND_MIN - sleepsW.length === 1 ? "" : "s"} to unlock bedtime pattern detection.` });
-    if (diaperDaysMissing >= 2) recs.push({ icon: "baby_changing_station", c: "#15803D", t: `Diaper logs are missing for ${diaperDaysMissing} day${diaperDaysMissing === 1 ? "" : "s"} — quick to add next time you change one.` });
-    if (sleepsW.length >= TREND_MIN && sleepDaysMissing <= 1) recs.push({ icon: "schedule", c: "#7056f4", t: `Keep logging naps right after they happen — it keeps ${firstName}'s sleep insights accurate.` });
-    if (feedsW.length && feedsL.length && Math.abs(pct(feedsW.length, feedsL.length)) >= 25) recs.push({ icon: "restaurant", c: "#d6336c", t: `Feeding changed noticeably vs last week — worth a gentle note for your next clinic visit.` });
-    if (!totalLogs) recs.push({ icon: "edit_note", c: "#7056f4", t: `Start with your next feed or nap — you don't need to backfill everything.` });
-    if (recs.length < 2) recs.push({ icon: "favorite", c: "#d6336c", t: `Great consistency this week — small daily logs build the clearest picture.` });
+    if (diaperDaysMissing >= 2) recs.push({ icon: "baby_changing_station", c: "#15803D", t: `Diaper logs are missing for ${diaperDaysMissing} day${diaperDaysMissing === 1 ? "" : "s"} - quick to add next time you change one.` });
+    if (sleepsW.length >= TREND_MIN && sleepDaysMissing <= 1) recs.push({ icon: "schedule", c: "#7056f4", t: `Keep logging naps right after they happen - it keeps ${firstName}'s sleep insights accurate.` });
+    if (feedsW.length && feedsL.length && Math.abs(pct(feedsW.length, feedsL.length)) >= 25) recs.push({ icon: "restaurant", c: "#d6336c", t: `Feeding changed noticeably vs last week - worth a gentle note for your next clinic visit.` });
+    if (!totalLogs) recs.push({ icon: "edit_note", c: "#7056f4", t: `Start with your next feed or nap - you don't need to backfill everything.` });
+    if (recs.length < 2) recs.push({ icon: "favorite", c: "#d6336c", t: `Great consistency this week - small daily logs build the clearest picture.` });
 
     document.getElementById("recsCard").innerHTML = recs.slice(0, 4).map((r, i) => `<div class="flex items-start gap-3 p-3 ${i ? "border-t border-surface-container" : ""}">
       <span class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5" style="background:${r.c}1f;color:${r.c}"><span class="material-symbols-outlined text-[18px]">${r.icon}</span></span>
@@ -531,10 +677,10 @@
             <span class="w-10 h-10 rounded-full bg-white/12 text-[#f7b89d] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">workspace_premium</span></span>
             <div class="min-w-0 flex-1">
               <h3 class="font-headline-md text-[18px] leading-6 font-extrabold">Full insights are Premium</h3>
-              <p class="text-[13px] leading-5 text-white/72 mt-1">Free users can preview the summary. Upgrade to unlock wellness score, guidelines, trends, growth patterns, and recommendations.</p>
+              <p class="text-[13px] leading-5 text-white/72 mt-1">Free users can preview the shape. Upgrade to unlock the score model, guideline comparison, trend lab, growth context, and doctor-ready reports.</p>
             </div>
           </div>
-          <button class="mt-4 w-full h-12 rounded-full bg-white text-[#241b3a] font-extrabold active:scale-95 transition-transform" data-upgrade-insights type="button">Unlock Early Bird - USD 6</button>
+          <button class="ins-premium-action mt-4 w-full h-12 rounded-full bg-white text-[#241b3a] font-extrabold flex items-center justify-center gap-2" data-upgrade-insights type="button"><span>Unlock Early Bird - USD 6</span><span class="w-7 h-7 rounded-full bg-[#241b3a]/8 grid place-items-center"><span class="material-symbols-outlined text-[17px]">arrow_forward</span></span></button>
         </section>`);
     }
 
@@ -554,11 +700,11 @@
       overlay.innerHTML = index === 0
         ? `<div class="premium-lock-card text-center">
             <div class="w-10 h-10 rounded-full mx-auto bg-[#eee8ff] text-[#7056f4] flex items-center justify-center"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">lock</span></div>
-            <h4 class="mt-2 text-[15px] leading-5 font-extrabold text-[#241b3a]">Premium insight locked</h4>
-            <p class="mt-1 text-[12px] leading-4 text-[#5f536f]">Preview the shape. Unlock the full details when ready.</p>
-            <button class="mt-3 h-10 px-4 rounded-full bg-primary text-on-primary text-[13px] font-extrabold active:scale-95 transition-transform" data-upgrade-insights type="button">Upgrade</button>
+            <h4 class="mt-2 text-[15px] leading-5 font-extrabold text-[#241b3a]">Premium model locked</h4>
+            <p class="mt-1 text-[12px] leading-4 text-[#5f536f]">The preview stays visible, but the actual scoring and recommendation detail unlocks with Premium.</p>
+            <button class="ins-premium-action mt-3 h-10 px-4 rounded-full bg-primary text-on-primary text-[13px] font-extrabold" data-upgrade-insights type="button">Upgrade</button>
           </div>`
-        : `<div class="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-[12px] font-extrabold text-[#241b3a]" style="box-shadow:0 8px 18px rgba(36,27,58,.10)"><span class="material-symbols-outlined text-[15px]">lock</span>Premium</div>`;
+        : `<button class="ins-premium-action inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-2 text-[12px] font-extrabold text-[#241b3a]" style="box-shadow:0 8px 18px rgba(36,27,58,.10)" data-upgrade-insights type="button"><span class="material-symbols-outlined text-[15px]">lock</span>Premium</button>`;
       section.appendChild(overlay);
     });
 
@@ -578,27 +724,28 @@
       <div class="flex-1 min-w-0"><h4 class="font-headline-md text-body-lg text-on-surface">Sleep Prediction Lab</h4><p class="font-label-sm text-label-sm text-on-surface-variant">Nap window, bedtime rhythm, and confidence model</p></div>
       ${p.hasData ? `<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full" style="background:#eef0ff;color:#4f46e5">${p.confidence}</span>` : ""}</div>`;
     if (!p.hasData) {
-      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log a few sleeps and we'll predict the next nap window and a typical bedtime.</p>`;
+      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log a few sleeps and we'll predict the next nap window and a typical bedtime.</p><div class="ins-lab-meter text-[#4f46e5]" aria-hidden="true"><span class="is-on"></span><span></span><span></span></div>`;
       return;
     }
     const rows = [];
     if (p.nextNap) {
       const w0 = Math.round(p.wakeWindow[0] / 6) / 10, w1 = Math.round(p.wakeWindow[1] / 6) / 10;
-      rows.push(`<div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">bedtime</span><div class="flex-1 min-w-0"><p class="font-body-md text-on-surface">Next nap window</p><p class="font-label-sm text-label-sm text-on-surface-variant">After a ${w0}–${w1}h awake window</p></div><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${fmtTime(p.nextNap.from)}–${fmtTime(p.nextNap.to)}</p></div>`);
+      rows.push(`<div class="ins-mini-row"><span class="inline-flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">bedtime</span><span><span class="block font-body-md text-on-surface">Next nap window</span><span class="block font-label-sm text-label-sm text-on-surface-variant">After a ${w0}-${w1}h awake window</span></span></span><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${fmtTime(p.nextNap.from)}-${fmtTime(p.nextNap.to)}</p></div>`);
     }
     if (p.bedtime) {
-      rows.push(`<div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">dark_mode</span><div class="flex-1 min-w-0"><p class="font-body-md text-on-surface">Typical bedtime</p><p class="font-label-sm text-label-sm text-on-surface-variant">From ${p.basedOnDays} day${p.basedOnDays === 1 ? "" : "s"} of sleep</p></div><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${B.formatMinutesOfDay(p.bedtime.from)}–${B.formatMinutesOfDay(p.bedtime.to)}</p></div>`);
+      rows.push(`<div class="ins-mini-row"><span class="inline-flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[20px] text-[#4f46e5]">dark_mode</span><span><span class="block font-body-md text-on-surface">Typical bedtime</span><span class="block font-label-sm text-label-sm text-on-surface-variant">From ${p.basedOnDays} day${p.basedOnDays === 1 ? "" : "s"} of sleep</span></span></span><p class="font-headline-md text-body-md text-on-surface whitespace-nowrap">${B.formatMinutesOfDay(p.bedtime.from)}-${B.formatMinutesOfDay(p.bedtime.to)}</p></div>`);
     }
     if (!rows.length) rows.push(`<p class="font-body-md text-body-md text-on-surface-variant">End a sleep session to get the next nap prediction.</p>`);
-    card.innerHTML = head + `<div class="space-y-3">${rows.join('<div class="border-t border-surface-container"></div>')}</div>`;
+    const meterLevel = p.confidence === "High" ? 3 : p.confidence === "Medium" ? 2 : 1;
+    card.innerHTML = head + `<div class="rounded-[18px] bg-[#eef0ff]/55 p-3">${rows.join("")}</div><div class="ins-lab-meter text-[#4f46e5]" aria-hidden="true">${[0,1,2].map((i) => `<span class="${i < meterLevel ? "is-on" : ""}"></span>`).join("")}</div>`;
   }
 
   // ---------- premium live: growth correlations ----------
   function corrTakeaway(iv) {
     if (iv.gainPerWeek >= 100) return `Strong weight gain alongside ${iv.avgFeeds} feeds and ${iv.avgSleepHours}h sleep a day.`;
     if (iv.gainPerWeek >= 30) return `Steady gain with ${iv.avgFeeds} feeds and ${iv.avgSleepHours}h sleep a day.`;
-    if (iv.gainPerWeek >= 0) return `Slower gain this stretch — common as babies grow, seen with ${iv.avgFeeds} feeds/day.`;
-    return `Slight dip — worth mentioning to your doctor at the next visit.`;
+    if (iv.gainPerWeek >= 0) return `Slower gain this stretch - common as babies grow, seen with ${iv.avgFeeds} feeds/day.`;
+    return `Slight dip - worth mentioning to your doctor at the next visit.`;
   }
 
   function renderGrowthCorr() {
@@ -609,17 +756,18 @@
       <span class="w-9 h-9 rounded-full bg-[#e5fbf2] text-[#0f766e] flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1;">monitoring</span></span>
       <div class="flex-1 min-w-0"><h4 class="font-headline-md text-body-lg text-on-surface">Growth Correlation Lab</h4><p class="font-label-sm text-label-sm text-on-surface-variant">WHO context, velocity, feeding and sleep overlap</p></div></div>`;
     if (!g.hasData) {
-      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log at least two weight measurements and we'll connect feeding & sleep to your baby's growth.</p>`;
+      card.innerHTML = head + `<p class="font-body-md text-body-md text-on-surface-variant">Log at least two weight measurements and we'll connect feeding and sleep to your baby's growth.</p><div class="ins-lab-meter text-[#0f766e]" aria-hidden="true"><span class="is-on"></span><span></span><span></span></div>`;
       return;
     }
     const body = g.intervals.slice(-3).reverse().map((iv) => {
       const gain = `${iv.gainPerWeek >= 0 ? "+" : ""}${iv.gainPerWeek} g/wk`;
-      return `<div class="rounded-2xl bg-surface-container-low/60 p-3">
-        <div class="flex items-center justify-between gap-2"><p class="font-label-sm text-label-sm text-on-surface-variant">${fmtDate(iv.fromAt)} → ${fmtDate(iv.toAt)}</p><span class="font-headline-md text-body-md" style="color:${iv.gainPerWeek >= 0 ? "#15803D" : "#b45309"}">${gain}</span></div>
+      return `<div class="rounded-[18px] bg-[#e5fbf2]/55 p-3">
+        <div class="flex items-center justify-between gap-2"><p class="font-label-sm text-label-sm text-on-surface-variant">${fmtDate(iv.fromAt)} to ${fmtDate(iv.toAt)}</p><span class="font-headline-md text-body-md" style="color:${iv.gainPerWeek >= 0 ? "#15803D" : "#b45309"}">${gain}</span></div>
         <div class="flex gap-4 mt-1.5"><span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">restaurant</span>${iv.avgFeeds}/day</span><span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">bedtime</span>${iv.avgSleepHours}h/day</span></div>
         <p class="font-label-sm text-label-sm text-on-surface mt-1.5">${corrTakeaway(iv)}</p></div>`;
     }).join('<div class="h-2"></div>');
-    card.innerHTML = head + body;
+    const meterLevel = Math.min(3, Math.max(1, g.intervals.length));
+    card.innerHTML = head + body + `<div class="ins-lab-meter text-[#0f766e]" aria-hidden="true">${[0,1,2].map((i) => `<span class="${i < meterLevel ? "is-on" : ""}"></span>`).join("")}</div>`;
   }
 
   // ---------- age-aware benchmark engine (RESEARCH.md) ----------
@@ -640,7 +788,7 @@
       : "";
     document.getElementById("nutritionCard").innerHTML = `
       <span class="w-11 h-11 rounded-full bg-[#fff3da] text-[#b45309] flex items-center justify-center shrink-0"><span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">restaurant_menu</span></span>
-      <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Nutrition stage · ${Math.floor(ageMo)} mo</p>
+      <div class="min-w-0"><p class="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant/70">Nutrition stage - ${Math.floor(ageMo)} mo</p>
       <p class="font-headline-md text-body-lg font-extrabold text-on-surface">${st.title}</p>
       <p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">${st.guidance}</p>${correctedNote}</div>`;
   }
@@ -661,17 +809,30 @@
     const dG = latest?.weightKg && gMed ? (Math.abs((latest.weightKg - gMed) / gMed) <= 0.12 ? { score: 25, label: "On track" } : { score: 18, label: "Monitor" }) : { score: 12, label: "Needs data" };
     const total = Math.round(dF.score + dS.score + dD.score + dG.score);
     const name = (selectedBaby?.name || "Baby").split(" ")[0];
-    const row = (icon, label, sub) => `<div class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-white/90">${icon}</span><span class="font-label-md text-label-md text-white/90 flex-1">${label}</span><span class="font-label-md text-label-md font-bold text-white">${sub}</span></div>`;
+    const row = (icon, label, sub) => `<div class="ins-mini-row"><span class="inline-flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[18px] text-white/90">${icon}</span><span class="font-label-md text-label-md text-white/90">${label}</span></span><span class="font-label-md text-label-md font-bold text-white text-right">${sub}</span></div>`;
+    const circumference = 2 * Math.PI * 42;
+    const offset = Math.round(circumference * (1 - total / 100));
     document.getElementById("wellnessCard").innerHTML = `
-      <p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/70">${name} wellness score</p>
-      <div class="flex items-end gap-2 mt-1 mb-3"><span class="font-display tnum text-[46px] leading-none font-extrabold">${total}</span><span class="text-white/70 font-headline-md mb-1">/100 · ${B.wellnessLabel(total)}</span></div>
-      <div class="space-y-1.5">
+      <div class="absolute inset-0 opacity-35 pointer-events-none" style="background:radial-gradient(circle at 88% 0%,rgba(255,255,255,.44),transparent 38%),radial-gradient(circle at 0% 100%,rgba(247,184,157,.26),transparent 44%)"></div>
+      <div class="relative flex items-start justify-between gap-4">
+        <div class="min-w-0">
+          <p class="font-label-sm text-label-sm uppercase tracking-[0.16em] text-white/72">${name} wellness score</p>
+          <div class="flex items-end gap-2 mt-2"><span class="font-display tnum text-[46px] leading-none font-extrabold">${total}</span><span class="text-white/74 font-headline-md mb-1">/100</span></div>
+          <p class="mt-1 inline-flex items-center gap-1.5 rounded-full bg-white/12 px-2.5 py-1 text-[12px] font-extrabold text-white"><span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1;">verified</span>${B.wellnessLabel(total)}</p>
+        </div>
+        <svg viewBox="0 0 104 104" class="w-[94px] h-[94px] shrink-0" aria-hidden="true">
+          <circle cx="52" cy="52" r="42" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="10"/>
+          <circle cx="52" cy="52" r="42" fill="none" stroke="rgba(255,255,255,.92)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" transform="rotate(-90 52 52)"/>
+          <text x="52" y="57" text-anchor="middle" fill="white" font-size="19" font-weight="900">${total}</text>
+        </svg>
+      </div>
+      <div class="relative mt-4 rounded-[18px] bg-white/10 p-3">
         ${row("restaurant", "Feeding", dF.label)}
         ${row("bedtime", "Sleep", dS.label)}
         ${row("baby_changing_station", "Diaper", dD.label)}
         ${row("monitoring", "Growth", dG.label)}
       </div>
-      <p class="font-label-sm text-label-sm text-white/65 mt-3">Based on today's logs against ${Math.floor(ageMo)}-month guidelines.</p>`;
+      <p class="relative font-label-sm text-label-sm text-white/68 mt-3">Based on today's logs against ${Math.floor(ageMo)}-month guidelines.</p>`;
   }
 
   function benchRow({ icon, chipBg, chipFg, label, value, rangeText, status }) {
@@ -697,7 +858,7 @@
     const cards = [];
 
     cards.push(benchRow({ icon: "restaurant", chipBg: "#ffe3ec", chipFg: "#d6336c", label: "Feeds today", value: `${feedsToday}`,
-      rangeText: fb.freq ? `${fb.freq[0]}–${fb.freq[1]}/day (${fb.type})` : "varies at this age", status: fb.freq ? B.rangeStatus(feedsToday, fb.freq) : { tone: "info", short: "Flexible" } }));
+      rangeText: fb.freq ? `${fb.freq[0]}-${fb.freq[1]}/day (${fb.type})` : "varies at this age", status: fb.freq ? B.rangeStatus(feedsToday, fb.freq) : { tone: "info", short: "Flexible" } }));
 
     // formula average volume vs range (only if formula/mixed and volumes logged)
     if (fb.volume) {
@@ -705,12 +866,12 @@
       if (vols.length) {
         const avg = Math.round(vols.reduce((a, b) => a + b, 0) / vols.length);
         cards.push(benchRow({ icon: "local_drink", chipBg: "#e8f1ff", chipFg: "#1E40AF", label: "Avg feed volume", value: `${avg}ml`,
-          rangeText: `${fb.volume[0]}–${fb.volume[1]}ml/feed`, status: B.rangeStatus(avg, fb.volume) }));
+          rangeText: `${fb.volume[0]}-${fb.volume[1]}ml/feed`, status: B.rangeStatus(avg, fb.volume) }));
       }
     }
 
     cards.push(benchRow({ icon: "bedtime", chipBg: "#eee8ff", chipFg: "#7056f4", label: "Sleep today", value: fmtDur(Math.round(sleepTodayH * 60)),
-      rangeText: `${sb.totalHours[0]}–${sb.totalHours[1]}h/day`, status: B.rangeStatus(sleepTodayH, sb.totalHours) }));
+      rangeText: `${sb.totalHours[0]}-${sb.totalHours[1]}h/day`, status: B.rangeStatus(sleepTodayH, sb.totalHours) }));
 
     cards.push(benchRow({ icon: "baby_changing_station", chipBg: "#e5fbf2", chipFg: "#15803D", label: "Wet diapers today", value: `${wetToday}`,
       rangeText: `${db.wetMin}+ per day`, status: B.rangeStatus(wetToday, [db.wetMin, null]) }));
@@ -775,7 +936,7 @@
   function renderNextMilestone() {
     const { current, next } = B.milestonesForAge(ageMo);
     const card = document.getElementById("milestoneNextCard");
-    const block = (m, heading, tone) => `<p class="font-label-sm text-label-sm uppercase tracking-wide" style="color:${tone}">${heading} · ${m.age} months</p>
+    const block = (m, heading, tone) => `<p class="font-label-sm text-label-sm uppercase tracking-wide" style="color:${tone}">${heading} - ${m.age} months</p>
       <ul class="mt-1.5 space-y-1.5">${m.items.slice(0, 4).map((it) => `<li class="flex items-start gap-2 font-body-md text-body-md text-on-surface"><span class="material-symbols-outlined text-[18px] mt-0.5" style="color:${tone}">check_circle</span>${it}</li>`).join("")}</ul>`;
     const parts = [];
     if (current) parts.push(`<div>${block(current, "Around now", "#15803D")}</div>`);
@@ -784,6 +945,7 @@
   }
 
   renderSummary();
+  renderBriefMetrics();
   renderNutrition();
   renderWellness();
   renderBenchmarks();

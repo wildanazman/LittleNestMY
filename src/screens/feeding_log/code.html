@@ -408,9 +408,10 @@
 
 <!-- Save Button -->
 <p class="font-label-md text-label-md text-tertiary px-1 hidden" id="saveFeedback" aria-live="polite">Saved.</p>
+<button class="hidden w-full h-11 rounded-[18px] bg-surface-container text-on-surface-variant font-bold active:scale-95 transition-transform" id="cancelEditFeedButton" type="button">Cancel edit</button>
 <button class="feeding-pressable w-full h-[58px] bg-primary text-on-primary text-[18px] font-bold tracking-[-0.01em] rounded-[20px] flex items-center justify-center gap-2" id="saveFeedingButton" type="button" style="box-shadow: 0 1px 2px rgba(131,83,60,0.10), 0 12px 28px rgba(131,83,60,0.22);">
 <span class="material-symbols-outlined text-[20px]">check</span>
-            Save feed
+            <span id="saveFeedingButtonLabel">Save feed</span>
         </button>
 <!-- Brand Picker Sheet -->
 <div class="fixed inset-0 z-[120] hidden items-end justify-center bg-black/30" id="feedingBrandSheet">
@@ -517,7 +518,7 @@
         const { goToScreen, goBackOrTo, screenUrl } = await import(`${moduleBase}utils/prototypeUi.mjs`);
         const { getBabyPermissions, redirectViewOnly } = await import(`${moduleBase}utils/permissions.mjs`);
 
-        const state = { feedingType: "bottle", isSaving: false, brand: "" };
+        const state = { feedingType: "bottle", isSaving: false, brand: "", editingLogId: "" };
         const babyState = await loadBabyProfilesRemote(babyProfile);
         const selectedBabyId = babyState.selectedBabyId;
         const permissions = await getBabyPermissions(selectedBabyId);
@@ -543,6 +544,8 @@
         const formulaBrandField = document.getElementById("formulaBrandField");
         const formulaBrandInput = document.getElementById("formulaBrandInput");
         const saveButton = document.getElementById("saveFeedingButton");
+        const saveButtonLabel = document.getElementById("saveFeedingButtonLabel");
+        const cancelEditButton = document.getElementById("cancelEditFeedButton");
         const saveFeedback = document.getElementById("saveFeedback");
         const historyList = document.getElementById("feedingHistoryList");
         const backButton = document.getElementById("feedingBackButton");
@@ -569,6 +572,7 @@
         formulaBrandInput.addEventListener("input", () => state.brand = formulaBrandInput.value.trim());
         breastTimerToggle.addEventListener("click", toggleBreastTimer);
         breastTimerReset.addEventListener("click", resetBreastTimer);
+        cancelEditButton.addEventListener("click", clearEditMode);
 
         // Formula brand chips + sheet
         const ALL_FORMULA_BRANDS = ["Similac / Gain Plus (Abbott)","Enfalac / Enfagrow A+ (Mead Johnson)","Frisolac / Frisogrow (Friso)","S-26 Gold / Promil Gold (Wyeth)","Nestlé NAN Pro / Supremepro","Mamil Gold / Dumex Dugro","Anmum Infacare / Essential","Karihome (Goat Milk)","AptaGro (Aptamil)","Fernleaf / Fernleaf Formulated Milk Powder","Morinaga Chil-mil / Chil-kid","Lactogen / Lactogrow (Nestlé)","Bellamy's Organic","Novalac (Standard & Speciality formulas)","Wyeth SMA Nutrition"];
@@ -637,7 +641,7 @@
             });
         }
         function ensureFeedingBrandChip(brand) {
-            if (formulaBrandChips.querySelector(`[data-brand="${brand}"]`)) return;
+            if ([...formulaBrandChips.querySelectorAll("[data-brand]")].some((chip) => chip.dataset.brand === brand)) return;
             const div = document.createElement("div");
             div.className = "brand-chip h-10 pl-4 pr-1.5 rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface text-[14px] font-bold inline-flex items-center gap-0.5 cursor-pointer";
             div.dataset.brand = brand;
@@ -647,7 +651,7 @@
         }
         function selectFeedingChip(brand) {
             formulaBrandChips.querySelectorAll("[data-brand]").forEach(c => c.classList.remove("bg-primary", "text-on-primary", "border-primary"));
-            const match = formulaBrandChips.querySelector(`[data-brand="${brand}"]`);
+            const match = [...formulaBrandChips.querySelectorAll("[data-brand]")].find((chip) => chip.dataset.brand === brand);
             if (match) match.classList.add("bg-primary", "text-on-primary", "border-primary");
         }
         dateInput.value = getCurrentDateValue();
@@ -824,7 +828,7 @@
             }
 
             const log = {
-                id: `feed-local-${Date.now()}`,
+                id: state.editingLogId || `feed-local-${Date.now()}`,
                 babyId: selectedBabyId,
                 type: state.feedingType,
                 startedAt,
@@ -852,9 +856,12 @@
             state.brand = "";
             dateInput.value = getCurrentDateValue();
             timeInput.value = getCurrentTimeValue();
+            const wasEditing = Boolean(state.editingLogId);
+            state.editingLogId = "";
+            updateEditUi();
             updatePresetState();
             await refreshLogs();
-            showSavedFeedback();
+            showSavedFeedback(wasEditing);
             state.isSaving = false;
             saveButton.disabled = false;
             saveButton.classList.remove("opacity-70");
@@ -923,13 +930,22 @@
                     </div>
                     <div class="text-right shrink-0 pl-3">
                         <p class="font-headline-md text-headline-md text-primary">${amount}</p>
-                        <button class="mt-1 text-label-sm text-error" data-delete-feed="${log.id}" type="button">Delete</button>
+                        <div class="mt-1 flex justify-end gap-3">
+                            <button class="text-label-sm font-bold text-primary" data-edit-feed="${escapeHtml(log.id)}" type="button">Edit</button>
+                            <button class="text-label-sm text-error" data-delete-feed="${escapeHtml(log.id)}" type="button">Delete</button>
+                        </div>
                     </div>
                 </div>
             `;
         }
 
         function bindHistoryActions() {
+            historyList.querySelectorAll("[data-edit-feed]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    const log = feedingLogItems.find((item) => item.id === button.dataset.editFeed);
+                    if (log) startEditLog(log);
+                });
+            });
             historyList.querySelectorAll("[data-delete-feed]").forEach((button) => {
                 button.addEventListener("click", async () => {
                     if (!confirm("Delete this feeding log?")) return;
@@ -942,8 +958,69 @@
                     await refreshLogs();
                     saveFeedback.textContent = "Feeding log deleted.";
                     saveFeedback.classList.remove("hidden");
+                    if (state.editingLogId === button.dataset.deleteFeed) clearEditMode();
                 });
             });
+        }
+
+        function startEditLog(log) {
+            if (timer.running) pauseBreastTimer();
+            resetBreastTimer();
+            state.editingLogId = log.id;
+            state.feedingType = log.type || "bottle";
+            state.brand = log.brand || "";
+            const typeIndexMap = { breast: 0, bottle: 1, formula: 2, solid: 3 };
+            moveIndicator(typeIndexMap[state.feedingType] ?? 1);
+            updateRelevantFields();
+
+            const startedAt = new Date(log.startedAt || Date.now());
+            dateInput.value = localDateValue(Number.isNaN(startedAt.getTime()) ? new Date() : startedAt);
+            timeInput.value = Number.isNaN(startedAt.getTime())
+                ? getCurrentTimeValue()
+                : `${String(startedAt.getHours()).padStart(2, "0")}:${String(startedAt.getMinutes()).padStart(2, "0")}`;
+
+            amountInput.value = log.type === "solid"
+                ? (log.amountGrams ? String(log.amountGrams) : "")
+                : (log.amountMl ? String(log.amountMl) : "");
+            const duration = log.durationMinutes || (log.endedAt ? Math.max(0, Math.round((new Date(log.endedAt) - new Date(log.startedAt)) / 60000)) : 0);
+            durationInput.value = duration > 0 ? String(duration) : "";
+            noteInput.value = log.notes || "";
+            formulaBrandInput.value = state.brand;
+            if (state.brand) {
+                ensureFeedingBrandChip(state.brand);
+                selectFeedingChip(state.brand);
+            } else {
+                selectFeedingChip("");
+            }
+            updatePresetState();
+            updateEditUi();
+            saveFeedback.textContent = "Editing feeding log. Update when ready.";
+            saveFeedback.classList.remove("hidden");
+            document.querySelector("main")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function clearEditMode() {
+            state.editingLogId = "";
+            amountInput.value = "";
+            durationInput.value = "";
+            noteInput.value = "";
+            formulaBrandInput.value = "";
+            state.brand = "";
+            dateInput.value = getCurrentDateValue();
+            timeInput.value = getCurrentTimeValue();
+            resetBreastTimer();
+            selectFeedingChip("");
+            updatePresetState();
+            updateEditUi();
+            saveFeedback.textContent = "Edit cancelled.";
+            saveFeedback.classList.remove("hidden");
+        }
+
+        function updateEditUi() {
+            const editing = Boolean(state.editingLogId);
+            cancelEditButton.classList.toggle("hidden", !editing);
+            saveButton.querySelector(".material-symbols-outlined").textContent = editing ? "save" : "check";
+            saveButtonLabel.textContent = editing ? "Update feed" : "Save feed";
         }
 
         function adjustAmount(change) {
@@ -1026,8 +1103,10 @@
             return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
         }
 
-        function showSavedFeedback() {
-            saveFeedback.textContent = "Saved. Home dashboard will use this latest feed.";
+        function showSavedFeedback(wasEditing = false) {
+            saveFeedback.textContent = wasEditing
+                ? "Feeding log updated. Home dashboard will use the latest details."
+                : "Saved. Home dashboard will use this latest feed.";
             saveFeedback.classList.remove("hidden");
             setTimeout(() => saveFeedback.classList.add("hidden"), 2400);
         }
