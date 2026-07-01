@@ -1643,7 +1643,8 @@
             formatRelativeTime,
             formatTime,
             isSameLocalDay,
-            profileAgeDisplay
+            profileAgeDisplay,
+            pretermAgeDisplay
         } = dateFormatModule;
         const {
             getPersistedCalendarEvents,
@@ -1805,19 +1806,17 @@
         }
         if (selectedBaby) {
             setText("babyName", selectedBaby.name);
-            const ageInfo = profileAgeDisplay(selectedBaby, now);
-            if (ageInfo.corrected) {
-                setText("babyAge", `Corrected age: ${ageInfo.corrected}`);
-                const noteEl = document.getElementById("correctedAgeNote");
+            const preterm = pretermAgeDisplay(selectedBaby, now);
+            const noteEl = document.getElementById("correctedAgeNote");
+            if (preterm) {
+                setText("babyAge", preterm.primary);
                 if (noteEl) {
-                    noteEl.innerHTML = `<span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">child_care</span><span>Preterm</span><span class="preterm-home-note__muted">Actual age: ${escapeHtml(ageInfo.actual)}</span>`;
-                    noteEl.classList.remove("truncate");
+                    noteEl.innerHTML = `<span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1;">child_care</span><span>Preterm</span><span class="preterm-home-note__muted">${escapeHtml(preterm.secondary)}</span>`;
+                    noteEl.classList.remove("truncate", "hidden");
                     noteEl.classList.add("preterm-home-note");
-                    noteEl.classList.remove("hidden");
                 }
             } else {
-                setText("babyAge", ageInfo.actual);
-                const noteEl = document.getElementById("correctedAgeNote");
+                setText("babyAge", calculateBabyAge(selectedBaby.dateOfBirth, now));
                 if (noteEl) {
                     noteEl.classList.remove("preterm-home-note");
                     noteEl.classList.add("hidden");

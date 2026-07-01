@@ -154,3 +154,29 @@ export function profileAgeDisplay(profile, now = new Date()) {
 function hasActivePrematureProfile(profile) {
   return profile?.isPremature === true || String(profile?.isPremature || "").toLowerCase() === "true";
 }
+
+// Preterm baby-card age display, keyed to the Expected Due Date (EDD).
+// Returns { primary, secondary } or null (not preterm / no EDD / corrected-age expired).
+// Before EDD  -> primary = Postmenstrual Age (PMA), secondary = actual age in days.
+// On/after EDD -> primary = Corrected age, secondary = actual age (months/days).
+export function pretermAgeDisplay(profile, now = new Date()) {
+  if (!hasActivePrematureProfile(profile)) return null;
+  const eddStr = getCorrectedDateOfBirth(profile); // EDD (or derived from gestational age)
+  if (!eddStr || !profile?.dateOfBirth) return null;
+  const edd = new Date(`${eddStr}T00:00:00+08:00`);
+  const dob = new Date(`${profile.dateOfBirth}T00:00:00+08:00`);
+  if (Number.isNaN(edd.getTime()) || Number.isNaN(dob.getTime())) return null;
+
+  const actualDays = Math.max(0, Math.floor((startOfDay(now) - startOfDay(dob)) / 86400000));
+
+  if (now < edd) {
+    // PMA = weeks since the last menstrual period (EDD is LMP + 280 days).
+    const lmp = new Date(edd.getTime() - 280 * 86400000);
+    const pmaDays = Math.max(0, Math.floor((startOfDay(now) - startOfDay(lmp)) / 86400000));
+    const w = Math.floor(pmaDays / 7);
+    const d = pmaDays % 7;
+    return { primary: `PMA: ${w}w ${d}d`, secondary: `Actual age: ${actualDays} ${actualDays === 1 ? "day" : "days"}` };
+  }
+
+  return { primary: `Corrected age: ${calculateBabyAge(eddStr, now)}`, secondary: `Actual age: ${calculateBabyAge(profile.dateOfBirth, now)}` };
+}
