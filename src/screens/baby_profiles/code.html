@@ -253,7 +253,7 @@
 <script type="module">
   const moduleBase = window.location.protocol === "file:" ? "../../" : "/src/";
   const { babyProfile: mockBabyProfile } = await import(`${moduleBase}data/mockData.mjs`);
-  const { calculateBabyAge, profileAgeDisplay } = await import(`${moduleBase}utils/dateFormat.mjs`);
+  const { calculateBabyAge, profileAgeDisplay, pretermAgeDisplay } = await import(`${moduleBase}utils/dateFormat.mjs`);
   const {
     getLogsForBaby,
     getPersistedGrowthRecords
@@ -335,13 +335,14 @@
   function renderProfileCard(profile, isSelected, totalProfiles, canManageBaby) {
     const ageDisplay = profileAgeDisplay(profile, new Date());
     const age = ageDisplay.actual;
-    const correctedNote = ageDisplay.corrected
+    const preterm = pretermAgeDisplay(profile, new Date());
+    const correctedNote = preterm
       ? `<div class="preterm-summary">
           <span class="preterm-summary__icon"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">child_care</span></span>
           <div class="min-w-0">
             <p class="preterm-summary__label">Preterm tracking</p>
-            <p class="preterm-summary__value">Corrected age: ${escapeHtml(ageDisplay.corrected)}</p>
-            <p class="preterm-summary__meta">Born age: ${escapeHtml(ageDisplay.actual)}</p>
+            <p class="preterm-summary__value">${escapeHtml(preterm.primary)}</p>
+            <p class="preterm-summary__meta">${escapeHtml(preterm.secondary)}</p>
             <span class="preterm-summary__chip"><span class="material-symbols-outlined text-[13px]">timeline</span> Growth and milestones use corrected age</span>
           </div>
         </div>`
@@ -367,7 +368,7 @@
               <h2 class="font-headline-md text-[20px] leading-7 font-bold truncate">${escapeHtml(profile.name)}</h2>
               ${isSelected ? '<span class="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1 text-[11px] font-extrabold">Current</span>' : ""}
             </div>
-            <p class="font-body-md text-[15px] text-on-surface-variant">${ageDisplay.corrected ? `Corrected age: ${escapeHtml(ageDisplay.corrected)}` : escapeHtml(age)}</p>
+            <p class="font-body-md text-[15px] text-on-surface-variant">${preterm ? escapeHtml(preterm.primary) : escapeHtml(age)}</p>
             <p class="font-label-sm text-[12px] text-outline">Born ${dob}${bloodGroup ? ` · ${escapeHtml(bloodGroup)}` : ""}</p>
           </div>
         </div>
