@@ -52,6 +52,8 @@
   .premium-lock-card { width: 100%; border-radius: 20px; background: rgba(255,255,255,.94); border: 1px solid rgba(131,83,60,.16); box-shadow: 0 8px 22px rgba(36,27,58,.12); padding: 14px; }
   .premium-preview-cta { border-radius: 22px; background: #241b3a; color: #fff; padding: 16px; box-shadow: 0 8px 22px rgba(36,27,58,.16); }
   @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
+  .ins-h3 { display: flex; align-items: center; gap: 8px; }
+  .ins-h3::before { content: ""; width: 4px; height: 15px; border-radius: 99px; background: linear-gradient(#9b7cff, #7056f4); flex-shrink: 0; }
 </style>
 <style> body { min-height: 100dvh; } </style>
 <script type="module" src="/src/utils/theme.mjs"></script>
@@ -87,47 +89,47 @@
 </button>
 </section>
 
-<!-- Nutrition stage -->
-<section class="rise" style="animation-delay:.03s"><div class="rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3" id="nutritionCard"></div></section>
-
-<!-- Wellness score -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.06s"><div class="rounded-[26px] p-5 soft-shadow text-white relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" id="wellnessCard"></div></section>
+<!-- Wellness score (headline) -->
+<section class="rise" data-premium-lock="true" style="animation-delay:.03s"><div class="rounded-[26px] p-5 soft-shadow text-white relative overflow-hidden" style="background:linear-gradient(150deg,#7056f4,#9b7cff)" id="wellnessCard"></div></section>
 
 <!-- Today vs guidelines -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.09s">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Today vs guidelines</h3>
+<section class="rise" data-premium-lock="true" style="animation-delay:.05s">
+<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Today vs guidelines</h3>
 <div class="grid grid-cols-1 gap-2.5" id="benchmarkCards"></div>
 </section>
 
-<!-- Data confidence -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.05s">
-<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-5" id="confidenceCard"></div>
+<!-- Nutrition stage -->
+<section class="rise" style="animation-delay:.07s"><div class="rounded-[20px] bg-surface-container-lowest border border-white/60 soft-shadow p-4 flex items-center gap-3" id="nutritionCard"></div></section>
+
+<!-- Trends -->
+<section class="space-y-4 rise" data-premium-lock="true" style="animation-delay:.09s">
+<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface px-1">Trends &amp; patterns</h3>
+<div class="space-y-4" id="trendCards"></div>
 </section>
 
 <!-- Weekly highlights -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.1s">
+<section class="rise" data-premium-lock="true" style="animation-delay:.11s">
 <div class="flex items-center justify-between mb-2 px-1">
-<h3 class="font-headline-md text-headline-md text-on-surface">Weekly highlights</h3>
+<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface">Weekly highlights</h3>
 <button class="text-[#7056f4] flex items-center gap-1 font-label-md text-label-md active:scale-95 transition-transform" id="shareHighlights" type="button"><span class="material-symbols-outlined text-[18px]">ios_share</span>Share</button>
 </div>
 <div class="grid grid-cols-1 gap-2.5" id="highlightsCard"></div>
 </section>
 
-<!-- Trends -->
-<section class="space-y-4 rise" data-premium-lock="true" style="animation-delay:.15s">
-<h3 class="font-headline-md text-headline-md text-on-surface px-1">Trends &amp; patterns</h3>
-<div class="space-y-4" id="trendCards"></div>
-</section>
-
 <!-- Growth vs WHO -->
-<section class="rise" data-premium-lock="true"><h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Growth vs WHO median</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="growthCard"></div></section>
+<section class="rise" data-premium-lock="true" style="animation-delay:.13s"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Growth vs WHO median</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="growthCard"></div></section>
 
 <!-- Next milestone -->
-<section class="rise" data-premium-lock="true"><h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">What's next</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="milestoneNextCard"></div></section>
+<section class="rise" data-premium-lock="true" style="animation-delay:.15s"><h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">What's next</h3><div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-4" id="milestoneNextCard"></div></section>
+
+<!-- Data confidence -->
+<section class="rise" data-premium-lock="true" style="animation-delay:.17s">
+<div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-5" id="confidenceCard"></div>
+</section>
 
 <!-- Recommendations -->
-<section class="rise" data-premium-lock="true" style="animation-delay:.2s">
-<h3 class="font-headline-md text-headline-md text-on-surface mb-2 px-1">Recommended next steps</h3>
+<section class="rise" data-premium-lock="true" style="animation-delay:.19s">
+<h3 class="ins-h3 font-headline-md text-headline-md text-on-surface mb-2 px-1">Recommended next steps</h3>
 <div class="rounded-[24px] bg-surface-container-lowest border border-white/60 soft-shadow p-2" id="recsCard"></div>
 </section>
 
