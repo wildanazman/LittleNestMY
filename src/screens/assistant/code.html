@@ -247,14 +247,16 @@
   const isYesterday = (v) => between(v, yStart, startOfToday);
 
   const sleepMins = (s) => s.endedAt ? Math.max(0, Math.round((new Date(s.endedAt) - new Date(s.startedAt)) / 60000)) : 0;
-  const diaperType = (log) => String(log?.type || "").toLowerCase();
+  // Diaper logger saves the type as `diaperType` with values pee | poop | mixed.
+  // (Fall back to legacy `type`/"dirty"/"wet" for older logs.)
+  const diaperType = (log) => String(log?.diaperType || log?.type || "").toLowerCase();
   const isStoolDiaper = (log) => {
     const type = diaperType(log);
-    return Boolean(log?.dirty || type === "dirty" || type === "mixed" || log?.poopColor || log?.poopConsistency);
+    return Boolean(type === "poop" || type === "mixed" || type === "dirty" || log?.dirty || log?.poopColor || log?.poopConsistency);
   };
   const isWetDiaper = (log) => {
     const type = diaperType(log);
-    return Boolean(log?.wet || type === "wet" || type === "mixed" || log?.peeColor || log?.peeAmount);
+    return Boolean(type === "pee" || type === "mixed" || type === "wet" || log?.wet || log?.peeColor || log?.peeAmount);
   };
 
   const feedsW = allFeeds.filter((l) => inThisWeek(l.startedAt));
@@ -715,8 +717,9 @@
     const stoolDay = latestStool ? new Date(latestStool.changedAt.getFullYear(), latestStool.changedAt.getMonth(), latestStool.changedAt.getDate()) : null;
     const daysSince = stoolDay ? Math.floor((startOfToday - stoolDay) / 86400000) : null;
     const ss = B.stoolStatus(daysSince, feedingType);
-    cards.push(benchRow({ icon: "category", chipBg: "#fff3da", chipFg: "#b45309", label: "Last stool", value: daysSince == null ? "—" : (daysSince === 0 ? "Today" : `${daysSince}d ago`),
-      rangeText: `${B.normalizeFeedingType(feedingType) === "breast" ? "breastfed" : "formula/mixed"} pattern`, status: { tone: ss.tone, short: ss.tone === "good" ? "Normal" : "Monitor" } }));
+    cards.push(benchRow({ icon: "category", chipBg: "#fff3da", chipFg: "#b45309", label: "Last stool", value: daysSince == null ? "No data" : (daysSince === 0 ? "Today" : `${daysSince}d ago`),
+      rangeText: daysSince == null ? "Log a poop diaper to track this" : `${B.normalizeFeedingType(feedingType) === "breast" ? "breastfed" : "formula/mixed"} pattern`,
+      status: { tone: ss.tone, short: ss.tone === "good" ? "Normal" : ss.tone === "info" ? "No data" : "Monitor" } }));
 
     document.getElementById("benchmarkCards").innerHTML = cards.join("");
   }
